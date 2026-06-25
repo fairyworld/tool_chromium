@@ -615,6 +615,9 @@ enum class TipsNotificationType;
 // Returns whether chrome next is enabled.
 + (BOOL)isChromeNextEnabled;
 
+// Returns whether overflow menu refactoring on the NTP is enabled.
++ (BOOL)isOverflowMenuNTPRefactorEnabled;
+
 // Returns whether the chrome next share icon is visible.
 + (BOOL)isChromeNextShareIconVisible;
 

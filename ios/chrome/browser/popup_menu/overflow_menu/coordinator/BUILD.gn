@@ -56,6 +56,7 @@ source_set("coordinator") {
     "//ios/chrome/browser/policy/ui_bundled:user_policy_util",
     "//ios/chrome/browser/popup_menu/overflow_menu/model",
     "//ios/chrome/browser/popup_menu/overflow_menu/public",
+    "//ios/chrome/browser/popup_menu/overflow_menu/public:features",
     "//ios/chrome/browser/popup_menu/overflow_menu/public:overflow_menu_constants",
     "//ios/chrome/browser/popup_menu/overflow_menu/resources",
     "//ios/chrome/browser/popup_menu/overflow_menu/ui:overflow_menu_metrics",

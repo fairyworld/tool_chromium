@@ -1544,6 +1544,13 @@ inline constexpr char kOptimizationGuideDebugLogsDescription[] =
     "Enables the optimization guide to log and save debug messages that can be "
     "shown in the internals page.";
 
+inline constexpr char kOverflowMenuNTPRefactorName[] =
+    "NTP Overflow Menu Refactor";
+inline constexpr char kOverflowMenuNTPRefactorDescription[] =
+    "When enabled, the overflow menu on the NTP is pared down and the entry "
+    "point for homepage customization is moved from the NTP header to the "
+    "overflow menu.";
+
 inline constexpr char kPageActionMenuAuthFlowName[] =
     "Page Action Menu Auth Flow";
 inline constexpr char kPageActionMenuAuthFlowDescription[] =

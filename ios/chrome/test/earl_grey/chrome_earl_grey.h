@@ -846,6 +846,9 @@ id<GREYAction> grey_longPressWithDuration(base::TimeDelta duration);
 // Returns whether Chrome Next is enabled.
 - (BOOL)isChromeNextEnabled;
 
+// Returns whether overflow menu refactoring on the NTP is enabled.
+- (BOOL)isOverflowMenuNTPRefactorEnabled;
+
 // Returns whether the Chrome Next Share Icon is visible.
 - (BOOL)isChromeNextShareIconVisible;
 

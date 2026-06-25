@@ -61,6 +61,7 @@
 #import "ios/chrome/browser/policy/ui_bundled/user_policy_util.h"
 #import "ios/chrome/browser/popup_menu/overflow_menu/coordinator/overflow_menu_orderer.h"
 #import "ios/chrome/browser/popup_menu/overflow_menu/model/destination_usage_history.h"
+#import "ios/chrome/browser/popup_menu/overflow_menu/public/features.h"
 #import "ios/chrome/browser/popup_menu/overflow_menu/public/overflow_menu_constants.h"
 #import "ios/chrome/browser/popup_menu/overflow_menu/ui/overflow_menu_metrics.h"
 #import "ios/chrome/browser/popup_menu/overflow_menu/ui/ui_swift.h"
@@ -1599,6 +1600,74 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   return destinations;
 }
 
+// Helper for `-actionForActionType:`. Returns the overflow menu action for the
+// given `actionType`.
+- (OverflowMenuAction*)baseActionForActionType:
+    (overflow_menu::ActionType)actionType {
+  switch (actionType) {
+    case overflow_menu::ActionType::Reload:
+      return ([self isPageLoading]) ? self.stopLoadAction : self.reloadAction;
+    case overflow_menu::ActionType::NewTab:
+      return self.openTabAction;
+    case overflow_menu::ActionType::NewIncognitoTab:
+      return self.openIncognitoTabAction;
+    case overflow_menu::ActionType::NewWindow:
+      return self.openNewWindowAction;
+    case overflow_menu::ActionType::Bookmark: {
+      BOOL pageIsBookmarked =
+          self.webState && self.bookmarkModel &&
+          self.bookmarkModel->IsBookmarked(self.webState->GetVisibleURL());
+      return (pageIsBookmarked) ? self.editBookmarkAction
+                                : self.addBookmarkAction;
+    }
+    case overflow_menu::ActionType::ReadingList:
+      return self.readLaterAction;
+    case overflow_menu::ActionType::ClearBrowsingData:
+      // Showing the Clear Browsing Data Action would be confusing in incognito.
+      return (self.incognito) ? nil : self.clearBrowsingDataAction;
+    case overflow_menu::ActionType::Translate:
+      return self.translateAction;
+    case overflow_menu::ActionType::DesktopSite:
+      return ([self userAgentType] != web::UserAgentType::DESKTOP)
+                 ? self.requestDesktopAction
+                 : self.requestMobileAction;
+    case overflow_menu::ActionType::FindInPage:
+      return self.findInPageAction;
+    case overflow_menu::ActionType::TextZoom:
+      return self.textZoomAction;
+    case overflow_menu::ActionType::ReportAnIssue:
+      return self.reportIssueAction;
+    case overflow_menu::ActionType::Help:
+      return self.helpAction;
+    case overflow_menu::ActionType::ShareChrome:
+      return self.shareChromeAction;
+    case overflow_menu::ActionType::EditActions:
+      return self.editActionsAction;
+    case overflow_menu::ActionType::LensOverlay:
+      return self.lensOverlayAction;
+    case overflow_menu::ActionType::AIPrototype:
+      return self.AIPrototypeAction;
+    case overflow_menu::ActionType::SetTabReminder:
+      return (self.incognito || !send_tab_to_self::AreIOSTabRemindersEnabled())
+                 ? nil
+                 : self.setTabReminderAction;
+    case overflow_menu::ActionType::ReaderMode:
+      return self.readerModeAction;
+    case overflow_menu::ActionType::AskBWG:
+      return self.askBWGAction;
+    case overflow_menu::ActionType::HideToolbars:
+      return self.hideToolbarsAction;
+    case overflow_menu::ActionType::TabGroupDeprecated:
+      NOTREACHED();
+    case overflow_menu::ActionType::ShareThisPage:
+      return self.shareAction;
+    case overflow_menu::ActionType::Signin:
+      return self.signinAction;
+    case overflow_menu::ActionType::Identity:
+      return self.identityAction;
+  }
+}
+
 // Returns YES if the Overflow Menu should indicate an identity error.
 - (BOOL)shouldIndicateIdentityError {
   if (!self.syncService) {
@@ -2398,68 +2467,14 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 
 - (OverflowMenuAction*)actionForActionType:
     (overflow_menu::ActionType)actionType {
-  switch (actionType) {
-    case overflow_menu::ActionType::Reload:
-      return ([self isPageLoading]) ? self.stopLoadAction : self.reloadAction;
-    case overflow_menu::ActionType::NewTab:
-      return self.openTabAction;
-    case overflow_menu::ActionType::NewIncognitoTab:
-      return self.openIncognitoTabAction;
-    case overflow_menu::ActionType::NewWindow:
-      return self.openNewWindowAction;
-    case overflow_menu::ActionType::Bookmark: {
-      BOOL pageIsBookmarked =
-          self.webState && self.bookmarkModel &&
-          self.bookmarkModel->IsBookmarked(self.webState->GetVisibleURL());
-      return (pageIsBookmarked) ? self.editBookmarkAction
-                                : self.addBookmarkAction;
+  OverflowMenuAction* action = [self baseActionForActionType:actionType];
+  if (IsOverflowMenuNTPRefactorEnabled()) {
+    if (action && !action.enabled && [self isCurrentWebPageNTP]) {
+      // NTP does not support disabled actions.
+      return nil;
     }
-    case overflow_menu::ActionType::ReadingList:
-      return self.readLaterAction;
-    case overflow_menu::ActionType::ClearBrowsingData:
-      // Showing the Clear Browsing Data Action would be confusing in incognito.
-      return (self.incognito) ? nil : self.clearBrowsingDataAction;
-    case overflow_menu::ActionType::Translate:
-      return self.translateAction;
-    case overflow_menu::ActionType::DesktopSite:
-      return ([self userAgentType] != web::UserAgentType::DESKTOP)
-                 ? self.requestDesktopAction
-                 : self.requestMobileAction;
-    case overflow_menu::ActionType::FindInPage:
-      return self.findInPageAction;
-    case overflow_menu::ActionType::TextZoom:
-      return self.textZoomAction;
-    case overflow_menu::ActionType::ReportAnIssue:
-      return self.reportIssueAction;
-    case overflow_menu::ActionType::Help:
-      return self.helpAction;
-    case overflow_menu::ActionType::ShareChrome:
-      return self.shareChromeAction;
-    case overflow_menu::ActionType::EditActions:
-      return self.editActionsAction;
-    case overflow_menu::ActionType::LensOverlay:
-      return self.lensOverlayAction;
-    case overflow_menu::ActionType::AIPrototype:
-      return self.AIPrototypeAction;
-    case overflow_menu::ActionType::SetTabReminder:
-      return (self.incognito || !send_tab_to_self::AreIOSTabRemindersEnabled())
-                 ? nil
-                 : self.setTabReminderAction;
-    case overflow_menu::ActionType::ReaderMode:
-      return self.readerModeAction;
-    case overflow_menu::ActionType::AskBWG:
-      return self.askBWGAction;
-    case overflow_menu::ActionType::HideToolbars:
-      return self.hideToolbarsAction;
-    case overflow_menu::ActionType::TabGroupDeprecated:
-      NOTREACHED();
-    case overflow_menu::ActionType::ShareThisPage:
-      return self.shareAction;
-    case overflow_menu::ActionType::Signin:
-      return self.signinAction;
-    case overflow_menu::ActionType::Identity:
-      return self.identityAction;
   }
+  return action;
 }
 
 // Returns an action for the given `actionType` suitable for displaying in a
