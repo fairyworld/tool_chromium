@@ -97,9 +97,6 @@ class CONTENT_EXPORT Request
 
   void ReportBadMessage(const char* message);
 
-  void SetForceAllowRedirectToForTesting(bool allow) {
-    force_allow_redirect_to_for_testing_ = allow;
-  }
 
   // Starts the token request. Returns true if the request started successfully
   // and is now pending. Returns false if the request was terminated immediately
@@ -666,9 +663,6 @@ class CONTENT_EXPORT Request
 
   // Whether the callback for the current request has been delayed.
   bool complete_request_delayed_{false};
-
-  // Can be set to true in tests.
-  bool force_allow_redirect_to_for_testing_{false};
 
   // Whether we are currently in the `RedirectTo` flow. This is used to ignore
   // dismissals triggered by tab closure on Android during the navigation.

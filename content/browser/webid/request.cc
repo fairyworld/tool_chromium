@@ -329,10 +329,11 @@ bool Request::RequestToken(
     return false;
   }
 
-  can_accept_redirect_to_ = force_allow_redirect_to_for_testing_ ||
-                            ((IsNavigationInterceptionEnabled() ||
-                              HasEmbedderLoginRequest(&render_frame_host())) &&
-                             navigation_handle != nullptr);
+  can_accept_redirect_to_ =
+      request_service_->force_allow_redirect_to_for_testing() ||
+      ((IsNavigationInterceptionEnabled() ||
+        HasEmbedderLoginRequest(&render_frame_host())) &&
+       navigation_handle != nullptr);
 
   had_transient_user_activation_ =
       (navigation_handle &&

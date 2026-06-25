@@ -9111,7 +9111,8 @@ TEST_F(RequestTest, DismissIgnoredDuringRedirectTo) {
   MockConfiguration config = kConfigurationValid;
   config.delay_token_response = true;
 
-  request_->SetForceAllowRedirectToForTesting(true);
+  RequestService::GetOrCreateForCurrentDocument(main_test_rfh())
+      ->SetForceAllowRedirectToForTesting(true);
 
   // Start the request flow.
   RunAuthDontWaitForCallback(kDefaultRequestParameters, config);

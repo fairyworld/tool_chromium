@@ -69,6 +69,13 @@ class CONTENT_EXPORT RequestService
   RequestService(const RequestService&) = delete;
   RequestService& operator=(const RequestService&) = delete;
 
+  void SetForceAllowRedirectToForTesting(bool allow) {
+    force_allow_redirect_to_for_testing_ = allow;
+  }
+  bool force_allow_redirect_to_for_testing() const {
+    return force_allow_redirect_to_for_testing_;
+  }
+
   // Binds a new receiver to a request session.
   void BindFederatedAuthRequest(
       mojo::PendingReceiver<blink::mojom::FederatedAuthRequest> receiver);
@@ -169,6 +176,8 @@ class CONTENT_EXPORT RequestService
   // Requests made when there is a pending FedCM request or for the purpose of
   // Wallets or multi-IDP are not counted.
   int num_requests_{0};
+
+  bool force_allow_redirect_to_for_testing_ = false;
 
   raw_ptr<IdentityRegistry> identity_registry_ = nullptr;
 
