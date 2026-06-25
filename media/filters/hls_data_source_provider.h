@@ -124,6 +124,10 @@ class MEDIA_EXPORT HlsDataSourceStream {
   // origin sets and merges the security flags.
   void MergeSecurityMetadata(const hls::SecurityMetadata& other);
 
+  // Prepend another stream's data and merge its security metadata.
+  // This is used for parallel fetching of init segment and media segment.
+  void PrependInitStream(std::unique_ptr<HlsDataSourceStream> init_stream);
+
   // A stream's origin is considered tainted if any backing data source involved
   // in this playback is tainted.
   void set_would_taint_origin() { security_info_.would_taint_origin = true; }
