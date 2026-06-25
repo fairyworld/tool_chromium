@@ -550,7 +550,6 @@ public abstract class ChromeFeatureList {
     public static final String NOTIFICATION_TRAMPOLINE_NO_NEW_TASK =
             "NotificationTrampolineNoNewTask";
     public static final String NTP_MVC_REFACTOR = "NtpMvcRefactor";
-    public static final String NTP_SIMPLIFICATION = "NtpSimplification";
     public static final String OMAHA_MIN_SDK_VERSION_ANDROID = "OmahaMinSdkVersionAndroid";
     public static final String OMNIBOX_AUTOFOCUS_ON_INCOGNITO_NTP =
             "OmniboxAutofocusOnIncognitoNtp";
@@ -1122,8 +1121,6 @@ public abstract class ChromeFeatureList {
                     /* defaultValueInTests= */ true);
     public static final CachedFlag sNtpMvcRefactor =
             newCachedFlag(NTP_MVC_REFACTOR, /* defaultValue= */ false);
-    public static final CachedFlag sNtpSimplification =
-            newCachedFlag(NTP_SIMPLIFICATION, /* defaultValue= */ true);
     public static final CachedFlag sOnStartupWindowPolicy =
             newCachedFlag(
                     ON_STARTUP_WINDOW_POLICY,
@@ -1391,7 +1388,6 @@ public abstract class ChromeFeatureList {
                     sNotificationTrampoline,
                     sNotificationTrampolineNoNewTask,
                     sNtpMvcRefactor,
-                    sNtpSimplification,
                     sOnStartupWindowPolicy,
                     sPCctMinimumHeight,
                     sPaintPreviewDemo,

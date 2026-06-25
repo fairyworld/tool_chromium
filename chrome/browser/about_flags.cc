@@ -12646,11 +12646,6 @@ const FeatureEntry kFeatureEntries[] = {
 #endif
 
 #if BUILDFLAG(IS_ANDROID)
-    {"ntp-simplification", flag_descriptions::kNtpSimplificationName,
-     flag_descriptions::kNtpSimplificationDescription, kOsAndroid,
-     FEATURE_VALUE_TYPE(chrome::android::kNtpSimplification)},
-#endif
-#if BUILDFLAG(IS_ANDROID)
     {"new-tab-page-customization-theme-sync",
      flag_descriptions::kNewTabPageCustomizationThemeSyncName,
      flag_descriptions::kNewTabPageCustomizationThemeSyncDescription,
