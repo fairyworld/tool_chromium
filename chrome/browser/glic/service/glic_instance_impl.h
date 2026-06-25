@@ -58,6 +58,7 @@ class GlicZeroStateSuggestionsManager;
 
 BASE_DECLARE_FEATURE(kGlicRemoveDaisyChainingWhenFreShowing);
 BASE_DECLARE_FEATURE(kGlicUnbindOnClose);
+BASE_DECLARE_FEATURE(kGlicRemoveBlankInstancesOnClose);
 
 // A GlicInstance owns a single host keeping any state that must exist for the
 // lifetime of the host. When a host is showing, the GlicInstance creates a

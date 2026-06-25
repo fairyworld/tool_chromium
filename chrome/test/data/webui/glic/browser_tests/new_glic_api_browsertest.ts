@@ -140,6 +140,13 @@ class ApiTests extends ApiTestFixtureBase {
     this.assertCreateTabFails('file:///tmp/test.html');
   }
 
+  async testNoRemoveBlankInstanceOnCloseIfInputSubmitted() {
+    assertDefined(this.host.getMetrics);
+    const metrics = this.host.getMetrics();
+    assertDefined(metrics.onUserInputSubmitted);
+    metrics.onUserInputSubmitted(WebClientMode.TEXT);
+  }
+
   async testCreateTabInBackground() {
     assertDefined(this.host.createTab);
 

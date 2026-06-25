@@ -162,6 +162,7 @@ std::vector<std::string> GetTestSuiteNames() {
       "NewGlicApiTestWithGeminiActOnWebPolicy",
       "NewGlicApiMultiProfileTest",
       "NewGlicApiTestWithDefaultTabContextDisabled",
+      "NewGlicApiTestWithBlankInstanceDelay",
       "NewGlicApiTestWithDefaultTabContextEnabled",
       "NewGlicApiTestWithWebActuationSettingDisabled",
       "NewGlicApiTestWithWebActuationSettingEnabled",
@@ -423,6 +424,17 @@ class NewGlicApiTestWithDefaultTabContextDisabled : public NewGlicApiTest {
   NewGlicApiTestWithDefaultTabContextDisabled() {
     feature_list_.InitWithFeatures({},
                                    {features::kGlicDefaultTabContextSetting});
+  }
+
+ private:
+  base::test::ScopedFeatureList feature_list_;
+};
+
+class NewGlicApiTestWithBlankInstanceDelay : public NewGlicApiTest {
+ public:
+  NewGlicApiTestWithBlankInstanceDelay() {
+    feature_list_.InitAndEnableFeatureWithParameters(
+        kGlicRemoveBlankInstancesOnClose, {{"delay", "100ms"}});
   }
 
  private:
@@ -755,6 +767,28 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest,
   EXPECT_EQ(GetTabListInterface()->GetTabCount(), 1);
   ExecuteJsTest();
   EXPECT_EQ(GetTabListInterface()->GetTabCount(), 1);
+}
+
+IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithBlankInstanceDelay,
+                       testNoRemoveBlankInstanceOnCloseIfInputSubmitted) {
+  ASSERT_OK_AND_ASSIGN(GlicInstanceImpl * instance, OpenGlicForActiveTab());
+  ExecuteJsTest();
+
+  // Close Glic to trigger the blank instance removal check.
+  instance->CloseAllEmbedders();
+  ASSERT_OK(WaitForGlicClose());
+
+  // Wait for the blank instance removal timer (configured to 100ms in this
+  // suite).
+  {
+    base::RunLoop loop;
+    base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
+        FROM_HERE, loop.QuitClosure(), base::Milliseconds(200));
+    loop.Run();
+  }
+
+  // The instance should still exist and match the original.
+  EXPECT_EQ(GetOnlyGlicInstance(), instance);
 }
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testGetImageBytesFromTab) {
@@ -2375,6 +2409,11 @@ INSTANTIATE_TEST_SUITE_P(,
                          &WithTestParams::PrintTestVariant);
 
 INSTANTIATE_TEST_SUITE_P(,
+                         NewGlicApiTestWithBlankInstanceDelay,
+                         DefaultTestParamSet(),
+                         &WithTestParams::PrintTestVariant);
+
+INSTANTIATE_TEST_SUITE_P(,
                          NewGlicApiTestWithDefaultTabContextEnabled,
                          DefaultTestParamSet(),
                          &WithTestParams::PrintTestVariant);
@@ -2429,6 +2468,8 @@ GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(NewGlicApiMultiProfileTest);
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(
     NewGlicApiTestWithDefaultTabContextDisabled);
+GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(
+    NewGlicApiTestWithBlankInstanceDelay);
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(
     NewGlicApiTestWithDefaultTabContextEnabled);
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(

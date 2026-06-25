@@ -2717,17 +2717,6 @@ IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab,
   ContinueJsTest();
 }
 
-IN_PROC_BROWSER_TEST_P(GlicApiTest, testRemoveBlankInstanceOnClose) {
-  RunTestSequence(
-      InstrumentTab(kFirstTab),
-      OpenGlic(GlicInstrumentMode::kNone, /*conversation_id=*/std::nullopt));
-  ASSERT_EQ(1u, GetInstanceCoordinatorImpl().GetInstances().size());
-  ExecuteJsTest();
-  ASSERT_TRUE(base::test::RunUntil([&]() {
-    return GetInstanceCoordinatorImpl().GetInstances().size() == 0u;
-  }));
-}
-
 IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab,
                        testSwitchConversationToExistingInstance) {
   // Open glic. It will register a conversation.

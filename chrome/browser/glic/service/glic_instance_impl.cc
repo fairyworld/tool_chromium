@@ -1380,6 +1380,10 @@ void GlicInstanceImpl::MaybeRemoveBlankInstanceOnClose() {
   if (conversation_id().has_value()) {
     return;
   }
+  // If the user has submitted input, the instance is not blank.
+  if (!last_prompt_submission_time_.is_null()) {
+    return;
+  }
   if (embedders_.size() != 1) {
     return;
   }
