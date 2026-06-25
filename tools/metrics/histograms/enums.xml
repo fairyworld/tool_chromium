@@ -17621,6 +17621,7 @@ from previous Chrome versions.
   <int value="1025383624" label="FilesLocalImageSearch:enabled"/>
   <int value="1026169964" label="MicMuteNotifications:enabled"/>
   <int value="1026981579" label="TLS13HardeningForLocalAnchors:enabled"/>
+  <int value="1027183966" label="CrossDeviceSigninFromDesktop:disabled"/>
   <int value="1027252926" label="SyncSupportSecondaryAccount:enabled"/>
   <int value="1028485522" label="TLSTrustAnchorIDs:disabled"/>
   <int value="1028801420" label="RippleForEnhancedProtection:disabled"/>
@@ -20383,6 +20384,7 @@ from previous Chrome versions.
   <int value="1898286738" label="EnableRFC8925:disabled"/>
   <int value="1898762702" label="AndroidXrImmersivePlayer:enabled"/>
   <int value="1899111954" label="WebRtcMetronomeTaskQueue:disabled"/>
+  <int value="1899152924" label="CrossDeviceSigninFromDesktop:enabled"/>
   <int value="1899248188" label="MediaApp:disabled"/>
   <int value="1899572583"
       label="AccessibilityManifestV3EnhancedNetworkTts:enabled"/>

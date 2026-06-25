@@ -11484,6 +11484,14 @@ const FeatureEntry kFeatureEntries[] = {
 
 #endif  // BUILDFLAG(IS_ANDROID)
 
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+    {"cross-device-signin-from-desktop",
+     flag_descriptions::kCrossDeviceSigninFromDesktopName,
+     flag_descriptions::kCrossDeviceSigninFromDesktopDescription,
+     kOsMac | kOsWin | kOsLinux,
+     FEATURE_VALUE_TYPE(switches::kCrossDeviceSigninFromDesktop)},
+#endif
+
 #if BUILDFLAG(IS_ANDROID)
     {"enable-activityless-signin-all-entry-point",
      flag_descriptions::kEnableActivitylessSigninAllEntryPointName,
