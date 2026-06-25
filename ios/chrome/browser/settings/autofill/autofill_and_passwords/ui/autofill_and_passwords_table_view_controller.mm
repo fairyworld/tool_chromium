@@ -227,7 +227,13 @@
 }
 
 - (void)setShouldShowAutofillAIFeatures:(BOOL)shouldShow {
+  if (_shouldShowAutofillAIFeatures == shouldShow) {
+    return;
+  }
   _shouldShowAutofillAIFeatures = shouldShow;
+  if (self.isViewLoaded) {
+    [self reloadData];
+  }
 }
 
 #pragma mark - AutofillAndPasswordsSigninPromoConsumer
