@@ -1940,13 +1940,15 @@ suite('ContextualActionMenu', () => {
         actionMenu.isSidePanel = true;
         await microtasksFinished();
         assertEquals(
-            actionMenu.i18n('currentTabSuffix'), suffix.textContent.trim(),
+            `· ${actionMenu.i18n('currentTabSuffix')}`,
+            suffix.textContent.trim(),
             'Should render "Current tab" in side panel contextual tasks');
 
         actionMenu.isSidePanel = false;
         await microtasksFinished();
         assertEquals(
-            actionMenu.i18n('recentTabsSuffix'), suffix.textContent.trim(),
+            `· ${actionMenu.i18n('recentTabsSuffix')}`,
+            suffix.textContent.trim(),
             'Should fall back to "Recent tab" on the NTP');
       });
 

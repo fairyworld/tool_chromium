@@ -98,6 +98,7 @@ export function getHtml(this: ComposeboxEverywhereElement) {
                       .smartTabSharingActive="${this.smartTabSharingActive}"
                       .searchboxLayoutMode="${this.searchboxLayoutMode}"
                       .tabSuggestions="${this.tabSuggestions}"
+                      .recentTabId="${this.recentTabId}"
                       .hasImageFiles="${this.hasImageFiles()}"
                       .disabledTabIds="${this.addedTabsIds}"
                       .aimThreadRestoredTabs="${this.aimThreadRestoredTabs}"
