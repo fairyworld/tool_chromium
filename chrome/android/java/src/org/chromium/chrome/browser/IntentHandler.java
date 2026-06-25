@@ -376,7 +376,6 @@ public class IntentHandler {
     public static final String BRING_TAB_GROUP_TO_FRONT_SOURCE_EXTRA =
             "BRING_TAB_GROUP_TO_FRONT_SOURCE";
     public static final String DAYDREAM_CATEGORY = "com.google.intent.category.DAYDREAM";
-    public static final String SHARE_INTENT_HISTOGRAM = "Android.Intent.ShareIntentUrlCount";
     public static final String TRUSTED_REFERRER_HISTOGRAM = "Android.Intent.TrustedReferrer";
     public static final String TRUSTED_TRANSITION_TYPE_HISTOGRAM =
             "Android.Intent.TrustedTransitionTypeUsed";
@@ -1337,10 +1336,6 @@ public class IntentHandler {
             extractStringsWithPrefix(text, UrlConstants.HTTP_URL_PREFIX, urls);
             extractStringsWithPrefix(text, UrlConstants.HTTPS_URL_PREFIX, urls);
         }
-
-        // Record a small exact linear histogram as we mostly care about 0/1/2, but the presence of
-        // larger counts would be interesting.
-        RecordHistogram.recordExactLinearHistogram(SHARE_INTENT_HISTOGRAM, urls.size(), 5);
 
         if (!urls.isEmpty()) {
             // If multiple URLs are present, somewhat arbitrarily pick the last one (preferring
