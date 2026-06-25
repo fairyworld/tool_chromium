@@ -250,7 +250,9 @@ bool StartupUtils::IsDeviceRegistered(PrefService& local_state) {
   if (value > 0) {
     // Recreate flag file in case it was lost.
     base::ThreadPool::PostTask(
-        FROM_HERE, {base::TaskPriority::BEST_EFFORT, base::MayBlock()},
+        FROM_HERE,
+        {base::TaskPriority::USER_VISIBLE, base::MayBlock(),
+         base::TaskShutdownBehavior::BLOCK_SHUTDOWN},
         base::BindOnce(&CreateOobeCompleteFlagFile));
     return true;
   } else if (value == 0) {
@@ -291,11 +293,15 @@ void StartupUtils::MarkDeviceRegistered(PrefService& local_state,
 
   if (done_callback.is_null()) {
     base::ThreadPool::PostTask(
-        FROM_HERE, {base::TaskPriority::BEST_EFFORT, base::MayBlock()},
+        FROM_HERE,
+        {base::TaskPriority::USER_VISIBLE, base::MayBlock(),
+         base::TaskShutdownBehavior::BLOCK_SHUTDOWN},
         base::BindOnce(&CreateOobeCompleteFlagFile));
   } else {
     base::ThreadPool::PostTaskAndReply(
-        FROM_HERE, {base::TaskPriority::BEST_EFFORT, base::MayBlock()},
+        FROM_HERE,
+        {base::TaskPriority::USER_VISIBLE, base::MayBlock(),
+         base::TaskShutdownBehavior::BLOCK_SHUTDOWN},
         base::BindOnce(&CreateOobeCompleteFlagFile), std::move(done_callback));
   }
 }
