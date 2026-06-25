@@ -149,6 +149,7 @@ source_set("browser_tests") {
 
   if (enable_extensions_core) {
     sources += [ "extensions/extensions_browsertest.cc" ]
+    deps += [ "//chrome/browser/ui/webui/extensions:test_support" ]
   }
 
   if (enable_extensions) {
@@ -412,6 +413,7 @@ source_set("interactive_ui_tests") {
 
   if (enable_extensions_core) {
     sources += [ "extensions/extensions_focus_test.cc" ]
+    deps += [ "//chrome/browser/ui/webui/extensions:test_support" ]
   }
 
   if (enable_print_preview && !is_chromeos) {
