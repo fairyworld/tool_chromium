@@ -4017,6 +4017,7 @@ if (!is_android) {
         "../browser/ui/color/win/native_chrome_color_mixer_win_browsertest.cc",
         "../browser/ui/views/sync/inline_login_ui_browsertest.cc",
         "../browser/ui/views/uninstall_view_browsertest.cc",
+        "../browser/win/isolated_browser_support_browsertest.cc",
         "../test/delayload/delayload_hook_browsertest.cc",
       ]
 
@@ -4027,6 +4028,7 @@ if (!is_android) {
         "//chrome/app:chrome_dll_resources",
         "//chrome/app:command_ids",
         "//chrome/browser:font_prewarmer_tab_helper",
+        "//chrome/browser/win:isolated_browser_support",
         "//chrome/credential_provider/common:common_constants",
         "//components/onc",
         "//sandbox/win:sandbox",
