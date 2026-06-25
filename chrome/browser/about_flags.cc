@@ -4704,6 +4704,16 @@ const FeatureEntry::FeatureVariation kSplitViewHorizontalVariations[] = {
     {"Indirect Access", kSplitViewHorizontalIndirectAccess, nullptr}};
 #endif
 
+const FeatureEntry::FeatureParam kToolbarGlowUpNoReload[] = {
+    {"reload", "false"}};
+const FeatureEntry::FeatureParam kToolbarGlowUpNoReloadBackForward[] = {
+    {"reload", "false"},
+    {"back-forward", "false"}};
+const FeatureEntry::FeatureVariation kToolbarGlowUpVariations[] = {
+    {"no reload animation", kToolbarGlowUpNoReload, nullptr},
+    {"no reload, back, or forward animations",
+     kToolbarGlowUpNoReloadBackForward, nullptr}};
+
 // RECORDING USER METRICS FOR FLAGS:
 // -----------------------------------------------------------------------------
 // The first line of the entry is the internal name.
@@ -9619,7 +9629,9 @@ const FeatureEntry kFeatureEntries[] = {
 
     {"toolbar-glow-up", flag_descriptions::kToolbarGlowUpName,
      flag_descriptions::kToolbarGlowUpDescription, kOsDesktop,
-     FEATURE_VALUE_TYPE(features::kToolbarGlowUp)},
+     FEATURE_WITH_PARAMS_VALUE_TYPE(features::kToolbarGlowUp,
+                                    kToolbarGlowUpVariations,
+                                    "ToolbarGlowUp")},
 
     {"toolbar-profile-chip-resizing",
      flag_descriptions::kToolbarProfileChipResizingName,

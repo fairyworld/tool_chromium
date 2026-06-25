@@ -12548,7 +12548,38 @@
             ],
             "experiments": [
                 {
-                    "name": "Enabled_20260325",
+                    "name": "Enabled_20260625",
+                    "enable_features": [
+                        "MenuSimplification",
+                        "RoundedIcons",
+                        "TabGroupColorRefresh",
+                        "TabStripDeclutter",
+                        "ToolbarGlowUp",
+                        "UpdateTabGroupColors",
+                        "WebuiRefresh2026"
+                    ]
+                },
+                {
+                    "name": "Enabled_NoReload_20260625",
+                    "params": {
+                        "reload": "false"
+                    },
+                    "enable_features": [
+                        "MenuSimplification",
+                        "RoundedIcons",
+                        "TabGroupColorRefresh",
+                        "TabStripDeclutter",
+                        "ToolbarGlowUp",
+                        "UpdateTabGroupColors",
+                        "WebuiRefresh2026"
+                    ]
+                },
+                {
+                    "name": "Enabled_NoNavigation_20260625",
+                    "params": {
+                        "back-forward": "false",
+                        "reload": "false"
+                    },
                     "enable_features": [
                         "MenuSimplification",
                         "RoundedIcons",
