@@ -1204,7 +1204,7 @@ actions::ActionItem* BrowserWindowFeatures::GetRootActionItem() {
 }
 
 ToastController* BrowserWindowFeatures::toast_controller() {
-  return toast_service_ ? toast_service_->toast_controller() : nullptr;
+  return browser_ ? ToastController::From(browser_) : nullptr;
 }
 
 LocationBar* BrowserWindowFeatures::location_bar() {

@@ -42,6 +42,7 @@
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/web_contents.h"
 #include "ui/base/l10n/l10n_util.h"
+#include "ui/base/unowned_user_data/unowned_user_data_host.h"
 #include "ui/views/bubble/bubble_dialog_delegate_view.h"
 #include "ui/views/focus/focus_manager.h"
 #include "ui/views/view.h"
@@ -51,16 +52,31 @@
 #include "chrome/browser/ui/fullscreen_util_mac.h"
 #endif
 
+DEFINE_USER_DATA(ToastController);
+
 ToastParams::ToastParams(ToastId id) : toast_id(id) {}
 ToastParams::ToastParams(ToastParams&& other) noexcept = default;
 ToastParams& ToastParams::operator=(ToastParams&& other) noexcept = default;
 ToastParams::~ToastParams() = default;
 
+// static
+ToastController* ToastController::From(
+    BrowserWindowInterface* browser_window_interface) {
+  return browser_window_interface
+             ? Get(browser_window_interface->GetUnownedUserDataHost())
+             : nullptr;
+}
+
 ToastController::ToastController(
     BrowserWindowInterface* browser_window_interface,
     const ToastRegistry* toast_registry)
     : browser_window_interface_(browser_window_interface),
-      toast_registry_(toast_registry) {}
+      toast_registry_(toast_registry) {
+  if (browser_window_interface_) {
+    scoped_unowned_user_data_.emplace(
+        browser_window_interface_->GetUnownedUserDataHost(), *this);
+  }
+}
 
 ToastController::~ToastController() = default;
 
