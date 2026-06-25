@@ -22,6 +22,7 @@
 #include "base/test/mock_callback.h"
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
+#include "base/types/expected.h"
 #include "components/ukm/test_ukm_recorder.h"
 #include "content/browser/web_contents/web_contents_impl.h"
 #include "content/browser/webid/disconnect_request.h"
@@ -1279,13 +1280,11 @@ class RequestTest : public RenderViewHostImplTestHarness {
     RequestService* service =
         RequestService::GetOrCreateForCurrentDocument(main_test_rfh());
     if (service && service->GetActiveRequestForTesting()) {
-      service->GetActiveRequestForTesting()->ResetAndDeleteThisForTesting();
+      service->DestroyActiveRequestForTesting();
     }
-    // The destruction is asynchronous. Wait until the Request object is
-    // physically destroyed, which will automatically invalidate the weak
-    // pointer and ensure fallback metrics are recorded in its destructor.
-    ASSERT_TRUE(base::test::RunUntil([&]() { return !request_; }));
+    ASSERT_FALSE(request_);
   }
+
   void SetNetworkRequestManager(
       std::unique_ptr<TestIdpNetworkRequestManager> manager) {
     test_network_request_manager_ = std::move(manager);
@@ -5472,7 +5471,9 @@ TEST_F(RequestTest, TooManyRequests) {
       FederatedAuthRequestResult::kTooManyRequests,
       /*standalone_console_message=*/std::nullopt,
       /*selected_idp_config_url=*/std::nullopt};
-  RunAuthTest(kDefaultRequestParameters, expectations, configuration);
+  auto concurrent_helper = std::make_unique<AuthRequestCallbackHelper>();
+  RunAuthTest(kDefaultRequestParameters, expectations, configuration,
+              concurrent_helper.get());
   EXPECT_FALSE(DidFetchAnyEndpoint());
 
   // Check that the appropriate metrics are recorded upon destruction.
@@ -5530,7 +5531,8 @@ TEST_F(RequestTest, TooManyRequestsDifferentIdP) {
   // Initiates a new API call with a different IdP.
   RequestParameters request{kDefaultRequestParameters};
   request.identity_providers[0].provider = kProviderTwoUrlFull;
-  RunAuthTest(request, expectations, configuration);
+  auto concurrent_helper = std::make_unique<AuthRequestCallbackHelper>();
+  RunAuthTest(request, expectations, configuration, concurrent_helper.get());
   EXPECT_FALSE(DidFetchAnyEndpoint());
 
   // Check that the appropriate metrics are recorded upon destruction.
@@ -5575,7 +5577,9 @@ TEST_F(RequestTest, ActiveModeTooManyRequestsWithNewPassiveFlow) {
       /*standalone_console_message=*/std::nullopt,
       /*selected_idp_config_url=*/std::nullopt};
 
-  RunAuthTest(kDefaultRequestParameters, expectations, configuration);
+  auto concurrent_helper = std::make_unique<AuthRequestCallbackHelper>();
+  RunAuthTest(kDefaultRequestParameters, expectations, configuration,
+              concurrent_helper.get());
   EXPECT_FALSE(DidFetchAnyEndpoint());
 
   // Check that the appropriate metrics are recorded upon destruction.
@@ -5631,7 +5635,8 @@ TEST_F(RequestTest, ActiveModeTooManyRequestsWithNewActiveFlow) {
   static_cast<TestRenderFrameHost*>(web_contents()->GetPrimaryMainFrame())
       ->SimulateUserActivation();
 
-  RunAuthTest(parameters, expectations, configuration);
+  auto concurrent_helper = std::make_unique<AuthRequestCallbackHelper>();
+  RunAuthTest(parameters, expectations, configuration, concurrent_helper.get());
   EXPECT_FALSE(DidFetchAnyEndpoint());
 
   // Check that the appropriate metrics are recorded upon destruction.
@@ -9208,6 +9213,54 @@ TEST_F(RequestTest, ResolveViaFederatedRequestServiceEmptyPostRedirectBody) {
   // violation and reported a bad message.
   EXPECT_EQ("POST redirects must have a body",
             bad_message_observer.WaitForBadMessage());
+}
+
+TEST_F(RequestTest, StartTokenRequestViaFederatedRequestService) {
+  mojo::Remote<blink::mojom::FederatedRequestService> federated_request_service;
+  RequestService* service =
+      RequestService::GetOrCreateForCurrentDocument(main_test_rfh());
+  service->BindFederatedRequestService(
+      federated_request_service.BindNewPipeAndPassReceiver());
+
+  // We must reset the active request first if one was created in SetUp,
+  // because StartTokenRequest will reject with kErrorTooManyRequests if there
+  // is one.
+  ResetAndDeleteRequest();
+
+  auto idp_ptr = blink::mojom::IdentityProviderRequestOptions::New();
+  idp_ptr->config = blink::mojom::IdentityProviderConfig::New();
+  idp_ptr->config->config_url = GURL(kProviderUrlFull);
+  idp_ptr->config->client_id = kClientId;
+  idp_ptr->nonce = kNonce;
+
+  std::vector<blink::mojom::IdentityProviderRequestOptionsPtr> idp_ptrs;
+  idp_ptrs.push_back(std::move(idp_ptr));
+
+  auto get_params = blink::mojom::IdentityProviderGetParameters::New(
+      std::move(idp_ptrs), blink::mojom::RpContext::kSignIn,
+      blink::mojom::RpMode::kPassive);
+
+  std::vector<blink::mojom::IdentityProviderGetParametersPtr> idp_get_params;
+  idp_get_params.push_back(std::move(get_params));
+
+  mojo::Remote<blink::mojom::FederatedRequest> federated_request;
+
+  base::RunLoop run_loop;
+  federated_request_service->StartTokenRequest(
+      std::move(idp_get_params), MediationRequirement::kSilent,
+      federated_request.BindNewPipeAndPassReceiver(),
+      base::BindLambdaForTesting(
+          [&](base::expected<blink::mojom::TokenRequestSuccessPtr,
+                             blink::mojom::TokenRequestFailurePtr> result) {
+            // Checking that the callback resolves proves that the IPC routing
+            // works.
+            EXPECT_FALSE(result.has_value());
+            ASSERT_TRUE(result.error());
+            EXPECT_EQ(result.error()->status,
+                      blink::mojom::RequestTokenStatus::kError);
+            run_loop.Quit();
+          }));
+  run_loop.Run();
 }
 
 }  // namespace content::webid

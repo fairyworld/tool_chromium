@@ -36,6 +36,24 @@ class IdpNetworkRequestManager;
 class UserInfoRequest;
 class DisconnectRequest;
 
+using ResolveTokenRequestCallback =
+    blink::mojom::FederatedRequestService::ResolveTokenRequestCallback;
+using SetIdpSigninStatusCallback =
+    blink::mojom::FederatedRequestService::SetIdpSigninStatusCallback;
+using RegisterIdPCallback =
+    blink::mojom::FederatedRequestService::RegisterIdPCallback;
+using UnregisterIdPCallback =
+    blink::mojom::FederatedRequestService::UnregisterIdPCallback;
+using PreventSilentAccessCallback =
+    blink::mojom::FederatedRequestService::PreventSilentAccessCallback;
+using DisconnectCallback =
+    blink::mojom::FederatedRequestService::DisconnectCallback;
+using RequestUserInfoCallback =
+    blink::mojom::FederatedRequestService::RequestUserInfoCallback;
+using StartTokenRequestCallback =
+    blink::mojom::FederatedRequestService::StartTokenRequestCallback;
+using MediationRequirement = ::password_manager::CredentialMediationRequirement;
+
 // RequestService is a document-scoped manager class that coordinates
 // Federated Credential Management (FedCM) requests for a given RenderFrameHost.
 // It owns the active Request session.
@@ -59,6 +77,12 @@ class CONTENT_EXPORT RequestService
       mojo::PendingReceiver<blink::mojom::FederatedRequestService> receiver);
 
   // blink::mojom::FederatedRequestService:
+  void StartTokenRequest(
+      std::vector<blink::mojom::IdentityProviderGetParametersPtr>
+          idp_get_params,
+      MediationRequirement requirement,
+      mojo::PendingReceiver<blink::mojom::FederatedRequest> request_receiver,
+      StartTokenRequestCallback callback) override;
   void RequestUserInfo(blink::mojom::IdentityProviderConfigPtr provider,
                        RequestUserInfoCallback callback) override;
   void RegisterIdP(const GURL& idp, RegisterIdPCallback callback) override;
@@ -101,8 +125,8 @@ class CONTENT_EXPORT RequestService
       FederatedIdentityPermissionContextDelegate* permission_delegate,
       IdentityRegistry* identity_registry);
 
-  // Called by Request when it has completed or finished.
-  void OnRequestDestroyed(Request* request);
+  // Destroys the active request. Strictly for use in tests.
+  void DestroyActiveRequestForTesting();
 
   void IncrementNumRequests() { ++num_requests_; }
 
@@ -126,10 +150,19 @@ class CONTENT_EXPORT RequestService
       std::optional<std::vector<blink::mojom::IdentityUserInfoPtr>> user_info);
   void CompleteDisconnectRequest(DisconnectCallback callback,
                                  blink::mojom::DisconnectStatus status);
+  void OnTokenRequestComplete(
+      Request* request,
+      StartTokenRequestCallback callback,
+      blink::mojom::RequestTokenStatus status,
+      const std::optional<GURL>& selected_idp_config_url,
+      std::optional<base::Value> token,
+      blink::mojom::TokenErrorPtr error,
+      bool is_auto_selected);
   void CleanUpCompletedRequest(Request* request);
   std::unique_ptr<Metrics> CreateFedCmMetrics();
 
   std::unique_ptr<Request> active_request_;
+  // Temporary storage for completed requests pending destruction.
   std::vector<std::unique_ptr<Request>> completed_requests_;
 
   // Number of navigator.credentials.get() requests made for metrics purposes.

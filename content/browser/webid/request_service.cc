@@ -6,6 +6,7 @@
 
 #include "base/command_line.h"
 #include "base/functional/bind.h"
+#include "base/types/expected.h"
 #include "content/browser/devtools/devtools_instrumentation.h"
 #include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/browser/webid/disconnect_request.h"
@@ -107,7 +108,75 @@ Request* RequestService::GetOrCreateActiveRequest() {
   return active_request_.get();
 }
 
-void RequestService::OnRequestDestroyed(Request* request) {
+void RequestService::DestroyActiveRequestForTesting() {
+  active_request_.reset();
+}
+
+void RequestService::StartTokenRequest(
+    std::vector<blink::mojom::IdentityProviderGetParametersPtr> idp_get_params,
+    MediationRequirement requirement,
+    mojo::PendingReceiver<blink::mojom::FederatedRequest> request_receiver,
+    StartTokenRequestCallback callback) {
+  // 1. Create the new request temporarily.
+  RenderFrameHost& rfh = render_frame_host();
+  BrowserContext* browser_context = rfh.GetBrowserContext();
+  auto new_request = std::make_unique<Request>(
+      &rfh, *this, browser_context->GetFederatedIdentityApiPermissionContext(),
+      browser_context->GetFederatedIdentityAutoReauthnPermissionContext(),
+      browser_context->GetFederatedIdentityPermissionContext());
+  new_request->BindReceiver(std::move(request_receiver));
+
+  auto wrapper_callback = base::BindOnce(
+      &RequestService::OnTokenRequestComplete, weak_ptr_factory_.GetWeakPtr(),
+      new_request.get(), std::move(callback));
+
+  // 2. Temporarily hold the old active request on the stack.
+  // This keeps it alive and valid during the RequestToken() checks, preventing
+  // dangling pointers/UAF if the new request is rejected or replaces the old
+  // one.
+  std::unique_ptr<Request> old_request = std::move(active_request_);
+
+  // 3. Pre-assign the new request as active.
+  // This ensures that if the request completes synchronously (e.g. in tests or
+  // some error cases), OnTokenRequestComplete() will find it in active_request_
+  // and clean it up.
+  active_request_ = std::move(new_request);
+
+  // 4. Call RequestToken on the new request.
+  // This is coming from Mojo, so we have no navigation handle.
+  if (active_request_->RequestToken(std::move(idp_get_params), requirement,
+                                    /*navigation_handle=*/nullptr, GURL(),
+                                    std::move(wrapper_callback))) {
+    // 5. If it started successfully, we keep it as the active request!
+    // The old_request on the stack will go out of scope and be destroyed
+    // safely.
+  } else {
+    // 6. If it failed immediately, discard the new request and restore the old
+    // one!
+    active_request_ = std::move(old_request);
+  }
+}
+
+void RequestService::OnTokenRequestComplete(
+    Request* request,
+    StartTokenRequestCallback callback,
+    blink::mojom::RequestTokenStatus status,
+    const std::optional<GURL>& selected_idp_config_url,
+    std::optional<base::Value> token,
+    blink::mojom::TokenErrorPtr error,
+    bool is_auto_selected) {
+  if (status == blink::mojom::RequestTokenStatus::kSuccess) {
+    auto success = blink::mojom::TokenRequestSuccess::New();
+    success->selected_idp_config_url = selected_idp_config_url.value();
+    success->token = std::move(token);
+    success->is_auto_selected = is_auto_selected;
+    std::move(callback).Run(std::move(success));
+  } else {
+    auto failure = blink::mojom::TokenRequestFailure::New();
+    failure->status = status;
+    failure->error = std::move(error);
+    std::move(callback).Run(base::unexpected(std::move(failure)));
+  }
   if (active_request_.get() == request) {
     // Release ownership synchronously to prevent race conditions with
     // subsequent requests, but keep it in completed_requests_ to ensure it does
@@ -278,7 +347,8 @@ void RequestService::RequestUserInfo(
   // Enforce identity-credentials-get Permissions Policy browser-side.
   if (!render_frame_host().IsFeatureEnabled(
           network::mojom::PermissionsPolicyFeature::kIdentityCredentialsGet)) {
-    // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage().
+    // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage() and try to
+    // remove the callback run() below.
     mojo::ReportBadMessage(
         "identity-credentials-get permissions policy not enabled");
     std::move(callback).Run(blink::mojom::RequestUserInfoResult::NewStatus(
@@ -287,7 +357,8 @@ void RequestService::RequestUserInfo(
   }
 
   if (!render_frame_host().GetPage().IsPrimary()) {
-    // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage().
+    // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage() and try to
+    // remove the callback run() below.
     mojo::ReportBadMessage(
         "FedCM should not be allowed in nested frame trees.");
     std::move(callback).Run(blink::mojom::RequestUserInfoResult::NewStatus(
@@ -347,7 +418,8 @@ void RequestService::Disconnect(
   // The renderer checks this, but a compromised renderer can bypass it.
   if (!render_frame_host().IsFeatureEnabled(
           network::mojom::PermissionsPolicyFeature::kIdentityCredentialsGet)) {
-    // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage().
+    // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage() and try to
+    // remove the callback run() below.
     mojo::ReportBadMessage(
         "identity-credentials-get permissions policy not enabled");
     std::move(callback).Run(blink::mojom::DisconnectStatus::kError);
@@ -419,14 +491,16 @@ void RequestService::ResolveTokenRequest(
                                    ? redirect_to->get_get()->url
                                    : redirect_to->get_post()->url;
     if (!redirect_url.is_valid()) {
-      // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage().
+      // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage() and try to
+      // remove the callback run() below.
       mojo::ReportBadMessage("Invalid redirect URL");
       std::move(callback).Run(false);
       return;
     }
     if (redirect_to->is_post() &&
         redirect_to->get_post()->request_body.empty()) {
-      // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage().
+      // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage() and try to
+      // remove the callback run() below.
       mojo::ReportBadMessage("POST redirects must have a body");
       std::move(callback).Run(false);
       return;

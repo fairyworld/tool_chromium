@@ -97,21 +97,23 @@ class CONTENT_EXPORT Request
 
   void ReportBadMessage(const char* message);
 
-  // Unassociates and deletes `this` from the document for use by tests.
-  // TODO(crbug.com/459135671): Change tests to navigate instead and remove
-  // this method.
-  void ResetAndDeleteThisForTesting();
-
   void SetForceAllowRedirectToForTesting(bool allow) {
     force_allow_redirect_to_for_testing_ = allow;
   }
 
-  // An overload of the mojo version of RequestToken. |navigation_handle|
-  // is passed when this request was triggered by navigation interception, so
-  // that we can use this handle for user activation checking and setting up
-  // parameters for a later redirect.
-  // This is virtual so that it can be mocked.MockNavigationThrottleRegistry
-  virtual void RequestToken(
+  // Starts the token request. Returns true if the request started successfully
+  // and is now pending. Returns false if the request was terminated immediately
+  // (e.g. due to permissions policy, invalid parameters, or being rejected in
+  // favor of an existing request).
+  // This is an overload of the mojo version of RequestToken.
+  // |navigation_handle| is passed when this request was triggered by navigation
+  // interception, so that we can use this handle for user activation checking
+  // and setting up parameters for a later redirect. This is virtual so that it
+  // can be mocked.
+  // TODO(crbug.com/519217823): Consider moving request
+  // deduplication/replacement logic to RequestService once the service fully
+  // manages all request lifecycles.
+  virtual bool RequestToken(
       std::vector<blink::mojom::IdentityProviderGetParametersPtr>
           idp_get_params_ptrs,
       MediationRequirement requirement,
@@ -421,6 +423,8 @@ class CONTENT_EXPORT Request
       const std::vector<GURL>& old_idp_order,
       const std::vector<IdentityProviderGetParametersPtr>& idps,
       const MediationRequirement& requirement);
+
+  void OnConnectionError();
 
   void CleanUp();
 

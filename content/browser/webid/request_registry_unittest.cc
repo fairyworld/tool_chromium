@@ -144,11 +144,6 @@ class RequestRegistryTest : public RenderViewHostImplTestHarness {
   }
 
   void TearDown() override {
-    RequestService* service =
-        RequestService::GetOrCreateForCurrentDocument(main_test_rfh());
-    if (service && service->GetActiveRequestForTesting()) {
-      service->GetActiveRequestForTesting()->ResetAndDeleteThisForTesting();
-    }
     request_ = nullptr;
     mock_identity_registry_ = nullptr;
     request_service_remote_.reset();

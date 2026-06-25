@@ -172,6 +172,9 @@ Request::Request(
   CHECK(api_permission_delegate_);
   CHECK(auto_reauthn_permission_delegate_);
   CHECK(permission_delegate_);
+
+  receivers_.set_disconnect_handler(
+      base::BindRepeating(&Request::OnConnectionError, base::Unretained(this)));
 }
 
 Request::~Request() {
@@ -195,20 +198,20 @@ void Request::BindReceiver(
   receivers_.Add(this, std::move(pending_receiver));
 }
 
-void Request::ReportBadMessage(const char* message) {
-  auth_request_receivers_.ReportBadMessage(message);
+void Request::OnConnectionError() {
+  // If the renderer disconnected the FederatedRequest pipe, it means
+  // the request was aborted (e.g. via AbortController).
+  CancelTokenRequest();
 }
 
-void Request::ResetAndDeleteThisForTesting() {
-  // Resetting the receivers_ before we destruct the objects means that
-  // callbacks won't be called. This matches DocumentService::ResetAndDeleteThis
-  // and is what our tests expect.
-  auth_request_receivers_.Clear();
-  receivers_.Clear();
-  // TODO(crbug.com/519217823): Refactor the test harness to avoid having the
-  // Request object request its own destruction, by transitioning tests to
-  // trigger destruction via RequestService directly.
-  request_service_->OnRequestDestroyed(this);
+void Request::ReportBadMessage(const char* message) {
+  if (auth_request_receivers_.current_receiver()) {
+    auth_request_receivers_.ReportBadMessage(message);
+  } else if (receivers_.current_receiver()) {
+    receivers_.ReportBadMessage(message);
+  } else {
+    mojo::ReportBadMessage(message);
+  }
 }
 
 std::vector<IdentityProviderRequestOptionsPtr>
@@ -257,7 +260,7 @@ void Request::RequestToken(
                /*navigation_handle=*/nullptr, GURL(), std::move(callback));
 }
 
-void Request::RequestToken(
+bool Request::RequestToken(
     std::vector<IdentityProviderGetParametersPtr> idp_get_params_ptrs,
     MediationRequirement requirement,
     NavigationHandle* navigation_handle,
@@ -265,7 +268,7 @@ void Request::RequestToken(
     RequestTokenCallback callback) {
   if (ShouldTerminateRequest(idp_get_params_ptrs, requirement,
                              navigation_handle)) {
-    return;
+    return false;
   }
   bool intercept = false;
   bool should_complete_request_immediately = false;
@@ -295,7 +298,7 @@ void Request::RequestToken(
                            /*error=*/nullptr,
                            /*is_auto_selected=*/false),
             delay);
-        return;
+        return true;
       }
       idp_get_params_ptr->providers = std::move(providers);
     }
@@ -314,7 +317,7 @@ void Request::RequestToken(
                             std::nullopt,
                             /*error=*/nullptr,
                             /*is_auto_selected=*/false);
-    return;
+    return false;
   }
 
   can_accept_redirect_to_ = force_allow_redirect_to_for_testing_ ||
@@ -347,7 +350,7 @@ void Request::RequestToken(
     std::move(callback).Run(RequestTokenStatus::kErrorTooManyRequests,
                             std::nullopt, std::nullopt, /*error=*/nullptr,
                             /*is_auto_selected=*/false);
-    return;
+    return false;
   }
 
   // From here on out, all failures go through CompleteRequest, so this is
@@ -409,7 +412,7 @@ void Request::RequestToken(
           FederatedAuthRequestResult::kMissingTransientUserActivation,
           TokenStatus::kMissingTransientUserActivation,
           /*should_delay_callback=*/false);
-      return;
+      return false;
     }
   } else {
     rp_mode_ = RpMode::kPassive;
@@ -420,7 +423,7 @@ void Request::RequestToken(
         FederatedAuthRequestResult::kRelyingPartyOriginIsOpaque,
         TokenStatus::kRpOriginIsOpaque,
         /*should_delay_callback=*/false);
-    return;
+    return false;
   }
 
   FederatedApiPermissionStatus permission_status = GetApiPermissionStatus();
@@ -432,7 +435,7 @@ void Request::RequestToken(
       CompleteRequestWithError(resultAndTokenStatus.first,
                                resultAndTokenStatus.second,
                                /*should_delay_callback=*/true);
-      return;
+      return true;
     }
   }
 
@@ -448,7 +451,7 @@ void Request::RequestToken(
         CompleteRequestWithError(FederatedAuthRequestResult::kError,
                                  /*token_status=*/std::nullopt,
                                  /*should_delay_callback=*/false);
-        return;
+        return false;
       }
 
       url::Origin idp_origin = url::Origin::Create(idp_ptr->config->config_url);
@@ -457,7 +460,7 @@ void Request::RequestToken(
             FederatedAuthRequestResult::kIdpNotPotentiallyTrustworthy,
             TokenStatus::kIdpNotPotentiallyTrustworthy,
             /*should_delay_callback=*/false);
-        return;
+        return false;
       }
     }
   }
@@ -530,7 +533,7 @@ void Request::RequestToken(
                             : TokenStatus::kNotSignedInWithIdp;
     CompleteRequestWithError(result, token_status,
                              /*should_delay_callback=*/true);
-    return;
+    return true;
   }
 
   // Show loading dialog while fetching endpoints if it is a active flow. This
@@ -548,7 +551,7 @@ void Request::RequestToken(
             get_info_it->second.rp_context, rp_mode_,
             base::BindOnce(&Request::OnDialogDismissed,
                            weak_ptr_factory_.GetWeakPtr()))) {
-      return;
+      return false;
     }
   }
 
@@ -559,9 +562,10 @@ void Request::RequestToken(
     request_dialog_controller_->GetPassiveDialogVolume(
         base::BindOnce(&Request::OnGetPassiveDialogVolume,
                        weak_ptr_factory_.GetWeakPtr(), std::move(unique_idps)));
-    return;
+    return true;
   }
   FetchEndpointsForIdps(std::move(unique_idps));
+  return true;
 }
 
 void Request::RequestUserInfo(blink::mojom::IdentityProviderConfigPtr provider,
