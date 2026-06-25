@@ -114,18 +114,23 @@ public interface SideUiCoordinator extends SideUiStateProvider {
         }
     }
 
-    /**
-     * POD-type that holds the info for a request to reposition or resize a {@link SideUiContainer}.
-     *
-     * <p>TODO(crbug.com/478338737): Consider renaming this class as "SideUiUpdateRequest".
-     */
-    final class SideUiContainerProperties {
+    /** POD-type that holds the request for {@link #updateUi}. */
+    final class UiUpdateRequest {
+        /**
+         * ID of the {@link SideUiContainer} that requested the UI update.
+         *
+         * <p>TODO(crbug.com/478338737): Make {@code mSideUiId} nullable since a UI update isn't
+         * always requested by a {@link SideUiContainer}. For example, when the window size is
+         * changed, the UI update won't have a {@code mSideUiId}.
+         */
         final @SideUiId int mSideUiId;
-        final @AnchorSide int mAnchorSide;
 
-        public SideUiContainerProperties(@SideUiId int id, @AnchorSide int side) {
+        /** Whether animations should be suppressed during the UI update. */
+        final boolean mSuppressAnimations;
+
+        public UiUpdateRequest(@SideUiId int id, boolean suppressAnimations) {
             mSideUiId = id;
-            mAnchorSide = side;
+            mSuppressAnimations = suppressAnimations;
         }
     }
 
@@ -240,19 +245,15 @@ public interface SideUiCoordinator extends SideUiStateProvider {
     void unregisterSideUiContainer(SideUiContainer sideUiContainer);
 
     /**
-     * Requests that the registered {@link SideUiContainer} change its width.
-     * <strong>Important:</strong> this should only be called by the feature that owns the affected
-     * {@link SideUiContainer}.
+     * Updates all {@link SideUiContainer}s and {@link SideUiObserver}s.
      *
-     * @param properties The {@link SideUiContainerProperties} that defines the new requested
-     *     position for the registered {@link SideUiContainer}.
-     * @param suppressAnimations Whether animations should be suppressed for the container update.
-     *     If true, the update will happen immediately, without animations.
-     * @throw IllegalArgumentException if the given properties comes with an invalid {@link
-     *     SideUiId} not found in the registered containers, such as duplicated {@link SideUiId} or
-     *     {@link AnchorSide}.
+     * <p>Each {@link SideUiContainer} or {@link SideUiObserver} will also be notified of relevant
+     * events before/during/after the new {@link SideUiSpecs} is applied to the UI. Please see their
+     * documentation for details.
+     *
+     * @param request The {@link UiUpdateRequest} for the update.
      */
-    void requestUpdateContainer(SideUiContainerProperties properties, boolean suppressAnimations);
+    void updateUi(UiUpdateRequest request);
 
     /** Destroys all objects owned by this coordinator. */
     void destroy();

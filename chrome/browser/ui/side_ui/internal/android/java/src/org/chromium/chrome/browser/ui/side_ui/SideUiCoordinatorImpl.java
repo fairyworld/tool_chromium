@@ -135,9 +135,8 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
     }
 
     @Override
-    public void requestUpdateContainer(
-            SideUiContainerProperties properties, boolean suppressAnimations) {
-        updateUi(properties.mSideUiId, suppressAnimations);
+    public void updateUi(UiUpdateRequest request) {
+        updateUiInternal(request);
     }
 
     @Override
@@ -248,7 +247,7 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
             // zero width. SideUiContainer may need to save states so that it can restore its UI
             // when the window becomes large enough again.
             //
-            // So we should notify SideUiContainer, which should then call requestUpdateContainer().
+            // So we should notify SideUiContainer, which should then call updateUi().
             sideUiContainer.onWindowResized(/* canShowSideUi= */ false);
             return;
         }
@@ -297,29 +296,15 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
         return allocatedAnchorSide.contains(sideUiContainer.getAnchorSide());
     }
 
-    /**
-     * Updates all {@link SideUiContainer}s and {@link SideUiObserver}s.
-     *
-     * <p>Each {@link SideUiContainer} or {@link SideUiObserver} will also be notified of relevant
-     * events before/during/after the new {@link SideUiSpecs} is applied to the UI. Please see their
-     * documentation for details.
-     *
-     * <p>TODO(crbug.com/478338737): Make {@code requestingSideUiId} nullable since a UI update
-     * isn't always requested by a {@link SideUiContainer}. For example, when the window size is
-     * changed, the UI update won't have a {@code requestingSideUiId}.
-     *
-     * @param requestingSideUiId The {@link SideUiContainer} that requested the update.
-     * @param suppressAnimations Whether the animation should be suppressed.
-     */
-    private void updateUi(@SideUiId int requestingSideUiId, boolean suppressAnimations) {
+    private void updateUiInternal(UiUpdateRequest request) {
         // 1. End any existing transitions still in progress. This needs to be done before checking
         // the current specs, since specs aren't fully updated until after all transitions have
         // finished.
         TransitionManager.endTransitions(getRootView());
 
         // 2. Check if animations should be disabled entirely.
-        suppressAnimations =
-                suppressAnimations
+        boolean suppressAnimations =
+                request.mSuppressAnimations
                         || ChromeFeatureList.sEnableAndroidSidePanelDisableAnimations.getValue();
 
         // 3. Determine the new SideUiShowability and the new SideUiSpecs.
@@ -335,7 +320,7 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
 
         // 5. Handle auto-close/auto-restore.
         for (var container : mSideUiContainers) {
-            if (container.getSideUiId() == requestingSideUiId) {
+            if (container.getSideUiId() == request.mSideUiId) {
                 // No need to auto-close/auto-restore the requesting SideUi.
                 continue;
             }

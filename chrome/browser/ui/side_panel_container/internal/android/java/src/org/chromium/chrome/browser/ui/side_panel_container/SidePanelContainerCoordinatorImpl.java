@@ -26,8 +26,8 @@ import org.chromium.chrome.browser.ui.side_panel_container.dev.SidePanelDevFeatu
 import org.chromium.chrome.browser.ui.side_ui.SideUiContainer;
 import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator;
 import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.AnchorSide;
-import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiContainerProperties;
 import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiId;
+import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.UiUpdateRequest;
 import org.chromium.ui.base.ViewUtils;
 
 /** Implementation of {@link SidePanelContainerCoordinator}. */
@@ -105,9 +105,7 @@ final class SidePanelContainerCoordinatorImpl
         mContainerView.removeAllViews();
         mContainerView.addView(content.mView);
 
-        mSideUiCoordinator.requestUpdateContainer(
-                new SideUiContainerProperties(SideUiId.SIDE_PANEL, SIDE_PANEL_DEFAULT_ANCHOR_SIDE),
-                suppressAnimations);
+        mSideUiCoordinator.updateUi(new UiUpdateRequest(SideUiId.SIDE_PANEL, suppressAnimations));
         // TODO(crbug.com/496407828): Move this around so it actually runs after the animation is
         //  finished.
         onContentPopulated.run();
@@ -118,9 +116,7 @@ final class SidePanelContainerCoordinatorImpl
         log(TAG, "startRemovingContent", suppressAnimations);
         ThreadUtils.assertOnUiThread();
 
-        mSideUiCoordinator.requestUpdateContainer(
-                new SideUiContainerProperties(SideUiId.SIDE_PANEL, SIDE_PANEL_DEFAULT_ANCHOR_SIDE),
-                suppressAnimations);
+        mSideUiCoordinator.updateUi(new UiUpdateRequest(SideUiId.SIDE_PANEL, suppressAnimations));
         // TODO(crbug.com/496407828): Move this around so it actually runs after the animation is
         //  finished.
         onContentRemoved.run();

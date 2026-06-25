@@ -12,8 +12,8 @@ import androidx.annotation.Px;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.AnchorSide;
-import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiContainerProperties;
 import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiId;
+import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.UiUpdateRequest;
 import org.chromium.ui.base.ViewUtils;
 
 /** Minimum implementation of {@link SideUiContainer} to allow setting/getting width for tests. */
@@ -128,8 +128,6 @@ public final class TestSideUiContainer implements SideUiContainer {
 
     @Override
     public void onWindowResized(boolean canShowSideUi) {
-        mSideUiCoordinator.requestUpdateContainer(
-                new SideUiContainerProperties(mSideUiId, mAnchorSide),
-                /* suppressAnimations= */ true);
+        mSideUiCoordinator.updateUi(new UiUpdateRequest(mSideUiId, /* suppressAnimations= */ true));
     }
 }

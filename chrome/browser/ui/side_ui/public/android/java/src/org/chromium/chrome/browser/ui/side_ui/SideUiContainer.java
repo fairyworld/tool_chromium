@@ -113,7 +113,7 @@ public interface SideUiContainer {
      * <p>This method is called during a UI update flow in {@link SideUiCoordinator}, immediately
      * before the new {@link SideUiSpecs} is applied to the UI. Implementations should use this
      * method to preserve states needed by {@link #onWillAutoRestore()}, but <i>not</i> request
-     * another UI update via {@link SideUiCoordinator#requestUpdateContainer}.
+     * another UI update via {@link SideUiCoordinator#updateUi}.
      */
     default void onWillAutoClose() {}
 
