@@ -135,8 +135,8 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://policy",
       "chrome://predictors",
 
-  // TODO(crbug.com/511254271): Flaky on some Linux builders.
-#if !BUILDFLAG(IS_LINUX)
+  // TODO(crbug.com/511254271): Flaky on some Linux and ChromeOS builders.
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
       "chrome://prefs-internals",
 #endif
 
