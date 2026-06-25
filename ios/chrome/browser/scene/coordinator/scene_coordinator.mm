@@ -123,10 +123,10 @@
 
 // Used to create PassKey to access the UIViewController through the
 // BrowserProvider interface (crbug.com/40606165).
-class SceneCoordinatorHelper {
+class SceneCoordinatorPassKeyFactory {
  public:
   static BrowserProviderPassKey CreateKey() {
-    return base::PassKey<SceneCoordinatorHelper>();
+    return base::PassKey<SceneCoordinatorPassKeyFactory>();
   }
 };
 
@@ -1161,7 +1161,7 @@ inline LayoutStateScenePassKey PassKey() {
     id<BrowserProvider> presentingInterface =
         self.sceneState.browserProviderInterface.currentBrowserProvider;
     baseViewController = [presentingInterface
-        viewController:SceneCoordinatorHelper::CreateKey()];
+        viewController:SceneCoordinatorPassKeyFactory::CreateKey()];
   }
   __weak __typeof(self) weakSelf = self;
   _guidedTourCoordinator =
