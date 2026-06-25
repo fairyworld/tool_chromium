@@ -9002,6 +9002,8 @@ from previous Chrome versions.
   <int value="-1756299290" label="WebSerialAPI:enabled"/>
   <int value="-1755714804" label="FeedCloseRefresh:enabled"/>
   <int value="-1755301960" label="ClearOldBrowsingData:enabled"/>
+  <int value="-1754813606"
+      label="PasswordSaveUpdateDropdownMenuExperiment:enabled"/>
   <int value="-1754262889" label="RemoteCopyPersistentNotification:enabled"/>
   <int value="-1753979488" label="SupportForcedSigninPolicy:enabled"/>
   <int value="-1753314199"
@@ -19696,6 +19698,8 @@ from previous Chrome versions.
   <int value="1685873842" label="PrefetchActivationBeacon:enabled"/>
   <int value="1685892690" label="AndroidTipsNotificationsV2:disabled"/>
   <int value="1686788127" label="AndroidKeyboardA11y:enabled"/>
+  <int value="1686899392"
+      label="PasswordSaveUpdateDropdownMenuExperiment:disabled"/>
   <int value="1687272287" label="HandwritingLibraryDlc:disabled"/>
   <int value="1687544136" label="AndroidManagedByMenuItem:enabled"/>
   <int value="1687735881" label="WebAppInstallation:disabled"/>

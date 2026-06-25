@@ -10839,6 +10839,12 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kThreeButtonPasswordSaveDialogDescription, kOsDesktop,
      FEATURE_VALUE_TYPE(features::kThreeButtonPasswordSaveDialog)},
 
+    {"password-save-update-dropdown-menu-experiment",
+     flag_descriptions::kPasswordSaveUpdateDropdownMenuExperimentName,
+     flag_descriptions::kPasswordSaveUpdateDropdownMenuExperimentDescription,
+     kOsDesktop,
+     FEATURE_VALUE_TYPE(features::kPasswordSaveUpdateDropdownMenuExperiment)},
+
 #endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)

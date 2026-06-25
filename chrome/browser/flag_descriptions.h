@@ -3881,6 +3881,12 @@ inline constexpr char kPasswordSaveInContextErrorResolutionDescription[] =
     "Starts the password manager error resolution flow after offering to "
     "save a password.";
 
+inline constexpr char kPasswordSaveUpdateDropdownMenuExperimentName[] =
+    "Password Save/Update Dropdown Menu Experiment";
+inline constexpr char kPasswordSaveUpdateDropdownMenuExperimentDescription[] =
+    "Enables an experimental dropdown menu for password save and update "
+    "prompts.";
+
 inline constexpr char kPasswordUploadUiUpdateName[] =
     "Password Upload UI Update";
 inline constexpr char kPasswordUploadUiUpdateDescription[] =
