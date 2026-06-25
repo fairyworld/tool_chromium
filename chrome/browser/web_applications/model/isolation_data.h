@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_WEB_APPLICATIONS_ISOLATED_WEB_APPS_ISOLATION_DATA_H_
-#define CHROME_BROWSER_WEB_APPLICATIONS_ISOLATED_WEB_APPS_ISOLATION_DATA_H_
+#ifndef CHROME_BROWSER_WEB_APPLICATIONS_ISOLATION_DATA_H_
+#define CHROME_BROWSER_WEB_APPLICATIONS_ISOLATION_DATA_H_
 
 #include <optional>
 #include <set>
 #include <string>
 
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_integrity_block_data.h"
+#include "chrome/browser/web_applications/model/integrity_block_data.h"
 #include "components/webapps/isolated_web_apps/types/iwa_version.h"
 #include "components/webapps/isolated_web_apps/types/storage_location.h"
 #include "components/webapps/isolated_web_apps/types/update_channel.h"
@@ -21,10 +21,10 @@ namespace web_app {
 class IsolationData {
  public:
   struct PendingUpdateInfo {
-    PendingUpdateInfo(IsolatedWebAppStorageLocation location,
-                      IwaVersion version,
-                      std::optional<IsolatedWebAppIntegrityBlockData>
-                          integrity_block_data = std::nullopt);
+    PendingUpdateInfo(
+        IsolatedWebAppStorageLocation location,
+        IwaVersion version,
+        std::optional<IntegrityBlockData> integrity_block_data = std::nullopt);
     ~PendingUpdateInfo();
     PendingUpdateInfo(const PendingUpdateInfo&);
     PendingUpdateInfo& operator=(const PendingUpdateInfo&);
@@ -40,7 +40,7 @@ class IsolationData {
     IsolatedWebAppStorageLocation location;
     IwaVersion version;
 
-    std::optional<IsolatedWebAppIntegrityBlockData> integrity_block_data;
+    std::optional<IntegrityBlockData> integrity_block_data;
   };
 
   class OpenedTabsCounterNotificationState {
@@ -96,8 +96,7 @@ class IsolationData {
   const std::optional<PendingUpdateInfo>& pending_update_info() const {
     return pending_update_info_;
   }
-  const std::optional<IsolatedWebAppIntegrityBlockData>& integrity_block_data()
-      const {
+  const std::optional<IntegrityBlockData>& integrity_block_data() const {
     return integrity_block_data_;
   }
   const std::optional<GURL>& update_manifest_url() const {
@@ -113,16 +112,15 @@ class IsolationData {
   }
 
  private:
-  IsolationData(
-      IsolatedWebAppStorageLocation location,
-      IwaVersion version,
-      std::set<std::string> controlled_frame_partitions,
-      std::optional<PendingUpdateInfo> pending_update_info,
-      std::optional<IsolatedWebAppIntegrityBlockData> integrity_block_data,
-      std::optional<GURL> update_manifest_url,
-      std::optional<UpdateChannel> update_channel,
-      std::optional<OpenedTabsCounterNotificationState>
-          opened_tabs_counter_notification_state);
+  IsolationData(IsolatedWebAppStorageLocation location,
+                IwaVersion version,
+                std::set<std::string> controlled_frame_partitions,
+                std::optional<PendingUpdateInfo> pending_update_info,
+                std::optional<IntegrityBlockData> integrity_block_data,
+                std::optional<GURL> update_manifest_url,
+                std::optional<UpdateChannel> update_channel,
+                std::optional<OpenedTabsCounterNotificationState>
+                    opened_tabs_counter_notification_state);
 
   IsolatedWebAppStorageLocation location_;
   IwaVersion version_;
@@ -138,7 +136,7 @@ class IsolationData {
   // This field is used to prevent redundant update attempts in case of key
   // rotation by comparing the stored public keys against the rotated key.
   // key. Please don't rely on it for anything security-critical!
-  std::optional<IsolatedWebAppIntegrityBlockData> integrity_block_data_;
+  std::optional<IntegrityBlockData> integrity_block_data_;
 
   // Informs the browser where to look up the update manifest for this IWA and
   // which update channel to use.
@@ -186,10 +184,8 @@ class IsolationData {
     Builder& ClearPendingUpdateInfo() &;
     Builder&& ClearPendingUpdateInfo() &&;
 
-    Builder& SetIntegrityBlockData(
-        IsolatedWebAppIntegrityBlockData integrity_block_data) &;
-    Builder&& SetIntegrityBlockData(
-        IsolatedWebAppIntegrityBlockData integrity_block_data) &&;
+    Builder& SetIntegrityBlockData(IntegrityBlockData integrity_block_data) &;
+    Builder&& SetIntegrityBlockData(IntegrityBlockData integrity_block_data) &&;
 
     Builder& SetUpdateManifestUrl(GURL update_manifest_url) &;
     Builder&& SetUpdateManifestUrl(GURL update_manifest_url) &&;
@@ -217,7 +213,7 @@ class IsolationData {
 
     std::set<std::string> controlled_frame_partitions_;
     std::optional<IsolationData::PendingUpdateInfo> pending_update_info_;
-    std::optional<IsolatedWebAppIntegrityBlockData> integrity_block_data_;
+    std::optional<IntegrityBlockData> integrity_block_data_;
     std::optional<GURL> update_manifest_url_;
     std::optional<OpenedTabsCounterNotificationState>
         opened_tabs_counter_notification_state_;
@@ -227,4 +223,4 @@ class IsolationData {
 
 }  // namespace web_app
 
-#endif  // CHROME_BROWSER_WEB_APPLICATIONS_ISOLATED_WEB_APPS_ISOLATION_DATA_H_
+#endif  // CHROME_BROWSER_WEB_APPLICATIONS_ISOLATION_DATA_H_

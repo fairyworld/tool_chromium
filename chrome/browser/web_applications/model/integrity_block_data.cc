@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_integrity_block_data.h"
+#include "chrome/browser/web_applications/model/integrity_block_data.h"
 
 #include <variant>
 
@@ -92,43 +92,39 @@ SignatureInfoProto SignatureInfoToProto(const auto& signature_info) {
 
 }  // namespace
 
-IsolatedWebAppIntegrityBlockData::IsolatedWebAppIntegrityBlockData(
+IntegrityBlockData::IntegrityBlockData(
     std::vector<web_package::SignedWebBundleSignatureInfo> signatures)
     : signatures_(std::move(signatures)) {}
 
-IsolatedWebAppIntegrityBlockData::~IsolatedWebAppIntegrityBlockData() = default;
+IntegrityBlockData::~IntegrityBlockData() = default;
 
-IsolatedWebAppIntegrityBlockData::IsolatedWebAppIntegrityBlockData(
-    const IsolatedWebAppIntegrityBlockData&) = default;
-IsolatedWebAppIntegrityBlockData& IsolatedWebAppIntegrityBlockData::operator=(
-    const IsolatedWebAppIntegrityBlockData&) = default;
+IntegrityBlockData::IntegrityBlockData(const IntegrityBlockData&) = default;
+IntegrityBlockData& IntegrityBlockData::operator=(const IntegrityBlockData&) =
+    default;
 
-bool IsolatedWebAppIntegrityBlockData::operator==(
-    const IsolatedWebAppIntegrityBlockData& other) const = default;
+bool IntegrityBlockData::operator==(const IntegrityBlockData& other) const =
+    default;
 
 // static
-IsolatedWebAppIntegrityBlockData
-IsolatedWebAppIntegrityBlockData::FromIntegrityBlock(
+IntegrityBlockData IntegrityBlockData::FromIntegrityBlock(
     const web_package::SignedWebBundleIntegrityBlock& integrity_block) {
-  return IsolatedWebAppIntegrityBlockData(base::ToVector(
+  return IntegrityBlockData(base::ToVector(
       integrity_block.signature_stack().entries(),
       &web_package::SignedWebBundleSignatureStackEntry::signature_info));
 }
 
 // static
-base::expected<IsolatedWebAppIntegrityBlockData, std::string>
-IsolatedWebAppIntegrityBlockData::FromProto(
+base::expected<IntegrityBlockData, std::string> IntegrityBlockData::FromProto(
     const proto::IsolationData::IntegrityBlockData& proto) {
   std::vector<web_package::SignedWebBundleSignatureInfo> signatures;
   for (const auto& si_proto : proto.signatures()) {
     ASSIGN_OR_RETURN(auto signature_info, SignatureInfoFromProto(si_proto));
     signatures.push_back(std::move(signature_info));
   }
-  return IsolatedWebAppIntegrityBlockData(std::move(signatures));
+  return IntegrityBlockData(std::move(signatures));
 }
 
-proto::IsolationData::IntegrityBlockData
-IsolatedWebAppIntegrityBlockData::ToProto() const {
+proto::IsolationData::IntegrityBlockData IntegrityBlockData::ToProto() const {
   proto::IsolationData::IntegrityBlockData proto;
   for (const auto& signature_info : signatures_) {
     proto::IsolationData::IntegrityBlockData::SignatureInfo si_proto;
@@ -156,7 +152,7 @@ IsolatedWebAppIntegrityBlockData::ToProto() const {
   return proto;
 }
 
-base::Value IsolatedWebAppIntegrityBlockData::AsDebugValue() const {
+base::Value IntegrityBlockData::AsDebugValue() const {
   return base::Value(base::DictValue().Set(
       "signatures", base::ToValueList(signatures_, [](const auto& signature) {
         return std::visit(
@@ -194,7 +190,7 @@ base::Value IsolatedWebAppIntegrityBlockData::AsDebugValue() const {
       })));
 }
 
-bool IsolatedWebAppIntegrityBlockData::HasPublicKey(
+bool IntegrityBlockData::HasPublicKey(
     base::span<const uint8_t> public_key) const {
   return std::ranges::any_of(signatures(), [&](const auto& signature_info) {
     return std::visit(

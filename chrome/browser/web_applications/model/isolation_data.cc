@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/web_applications/isolated_web_apps/isolation_data.h"
+#include "chrome/browser/web_applications/model/isolation_data.h"
 
 #include "base/containers/to_value_list.h"
 #include "base/values.h"
@@ -31,7 +31,7 @@ IsolationData::IsolationData(
     IwaVersion version,
     std::set<std::string> controlled_frame_partitions,
     std::optional<PendingUpdateInfo> pending_update_info,
-    std::optional<IsolatedWebAppIntegrityBlockData> integrity_block_data,
+    std::optional<IntegrityBlockData> integrity_block_data,
     std::optional<GURL> update_manifest_url,
     std::optional<UpdateChannel> update_channel,
     std::optional<OpenedTabsCounterNotificationState>
@@ -87,7 +87,7 @@ base::Value IsolationData::AsDebugValue() const {
 IsolationData::PendingUpdateInfo::PendingUpdateInfo(
     IsolatedWebAppStorageLocation location,
     IwaVersion version,
-    std::optional<IsolatedWebAppIntegrityBlockData> integrity_block_data)
+    std::optional<IntegrityBlockData> integrity_block_data)
     : location(std::move(location)),
       version(std::move(version)),
       integrity_block_data(std::move(integrity_block_data)) {}
@@ -203,13 +203,13 @@ IsolationData::Builder&& IsolationData::Builder::ClearPendingUpdateInfo() && {
 }
 
 IsolationData::Builder& IsolationData::Builder::SetIntegrityBlockData(
-    IsolatedWebAppIntegrityBlockData integrity_block_data) & {
+    IntegrityBlockData integrity_block_data) & {
   integrity_block_data_ = std::move(integrity_block_data);
   return *this;
 }
 
 IsolationData::Builder&& IsolationData::Builder::SetIntegrityBlockData(
-    IsolatedWebAppIntegrityBlockData integrity_block_data) && {
+    IntegrityBlockData integrity_block_data) && {
   integrity_block_data_ = std::move(integrity_block_data);
   return std::move(*this);
 }

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_WEB_APPLICATIONS_ISOLATED_WEB_APPS_ISOLATED_WEB_APP_INTEGRITY_BLOCK_DATA_H_
-#define CHROME_BROWSER_WEB_APPLICATIONS_ISOLATED_WEB_APPS_ISOLATED_WEB_APP_INTEGRITY_BLOCK_DATA_H_
+#ifndef CHROME_BROWSER_WEB_APPLICATIONS_INTEGRITY_BLOCK_DATA_H_
+#define CHROME_BROWSER_WEB_APPLICATIONS_INTEGRITY_BLOCK_DATA_H_
 
 #include "base/values.h"
 #include "chrome/browser/web_applications/proto/web_app_isolation_data.pb.h"
@@ -13,23 +13,22 @@
 namespace web_app {
 
 // Represents the integrity block portion of `isolation_data()` for a Web App.
-class IsolatedWebAppIntegrityBlockData {
+class IntegrityBlockData {
  public:
-  explicit IsolatedWebAppIntegrityBlockData(
+  explicit IntegrityBlockData(
       std::vector<web_package::SignedWebBundleSignatureInfo> signatures);
-  ~IsolatedWebAppIntegrityBlockData();
+  ~IntegrityBlockData();
 
-  IsolatedWebAppIntegrityBlockData(const IsolatedWebAppIntegrityBlockData&);
-  IsolatedWebAppIntegrityBlockData& operator=(
-      const IsolatedWebAppIntegrityBlockData&);
+  IntegrityBlockData(const IntegrityBlockData&);
+  IntegrityBlockData& operator=(const IntegrityBlockData&);
 
-  bool operator==(const IsolatedWebAppIntegrityBlockData& other) const;
+  bool operator==(const IntegrityBlockData& other) const;
 
-  static IsolatedWebAppIntegrityBlockData FromIntegrityBlock(
+  static IntegrityBlockData FromIntegrityBlock(
       const web_package::SignedWebBundleIntegrityBlock& integrity_block);
 
-  static base::expected<IsolatedWebAppIntegrityBlockData, std::string>
-  FromProto(const proto::IsolationData::IntegrityBlockData& proto);
+  static base::expected<IntegrityBlockData, std::string> FromProto(
+      const proto::IsolationData::IntegrityBlockData& proto);
 
   proto::IsolationData::IntegrityBlockData ToProto() const;
 
@@ -48,4 +47,4 @@ class IsolatedWebAppIntegrityBlockData {
 
 }  // namespace web_app
 
-#endif  // CHROME_BROWSER_WEB_APPLICATIONS_ISOLATED_WEB_APPS_ISOLATED_WEB_APP_INTEGRITY_BLOCK_DATA_H_
+#endif  // CHROME_BROWSER_WEB_APPLICATIONS_INTEGRITY_BLOCK_DATA_H_
