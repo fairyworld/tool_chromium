@@ -60,6 +60,7 @@ void LogSuggestionUiDecision(
       event_type = LogEventType::kSuggestionDismissed;
       break;
     case FilterUiController::SuggestionUserDecision::kIgnored:
+    case FilterUiController::SuggestionUserDecision::kSettingsOpened:
       event_type = LogEventType::kSuggestionIgnored;
       break;
   }
@@ -71,6 +72,8 @@ void LogSuggestionUiDecision(
       trigger_source = "Cue";
       break;
     case FilterUiController::SuggestionViewState::kCollapsedInOmnibox:
+    case FilterUiController::SuggestionViewState::
+        kCollapsedInOmniboxAfterReopen:
       trigger_source = "Omnibox";
       break;
     case FilterUiController::SuggestionViewState::kInactive:
@@ -204,6 +207,7 @@ void FilterUiController::OnActionInvoked() {
     case SuggestionViewState::kInactive:
       NOTREACHED();
     case SuggestionViewState::kCollapsedInOmnibox:
+    case SuggestionViewState::kCollapsedInOmniboxAfterReopen:
       ShowCue(suggestion_state_->suggestion);
       break;
   }
@@ -241,7 +245,7 @@ void FilterUiController::ExecuteCommand(int command_id, int event_flags) {
       ClearSuggestion(SuggestionUserDecision::kDismissed);
       break;
     case internal::kSettingsCommand:
-      ClearSuggestion(SuggestionUserDecision::kIgnored);
+      ClearSuggestion(SuggestionUserDecision::kSettingsOpened);
       OpenSettings();
       break;
   }
@@ -332,6 +336,7 @@ void FilterUiController::OnPageActionAnchoredMessageShown(
       }
       break;
     case SuggestionViewState::kCollapsedInOmnibox:
+    case SuggestionViewState::kCollapsedInOmniboxAfterReopen:
       if (page_action_controller_) {
         page_action_controller_->OverrideText(
             kActionMultistepFilter,
@@ -354,7 +359,6 @@ void FilterUiController::OnPageActionAnchoredMessageHidden(
 
   switch (suggestion_state_->view_state) {
     case SuggestionViewState::kShowingInitialCue:
-    case SuggestionViewState::kReopenedFromOmnibox:
       LogSuggestionUiDecision(log_router_, *suggestion_state_,
                               SuggestionUserDecision::kIgnored);
       suggestion_state_->view_state = SuggestionViewState::kCollapsedInOmnibox;
@@ -364,8 +368,20 @@ void FilterUiController::OnPageActionAnchoredMessageHidden(
             suggestion_state_->suggestion.short_suggestion_message);
       }
       break;
+    case SuggestionViewState::kReopenedFromOmnibox:
+      LogSuggestionUiDecision(log_router_, *suggestion_state_,
+                              SuggestionUserDecision::kIgnored);
+      suggestion_state_->view_state =
+          SuggestionViewState::kCollapsedInOmniboxAfterReopen;
+      if (page_action_controller_) {
+        page_action_controller_->OverrideText(
+            kActionMultistepFilter,
+            suggestion_state_->suggestion.short_suggestion_message);
+      }
+      break;
     case SuggestionViewState::kInactive:
     case SuggestionViewState::kCollapsedInOmnibox:
+    case SuggestionViewState::kCollapsedInOmniboxAfterReopen:
       NOTREACHED();
   }
 }

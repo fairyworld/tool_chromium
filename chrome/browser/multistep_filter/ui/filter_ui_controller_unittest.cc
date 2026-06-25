@@ -552,8 +552,9 @@ TEST_F(FilterUiControllerTest,
   test_api(*controller_).OnPageActionAnchoredMessageShown(ActionState());
 }
 
-TEST_F(FilterUiControllerTest,
-       OnPageActionAnchoredMessageHiddenFromReopenedStateCollapsesToOmnibox) {
+TEST_F(
+    FilterUiControllerTest,
+    OnPageActionAnchoredMessageHiddenFromReopenedStateCollapsesToOmniboxAfterReopen) {
   UrlFilterSuggestion suggestion =
       CreateDummySuggestion(GURL("https://example.com"), DefaultAttributes());
   controller_->OnSuggestionGenerated(suggestion);
@@ -567,10 +568,12 @@ TEST_F(FilterUiControllerTest,
   EXPECT_EQ(test_api(*controller_).suggestion_state()->view_state,
             FilterUiController::SuggestionViewState::kReopenedFromOmnibox);
 
-  // Transition: ReopenedFromOmnibox -> CollapsedInOmnibox (on hidden)
+  // Transition: ReopenedFromOmnibox -> CollapsedInOmniboxAfterReopen (on
+  // hidden)
   test_api(*controller_).OnPageActionAnchoredMessageHidden(ActionState());
-  EXPECT_EQ(test_api(*controller_).suggestion_state()->view_state,
-            FilterUiController::SuggestionViewState::kCollapsedInOmnibox);
+  EXPECT_EQ(
+      test_api(*controller_).suggestion_state()->view_state,
+      FilterUiController::SuggestionViewState::kCollapsedInOmniboxAfterReopen);
   EXPECT_TRUE(test_api(*controller_).suggestion_state().has_value());
 }
 
