@@ -11,6 +11,7 @@
 #include "base/functional/bind.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/sequence_checker.h"
+#include "base/strings/strcat.h"
 #include "base/task/task_traits.h"
 #include "base/task/thread_pool.h"
 #include "base/time/time.h"
@@ -22,6 +23,7 @@
 #include "components/metrics/private_metrics/private_insights/fcp_simple_task_environment.h"
 #include "components/metrics/private_metrics/private_insights/private_insights_features.h"
 #include "components/prefs/pref_service.h"
+#include "components/version_info/version_info.h"
 #include "google_apis/google_api_keys.h"
 #include "third_party/abseil-cpp/absl/status/statusor.h"
 #include "third_party/federated_compute/src/fcp/client/fl_runner.h"
@@ -225,6 +227,8 @@ PrivateInsightsService::UploadBlocking(const base::FilePath& profile_dir,
 PrivateInsightsService::FederatedComputationResult
 PrivateInsightsService::RunFederatedComputation(
     const FederatedComputationParams& params) {
+  const std::string client_version =
+      base::StrCat({"chrome_v", version_info::GetMajorVersionNumber()});
   absl::StatusOr<fcp::client::FLRunnerResult> statusor =  // nocheck
       fcp::client::RunFederatedComputation(
           /*env_deps=*/params.task_env,
@@ -240,7 +244,7 @@ PrivateInsightsService::RunFederatedComputation(
           /*session_name=*/params.population_name,
           /*population_name=*/params.population_name,
           /*retry_token=*/"",
-          /*client_version=*/"",  // TODO(b/518646350): Add client version.
+          /*client_version=*/client_version,
           /*client_attestation_measurement=*/"");
   return ParseFederatedComputationResult(statusor);
 }
