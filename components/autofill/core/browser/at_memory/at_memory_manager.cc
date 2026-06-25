@@ -270,7 +270,9 @@ Suggestion TransformResultIntoSuggestion(
     }
     label_row.emplace_back(metadata.value);
   }
-  suggestion.labels.emplace_back(std::move(label_row));
+  if (!label_row.empty()) {
+    suggestion.labels.emplace_back(std::move(label_row));
+  }
   Suggestion::AtMemoryPayload at_memory_payload(entry.value, entry.type);
   at_memory_payload.identifier =
       GetPayloadIdentifier(entry.type, entry.identifier);
