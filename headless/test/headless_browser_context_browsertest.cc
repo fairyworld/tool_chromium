@@ -58,7 +58,7 @@ class HeadlessBrowserContextIsolationTest
   void RenderViewReady() override {
     if (!web_contents2_) {
       browser_context_ = browser()->CreateBrowserContextBuilder().Build();
-      web_contents2_ = browser_context_->CreateWebContentsBuilder().Build();
+      web_contents2_ = browser_context_->CreateWebContents();
       Observe(HeadlessWebContentsImpl::From(web_contents2_)->web_contents());
       return;
     }
@@ -168,10 +168,8 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserUserDataDirTest, Do) {
                                                 .SetIncognitoMode(false)
                                                 .Build();
 
-  HeadlessWebContents* web_contents =
-      browser_context->CreateWebContentsBuilder()
-          .SetInitialURL(embedded_test_server()->GetURL("/hello.html"))
-          .Build();
+  HeadlessWebContents* web_contents = browser_context->CreateWebContents(
+      embedded_test_server()->GetURL("/hello.html"));
 
   EXPECT_TRUE(WaitForLoad(web_contents));
 
@@ -201,10 +199,8 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, IncognitoMode) {
           .SetIncognitoMode(true)
           .Build();
 
-  HeadlessWebContents* web_contents =
-      browser_context->CreateWebContentsBuilder()
-          .SetInitialURL(embedded_test_server()->GetURL("/hello.html"))
-          .Build();
+  HeadlessWebContents* web_contents = browser_context->CreateWebContents(
+      embedded_test_server()->GetURL("/hello.html"));
 
   EXPECT_TRUE(WaitForLoad(web_contents));
 
@@ -249,10 +245,8 @@ IN_PROC_BROWSER_TEST_P(HeadlessBrowserTestWithUserDataDirAndMaybeIncognito,
                                                 .SetIncognitoMode(incognito())
                                                 .Build();
 
-  HeadlessWebContents* web_contents =
-      browser_context->CreateWebContentsBuilder()
-          .SetInitialURL(embedded_test_server()->GetURL("/hello.html"))
-          .Build();
+  HeadlessWebContents* web_contents = browser_context->CreateWebContents(
+      embedded_test_server()->GetURL("/hello.html"));
 
   EXPECT_TRUE(WaitForLoad(web_contents));
 

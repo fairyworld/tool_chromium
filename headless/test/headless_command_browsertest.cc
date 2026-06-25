@@ -77,11 +77,8 @@ class HeadlessCommandBrowserTest : public HeadlessBrowserTest,
     HeadlessBrowserContext* browser_context = context_builder.Build();
     browser()->SetDefaultBrowserContext(browser_context);
 
-    GURL handler_url = HeadlessCommandHandler::GetHandlerUrl();
-    HeadlessWebContents::Builder builder(
-        browser_context->CreateWebContentsBuilder());
-    HeadlessWebContents* web_contents =
-        builder.SetInitialURL(handler_url).Build();
+    HeadlessWebContents* web_contents = browser_context->CreateWebContents(
+        HeadlessCommandHandler::GetHandlerUrl());
 
     content::WebContents* content_web_contents =
         HeadlessWebContentsImpl::From(web_contents)->web_contents();

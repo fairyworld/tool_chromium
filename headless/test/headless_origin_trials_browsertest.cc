@@ -64,10 +64,8 @@ IN_PROC_BROWSER_TEST_F(HeadlessOriginTrialsBrowserTest,
   HeadlessBrowserContext* browser_context =
       browser()->CreateBrowserContextBuilder().Build();
 
-  HeadlessWebContents* web_contents =
-      browser_context->CreateWebContentsBuilder()
-          .SetInitialURL(GURL("https://example.test/no_origin_trial.html"))
-          .Build();
+  HeadlessWebContents* web_contents = browser_context->CreateWebContents(
+      GURL("https://example.test/no_origin_trial.html"));
   EXPECT_TRUE(WaitForLoad(web_contents));
 
   // Ensures that createShadowRoot() is not defined, as no token is provided to

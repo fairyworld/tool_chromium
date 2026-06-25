@@ -40,11 +40,10 @@ HeadlessDevToolsManagerDelegate::CreateNewTarget(
     return nullptr;
 
   HeadlessBrowserContext* context = browser_->GetDefaultBrowserContext();
-  HeadlessWebContentsImpl* web_contents_impl = HeadlessWebContentsImpl::From(
-      context->CreateWebContentsBuilder()
-          .SetInitialURL(url)
-          .SetWindowBounds(gfx::Rect(browser_->options()->window_size))
-          .Build());
+  HeadlessWebContents::CreateParams create_params(context, url);
+  create_params.window_bounds = gfx::Rect(browser_->options()->window_size);
+  HeadlessWebContentsImpl* web_contents_impl =
+      HeadlessWebContentsImpl::From(context->CreateWebContents(create_params));
   return target_type == content::DevToolsManagerDelegate::kTab
              ? content::DevToolsAgentHost::GetOrCreateForTab(
                    web_contents_impl->web_contents())

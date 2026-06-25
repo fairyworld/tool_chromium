@@ -41,13 +41,15 @@ class HEADLESS_EXPORT HeadlessBrowserContext {
 
   virtual ~HeadlessBrowserContext() {}
 
-  // Open a new tab. Returns a builder object which can be used to set
-  // properties for the new tab.
+  // Open a new tab.
   // Pointer to HeadlessWebContents becomes invalid after:
   // a) Calling HeadlessWebContents::Close, or
   // b) Calling HeadlessBrowserContext::Close on associated browser context, or
   // c) Calling HeadlessBrowser::Shutdown.
-  virtual HeadlessWebContents::Builder CreateWebContentsBuilder() = 0;
+  virtual HeadlessWebContents* CreateWebContents(
+      const HeadlessWebContents::CreateParams& params) = 0;
+  virtual HeadlessWebContents* CreateWebContents(const GURL& initial_url) = 0;
+  virtual HeadlessWebContents* CreateWebContents() = 0;
 
   // Returns all web contents owned by this browser context.
   virtual std::vector<HeadlessWebContents*> GetAllWebContents() = 0;

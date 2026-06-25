@@ -70,10 +70,8 @@ IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest, Navigation) {
   HeadlessBrowserContext* browser_context =
       browser()->CreateBrowserContextBuilder().Build();
 
-  HeadlessWebContents* web_contents =
-      browser_context->CreateWebContentsBuilder()
-          .SetInitialURL(embedded_test_server()->GetURL("/hello.html"))
-          .Build();
+  HeadlessWebContents* web_contents = browser_context->CreateWebContents(
+      embedded_test_server()->GetURL("/hello.html"));
   EXPECT_TRUE(WaitForLoad(web_contents));
 
   EXPECT_THAT(browser_context->GetAllWebContents(),
@@ -87,19 +85,15 @@ IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest,
   HeadlessBrowserContext* browser_context =
       browser()->CreateBrowserContextBuilder().Build();
 
-  HeadlessWebContents* web_contents =
-      browser_context->CreateWebContentsBuilder()
-          .SetInitialURL(embedded_test_server()->GetURL("/hello.html"))
-          .Build();
+  HeadlessWebContents* web_contents = browser_context->CreateWebContents(
+      embedded_test_server()->GetURL("/hello.html"));
   WaitForLoadAndGainFocus(web_contents);
 
   EXPECT_THAT(EvaluateScript(web_contents, "document.hasFocus()"),
               DictHasValue("result.result.value", true));
 
-  HeadlessWebContents* web_contents2 =
-      browser_context->CreateWebContentsBuilder()
-          .SetInitialURL(embedded_test_server()->GetURL("/hello.html"))
-          .Build();
+  HeadlessWebContents* web_contents2 = browser_context->CreateWebContents(
+      embedded_test_server()->GetURL("/hello.html"));
   WaitForLoadAndGainFocus(web_contents2);
 
   // Focus of different WebContents is independent.
@@ -118,9 +112,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest, HandleSSLError) {
       browser()->CreateBrowserContextBuilder().Build();
 
   HeadlessWebContents* web_contents =
-      browser_context->CreateWebContentsBuilder()
-          .SetInitialURL(https_server.GetURL("/hello.html"))
-          .Build();
+      browser_context->CreateWebContents(https_server.GetURL("/hello.html"));
 
   EXPECT_FALSE(WaitForLoad(web_contents));
 }
@@ -259,8 +251,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest, BrowserTabChangeContent) {
   HeadlessBrowserContext* browser_context =
       browser()->CreateBrowserContextBuilder().Build();
 
-  HeadlessWebContents* web_contents =
-      browser_context->CreateWebContentsBuilder().Build();
+  HeadlessWebContents* web_contents = browser_context->CreateWebContents();
   EXPECT_TRUE(WaitForLoad(web_contents));
 
   std::string script = "window.location = '" +
@@ -279,10 +270,8 @@ IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest, BrowserOpenInTab) {
   HeadlessBrowserContext* browser_context =
       browser()->CreateBrowserContextBuilder().Build();
 
-  HeadlessWebContents* web_contents =
-      browser_context->CreateWebContentsBuilder()
-          .SetInitialURL(embedded_test_server()->GetURL("/link.html"))
-          .Build();
+  HeadlessWebContents* web_contents = browser_context->CreateWebContents(
+      embedded_test_server()->GetURL("/link.html"));
   EXPECT_TRUE(WaitForLoad(web_contents));
 
   EXPECT_EQ(1u, browser_context->GetAllWebContents().size());
@@ -680,10 +669,8 @@ IN_PROC_BROWSER_TEST_F(HeadlessWebContentsAIPageContentTest, GetAIPageContent) {
   EXPECT_TRUE(embedded_test_server()->Start());
   HeadlessBrowserContext* browser_context =
       browser()->CreateBrowserContextBuilder().Build();
-  HeadlessWebContents* web_contents =
-      browser_context->CreateWebContentsBuilder()
-          .SetInitialURL(embedded_test_server()->GetURL("/hello.html"))
-          .Build();
+  HeadlessWebContents* web_contents = browser_context->CreateWebContents(
+      embedded_test_server()->GetURL("/hello.html"));
   EXPECT_TRUE(WaitForLoad(web_contents));
 
   content::WebContents* content_web_contents =

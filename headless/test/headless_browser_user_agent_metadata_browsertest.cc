@@ -81,10 +81,8 @@ class HeadlessBrowserNavigatorUADataTest : public HeadlessBrowserTest {
     HeadlessBrowserContext* browser_context =
         browser()->CreateBrowserContextBuilder().Build();
 
-    web_contents_ =
-        browser_context->CreateWebContentsBuilder()
-            .SetInitialURL(embedded_test_server()->GetURL("/hello.html"))
-            .Build();
+    web_contents_ = browser_context->CreateWebContents(
+        embedded_test_server()->GetURL("/hello.html"));
     EXPECT_TRUE(WaitForLoad(web_contents_));
 
     devtools_client_.AttachToWebContents(
@@ -234,10 +232,8 @@ class HeadlessBrowserUAHeaderTest : public HeadlessBrowserTest {
     // Capture the initial request.
     CaptureHeadersForPath("/hello.html");
 
-    web_contents_ =
-        browser_context->CreateWebContentsBuilder()
-            .SetInitialURL(embedded_test_server()->GetURL("/hello.html"))
-            .Build();
+    web_contents_ = browser_context->CreateWebContents(
+        embedded_test_server()->GetURL("/hello.html"));
     EXPECT_TRUE(WaitForLoad(web_contents_));
 
     devtools_client_.AttachToWebContents(

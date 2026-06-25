@@ -49,7 +49,10 @@ class HEADLESS_EXPORT HeadlessBrowserContextImpl final
       HeadlessBrowserContext::Builder* builder);
 
   // HeadlessBrowserContext implementation:
-  HeadlessWebContents::Builder CreateWebContentsBuilder() override;
+  HeadlessWebContents* CreateWebContents(
+      const HeadlessWebContents::CreateParams& params) override;
+  HeadlessWebContents* CreateWebContents(const GURL& initial_url) override;
+  HeadlessWebContents* CreateWebContents() override;
   std::vector<HeadlessWebContents*> GetAllWebContents() override;
   void Close() override;
   const std::string& Id() override;
@@ -80,7 +83,6 @@ class HEADLESS_EXPORT HeadlessBrowserContextImpl final
   content::OriginTrialsControllerDelegate* GetOriginTrialsControllerDelegate()
       override;
 
-  HeadlessWebContents* CreateWebContents(HeadlessWebContents::Builder* builder);
   // Register web contents which were created not through Headless API
   // (calling window.open() is a best example for this).
   void RegisterWebContents(

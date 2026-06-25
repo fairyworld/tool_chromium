@@ -121,8 +121,6 @@ void HeadlessShell::OnBrowserStart(HeadlessBrowser* browser) {
   }
 
   GURL target_url = ConvertArgumentToURL(args.front());
-  HeadlessWebContents::Builder builder(
-      browser_context->CreateWebContentsBuilder());
 
   // Check for headless commands and instantiate headless command handler
   // that will execute the commands against the target page.
@@ -130,7 +128,7 @@ void HeadlessShell::OnBrowserStart(HeadlessBrowser* browser) {
   if (HeadlessCommandHandler::HasHeadlessCommandSwitches(command_line)) {
     GURL handler_url = HeadlessCommandHandler::GetHandlerUrl();
     HeadlessWebContents* web_contents =
-        builder.SetInitialURL(handler_url).Build();
+        browser_context->CreateWebContents(handler_url);
     if (!web_contents) {
       LOG(ERROR) << "Navigation to " << handler_url << " failed.";
       ShutdownSoon();
@@ -147,7 +145,8 @@ void HeadlessShell::OnBrowserStart(HeadlessBrowser* browser) {
 #endif
 
   // Otherwise just open the target page.
-  HeadlessWebContents* web_contents = builder.SetInitialURL(target_url).Build();
+  HeadlessWebContents* web_contents =
+      browser_context->CreateWebContents(target_url);
   if (!web_contents) {
     LOG(ERROR) << "Navigation to " << target_url << " failed.";
     ShutdownSoon();

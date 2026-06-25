@@ -125,10 +125,32 @@ std::unique_ptr<HeadlessBrowserContextImpl> HeadlessBrowserContextImpl::Create(
       builder->browser_, std::move(builder->options_)));
 }
 
-HeadlessWebContents::Builder
-HeadlessBrowserContextImpl::CreateWebContentsBuilder() {
-  DCHECK(browser_->BrowserMainThread()->BelongsToCurrentThread());
-  return HeadlessWebContents::Builder(this);
+HeadlessWebContents* HeadlessBrowserContextImpl::CreateWebContents(
+    const HeadlessWebContents::CreateParams& params) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+
+  std::unique_ptr<HeadlessWebContentsImpl> headless_web_contents =
+      HeadlessWebContentsImpl::Create(params);
+
+  if (!headless_web_contents) {
+    return nullptr;
+  }
+
+  HeadlessWebContents* result = headless_web_contents.get();
+
+  RegisterWebContents(std::move(headless_web_contents));
+
+  return result;
+}
+
+HeadlessWebContents* HeadlessBrowserContextImpl::CreateWebContents(
+    const GURL& initial_url) {
+  return CreateWebContents(
+      HeadlessWebContents::CreateParams(this, initial_url));
+}
+
+HeadlessWebContents* HeadlessBrowserContextImpl::CreateWebContents() {
+  return CreateWebContents(HeadlessWebContents::CreateParams(this));
 }
 
 std::vector<HeadlessWebContents*>
@@ -258,24 +280,6 @@ HeadlessBrowserContextImpl::GetOriginTrialsControllerDelegate() {
             std::make_unique<blink::TrialTokenValidator>());
   }
   return origin_trials_controller_delegate_.get();
-}
-
-HeadlessWebContents* HeadlessBrowserContextImpl::CreateWebContents(
-    HeadlessWebContents::Builder* builder) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  std::unique_ptr<HeadlessWebContentsImpl> headless_web_contents =
-      HeadlessWebContentsImpl::Create(builder);
-
-  if (!headless_web_contents) {
-    return nullptr;
-  }
-
-  HeadlessWebContents* result = headless_web_contents.get();
-
-  RegisterWebContents(std::move(headless_web_contents));
-
-  return result;
 }
 
 void HeadlessBrowserContextImpl::RegisterWebContents(
