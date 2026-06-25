@@ -13,6 +13,7 @@
 #include "build/buildflag.h"
 #include "components/input/timeout_monitor.h"
 #include "content/browser/renderer_host/navigation_controller_impl.h"
+#include "content/browser/renderer_host/render_frame_host_manager.h"
 #include "content/browser/site_instance_impl.h"
 #include "content/common/content_navigation_policy.h"
 #include "content/common/features.h"
@@ -562,6 +563,29 @@ TEST_F(RenderFrameHostImplTest, ChildOfCredentiallessIsCredentialless) {
       grandchild_frame->GetNetworkIsolationKey().GetNonce().has_value());
   EXPECT_EQ(main_test_rfh()->GetPage().credentialless_iframes_nonce(),
             grandchild_frame->GetNetworkIsolationKey().GetNonce().value());
+}
+
+TEST_F(RenderFrameHostImplTest, SpeculativeFrameHostIsCredentialless) {
+  // Start with a committed page.
+  GURL url1("https://a.com");
+  NavigationSimulator::NavigateAndCommitFromDocument(url1, main_test_rfh());
+
+  // Start a cross-site navigation to create a speculative RFH.
+  GURL url2("https://b.com");
+  std::unique_ptr<NavigationSimulator> simulator =
+      NavigationSimulator::CreateBrowserInitiated(url2, contents());
+  simulator->Start();
+
+  RenderFrameHostManager* manager =
+      main_test_rfh()->frame_tree_node()->render_manager();
+  RenderFrameHostImpl* speculative_rfh = manager->speculative_frame_host();
+
+  if (AreStrictSiteInstancesEnabled()) {
+    ASSERT_NE(speculative_rfh, nullptr);
+    // Verify that calling IsCredentialless() on the speculative RFH
+    // does not crash and returns false (since it has no policy container yet).
+    EXPECT_FALSE(speculative_rfh->IsCredentialless());
+  }
 }
 
 // FakeLocalFrame implementation that records calls to BeforeUnload().
