@@ -15114,6 +15114,23 @@
             ]
         }
     ],
+    "IosAppStoreAgeSignal": [
+        {
+            "platforms": [
+                "ios"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "BuildExternalPrivacyContext",
+                        "EnforceCanSignInToChromeCapability",
+                        "ReadContextualAccountCapabilities"
+                    ]
+                }
+            ]
+        }
+    ],
     "IosOptimizedCPEPerformance": [
         {
             "platforms": [
