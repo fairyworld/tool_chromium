@@ -4190,6 +4190,55 @@ IN_PROC_BROWSER_TEST_F(PrerenderTargetHintBrowserTest,
   }
 }
 
+// Tests that once a prerender is consumed by activation, re-adding the same
+// speculation rule is able to start a fresh prerender (crbug.com/513412121).
+IN_PROC_BROWSER_TEST_F(
+    PrerenderTargetHintBrowserTest,
+    ActivateSameUrlAfterOriginalHasBeenConsumedByActivation) {
+  const GURL initial_url = GetUrl("/simple_links.html");
+  const GURL prerendering_url = GetUrl("/title2.html");
+
+  // Navigate to an initial page which has a link to `prerendering_url`.
+  ASSERT_TRUE(NavigateToURL(shell(), initial_url));
+
+  // Start prerendering `prerendering_url`.
+  PrerenderHostId host_id = prerender_helper()->AddPrerender(
+      prerendering_url, /*eagerness=*/std::nullopt, "_blank");
+  auto* prerender_web_contents =
+      test::PrerenderTestHelper::GetPrerenderWebContents(host_id);
+  ASSERT_NE(prerender_web_contents, web_contents_impl());
+
+  TestNavigationObserver activation_observer(prerendering_url);
+  activation_observer.WatchExistingWebContents();
+  test::PrerenderHostObserver prerender_observer(*prerender_web_contents,
+                                                 host_id);
+  prerender_helper()->OpenNewWindowWithoutOpener(*web_contents_impl(),
+                                                 prerendering_url);
+
+  activation_observer.WaitForNavigationFinished();
+  EXPECT_EQ(prerender_web_contents->GetLastCommittedURL(), prerendering_url);
+  EXPECT_EQ(activation_observer.last_navigation_url(), prerendering_url);
+  EXPECT_TRUE(prerender_observer.was_activated());
+  EXPECT_FALSE(HasHostForUrl(prerendering_url));
+
+  ExpectFinalStatusForSpeculationRule(PrerenderFinalStatus::kActivated);
+
+  // Re-add the same "_blank" speculation rule now that the original prerender
+  // has been consumed by activation. This should start a brand-new
+  // prerender-into-new-tab for the same URL.
+  PrerenderHostId new_host_id = prerender_helper()->AddPrerender(
+      prerendering_url, /*eagerness=*/std::nullopt, "_blank");
+  EXPECT_NE(new_host_id, host_id);
+
+  // The new prerender should live in its own new-tab WebContents, distinct from
+  // both the initiator and the now-activated original prerender.
+  auto* new_prerender_web_contents =
+      test::PrerenderTestHelper::GetPrerenderWebContents(new_host_id);
+  ASSERT_NE(new_prerender_web_contents, web_contents_impl());
+  ASSERT_NE(new_prerender_web_contents, prerender_web_contents);
+  ExpectWebContentsIsForNewTabPrerendering(*new_prerender_web_contents);
+}
+
 // Tests that window.open() annotated with "_blank" and "noopener" can activate
 // a prerender whose target_hint is "_blank".
 IN_PROC_BROWSER_TEST_F(PrerenderTargetHintBrowserTest,
