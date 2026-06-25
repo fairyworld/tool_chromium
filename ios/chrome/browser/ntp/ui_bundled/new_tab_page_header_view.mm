@@ -1434,9 +1434,6 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
 
   // Fakebox coloring looks at image/color/default to determine correct colors.
   [self setFakeboxColorsWithProgress:_lastAnimationPercent];
-
-
-  [self.fakeLocationBar applyBackgroundTheme];
 }
 
 // Empties the fakebox buttons stack.

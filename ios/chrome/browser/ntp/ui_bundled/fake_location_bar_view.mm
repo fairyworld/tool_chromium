@@ -80,6 +80,8 @@ UIColor* FakeboxBottomColor() {
 
     // Make sure the correct background is visible.
     if (IsNTPBackgroundCustomizationEnabled()) {
+      [self registerForTraitChanges:@[ NewTabPageImageBackgroundTrait.class ]
+                         withAction:@selector(applyBackgroundTheme)];
       [self applyBackgroundTheme];
     } else {
       _fakeLocationBarGradientView.hidden = NO;
