@@ -610,6 +610,8 @@ public abstract class ChromeFeatureList {
     public static final String RENAME_JOURNEYS = "RenameJourneys";
     public static final String REPORT_NOTIFICATION_CONTENT_DETECTION_DATA =
             "ReportNotificationContentDetectionData";
+    public static final String RESET_NATIVE_POINTER_IN_CREDIT_CARD_AUTH_DIALOG =
+            "ResetNativePointerInCreditCardAuthDialog";
     public static final String ROBUST_WINDOW_MANAGEMENT_EXPERIMENTAL =
             "RobustWindowManagementExperimental";
     public static final String SAFETY_HUB = "SafetyHub";

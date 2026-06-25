@@ -1064,6 +1064,11 @@ BASE_FEATURE(kManageTravelPerceptionSurvey, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kManageYourSavedInfoPerceptionSurvey,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
+// If enabled, the AuthenticatorSelectionDialogBridge will reset the native
+// pointer when the dialog is dismissed.
+BASE_FEATURE(kResetNativePointerInCreditCardAuthDialog,
+             base::FEATURE_ENABLED_BY_DEFAULT);
+
 // If enabled, an entry point to AtMemory will be shown at the bottom of the
 // Autocomplete dialogs.
 BASE_FEATURE(kShowAutocompleteAtMemoryButton,
