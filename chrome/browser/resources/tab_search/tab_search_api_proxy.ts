@@ -6,7 +6,7 @@ import type {ProfileData, SwitchToTabInfo, TokenRange} from './tab_search.mojom-
 import {PageCallbackRouter, PageHandlerFactory, PageHandlerRemote} from './tab_search.mojom-webui.js';
 
 /**
- * These values are persisted to logs and should not be renumbered or re-used.
+ * These values are persisted to logs and should not be renumbered or reused.
  * See tools/metrics/histograms/enums.xml.
  */
 export enum RecentlyClosedItemOpenAction {

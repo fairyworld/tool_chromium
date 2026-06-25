@@ -51,7 +51,7 @@ export const SEARCH_QUERY_MAX_LENGTH: number = 400;
 const TabSearchSearchFieldBase = CrSearchFieldMixinLit(CrLitElement);
 
 /**
- * These values are persisted to logs and should not be renumbered or re-used.
+ * These values are persisted to logs and should not be renumbered or reused.
  * See tools/metrics/histograms/enums.xml.
  */
 export enum TabSwitchAction {
