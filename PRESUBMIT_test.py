@@ -3198,6 +3198,31 @@ class BannedTypeCheckTest(unittest.TestCase):
         self.assertNotIn('some/cpp/ok/web_contents_destroyed_watcher.cc',
                          results[0].message)
 
+    def testBannedPerfettoTrack(self):
+        input_api = MockInputApi()
+        input_api.files = [
+            MockFile('some/cpp/problematic/file.cc', [
+                'perfetto::Track(123);',
+                'perfetto::Track::Global(456);',
+                'perfetto::Track::FromPointer(ptr);',
+                'perfetto::Track::ThreadScoped(ptr);',
+                'perfetto::Track{123};',
+            ]),
+            MockFile('some/cpp/ok/file.cc', [
+                'const perfetto::Track& track',
+                'perfetto::Track track;',
+                'std::vector<perfetto::Track> tracks;',
+                'perfetto::TrackEvent event;',
+            ]),
+        ]
+
+        results = PRESUBMIT.CheckNoBannedPatterns(input_api, MockOutputApi())
+
+        self.assertEqual(5, len(results))
+        for i in range(5):
+            self.assertIn('some/cpp/problematic/file.cc', results[i].message)
+            self.assertNotIn('some/cpp/ok/file.cc', results[i].message)
+
     def testBannedCppRandomFunctions(self):
         banned_rngs = [
             'absl::BitGen',
