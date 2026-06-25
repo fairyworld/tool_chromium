@@ -83,7 +83,7 @@ import java.util.List;
 @UseRunnerDelegate(ChromeJUnit4RunnerDelegate.class)
 @CommandLineFlags.Add({ChromeSwitches.DISABLE_FIRST_RUN_EXPERIENCE})
 @Batch(Batch.PER_CLASS)
-public class TabVerticalViewBinderRenderTest {
+public class VerticalTabListRenderTest {
     @ClassParameter
     private static final List<ParameterSet> sClassParams =
             new NightModeTestUtils.NightModeParams().getParameters();
@@ -96,13 +96,13 @@ public class TabVerticalViewBinderRenderTest {
     public ChromeRenderTestRule mRenderTestRule =
             ChromeRenderTestRule.Builder.withPublicCorpus()
                     .setBugComponent(UI_BROWSER_MOBILE_TAB_SWITCHER_GRID)
-                    .setRevision(2)
+                    .setRevision(1)
                     .build();
 
     private Activity mActivity;
     private FrameLayout mRenderView;
 
-    public TabVerticalViewBinderRenderTest(boolean isNightModeEnabled) {
+    public VerticalTabListRenderTest(boolean isNightModeEnabled) {
         NightModeTestUtils.setUpNightModeForBlankUiTestActivity(isNightModeEnabled);
         mRenderTestRule.setNightModeEnabled(isNightModeEnabled);
     }
