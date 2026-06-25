@@ -37,12 +37,10 @@ source_set("impl") {
     "translate_service.cc",
   ]
 
-  public_deps = [
-    ":translate",
-    "//chrome/browser:browser_public_dependencies",
-  ]
+  public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 
   deps = [
+    ":translate",
     "//chrome/browser:browser_process",
     "//chrome/browser/language",
     "//chrome/browser/language_detection",
@@ -79,6 +77,7 @@ source_set("impl") {
       "//chrome/browser/ui/tabs:tab_strip",
       "//chrome/browser/ui/toasts",
       "//chrome/browser/ui/toasts/api:toasts",
+      "//chrome/browser/ui/views/translate",
     ]
   }
 
@@ -133,6 +132,7 @@ if (!is_android) {
       "//chrome/browser/ui/toasts",
       "//chrome/browser/ui/toasts/api:toasts",
       "//chrome/browser/ui/translate",
+      "//chrome/browser/ui/views/translate",
       "//chrome/common",
       "//chrome/test:test_support",
       "//components/language/core/browser",

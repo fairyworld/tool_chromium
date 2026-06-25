@@ -4646,16 +4646,6 @@ static_library("ui") {
       "views/title_origin_label.h",
       "views/toolbar/avatar_toolbar_button_interface.cc",
       "views/toolbar/avatar_toolbar_button_interface.h",
-      "views/translate/partial_translate_bubble_view.cc",
-      "views/translate/partial_translate_bubble_view.h",
-      "views/translate/translate_bubble_controller.cc",
-      "views/translate/translate_bubble_controller.h",
-      "views/translate/translate_bubble_view.cc",
-      "views/translate/translate_bubble_view.h",
-      "views/translate/translate_language_search_view.cc",
-      "views/translate/translate_language_search_view.h",
-      "views/translate/translate_page_action_controller.cc",
-      "views/translate/translate_page_action_controller.h",
       "views/update_recommended_message_box.cc",
       "views/update_recommended_message_box.h",
       "views/upgrade_notification_controller.cc",
@@ -4922,6 +4912,8 @@ static_library("ui") {
       "//chrome/browser/ui/views/tabs/shared:impl",
       "//chrome/browser/ui/views/tabs/vertical",
       "//chrome/browser/ui/views/tabs/vertical:impl",
+      "//chrome/browser/ui/views/translate",
+      "//chrome/browser/ui/views/translate:impl",
       "//chrome/browser/ui/views/user_education",
       "//chrome/browser/ui/views/web_apps",
       "//chrome/browser/ui/views/web_dialogs",
@@ -5230,6 +5222,13 @@ static_library("ui") {
       # the following headers get modularized:
       # - c/b/ui/tab_ui_helper.h
       "//chrome/browser/ui/views/performance_controls:impl",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following headers get componentized:
+      # c/b/ui/chrome_pages.h
+      # c/b/ui/scoped_tabbed_browser_displayer.h
+      # c/b/ui/views/frame/browser_view.h
+      "//chrome/browser/ui/views/translate:impl",
     ]
 
     if (is_linux) {

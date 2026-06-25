@@ -4445,8 +4445,6 @@ if (!is_android) {
         "../browser/ui/views/tab_sharing/tab_sharing_test_utils.h",
         "../browser/ui/views/tab_sharing/tab_sharing_ui_views_browsertest.cc",
         "../browser/ui/views/tabs/groups/tab_group_editor_bubble_view_browsertest.cc",
-        "../browser/ui/views/translate/translate_bubble_test_utils_views.cc",
-        "../browser/ui/views/translate/translate_bubble_view_browsertest.cc",
         "../browser/ui/views/ui_devtools_browsertest.cc",
         "../browser/ui/views/upgrade_notification_controller_browsertest.cc",
         "../browser/ui/views/user_education/help_bubble_factory_views_browsertest.cc",
@@ -4568,6 +4566,9 @@ if (!is_android) {
         "//chrome/browser/ui/views/permissions:permission_prompt_observer",
         "//chrome/browser/ui/views/permissions/chip",
         "//chrome/browser/ui/views/send_tab_to_self",
+        "//chrome/browser/ui/views/translate",
+        "//chrome/browser/ui/views/translate:browser_tests",
+        "//chrome/browser/ui/views/translate:test_support",
         "//chrome/browser/ui/webui_browser:browser_tests",
         "//chrome/browser/ui/zoom:browser_tests",
         "//components/commerce/core:account_checker_test_support",
@@ -9116,6 +9117,7 @@ test("unit_tests") {
       "//chrome/browser/ui/views/permissions/chip",
       "//chrome/browser/ui/views/send_tab_to_self",
       "//chrome/browser/ui/views/tabs/vertical",
+      "//chrome/browser/ui/views/translate:unit_tests",
       "//chrome/browser/ui/views/web_dialogs:unit_tests",
       "//components/app_constants",
       "//components/commerce/core:pref_names",
@@ -9269,9 +9271,6 @@ test("unit_tests") {
       "../browser/ui/views/tabs/tab_strip_unittest.cc",
       "../browser/ui/views/tabs/tab_unittest.cc",
       "../browser/ui/views/task_manager_search_bar_view_unittest.cc",
-      "../browser/ui/views/translate/partial_translate_bubble_view_unittest.cc",
-      "../browser/ui/views/translate/translate_bubble_controller_unittest.cc",
-      "../browser/ui/views/translate/translate_bubble_view_unittest.cc",
       "../browser/ui/views/user_education/browser_help_bubble_unittest.cc",
       "../browser/ui/views/user_education/browser_ntp_promos_unittest.cc",
       "../browser/ui/views/user_education/browser_user_education_service_unittest.cc",
@@ -10531,9 +10530,6 @@ if (!is_android && !is_chromeos_device) {
         "../browser/ui/views/tabs/tab_strip_interactive_uitest.cc",
         "../browser/ui/views/test/view_event_test_base.cc",
         "../browser/ui/views/test/view_event_test_base.h",
-        "../browser/ui/views/translate/translate_bubble_test_utils_views.cc",
-        "../browser/ui/views/translate/translate_bubble_view_interactive_uitest.cc",
-        "../browser/ui/views/translate/translate_page_action_interactive_uitest.cc",
         "../browser/ui/views/user_education/browser_user_education_service_interactive_uitest.cc",
         "../browser/ui/views/user_education/custom_webui_help_bubble_interactive_uitest.cc",
         "../browser/ui/views/user_education/feature_promo_dialog_interactive_uitest.cc",
@@ -10601,6 +10597,9 @@ if (!is_android && !is_chromeos_device) {
         "//chrome/browser/ui/views/performance_controls:interactive_ui_tests",
         "//chrome/browser/ui/views/permissions/chip",
         "//chrome/browser/ui/views/tabs/vertical:impl",
+        "//chrome/browser/ui/views/translate",
+        "//chrome/browser/ui/views/translate:interactive_ui_tests",
+        "//chrome/browser/ui/views/translate:test_support",
         "//chrome/browser/ui/views/webid:interactive_ui_tests",
         "//chrome/browser/ui/views/zoom:interactive_ui_tests",
         "//chrome/browser/ui/web_applications:launch_utils",
@@ -11202,10 +11201,7 @@ if (!is_android) {
   test("captured_sites_interactive_tests") {
     use_xvfb = use_xvfb_in_this_config
 
-    sources = [
-      "../browser/ui/views/translate/translate_bubble_test_utils_views.cc",
-      "base/interactive_ui_tests_main.cc",
-    ]
+    sources = [ "base/interactive_ui_tests_main.cc" ]
 
     configs += [ "//build/config:precompiled_headers" ]
 
@@ -11249,6 +11245,7 @@ if (!is_android) {
       "//chrome/browser/ui/browser_window",
       "//chrome/browser/ui/translate",
       "//chrome/browser/ui/translate:test_support",
+      "//chrome/browser/ui/views/translate:test_support",
       "//chrome/renderer",
       "//components/javascript_dialogs",
       "//components/resources",
