@@ -111,6 +111,10 @@ void GeolocationHeaderService::Shutdown() {
 }
 
 void GeolocationHeaderService::PrimeLocation() {
+  if (!base::FeatureList::IsEnabled(omnibox::kPlatformAgnosticXGeo)) {
+    return;
+  }
+
   if (geolocation_.is_bound() || !template_url_service_) {
     return;
   }
@@ -184,8 +188,11 @@ GeolocationHeaderService::GetCachedLocationAccuracy() const {
 std::optional<std::string> GeolocationHeaderService::GetLocationHeader(
     const GURL& url,
     bool for_automatic_sending) {
-  if (!url.SchemeIs(url::kHttpsScheme) || !HasCachedLocation() ||
-      !IsUrlEligibleForLocationHeader(url)) {
+  if (!base::FeatureList::IsEnabled(omnibox::kPlatformAgnosticXGeo)) {
+    return std::nullopt;
+  }
+
+  if (!HasCachedLocation() || !IsUrlEligibleForLocationHeader(url)) {
     return std::nullopt;
   }
 
@@ -242,6 +249,58 @@ void GeolocationHeaderService::RecordInlineLocationSuggestionShown(
   }
 }
 
+bool GeolocationHeaderService::IsUrlEligibleForLocationHeader(
+    const GURL& url) const {
+  if (!url.SchemeIs(url::kHttpsScheme)) {
+    return false;
+  }
+
+  if (!template_url_service_) {
+    return false;
+  }
+  const TemplateURL* default_provider =
+      template_url_service_->GetDefaultSearchProvider();
+  if (!default_provider) {
+    return false;
+  }
+
+  // Only check send_x_geo_header if the feature is enabled, because this
+  // function is also used to check if a URL is eligible for the XGeo header
+  // even with the feature off (for legacy behavior metrics).
+  if (base::FeatureList::IsEnabled(omnibox::kPlatformAgnosticXGeo) &&
+      !default_provider->send_x_geo_header()) {
+    return false;
+  }
+
+  // 1. If the URL is a perfect match for the user's Default Search Engine
+  //    template (e.g., it contains the correct search terms parameter), it is
+  //    eligible.
+  if (default_provider->IsSearchURL(
+          url, template_url_service_->search_terms_data())) {
+    return true;
+  }
+
+  // 2. If it is not a perfect template match, we provide a fallback exclusively
+  //    for Google search properties. This is necessary because valid Google
+  //    searches can occur on non-standard paths (e.g. /webhp) or use hash
+  //    fragments (e.g. /#q=) which fail the strict IsSearchURL check but still
+  //    represent actual search queries.
+  bool is_google_dse =
+      default_provider->GetEngineType(
+          template_url_service_->search_terms_data()) == SEARCH_ENGINE_GOOGLE;
+
+  GURL dse_url = default_provider->GenerateSearchURL(
+      template_url_service_->search_terms_data());
+  bool is_dse_origin =
+      url::Origin::Create(url).IsSameOriginWith(url::Origin::Create(dse_url));
+
+  // The fallback requires the URL to be a recognized Google search URL and to
+  // exactly match the DSE's origin. This prevents leaking location to
+  // non-search Google properties (like google.com/maps) or cross-TLD
+  // navigations (like google.ca when the DSE is google.com).
+  return is_google_dse && is_dse_origin && google_util::IsGoogleSearchUrl(url);
+}
+
 bool GeolocationHeaderService::IsAllowedByPermission(const GURL& url) const {
   if (!HasDeviceLocationPermission(GeolocationAccuracy::kApproximate)) {
     return false;
@@ -282,51 +341,6 @@ bool GeolocationHeaderService::HasDeviceLocationPermission(
   return permissions::PermissionsClient::Get()->HasDevicePermission(
       ContentSettingsType::GEOLOCATION);
 #endif
-}
-
-bool GeolocationHeaderService::IsUrlEligibleForLocationHeader(
-    const GURL& url) const {
-  if (!url.SchemeIs(url::kHttpsScheme)) {
-    return false;
-  }
-
-  if (!template_url_service_) {
-    return false;
-  }
-  const TemplateURL* default_provider =
-      template_url_service_->GetDefaultSearchProvider();
-  if (!default_provider || !default_provider->send_x_geo_header()) {
-    return false;
-  }
-
-  // 1. If the URL is a perfect match for the user's Default Search Engine
-  //    template (e.g., it contains the correct search terms parameter), it is
-  //    eligible.
-  if (default_provider->IsSearchURL(
-          url, template_url_service_->search_terms_data())) {
-    return true;
-  }
-
-  // 2. If it is not a perfect template match, we provide a fallback exclusively
-  //    for Google search properties. This is necessary because valid Google
-  //    searches can occur on non-standard paths (e.g. /webhp) or use hash
-  //    fragments (e.g. /#q=) which fail the strict IsSearchURL check but still
-  //    represent actual search queries.
-  bool is_google_dse =
-      default_provider->GetEngineType(
-          template_url_service_->search_terms_data()) == SEARCH_ENGINE_GOOGLE;
-
-  GURL dse_url = default_provider->GenerateSearchURL(
-      template_url_service_->search_terms_data());
-
-  bool is_dse_origin =
-      url::Origin::Create(url).IsSameOriginWith(url::Origin::Create(dse_url));
-
-  // The fallback requires the URL to be a recognized Google search URL and to
-  // exactly match the DSE's origin. This prevents leaking location to
-  // non-search Google properties (like google.com/maps) or cross-TLD
-  // navigations (like google.ca when the DSE is google.com).
-  return is_google_dse && is_dse_origin && google_util::IsGoogleSearchUrl(url);
 }
 
 bool GeolocationHeaderService::EnsureGeolocationServiceConnection(

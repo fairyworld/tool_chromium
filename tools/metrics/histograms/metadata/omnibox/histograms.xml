@@ -4041,6 +4041,18 @@ Keep consistent with active providers. Doesn't need to include every provider in
   </summary>
 </histogram>
 
+<histogram name="Omnibox.Search.XGeoHeaderAttached" enum="Boolean"
+    expires_after="2026-11-20">
+  <owner>andypaicu@chromium.org</owner>
+  <owner>chrome-desktop-search@google.com</owner>
+  <summary>
+    Records whether the X-Geo HTTP header was attached to a search request
+    originating from the omnibox. Emitted when the network loader throttle
+    processes WillStartRequest or WillRedirectRequest for default search engine
+    search requests.
+  </summary>
+</histogram>
+
 <histogram name="Omnibox.SearchboxStats.Length" units="chars"
     expires_after="2026-11-12">
   <owner>mahmadi@chromium.org</owner>

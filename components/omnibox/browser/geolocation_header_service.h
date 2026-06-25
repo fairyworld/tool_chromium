@@ -97,6 +97,9 @@ class GeolocationHeaderService : public KeyedService {
       OmniboxInlineLocationSuggestionShown shown_state,
       size_t match_index) const;
 
+  // Returns true if the given URL is eligible for the X-Geo header.
+  bool IsUrlEligibleForLocationHeader(const GURL& url) const;
+
   void SetLocationAgeForTesting(base::TimeDelta age) {
     location_age_for_testing_ = age;
   }
@@ -115,7 +118,6 @@ class GeolocationHeaderService : public KeyedService {
   bool IsAllowedByPermission(const GURL& url) const;
   bool HasPrecisePermission(const GURL& url) const;
   bool HasDeviceLocationPermission(GeolocationAccuracy accuracy) const;
-  bool IsUrlEligibleForLocationHeader(const GURL& url) const;
 
   // Encapsulates the logic to connect to the device geolocation service.
   bool EnsureGeolocationServiceConnection(const GURL& requesting_url,
