@@ -18,6 +18,7 @@
 #include "components/favicon/core/test/mock_favicon_service.h"
 #include "components/multistep_filter/content/filter_initiated_navigation_marker.h"
 #include "components/multistep_filter/core/annotation_index/mock_annotation_index_client.h"
+#include "components/multistep_filter/core/data_models/suggestion_user_decision.h"
 #include "components/multistep_filter/core/features.h"
 #include "components/multistep_filter/core/multistep_filter_service.h"
 #include "components/multistep_filter/core/multistep_filter_util.h"
@@ -337,8 +338,7 @@ TEST_F(FilterUiControllerTest, ClearSuggestionResetsCachedSuggestion) {
 
   controller_->OnSuggestionGenerated(suggestion);
 
-  controller_->FilterUiController::ClearSuggestion(
-      FilterUiController::SuggestionUserDecision::kIgnored);
+  controller_->ClearSuggestion(SuggestionUserDecision::kIgnored);
 
   // Verify that the current suggestion is reset.
   EXPECT_FALSE(test_api(*controller_).suggestion_state().has_value());
@@ -369,8 +369,7 @@ TEST_F(FilterUiControllerTest, ClearSuggestionHidesPageAction) {
               HideAnchoredMessage(kActionMultistepFilter))
       .Times(1);
 
-  controller_->FilterUiController::ClearSuggestion(
-      FilterUiController::SuggestionUserDecision::kIgnored);
+  controller_->ClearSuggestion(SuggestionUserDecision::kIgnored);
 }
 
 TEST_F(FilterUiControllerTest, ClearSuggestionResetsViewState) {
@@ -382,8 +381,7 @@ TEST_F(FilterUiControllerTest, ClearSuggestionResetsViewState) {
   EXPECT_EQ(test_api(*controller_).suggestion_state()->view_state,
             FilterUiController::SuggestionViewState::kShowingInitialCue);
 
-  controller_->ClearSuggestion(
-      FilterUiController::SuggestionUserDecision::kIgnored);
+  controller_->ClearSuggestion(SuggestionUserDecision::kIgnored);
   EXPECT_FALSE(test_api(*controller_).suggestion_state().has_value());
 }
 

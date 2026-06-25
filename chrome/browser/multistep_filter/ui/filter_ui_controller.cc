@@ -24,6 +24,7 @@
 #include "chrome/grit/generated_resources.h"
 #include "components/favicon/core/favicon_service.h"
 #include "components/multistep_filter/content/filter_initiated_navigation_marker.h"
+#include "components/multistep_filter/core/data_models/suggestion_user_decision.h"
 #include "components/multistep_filter/core/logging/log_entry.h"
 #include "components/multistep_filter/core/logging/multistep_filter_logger.h"
 #include "components/multistep_filter/core/multistep_filter_service.h"
@@ -47,20 +48,19 @@ namespace multistep_filter {
 
 namespace {
 
-void LogSuggestionUiDecision(
-    MultistepFilterLogRouter* log_router,
-    const FilterUiController::SuggestionState& state,
-    FilterUiController::SuggestionUserDecision decision) {
+void LogSuggestionUiDecision(MultistepFilterLogRouter* log_router,
+                             const FilterUiController::SuggestionState& state,
+                             SuggestionUserDecision decision) {
   LogEventType event_type;
   switch (decision) {
-    case FilterUiController::SuggestionUserDecision::kAccepted:
+    case SuggestionUserDecision::kAccepted:
       event_type = LogEventType::kSuggestionAccepted;
       break;
-    case FilterUiController::SuggestionUserDecision::kDismissed:
+    case SuggestionUserDecision::kDismissed:
       event_type = LogEventType::kSuggestionDismissed;
       break;
-    case FilterUiController::SuggestionUserDecision::kIgnored:
-    case FilterUiController::SuggestionUserDecision::kSettingsOpened:
+    case SuggestionUserDecision::kIgnored:
+    case SuggestionUserDecision::kSettingsOpened:
       event_type = LogEventType::kSuggestionIgnored;
       break;
   }
@@ -80,7 +80,7 @@ void LogSuggestionUiDecision(
       NOTREACHED();
   }
 
-  if (decision == FilterUiController::SuggestionUserDecision::kAccepted) {
+  if (decision == SuggestionUserDecision::kAccepted) {
     MULTISTEP_FILTER_LOG(log_router, state.suggestion.triggering_navigation_id,
                          event_type, state.suggestion.triggering_host)
         << LogDetail{"navigation_attempted", true}
