@@ -22,6 +22,7 @@
 #include "third_party/abseil-cpp/absl/functional/overload.h"
 #if BUILDFLAG(ENABLE_HEVC_PARSER_AND_HW_DECODER)
 #include "media/parsers/h265_parser.h"
+#include "media/parsers/h26x_parser.h"
 #else
 #include "media/parsers/h265_nalu_parser.h"
 #endif  // BUILDFLAG(ENABLE_HEVC_PARSER_AND_HW_DECODER)
@@ -281,11 +282,15 @@ bool HEVCDecoderConfigurationRecord::ParseInternal(BufferReader* reader,
         for (const auto& sei_msg : sei.msgs) {
           std::visit(absl::Overload{
                          [](const H265SEIAlphaChannelInfo& info) {},
-                         [&](const H265SEIContentLightLevelInfo& info) {
+                         [&](const H26xSEIContentLightLevelInfo& info) {
                            hdr_metadata.SetCLLI(info.ToSkHdr());
                          },
-                         [&](const H265SEIMasteringDisplayInfo& info) {
+                         [&](const H26xSEIMasteringDisplayInfo& info) {
                            hdr_metadata.SetMDCV(info.ToSkHdr());
+                         },
+                         [](const H26xSEIUserDataRegisteredT35& info) {
+                           // TODO(http://crbug.com/395659818): Add method to
+                           // set HDR metadata from T35.
                          },
                          [](std::monostate) {},
                      },
