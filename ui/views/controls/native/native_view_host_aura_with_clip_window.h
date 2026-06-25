@@ -2,11 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef UI_VIEWS_CONTROLS_NATIVE_NATIVE_VIEW_HOST_AURA_H_
-#define UI_VIEWS_CONTROLS_NATIVE_NATIVE_VIEW_HOST_AURA_H_
+#ifndef UI_VIEWS_CONTROLS_NATIVE_NATIVE_VIEW_HOST_AURA_WITH_CLIP_WINDOW_H_
+#define UI_VIEWS_CONTROLS_NATIVE_NATIVE_VIEW_HOST_AURA_WITH_CLIP_WINDOW_H_
 
 #include <memory>
-#include <optional>
 
 #include "base/memory/raw_ptr.h"
 #include "ui/aura/window_observer.h"
@@ -24,15 +23,17 @@ namespace views {
 class NativeViewHost;
 
 // Aura implementation of NativeViewHostWrapper.
-class NativeViewHostAura : public NativeViewHostWrapper,
-                           public aura::WindowObserver {
+class NativeViewHostAuraWithClipWindow : public NativeViewHostWrapper,
+                                         public aura::WindowObserver {
  public:
-  explicit NativeViewHostAura(NativeViewHost* host);
+  explicit NativeViewHostAuraWithClipWindow(NativeViewHost* host);
 
-  NativeViewHostAura(const NativeViewHostAura&) = delete;
-  NativeViewHostAura& operator=(const NativeViewHostAura&) = delete;
+  NativeViewHostAuraWithClipWindow(const NativeViewHostAuraWithClipWindow&) =
+      delete;
+  NativeViewHostAuraWithClipWindow& operator=(
+      const NativeViewHostAuraWithClipWindow&) = delete;
 
-  ~NativeViewHostAura() override;
+  ~NativeViewHostAuraWithClipWindow() override;
 
   // Overridden from NativeViewHostWrapper:
   void AttachNativeView() override;
@@ -59,10 +60,21 @@ class NativeViewHostAura : public NativeViewHostWrapper,
 
  private:
   friend class NativeViewHostAuraTest;
+  class ClippingWindowDelegate;
 
   // Overridden from aura::WindowObserver:
   void OnWindowDestroying(aura::Window* window) override;
   void OnWindowDestroyed(aura::Window* window) override;
+
+  void CreateClippingWindow();
+
+  // Reparents the native view with the clipping window existing between it and
+  // its old parent, so that the fast resize path works.
+  void AddClippingWindow();
+
+  // If the native view has been reparented via AddClippingWindow, this call
+  // undoes it.
+  void RemoveClippingWindow();
 
   // Sets or updates the |corner_radii_| on the native view's layer.
   void ApplyRoundedCorners();
@@ -73,9 +85,13 @@ class NativeViewHostAura : public NativeViewHostWrapper,
   // Our associated NativeViewHost.
   raw_ptr<NativeViewHost> host_;
 
-  // If set, this is applied to the the layer to clip the content of attached
-  // native view.
-  std::optional<gfx::Rect> clip_rect_;
+  std::unique_ptr<ClippingWindowDelegate> clipping_window_delegate_;
+
+  // Window that exists between the native view and the parent that allows for
+  // clipping to occur. This is positioned in the coordinate space of
+  // host_->GetWidget().
+  std::unique_ptr<aura::Window> clipping_window_;
+  std::unique_ptr<gfx::Rect> clip_rect_;
 
   // Holds the corner_radii to be applied.
   gfx::RoundedCornersF corner_radii_;
@@ -92,12 +108,8 @@ class NativeViewHostAura : public NativeViewHostWrapper,
 
   // The top insets to exclude the underlying native view from the target.
   int top_inset_ = 0;
-
-  // If attached, this contains the value of owned_by_parent of the
-  // native view.
-  std::optional<bool> owned_by_parent_;
 };
 
 }  // namespace views
 
-#endif  // UI_VIEWS_CONTROLS_NATIVE_NATIVE_VIEW_HOST_AURA_H_
+#endif  // UI_VIEWS_CONTROLS_NATIVE_NATIVE_VIEW_HOST_AURA_WITH_CLIP_WINDOW_H_
