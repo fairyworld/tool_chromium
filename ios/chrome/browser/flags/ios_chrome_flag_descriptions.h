@@ -1335,11 +1335,6 @@ inline constexpr char kModelBasedPageClassificationName[] =
 inline constexpr char kModelBasedPageClassificationDescription[] =
     "Enables the model based page classification.";
 
-inline constexpr char kMostVisitedTilesCustomizationName[] =
-    "Most Visited Tiles Customization on iOS";
-inline constexpr char kMostVisitedTilesCustomizationDescription[] =
-    "Enables customization of Most Visited tiles on the New Tab Page.";
-
 inline constexpr char kMostVisitedTilesHorizontalRenderGroupName[] =
     "MVTiles Horizontal Render Group";
 inline constexpr char kMostVisitedTilesHorizontalRenderGroupDescription[] =
