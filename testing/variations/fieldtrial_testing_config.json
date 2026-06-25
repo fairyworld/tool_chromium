@@ -24779,6 +24779,7 @@
                         "presentation_offset": "0"
                     },
                     "enable_features": [
+                        "AllowMultipleSwapsPerVsync",
                         "UseAndroidCustomFrameDeadlines"
                     ]
                 },
@@ -24788,6 +24789,7 @@
                         "presentation_offset": "-1"
                     },
                     "enable_features": [
+                        "AllowMultipleSwapsPerVsync",
                         "UseAndroidCustomFrameDeadlines"
                     ]
                 }
