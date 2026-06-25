@@ -24,11 +24,12 @@ TEST_F(WebStateDeferredExecutorTest, AlreadyLoadedCallImmediately) {
   WebStateDeferredExecutor* executor = [[WebStateDeferredExecutor alloc] init];
 
   __block BOOL completion_called = NO;
-  [executor webState:&web_state
-      executeOnceLoaded:^(BOOL success) {
-        EXPECT_TRUE(success);
-        completion_called = YES;
-      }];
+  [executor
+      ensureWebStateIsLoaded:&web_state
+              withCompletion:^(web::WebState* inner_web_state, BOOL success) {
+                EXPECT_TRUE(success);
+                completion_called = YES;
+              }];
 
   EXPECT_TRUE(completion_called);
 }
@@ -49,9 +50,10 @@ class TestNavigationManager : public web::FakeNavigationManager {
   raw_ptr<web::FakeWebState> web_state_;
 };
 
-// Tests that if the web state is unrealized, calling executeOnceLoaded:
-// force-realizes the web state, triggers LoadIfNecessary() on the navigation
-// manager, and calls completion once loading succeeds.
+// Tests that if the web state is unrealized, calling
+// ensureWebStateIsLoaded:withCompletion: force-realizes the web state, triggers
+// LoadIfNecessary() on the navigation manager, and calls completion once
+// loading succeeds.
 TEST_F(WebStateDeferredExecutorTest, UnrealizedTriggersLoadAndCompletes) {
   web::FakeWebState web_state;
   web_state.SetIsRealized(false);
@@ -63,12 +65,9 @@ TEST_F(WebStateDeferredExecutorTest, UnrealizedTriggersLoadAndCompletes) {
 
   WebStateDeferredExecutor* executor = [[WebStateDeferredExecutor alloc] init];
 
-  base::test::TestFuture<BOOL> future;
-  auto* future_ptr = &future;
-  [executor webState:&web_state
-      executeOnceLoaded:^(BOOL success) {
-        future_ptr->SetValue(success);
-      }];
+  base::test::TestFuture<web::WebState*, BOOL> future;
+  [executor ensureWebStateIsLoaded:&web_state
+                    withCompletion:base::CallbackToBlock(future.GetCallback())];
 
   // The web state should be force-realized.
   EXPECT_TRUE(web_state.IsRealized());
@@ -86,7 +85,8 @@ TEST_F(WebStateDeferredExecutorTest, UnrealizedTriggersLoadAndCompletes) {
 
   // The completion block should now be called with success = YES.
   EXPECT_TRUE(future.Wait());
-  EXPECT_TRUE(future.Get());
+  // Get<1>() extracts the second argument from the callback (the success BOOL).
+  EXPECT_TRUE(future.Get<1>());
 }
 
 }  // namespace
