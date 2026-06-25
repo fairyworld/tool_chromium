@@ -156,7 +156,7 @@ BASE_FEATURE(kLensRestrictAnnotatedPageContentToSameSiteFramesForNextQueries,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kLensDeleteContextOnPageNavigation,
-             base::FEATURE_DISABLED_BY_DEFAULT);
+             base::FEATURE_ENABLED_BY_DEFAULT);
 
 const char kLensOverlayAndroidImplIntent[] = "intent";
 const char kLensOverlayAndroidImplWebUI[] = "webui";

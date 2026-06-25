@@ -19,6 +19,7 @@
 #include "third_party/lens_server_proto/aim_query.pb.h"
 #include "third_party/lens_server_proto/lens_overlay_client_context.pb.h"
 #include "third_party/lens_server_proto/lens_overlay_cluster_info.pb.h"
+#include "third_party/lens_server_proto/lens_overlay_request_id.pb.h"
 #include "third_party/lens_server_proto/lens_overlay_selection_type.pb.h"
 #include "third_party/lens_server_proto/lens_overlay_server.pb.h"
 #include "third_party/lens_server_proto/lens_overlay_service_deps.pb.h"
@@ -184,6 +185,10 @@ class ContextualSearchContextController {
     // The token corresponding to the Lens Overlay instance, if one was active
     // during the query submission.
     std::optional<base::UnguessableToken> overlay_token;
+
+    // List of request IDs of removed contexts to be sent to the server.
+    // Populated by ContextualSearchSessionHandle.
+    std::vector<lens::LensOverlayRequestId> removed_contexts;
   };
 
   virtual ~ContextualSearchContextController() = default;

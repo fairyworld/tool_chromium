@@ -963,6 +963,10 @@ lens::ClientToAimMessage ComposeboxQueryController::CreateClientToAimRequest(
         context_turn_metadata;
   }
 
+  // TODO(crbug.com/514803722): Tracked removed contexts are available in
+  // create_client_to_aim_request_info->removed_contexts, but we don't send them
+  // to the server yet until the proto changes are finalized.
+
   // Add the request id data for each file token.
   if (!active_files_.empty() && cluster_info_.has_value()) {
     bool is_region_interaction =

@@ -1815,6 +1815,8 @@ void ContextualSearchboxHandler::OpenUrl(
           contextual_session_handle->invocation_source());
   new_contextual_session_handle->set_submitted_context_tokens(
       contextual_session_handle->GetSubmittedContextTokens());
+  new_contextual_session_handle->set_submitted_tabs(
+      contextual_session_handle->submitted_tabs());
 
   // TODO(crbug.com/470404040): Determine what to do with the return
   // value of this call, or move this call to a different location.
