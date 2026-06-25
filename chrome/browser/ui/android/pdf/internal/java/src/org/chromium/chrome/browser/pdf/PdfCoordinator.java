@@ -155,6 +155,8 @@ public class PdfCoordinator
 
     private int mFindInPageCount;
 
+    private boolean mPageNavAndEditVisible = true;
+
     @VisibleForTesting public ChromePdfViewerFragment mChromePdfViewerFragment;
 
     /**
@@ -266,6 +268,10 @@ public class PdfCoordinator
         private @Nullable PdfView mPdfView;
 
         @Nullable private String mViewTag;
+        private @Nullable View mToolBoxView;
+        private @Nullable ViewGroup mContainerView;
+        private int mOriginalIndex;
+        private boolean mShowToolBoxView = true;
 
         public void setPdfViewForTesting(PdfView pdfView) {
             this.mPdfView = pdfView;
@@ -340,11 +346,43 @@ public class PdfCoordinator
                 mViewTag = savedInstanceState.getString(KEY_VIEW_TAG, null);
                 if (getView() != null) getView().setTag(mViewTag);
             }
-            // Remove the toolbox view (default edit icon) from the PDF viewer fragment in favor of
-            // the PDF toolbar.
-            View toolBoxView = view.findViewById(R.id.toolBoxView);
-            if (toolBoxView != null) {
-                ((ViewGroup) view).removeView(toolBoxView);
+            setUpToolBoxView(view);
+        }
+
+        @VisibleForTesting
+        void setUpToolBoxView(View view) {
+            mToolBoxView = view.findViewById(R.id.toolBoxView);
+            mContainerView = (ViewGroup) view;
+            if (mContainerView != null && mToolBoxView != null) {
+                mOriginalIndex = mContainerView.indexOfChild(mToolBoxView);
+            }
+            if (PdfUtils.isInlinePdfV2Enabled()) {
+                if (mDelegate != null) {
+                    setToolBoxViewVisibility(!mDelegate.isPageNavAndEditVisible());
+                } else {
+                    updateToolBoxView();
+                }
+            }
+        }
+
+        public void setToolBoxViewVisibility(boolean visible) {
+            if (mShowToolBoxView == visible) {
+                return;
+            }
+            mShowToolBoxView = visible;
+            updateToolBoxView();
+        }
+
+        private void updateToolBoxView() {
+            if (mContainerView == null || mToolBoxView == null) {
+                return;
+            }
+            boolean isCurrentlyAdded = mToolBoxView.getParent() != null;
+            if (mShowToolBoxView && !isCurrentlyAdded) {
+                int index = Math.min(mOriginalIndex, mContainerView.getChildCount());
+                mContainerView.addView(mToolBoxView, index);
+            } else if (!mShowToolBoxView && isCurrentlyAdded) {
+                mContainerView.removeView(mToolBoxView);
             }
         }
 
@@ -822,8 +860,11 @@ public class PdfCoordinator
     }
 
     @Override
-    public void rotate() {
-        // TODO(crbug.com/501138999): Implement rotate action
+    public void onPageNavAndEditVisibilityChanged(boolean visible) {
+        mPageNavAndEditVisible = visible;
+        if (mChromePdfViewerFragment != null) {
+            mChromePdfViewerFragment.setToolBoxViewVisibility(!visible);
+        }
     }
 
     // Implementation of PdfActionsDelegate
@@ -879,6 +920,11 @@ public class PdfCoordinator
         if (mToolbarCoordinator != null) {
             mToolbarCoordinator.setEditModeActive(editMode);
         }
+    }
+
+    @Override
+    public boolean isPageNavAndEditVisible() {
+        return mPageNavAndEditVisible;
     }
 
     @Override

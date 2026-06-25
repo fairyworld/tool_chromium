@@ -227,7 +227,6 @@ android_resources("java_resources") {
     "java/res/drawable/ic_refresh_36dp.xml",
     "java/res/drawable/ic_remove.xml",
     "java/res/drawable/ic_replay_white_24dp.xml",
-    "java/res/drawable/ic_rotate_page_24dp.xml",
     "java/res/drawable/ic_rule_folder_24dp.xml",
     "java/res/drawable/ic_schedule_fill_24dp.xml",
     "java/res/drawable/ic_screensaver_auto_24dp.xml",

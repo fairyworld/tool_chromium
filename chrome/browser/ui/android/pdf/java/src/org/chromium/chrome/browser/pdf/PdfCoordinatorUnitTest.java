@@ -7,6 +7,7 @@ package org.chromium.chrome.browser.pdf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -17,8 +18,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentActivity;
@@ -510,6 +513,42 @@ public class PdfCoordinatorUnitTest {
                 "Edit button should not be selected after onExitEditMode", editButton.isSelected());
     }
 
+    @Test
+    @EnableFeatures(ChromeFeatureList.INLINE_PDF_V2)
+    public void testToolBoxViewVisibility() {
+        createPdfCoordinator();
+
+        // Inject test fragment
+        TestChromePdfViewerFragment fragment = new TestChromePdfViewerFragment(mPdfCoordinator);
+        mPdfCoordinator.mChromePdfViewerFragment = fragment;
+
+        // Setup view hierarchy for fragment
+        FrameLayout fragmentView = new FrameLayout(mActivity);
+        View toolBoxView = new View(mActivity);
+        toolBoxView.setId(R.id.toolBoxView);
+        fragmentView.addView(toolBoxView);
+
+        // Manually trigger onViewCreated (our overridden version that skips JNI)
+        fragment.onViewCreated(fragmentView, null);
+
+        // Initially, isPageNavAndEditVisible is true (default), so toolBoxView should be removed
+        // (hidden)
+        assertNull(
+                "ToolBoxView should be removed initially because top toolbar is visible",
+                toolBoxView.getParent());
+
+        // Hide top toolbar -> toolBoxView should be added (visible)
+        mPdfCoordinator.onPageNavAndEditVisibilityChanged(false);
+        assertNotNull(
+                "ToolBoxView should be added when top toolbar is hidden", toolBoxView.getParent());
+
+        // Show top toolbar again -> toolBoxView should be removed (hidden)
+        mPdfCoordinator.onPageNavAndEditVisibilityChanged(true);
+        assertNull(
+                "ToolBoxView should be removed when top toolbar is visible",
+                toolBoxView.getParent());
+    }
+
     public static class TestModalDialogActivity extends org.chromium.ui.base.TestActivity
             implements org.chromium.ui.modaldialog.ModalDialogManagerHolder {
         private org.chromium.ui.modaldialog.ModalDialogManager mModalDialogManager;
@@ -758,6 +797,19 @@ public class PdfCoordinatorUnitTest {
         @Implementation
         public PdfDocument getPdfDocument() {
             return mPdfDocument;
+        }
+    }
+
+    private static class TestChromePdfViewerFragment
+            extends PdfCoordinator.ChromePdfViewerFragment {
+        public TestChromePdfViewerFragment(PdfActionsDelegate delegate) {
+            super(delegate);
+        }
+
+        @Override
+        public void onViewCreated(View view, Bundle savedInstanceState) {
+            // Skip super.onViewCreated to avoid JNI initialization.
+            setUpToolBoxView(view);
         }
     }
 }
