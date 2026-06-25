@@ -1553,8 +1553,9 @@ _CHROME_AI_WPT_TEST_CONFIG = targets.legacy_test_config(
         "blink_tests_write_run_histories",
     ],
     # Hardcoded '--child-processes=1' to enforce sequential execution by default
-    # and prevent timeouts. Overridden to 3 on x64 bots using the
-    # 'mac_x64_wpt_child_processes' mixin.
+    # and prevent timeouts. The slower x64 builder is sharded to 8 shards
+    # using the 'mac_x64_ai_wpt_shards' mixin to compensate for sequential
+    # execution.
     args = [
         "--release",
         "--timeout-multiplier=5",

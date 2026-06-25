@@ -827,10 +827,10 @@
       ],
     },
   },
-  'mac_x64_wpt_child_processes': {
-    'args': [
-      '--child-processes=3',
-    ],
+  'mac_x64_ai_wpt_shards': {
+    'swarming': {
+      'shards': 8,
+    },
   },
   'no_gpu': {
     'fail_if_unused': False,

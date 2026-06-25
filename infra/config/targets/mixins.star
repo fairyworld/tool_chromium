@@ -2378,14 +2378,13 @@ targets.mixin(
     ],
 )
 
-# Enables parallel execution for slower x64 bots.
-# Running sequentially on these bots causes global suite timeouts,
-# while 3 processes avoids this without causing the individual test
-# starvation seen on ARM64 bots.
-# (Overrides the base '--child-processes=1'; argparse respects the last value).
+# Shards the slower x64 bot to 8 shards (overriding the default of 4 shards).
+# Since these bots run sequentially to avoid resource starvation, they
+# take longer to complete the test suite, requiring more shards to keep
+# the total run time within the builder's limit.
 targets.mixin(
-    name = "mac_x64_wpt_child_processes",
-    args = [
-        "--child-processes=3",
-    ],
+    name = "mac_x64_ai_wpt_shards",
+    swarming = targets.swarming(
+        shards = 8,
+    ),
 )
