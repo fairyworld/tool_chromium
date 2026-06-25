@@ -1624,7 +1624,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   MediaFoundationServiceMonitor::RegisterPrefs(registry);
   os_crypt_async::AppBoundEncryptionProviderWin::RegisterLocalPrefs(registry);
   webnn::RegisterLocalPrefs(registry);
-  registry->RegisterStringPref(prefs::kPreviousIsolationState, std::string());
   registry->RegisterBooleanPref(prefs::kForegroundLaunchOnLogin, false);
   registry->RegisterBooleanPref(prefs::kStartupLaunchInfobarAccepted, false);
   registry->RegisterTimePref(prefs::kStartupLaunchInfobarLastDeclinedTime,
