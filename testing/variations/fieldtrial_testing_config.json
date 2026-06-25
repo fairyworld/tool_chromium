@@ -26126,6 +26126,23 @@
             ]
         }
     ],
+    "WebRTC-DataChannel-MessageInterleaving": [
+        {
+            "platforms": [
+                "android",
+                "android_webview",
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_20260625"
+                }
+            ]
+        }
+    ],
     "WebRTC-IPv6NetworkResolutionFixes": [
         {
             "platforms": [
