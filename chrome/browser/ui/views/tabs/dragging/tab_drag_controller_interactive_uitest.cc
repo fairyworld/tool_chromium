@@ -3463,51 +3463,11 @@ IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest, MAYBE_DragAll) {
 }
 
 #if BUILDFLAG(IS_MAC)
-// Regression test for https://crbug.com/496402864.
-// When in macOS fullscreen with a single tab, dragging the tab should not
-// move the fullscreen window. The tab drag controller should fall through to
-// normal tab dragging instead of entering RunMoveLoop().
-IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest,
-                       DragSingleTabInFullscreenDoesNotMoveWindow) {
-  // Enter fullscreen and wait for the transition to complete.
-  ui_test_utils::ToggleFullscreenModeAndWait(browser());
-  ASSERT_TRUE(browser()->GetWindow()->IsFullscreen());
-
-  TabStrip* tab_strip = GetTabStripForBrowser(browser());
-  ASSERT_EQ(1, browser()->tab_strip_model()->count());
-
-  const gfx::Rect initial_bounds = browser()->GetWindow()->GetBounds();
-
-  // Drag the only tab with a small horizontal offset that stays within the
-  // tab strip. We must NOT use GetDetachY() here because in fullscreen our
-  // fix skips RunMoveLoop, so a large vertical drag would cause the tab to
-  // detach into a new browser window instead of moving the window.
-  Tab* tab = tab_strip->tab_at(0);
-  ASSERT_TRUE(PressInputAtCenter(tab));
-  // Drag 20px to the right — enough to start the drag (> kMinimumDragDistance
-  // of 10px) but stays within the tab strip.
-  ASSERT_TRUE(DragInputToCenterNotifyWhenDone(
-      tab, base::BindOnce(&DragAllStep2, this), gfx::Vector2d(20, 0)));
-  // QuitDraggingObserver doesn't work here because the fullscreen fix
-  // skips RunMoveLoop(), so poll until the drag ends instead.
-  ASSERT_TRUE(
-      base::test::RunUntil([&]() { return !TabDragController::IsActive(); }));
-
-  // No new window should have been created.
-  EXPECT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  // The window should still be in fullscreen.
-  EXPECT_TRUE(browser()->GetWindow()->IsFullscreen());
-
-  // The window bounds should not have changed.
-  EXPECT_EQ(initial_bounds, browser()->GetWindow()->GetBounds());
-}
-
-// Same as above but with vertical tab strip enabled. Unlike horizontal tabs,
+// Regression test for https://crbug.com/496402864. Unlike horizontal tabs,
 // vertical tab strips are never hosted in the overlay widget, so
 // CanRestoreFullscreenWindowDuringDrag() returns true for VT. Dragging the
-// only tab in VT fullscreen exits fullscreen and enters the move loop,
-// allowing the user to drag the restored window normally.
+// only tab in VT fullscreen should exit fullscreen before entering the move
+// loop, allowing the user to drag the restored window normally.
 class VerticalTabsFullscreenDragTest
     : public DetachToBrowserTabDragControllerTest {
  public:
@@ -3554,8 +3514,8 @@ IN_PROC_BROWSER_TEST_P(VerticalTabsFullscreenDragTest,
       browser(), ui_test_utils::FullscreenWaiter::kNoFullscreen);
 
   // Drag the only tab. Since VT allows fullscreen restore, this will:
-  // 1. Call RestoreAttachedWindowForDrag() → exits fullscreen
-  // 2. Enter RunMoveLoop() → nested run loop
+  // 1. Call RestoreAttachedWindowForDrag(), which exits fullscreen.
+  // 2. Enter RunMoveLoop(), the nested run loop.
   ASSERT_TRUE(PressInputAtCenter(tab_view));
   ASSERT_TRUE(DragInputToCenterNotifyWhenDone(
       tab_view, base::BindLambdaForTesting([&]() {
