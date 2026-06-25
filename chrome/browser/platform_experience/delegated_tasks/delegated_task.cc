@@ -4,6 +4,7 @@
 
 #include "chrome/browser/platform_experience/delegated_tasks/delegated_task.h"
 
+#include "base/command_line.h"
 #include "base/time/time.h"
 
 namespace platform_experience {
@@ -11,5 +12,8 @@ namespace platform_experience {
 base::TimeDelta DelegatedTask::GetTimeout() const {
   return base::Seconds(10);
 }
+
+void DelegatedTask::AppendCommandLineSwitches(
+    base::CommandLine& /*cmd_line*/) const {}
 
 }  // namespace platform_experience

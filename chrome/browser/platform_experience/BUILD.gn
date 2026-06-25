@@ -8,14 +8,12 @@ if (is_win) {
   source_set("delegated_tasks") {
     public = [
       "delegated_tasks/delegated_task.h",
-      "delegated_tasks/delegated_task_registry.h",
       "delegated_tasks/delegated_task_runner.h",
       "delegated_tasks/peh_launcher.h",
     ]
 
     sources = [
       "delegated_tasks/delegated_task.cc",
-      "delegated_tasks/delegated_task_registry.cc",
       "delegated_tasks/delegated_task_runner.cc",
       "delegated_tasks/peh_launcher.cc",
     ]
