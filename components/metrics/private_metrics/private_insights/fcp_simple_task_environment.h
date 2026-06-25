@@ -5,6 +5,7 @@
 #ifndef COMPONENTS_METRICS_PRIVATE_METRICS_PRIVATE_INSIGHTS_FCP_SIMPLE_TASK_ENVIRONMENT_H_
 #define COMPONENTS_METRICS_PRIVATE_METRICS_PRIVATE_INSIGHTS_FCP_SIMPLE_TASK_ENVIRONMENT_H_
 
+#include "third_party/federated_compute/src/fcp/client/attestation/attestation_verifier.h"
 #include "third_party/federated_compute/src/fcp/client/example_query_result.pb.h"
 #include "third_party/federated_compute/src/fcp/client/simple_task_environment.h"
 
@@ -31,6 +32,9 @@ class FcpSimpleTaskEnvironment : public fcp::client::SimpleTaskEnvironment {
   bool TrainingConditionsSatisfied() override;
 
   std::unique_ptr<fcp::client::http::HttpClient> CreateHttpClient() override;
+
+  std::unique_ptr<fcp::client::attestation::AttestationVerifier>
+  CreateAttestationVerifier() override;
 
  private:
   std::string base_dir_;

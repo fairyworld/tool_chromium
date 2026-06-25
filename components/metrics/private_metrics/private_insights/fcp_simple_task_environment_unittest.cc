@@ -9,7 +9,11 @@
 #include <utility>
 
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/federated_compute/src/fcp/client/attestation/attestation_verifier.h"
 #include "third_party/federated_compute/src/fcp/client/example_query_result.pb.h"
+#include "third_party/federated_compute/src/fcp/confidentialcompute/crypto_test_util.h"
+#include "third_party/federated_compute/src/fcp/protos/confidentialcompute/signed_endorsements.pb.h"
+#include "third_party/federated_compute/src/fcp/protos/federatedcompute/confidential_encryption_config.pb.h"
 #include "third_party/federated_compute/src/fcp/protos/plan.pb.h"
 
 namespace private_insights {
@@ -46,6 +50,29 @@ TEST(FcpSimpleTaskEnvironmentTest, CreateExampleIterator) {
   auto third_result = iterator->Next();
   EXPECT_FALSE(third_result.ok());
   EXPECT_EQ(third_result.status().code(), absl::StatusCode::kOutOfRange);
+}
+
+TEST(FcpSimpleTaskEnvironmentTest, CreateAttestationVerifier) {
+  fcp::client::ExampleQueryResult query_result;
+  FcpSimpleTaskEnvironment task_env("base_dir", "cache_dir", query_result);
+
+  auto verifier = task_env.CreateAttestationVerifier();
+  ASSERT_NE(verifier, nullptr);
+
+  auto [public_key, private_key] =
+      fcp::confidential_compute::GenerateHpkeKeyPair("test_key_id");
+
+  google::internal::federatedcompute::v1::ConfidentialEncryptionConfig
+      encryption_config;
+  encryption_config.set_public_key(public_key);
+
+  fcp::confidentialcompute::SignedEndorsements signed_endorsements;
+  absl::Cord access_policy;
+
+  auto result =
+      verifier->Verify(access_policy, signed_endorsements, encryption_config);
+
+  ASSERT_TRUE(result.ok());
 }
 
 }  // namespace private_insights

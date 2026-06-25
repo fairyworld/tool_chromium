@@ -91,5 +91,6 @@ source_set("unit_tests") {
     "//components/metrics",
     "//components/prefs:test_support",
     "//testing/gtest",
+    "//third_party/federated_compute:confidential_compute_crypto_test_util",
   ]
 }

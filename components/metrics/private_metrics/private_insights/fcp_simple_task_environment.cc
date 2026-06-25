@@ -66,4 +66,13 @@ FcpSimpleTaskEnvironment::CreateHttpClient() {
   return std::make_unique<FcpHttpClient>();
 }
 
+std::unique_ptr<fcp::client::attestation::AttestationVerifier>
+FcpSimpleTaskEnvironment::CreateAttestationVerifier() {
+  // Use AlwaysPassingAttestationVerifier for now as we don't have the reference
+  // values configured yet. This allows FCP to proceed with data uploads.
+  // TODO(b/527790788): Add AttestationTransparencyVerifier.
+  return std::make_unique<
+      fcp::client::attestation::AlwaysPassingAttestationVerifier>();
+}
+
 }  // namespace private_insights
