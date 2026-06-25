@@ -80,7 +80,7 @@ public class BottomBarMediator
     private final Callback<@Nullable Tab> mTabSupplierObserver = this::onTabChanged;
     private final Callback<Boolean> mHomepageEnabledObserver = this::onHomepageEnabledChanged;
     private final Callback<Boolean> mOmniboxFocusObserver = this::onOmniboxFocusChanged;
-    private final Callback<@Nullable Profile> mProfileObserver = this::updateGlicVisibility;
+    private final Callback<@Nullable Profile> mProfileObserver = this::updateExtraActionVisibility;
     private final GlicKeyedService.AllowedChangedObserver mAllowedChangedObserver =
             this::onGlicAllowedChanged;
 
@@ -228,9 +228,9 @@ public class BottomBarMediator
     private void maybeShowIphs() {
         if (!mStartupPromoFlowFinished) return;
         boolean isBottomBarVisible = Boolean.TRUE.equals(mIsVisible);
-        boolean isGlicVisible =
-                Boolean.TRUE.equals(mModel.get(BottomBarProperties.IS_GLIC_BUTTON_VISIBLE));
-        if (isBottomBarVisible && isGlicVisible) {
+        boolean isExtraVisible =
+                Boolean.TRUE.equals(mModel.get(BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE));
+        if (isBottomBarVisible && isExtraVisible) {
             Profile profile = mProfileSupplier.get();
             Tracker tracker = profile == null ? null : TrackerFactory.getTrackerForProfile(profile);
             boolean hasSeenPromo =
@@ -248,7 +248,7 @@ public class BottomBarMediator
         }
     }
 
-    private void updateGlicVisibility(@Nullable Profile profile) {
+    private void updateExtraActionVisibility(@Nullable Profile profile) {
         Profile originalProfile = profile != null ? profile.getOriginalProfile() : null;
 
         // Manage observers for dynamic updates.
@@ -256,18 +256,22 @@ public class BottomBarMediator
 
         if (profile == null) {
             setButtonVisibility(ActionId.GLIC, false);
+            setButtonVisibility(ActionId.AI_MODE, false);
             return;
         }
 
         // Calculate and set visibility.
         long startTime = SystemClock.uptimeMillis();
-        boolean shouldBeVisible =
-                BottomBarActionEligibility.getEligibleExtraAction(originalProfile) == ActionId.GLIC;
+        @ActionId
+        int eligibleAction = BottomBarActionEligibility.getEligibleExtraAction(originalProfile);
         long decisionDuration = SystemClock.uptimeMillis() - startTime;
 
         BottomBarMetrics.recordGlicVisibilityDecisionTime(decisionDuration);
 
-        if (shouldBeVisible && !mGlicWasVisible) {
+        boolean showGlic = eligibleAction == ActionId.GLIC;
+        boolean showAiMode = eligibleAction == ActionId.AI_MODE;
+
+        if (showGlic && !mGlicWasVisible) {
             mGlicAppearedTimeMs = SystemClock.uptimeMillis();
             if (mBottomBarShownTimeMs != -1 && !mGlicTimeToAppearRecorded) {
                 long timeSinceShown = mGlicAppearedTimeMs - mBottomBarShownTimeMs;
@@ -275,9 +279,10 @@ public class BottomBarMediator
                 mGlicTimeToAppearRecorded = true;
             }
         }
-        mGlicWasVisible = shouldBeVisible;
+        mGlicWasVisible = showGlic;
 
-        setButtonVisibility(ActionId.GLIC, shouldBeVisible);
+        setButtonVisibility(ActionId.GLIC, showGlic);
+        setButtonVisibility(ActionId.AI_MODE, showAiMode);
     }
 
     private void updateObservers(@Nullable Profile originalProfile) {
@@ -312,11 +317,11 @@ public class BottomBarMediator
     }
 
     private void onGlicAllowedChanged() {
-        updateGlicVisibility(mProfileSupplier.get());
+        updateExtraActionVisibility(mProfileSupplier.get());
     }
 
     private void onTemplateURLServiceChanged() {
-        updateGlicVisibility(mProfileSupplier.get());
+        updateExtraActionVisibility(mProfileSupplier.get());
     }
 
     private void onHomepageEnabledChanged(boolean isEnabled) {

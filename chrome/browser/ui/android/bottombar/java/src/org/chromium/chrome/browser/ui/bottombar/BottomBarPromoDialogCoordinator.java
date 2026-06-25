@@ -14,8 +14,8 @@ import org.chromium.base.supplier.NonNullObservableSupplier;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.feature_engagement.TrackerFactory;
-import org.chromium.chrome.browser.glic.GlicEnabling;
 import org.chromium.chrome.browser.profiles.Profile;
+import org.chromium.chrome.browser.ui.actions.ActionId;
 import org.chromium.components.feature_engagement.FeatureConstants;
 import org.chromium.components.feature_engagement.Tracker;
 import org.chromium.ui.modaldialog.DialogDismissalCause;
@@ -80,7 +80,8 @@ public class BottomBarPromoDialogCoordinator
             return false;
         }
 
-        if (!GlicEnabling.isEnabledForProfile(profile.getOriginalProfile())) {
+        if (BottomBarActionEligibility.getEligibleExtraAction(profile.getOriginalProfile())
+                != ActionId.GLIC) {
             return false;
         }
 

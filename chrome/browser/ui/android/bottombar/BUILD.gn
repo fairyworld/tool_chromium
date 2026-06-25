@@ -53,6 +53,7 @@ android_library("metrics_java") {
 
 android_library("java") {
   sources = [
+    "java/src/org/chromium/chrome/browser/ui/bottombar/AiModeActionCoordinator.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/AppMenuActionButtonBinder.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBar.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarActionEligibility.java",
@@ -114,6 +115,7 @@ android_library("java") {
 
 robolectric_library("junit") {
   sources = [
+    "java/src/org/chromium/chrome/browser/ui/bottombar/AiModeActionCoordinatorUnitTest.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/AppMenuActionButtonBinderUnitTest.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarActionEligibilityUnitTest.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarButtonContainerUnitTest.java",

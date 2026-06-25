@@ -41,8 +41,10 @@ import org.chromium.chrome.browser.feature_engagement.TrackerFactory;
 import org.chromium.chrome.browser.glic.GlicEnabling;
 import org.chromium.chrome.browser.glic.GlicEnablingJni;
 import org.chromium.chrome.browser.profiles.Profile;
+import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
 import org.chromium.components.feature_engagement.FeatureConstants;
 import org.chromium.components.feature_engagement.Tracker;
+import org.chromium.components.search_engines.TemplateUrlService;
 import org.chromium.ui.base.TestActivity;
 import org.chromium.ui.modaldialog.DialogDismissalCause;
 import org.chromium.ui.modaldialog.ModalDialogManager;
@@ -61,6 +63,7 @@ public class BottomBarPromoDialogCoordinatorUnitTest {
 
     @Mock private ModalDialogManager mModalDialogManager;
     @Mock private Profile mProfile;
+    @Mock private TemplateUrlService mTemplateUrlService;
     @Mock private Tracker mTracker;
     @Mock private BottomBarPromoDialogCoordinator.BottomBarPromoDialogListener mListener;
     @Mock private GlicEnabling.Natives mGlicEnablingJniMock;
@@ -81,6 +84,9 @@ public class BottomBarPromoDialogCoordinatorUnitTest {
         TrackerFactory.setTrackerForTests(mTracker);
         GlicEnablingJni.setInstanceForTesting(mGlicEnablingJniMock);
         when(mGlicEnablingJniMock.isEnabledForProfile(any())).thenReturn(true);
+        TemplateUrlServiceFactory.setInstanceForTesting(mTemplateUrlService);
+        when(mTemplateUrlService.isDefaultSearchEngineGoogle()).thenReturn(true);
+        BottomBarActionEligibility.setCountrySupplier(() -> "us");
 
         mCoordinator = new BottomBarPromoDialogCoordinator(mActivity, mModalDialogManagerSupplier);
         mCoordinator.setListener(mListener);
@@ -89,6 +95,7 @@ public class BottomBarPromoDialogCoordinatorUnitTest {
     @After
     public void tearDown() {
         TrackerFactory.setTrackerForTests(null);
+        BottomBarActionEligibility.setCountrySupplier(null);
     }
 
     @Test

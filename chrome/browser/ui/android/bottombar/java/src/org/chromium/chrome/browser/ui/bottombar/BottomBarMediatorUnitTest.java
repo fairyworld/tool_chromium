@@ -230,7 +230,7 @@ public class BottomBarMediatorUnitTest {
         mGlicActionSupplier.set(glicModel);
         mNewTabActionSupplier.set(newTabModel);
 
-        mModel.set(BottomBarProperties.IS_GLIC_BUTTON_VISIBLE, true);
+        mModel.set(BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE, true);
 
         createMediator(/* shouldIncludeHomeButton= */ true);
         assertNotNull(mMediator);
@@ -326,7 +326,7 @@ public class BottomBarMediatorUnitTest {
         mGlicActionSupplier.set(glicModel);
         mNewTabActionSupplier.set(newTabModel);
 
-        mModel.set(BottomBarProperties.IS_GLIC_BUTTON_VISIBLE, true);
+        mModel.set(BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE, true);
 
         createMediator(/* shouldIncludeHomeButton= */ true);
         assertNotNull(mMediator);
@@ -392,7 +392,7 @@ public class BottomBarMediatorUnitTest {
         mNewTabActionSupplier.set(newTabModel);
 
         // Create mediator with GLIC not visible, which triggers New Tab IPH.
-        mModel.set(BottomBarProperties.IS_GLIC_BUTTON_VISIBLE, false);
+        mModel.set(BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE, false);
         createMediator(/* shouldIncludeHomeButton= */ true);
         assertNotNull(mMediator);
 
@@ -415,7 +415,7 @@ public class BottomBarMediatorUnitTest {
         mNewTabActionSupplier.set(newTabModel);
 
         // Create mediator with GLIC not visible, which triggers New Tab IPH.
-        mModel.set(BottomBarProperties.IS_GLIC_BUTTON_VISIBLE, false);
+        mModel.set(BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE, false);
         createMediator(/* shouldIncludeHomeButton= */ true);
         assertNotNull(mMediator);
 
@@ -432,7 +432,7 @@ public class BottomBarMediatorUnitTest {
         // GLIC button becomes visible.
         verify(mButtonManager).setListener(mButtonManagerListenerCaptor.capture());
         BottomBarButtonManager.Listener listener = mButtonManagerListenerCaptor.getValue();
-        mModel.set(BottomBarProperties.IS_GLIC_BUTTON_VISIBLE, true);
+        mModel.set(BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE, true);
         listener.onButtonVisibilityChanged(ActionId.GLIC, true);
 
         // maybeShowPromoDialog is now centralized.
@@ -465,7 +465,7 @@ public class BottomBarMediatorUnitTest {
     public void testStartupPromoFlowFinished_PromoShown_DefersIph() {
         PropertyModel newTabModel = new PropertyModel.Builder(ActionProperties.ALL_KEYS).build();
         mNewTabActionSupplier.set(newTabModel);
-        mModel.set(BottomBarProperties.IS_GLIC_BUTTON_VISIBLE, false);
+        mModel.set(BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE, false);
 
         // Create mediator without calling onStartupPromoFlowFinished immediately.
         mMediator =
