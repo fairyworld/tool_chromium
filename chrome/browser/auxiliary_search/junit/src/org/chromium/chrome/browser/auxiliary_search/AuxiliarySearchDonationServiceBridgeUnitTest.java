@@ -23,6 +23,7 @@ import androidx.appsearch.app.GenericDocument;
 import androidx.appsearch.app.PackageIdentifier;
 import androidx.appsearch.app.PutDocumentsRequest;
 import androidx.appsearch.app.SetSchemaRequest;
+import androidx.appsearch.builtintypes.Account;
 import androidx.appsearch.builtintypes.WebPage;
 import androidx.appsearch.exceptions.AppSearchException;
 
@@ -41,6 +42,8 @@ import org.mockito.junit.MockitoRule;
 import org.chromium.base.ServiceLoaderUtil;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.RobolectricUtil;
+import org.chromium.components.signin.base.CoreAccountInfo;
+import org.chromium.google_apis.gaia.GaiaId;
 
 import java.util.List;
 import java.util.Set;
@@ -185,7 +188,7 @@ public class AuxiliarySearchDonationServiceBridgeUnitTest {
                 AuxiliarySearchDonationServiceBridge.createHistoryDocument(
                         TEST_ID, TEST_URL, TEST_TITLE, TEST_LAST_VISITED);
 
-        bridge.donateHistory(List.of(page));
+        bridge.donateHistory(List.of(page), /* coreAccountInfo= */ null);
         RobolectricUtil.runAllBackgroundAndUi();
 
         verify(mMockSession).putAsync(mPutDocumentsRequestCaptor.capture());
@@ -217,7 +220,7 @@ public class AuxiliarySearchDonationServiceBridgeUnitTest {
                 AuxiliarySearchDonationServiceBridge.createHistoryDocument(
                         TEST_ID, TEST_URL, TEST_TITLE, TEST_LAST_VISITED);
 
-        bridge.donateHistory(List.of(page));
+        bridge.donateHistory(List.of(page), /* coreAccountInfo= */ null);
         RobolectricUtil.runAllBackgroundAndUi();
 
         verify(mMockSession, never()).putAsync(any());
@@ -230,10 +233,52 @@ public class AuxiliarySearchDonationServiceBridgeUnitTest {
         var bridge = new AuxiliarySearchDonationServiceBridge();
         RobolectricUtil.runAllBackgroundAndUi();
 
-        bridge.donateHistory(List.of());
+        bridge.donateHistory(List.of(), /* coreAccountInfo= */ null);
         RobolectricUtil.runAllBackgroundAndUi();
 
         verify(mMockSession, never()).putAsync(any());
+    }
+
+    @Test
+    public void testDonateHistory_withAccount() throws AppSearchException {
+        when(mMockFactory.createSearchSessionAsync(anyString()))
+                .thenReturn(Futures.immediateFuture(mMockSession));
+        when(mMockSession.setSchemaAsync(any())).thenReturn(Futures.immediateFuture(null));
+        when(mMockSession.putAsync(any())).thenReturn(Futures.immediateFuture(null));
+        var bridge = new AuxiliarySearchDonationServiceBridge();
+        RobolectricUtil.runAllBackgroundAndUi();
+        WebPage page =
+                AuxiliarySearchDonationServiceBridge.createHistoryDocument(
+                        TEST_ID, TEST_URL, TEST_TITLE, TEST_LAST_VISITED);
+        CoreAccountInfo coreAccountInfo =
+                CoreAccountInfo.createFromEmailAndGaiaId(
+                        "test_email@gmail.com", new GaiaId("test_gaia_id"));
+
+        bridge.donateHistory(List.of(page), coreAccountInfo);
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        verify(mMockSession).putAsync(mPutDocumentsRequestCaptor.capture());
+        PutDocumentsRequest request = mPutDocumentsRequestCaptor.getValue();
+        List<GenericDocument> documents = request.getGenericDocuments();
+        assertEquals(1, documents.size());
+        GenericDocument actualDoc = documents.get(0);
+        assertEquals(
+                AuxiliarySearchDonationServiceBridge.CHROME_WEB_PAGE_SCHEMA_NAME,
+                actualDoc.getSchemaType());
+        assertEquals(TEST_ID, actualDoc.getId());
+        WebPage webPage = actualDoc.toDocumentClass(WebPage.class);
+        assertEquals(TEST_ID, webPage.getId());
+        GenericDocument nestedAccountDoc =
+                actualDoc.getPropertyDocument(
+                        AuxiliarySearchDonationServiceBridge.ACCOUNT_PROPERTY_NAME);
+        assertNotNull(nestedAccountDoc);
+        Account actualAccount = nestedAccountDoc.toDocumentClass(Account.class);
+        assertEquals("test_gaia_id", actualAccount.getId());
+        assertEquals("test_gaia_id", actualAccount.getAccountId());
+        assertEquals("test_email@gmail.com", actualAccount.getAccountName());
+        assertEquals(
+                AuxiliarySearchDonationServiceBridge.ACCOUNT_TYPE_GOOGLE,
+                actualAccount.getAccountType());
     }
 
     @Test

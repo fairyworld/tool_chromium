@@ -27,6 +27,7 @@ import org.jni_zero.JniType;
 import org.chromium.base.ServiceLoaderUtil;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
+import org.chromium.components.signin.base.CoreAccountInfo;
 
 import java.io.Closeable;
 import java.util.List;
@@ -60,6 +61,10 @@ class AuxiliarySearchDonationServiceBridge implements Closeable {
     // Hard-code it based on the source of truth from AndroidX:
     // https://cs.android.com/search?q=f:androidx%2Fappsearch%2Fbuiltintypes%2FAccount.java
     @VisibleForTesting static final String BUILTIN_ACCOUNT_SCHEMA_NAME = "builtin:Account";
+    // Account type for Google accounts. See
+    // https://developer.android.com/reference/android/provider/ContactsContract.RawContacts#:~:text=com.google
+    // for reference.
+    @VisibleForTesting static final String ACCOUNT_TYPE_GOOGLE = "com.google";
 
     // Future which holds the `AppSearchSession` after initialization.
     // "Awaiting" this will ensure the session is initialized and the schema is set.
@@ -76,10 +81,12 @@ class AuxiliarySearchDonationServiceBridge implements Closeable {
     @CalledByNative
     public void donateHistory(
             @JniType("std::vector<AuxiliarySearchDonationService::HistoryData>")
-                    List<WebPage> pages) {
+                    List<WebPage> pages,
+            @JniType("std::optional<CoreAccountInfo>") @Nullable CoreAccountInfo coreAccountInfo) {
         if (mSessionFuture == null || pages.isEmpty()) {
             return;
         }
+        Account account = fromCoreAccountInfo(coreAccountInfo);
 
         var unused =
                 Futures.transformAsync(
@@ -94,11 +101,15 @@ class AuxiliarySearchDonationServiceBridge implements Closeable {
                                 // _is_ thrown, it is caught by `transformAsync`.
                                 GenericDocument webPageDoc =
                                         GenericDocument.fromDocumentClass(page);
-                                GenericDocument extendedDoc =
+                                var extendedDocBuilder =
                                         new GenericDocument.Builder<>(webPageDoc)
-                                                .setSchemaType(CHROME_WEB_PAGE_SCHEMA_NAME)
-                                                .build();
-                                builder.addGenericDocuments(extendedDoc);
+                                                .setSchemaType(CHROME_WEB_PAGE_SCHEMA_NAME);
+                                if (account != null) {
+                                    extendedDocBuilder.setPropertyDocument(
+                                            ACCOUNT_PROPERTY_NAME,
+                                            GenericDocument.fromDocumentClass(account));
+                                }
+                                builder.addGenericDocuments(extendedDocBuilder.build());
                             }
                             return session.putAsync(builder.build());
                         },
@@ -131,6 +142,19 @@ class AuxiliarySearchDonationServiceBridge implements Closeable {
                 .setName(title)
                 .setCreationTimestampMillis(lastVisited)
                 .setDocumentTtlMillis(HISTORY_DOCUMENT_TTL_MILLIS)
+                .build();
+    }
+
+    private static @Nullable Account fromCoreAccountInfo(
+            @Nullable CoreAccountInfo coreAccountInfo) {
+        if (coreAccountInfo == null) {
+            return null;
+        }
+        String gaiaId = coreAccountInfo.getGaiaId().toString();
+        return new Account.Builder(HISTORY_NAMESPACE, gaiaId)
+                .setAccountId(gaiaId)
+                .setAccountName(coreAccountInfo.getEmail())
+                .setAccountType(ACCOUNT_TYPE_GOOGLE)
                 .build();
     }
 
