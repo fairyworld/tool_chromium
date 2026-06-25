@@ -230,54 +230,15 @@ export class OmniboxPopupSearchboxElement extends
     return true;
   }
 
+  override isAutocompleteResultStale(result: AutocompleteResult): boolean {
+    return (!!this.lastQueriedInput &&
+            this.lastQueriedInput.trimStart() !== result.input) ||
+        !result.matches.length;
+  }
+
   //========================================================================
   // Event handlers
   //========================================================================
-
-  // TODO(b/519266700): This logic is very similar to mixin. We should look
-  // into refactoring when we clean up the mixin method.
-  override async onAutocompleteResultChanged(result: AutocompleteResult) {
-    if (this.lastQueriedInput &&
-            (this.lastQueriedInput.trimStart() !== result.input) ||
-        !result.matches.length) {
-      return;  // Stale result; ignore.
-    }
-
-    this.result = result;
-    const hasMatches = this.hasMatches();
-
-    this.dropdownIsVisible = hasMatches;
-
-    const firstMatch = hasMatches ? this.result.matches[0] : null;
-    if (firstMatch && firstMatch.allowedToBeDefaultMatch) {
-      // Select the default match and update the input.
-      this.getDropdownElement().selectFirst();
-      this.getInputElement().setInput({
-        text: this.lastQueriedInput ?? '',
-        inline: firstMatch.inlineAutocompletion,
-      });
-    } else if (
-        this.getInputElement().inputElement.value.trim() && hasMatches &&
-        this.selectedMatchIndex >= 0 &&
-        this.selectedMatchIndex < this.result.matches.length) {
-      // Restore the selection and update the input. Don't restore when the
-      // user deletes all their input and autocomplete is queried or else the
-      // empty input will change to the value of the first result.
-      await this.getDropdownElement().selectIndex(this.selectedMatchIndex);
-      this.getInputElement().setInput({
-        text: this.selectedMatch!.fillIntoEdit,
-        inline: '',
-        moveCursorToEnd: true,
-      });
-    } else {
-      // Remove the selection and update the input.
-      this.getDropdownElement().unselect();
-      this.getInputElement().setInput({
-        text: result.input,
-        inline: '',
-      });
-    }
-  }
 
   override onInputFocusChanged(e: CustomEvent<{value: string}>) {
     // Don't populate results if the user edited the input.
