@@ -533,9 +533,13 @@ void ContextualTasksComposeboxHandler::InitializeInputStateModel() {
                    const contextual_search::FileInfo& b) {
                   return a.selection_time < b.selection_time;
                 });
-      for (const auto& file_info : file_infos) {
-        if (file_info.tab_url.has_value() || file_info.tab_title.has_value()) {
-          auto tab_info = searchbox::mojom::TabInfo::New();
+      for (const contextual_search::FileInfo& file_info : file_infos) {
+        if ((file_info.mime_type == lens::MimeType::kHtml ||
+             file_info.mime_type == lens::MimeType::kAnnotatedPageContent) &&
+            (file_info.tab_url.has_value() ||
+             file_info.tab_title.has_value())) {
+          searchbox::mojom::TabInfoPtr tab_info =
+              searchbox::mojom::TabInfo::New();
           tab_info->tab_id = file_info.tab_session_id.has_value()
                                  ? file_info.tab_session_id.value().id()
                                  : 0;

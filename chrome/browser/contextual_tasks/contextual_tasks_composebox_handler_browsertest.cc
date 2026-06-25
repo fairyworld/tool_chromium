@@ -3743,6 +3743,7 @@ IN_PROC_BROWSER_TEST_F(
   tab_info1.tab_url = GURL("about:blank#1");
   tab_info1.tab_title = "About Blank 1";
   tab_info1.tab_session_id = SessionID::FromSerializedValue(42);
+  tab_info1.mime_type = lens::MimeType::kHtml;
   tab_info1.selection_time = now;
   submitted_file_infos.push_back(tab_info1);
 
@@ -3750,6 +3751,7 @@ IN_PROC_BROWSER_TEST_F(
   tab_info2.tab_url = GURL("about:blank#2");
   tab_info2.tab_title = "About Blank 2";
   tab_info2.tab_session_id = SessionID::FromSerializedValue(43);
+  tab_info2.mime_type = lens::MimeType::kHtml;
   tab_info2.selection_time = now + base::Seconds(1);
   submitted_file_infos.push_back(tab_info2);
 
