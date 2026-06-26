@@ -229,7 +229,8 @@ TEST_F(AppMenuModelTest, Basics) {
   // Choose something from the bookmark submenu and make sure it makes it back
   // to the delegate as well.
   size_t bookmarks_model_index =
-      model.GetIndexOfCommandId(IDC_BOOKMARKS_MENU).value();
+      model.GetIndexOfCommandId(AppMenuModel::kBookmarksMenuPlaceholder)
+          .value();
 
   EXPECT_GT(bookmarks_model_index, 0u);
   ui::MenuModel* bookmarks_model =
@@ -343,9 +344,11 @@ TEST_F(AppMenuModelTest, DoNotShowShareSubMenuItem) {
   AppMenuModel model(this, browser());
   model.Init();
 
-  ASSERT_TRUE(model.GetIndexOfCommandId(IDC_SAVE_AND_SHARE_MENU));
+  ASSERT_TRUE(
+      model.GetIndexOfCommandId(AppMenuModel::kSaveAndShareMenuPlaceholder));
   ui::MenuModel* submenu = model.GetSubmenuModelAt(
-      model.GetIndexOfCommandId(IDC_SAVE_AND_SHARE_MENU).value());
+      model.GetIndexOfCommandId(AppMenuModel::kSaveAndShareMenuPlaceholder)
+          .value());
   ASSERT_NE(submenu, nullptr);
 
   size_t expected_item_count = 7;
@@ -447,9 +450,11 @@ TEST_P(ExtensionsMenuModelTest, ExtensionsMenu) {
     ASSERT_TRUE(index.has_value());
     EXPECT_EQ(nullptr, model.GetSubmenuModelAt(*index));
   } else {
-    ASSERT_TRUE(model.GetIndexOfCommandId(IDC_EXTENSIONS_SUBMENU));
+    ASSERT_TRUE(
+        model.GetIndexOfCommandId(AppMenuModel::kExtensionsSubmenuPlaceholder));
     ui::MenuModel* extensions_submenu = model.GetSubmenuModelAt(
-        model.GetIndexOfCommandId(IDC_EXTENSIONS_SUBMENU).value());
+        model.GetIndexOfCommandId(AppMenuModel::kExtensionsSubmenuPlaceholder)
+            .value());
     ASSERT_NE(extensions_submenu, nullptr);
     ASSERT_EQ(2ul, extensions_submenu->GetItemCount());
     EXPECT_EQ(IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS,
@@ -505,7 +510,10 @@ TEST_F(AppMenuModelTest, YourSavedInfoSubmenusShown) {
   model.Init();
 
   const size_t your_saved_info_menu_index =
-      model.GetIndexOfCommandId(IDC_PASSWORDS_AND_AUTOFILL_MENU).value();
+      model
+          .GetIndexOfCommandId(
+              AppMenuModel::kPasswordsAndAutofillMenuPlaceholder)
+          .value();
   ui::SimpleMenuModel* your_saved_info_menu = static_cast<ui::SimpleMenuModel*>(
       model.GetSubmenuModelAt(your_saved_info_menu_index));
 
@@ -524,7 +532,10 @@ TEST_F(AppMenuModelTest, YourSavedInfoSubmenusDisabled) {
   model.Init();
 
   const size_t your_saved_info_menu_index =
-      model.GetIndexOfCommandId(IDC_PASSWORDS_AND_AUTOFILL_MENU).value();
+      model
+          .GetIndexOfCommandId(
+              AppMenuModel::kPasswordsAndAutofillMenuPlaceholder)
+          .value();
   ui::SimpleMenuModel* your_saved_info_menu = static_cast<ui::SimpleMenuModel*>(
       model.GetSubmenuModelAt(your_saved_info_menu_index));
 
@@ -545,7 +556,7 @@ TEST_F(AppMenuModelTest, ProfileSyncOnTest) {
   AppMenuModel model(this, browser());
   model.Init();
   const size_t profile_menu_index =
-      model.GetIndexOfCommandId(IDC_PROFILE_MENU_IN_APP_MENU).value();
+      model.GetIndexOfCommandId(AppMenuModel::kProfileMenuPlaceholder).value();
   ui::SimpleMenuModel* profile_menu = static_cast<ui::SimpleMenuModel*>(
       model.GetSubmenuModelAt(profile_menu_index));
   const size_t sync_settings_index =
@@ -556,7 +567,7 @@ TEST_F(AppMenuModelTest, ProfileSyncOnTest) {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 bool DoesHelpMenuHaveCommand(const AppMenuModel& model, int command_id) {
   const size_t help_menu_index =
-      model.GetIndexOfCommandId(IDC_HELP_MENU).value();
+      model.GetIndexOfCommandId(AppMenuModel::kHelpMenuPlaceholder).value();
   ui::SimpleMenuModel* help_menu = static_cast<ui::SimpleMenuModel*>(
       model.GetSubmenuModelAt(help_menu_index));
   return help_menu->GetIndexOfCommandId(command_id).has_value();
@@ -650,7 +661,7 @@ TEST_P(AppMenuModelSigninPromoTest, SignedIn) {
   AppMenuModel model(this, browser());
   model.Init();
   const size_t profile_menu_index =
-      model.GetIndexOfCommandId(IDC_PROFILE_MENU_IN_APP_MENU).value();
+      model.GetIndexOfCommandId(AppMenuModel::kProfileMenuPlaceholder).value();
   ui::SimpleMenuModel* profile_menu = static_cast<ui::SimpleMenuModel*>(
       model.GetSubmenuModelAt(profile_menu_index));
 
@@ -666,7 +677,7 @@ TEST_P(AppMenuModelSigninPromoTest, SignedOut) {
   AppMenuModel model(this, browser());
   model.Init();
   const size_t profile_menu_index =
-      model.GetIndexOfCommandId(IDC_PROFILE_MENU_IN_APP_MENU).value();
+      model.GetIndexOfCommandId(AppMenuModel::kProfileMenuPlaceholder).value();
   ui::SimpleMenuModel* profile_menu = static_cast<ui::SimpleMenuModel*>(
       model.GetSubmenuModelAt(profile_menu_index));
 
@@ -711,7 +722,7 @@ TEST_F(AppMenuModelTest,
   AppMenuModel model(this, browser());
   model.Init();
   const size_t profile_menu_index =
-      model.GetIndexOfCommandId(IDC_PROFILE_MENU_IN_APP_MENU).value();
+      model.GetIndexOfCommandId(AppMenuModel::kProfileMenuPlaceholder).value();
   ui::SimpleMenuModel* profile_menu = static_cast<ui::SimpleMenuModel*>(
       model.GetSubmenuModelAt(profile_menu_index));
 
@@ -749,7 +760,7 @@ TEST_F(AppMenuModelTest,
   AppMenuModel model(this, browser());
   model.Init();
   const size_t profile_menu_index =
-      model.GetIndexOfCommandId(IDC_PROFILE_MENU_IN_APP_MENU).value();
+      model.GetIndexOfCommandId(AppMenuModel::kProfileMenuPlaceholder).value();
   ui::SimpleMenuModel* profile_menu = static_cast<ui::SimpleMenuModel*>(
       model.GetSubmenuModelAt(profile_menu_index));
 
@@ -775,7 +786,7 @@ TEST_F(AppMenuModelTest, DisableSettingsItem) {
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   const size_t help_menu_index =
-      model.GetIndexOfCommandId(IDC_HELP_MENU).value();
+      model.GetIndexOfCommandId(AppMenuModel::kHelpMenuPlaceholder).value();
   ui::SimpleMenuModel* help_menu = static_cast<ui::SimpleMenuModel*>(
       model.GetSubmenuModelAt(help_menu_index));
   const size_t about_index = help_menu->GetIndexOfCommandId(IDC_ABOUT).value();
