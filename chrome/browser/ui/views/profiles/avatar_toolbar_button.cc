@@ -410,6 +410,9 @@ std::optional<SkColor> AvatarToolbarButton::GetHighlightBorderColor() const {
 void AvatarToolbarButton::UpdateInkdrop() {
   StateProvider* state_provider = state_manager_.GetActiveStateProvider();
   auto [hover_color_id, ripple_color_id] = state_provider->GetInkdropColors();
+  // TODO(crbug.com/516795763): When `kEnableAiSubscriptionAvatarRing` is
+  // enabled this method results in blurring the avatar ring. Consider if we
+  // need separate handling when the ring is visible.
   ConfigureToolbarInkdropForRefresh2023(this, hover_color_id, ripple_color_id);
 }
 
@@ -547,8 +550,18 @@ views::DialogDelegate* AvatarToolbarButton::GetDialogDelegate() {
 
 void AvatarToolbarButton::UpdateLayoutInsets() {
   const bool is_label_visible = IsLabelPresentAndVisible();
-  SetLayoutInsets(::GetLayoutInsets(is_label_visible ? AVATAR_CHIP_PADDING
-                                                     : TOOLBAR_BUTTON));
+  std::optional<ui::ImageModel> icon = GetImageModel(GetState());
+  if (!icon || icon->IsEmpty()) {
+    icon = GetImageModel(ButtonState::STATE_NORMAL);
+  }
+  // total_icon_size is the avatar size plus the potential width for the AI
+  // ring and its gap.
+  int total_icon_size =
+      (!icon || icon->IsEmpty()) ? GetIconSize() : icon->Size().width();
+  const gfx::Insets insets = state_manager_.GetLayoutInsets(
+      total_icon_size, GetIconSize(), is_label_visible);
+
+  SetLayoutInsets(insets);
   SetHorizontalAlignment(is_label_visible ? gfx::ALIGN_LEFT
                                           : gfx::ALIGN_CENTER);
 }
