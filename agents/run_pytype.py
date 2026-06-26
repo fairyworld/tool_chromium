@@ -14,17 +14,12 @@ sys.path.append(str(CHROMIUM_SRC_DIR))
 
 from testing.pytype_common import pytype_runner
 
+from agents import presubmit_support
+
 
 def main() -> int:
     extra_paths = [
-        # Needed so that the code in this directory can import neighboring code
-        # while maintaining compatibility with pytype. The hyphens in skill
-        # names affect pytype's ability to resolve paths for relative imports.
-        str(CHROMIUM_SRC_DIR / 'agents' / 'skills' / 'analyzing-sql-traces' /
-            'scripts'),
-        # Python code under //agents uses (or should use) fully qualified
-        # imports relative to the Chromium src directory wherever possible.
-        str(CHROMIUM_SRC_DIR),
+        str(p) for p in presubmit_support.get_agents_python_path_entries()
     ]
 
     files_to_exclude = [
