@@ -17,11 +17,12 @@ mojom("mojo_bindings") {
 source_set("password_manager_ui_handler") {
   sources = [ "password_manager_ui_handler.cc" ]
   public = [ "password_manager_ui_handler.h" ]
+  public_deps = [ "//chrome/browser/extensions/api/passwords_private" ]
   deps = [
     ":mojo_bindings",
-    "//chrome/browser/extensions",
     "//chrome/browser/sync",
     "//components/password_manager/core/browser",
+    "//components/password_manager/core/browser/export",
     "//content/public/browser",
     "//mojo/public/cpp/bindings",
   ]
@@ -54,7 +55,7 @@ source_set("promo_cards_handler") {
     ":promo_card",
     "//base",
     "//chrome/browser:browser_process",
-    "//chrome/browser/extensions",
+    "//chrome/browser/extensions/api/passwords_private",
     "//chrome/browser/lifetime",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/sync",
@@ -134,6 +135,7 @@ source_set("unit_tests") {
     "//base/test:test_support",
     "//chrome/browser/extensions",
     "//chrome/browser/extensions:test_support",
+    "//chrome/browser/extensions/api/passwords_private:test_support",
     "//chrome/browser/password_manager:test_support",
     "//chrome/browser/sync",
     "//chrome/test:test_support",

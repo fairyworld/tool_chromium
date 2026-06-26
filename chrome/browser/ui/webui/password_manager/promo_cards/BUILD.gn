@@ -12,7 +12,7 @@ source_set("promo_cards") {
   deps = [
     "//base",
     "//chrome/app:generated_resources",
-    "//chrome/browser/extensions",
+    "//chrome/browser/extensions/api/passwords_private",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/sync",
     "//chrome/browser/ui/webui/password_manager:promo_card",
@@ -70,6 +70,7 @@ source_set("unit_tests") {
   if ((enable_dice_support || is_chromeos) && is_chrome_branded) {
     sources += [ "move_passwords_promo_unittest.cc" ]
     deps += [
+      "//chrome/browser/extensions/api/passwords_private",
       "//chrome/browser/sync",
       "//chrome/browser/webauthn:test_support",
     ]
