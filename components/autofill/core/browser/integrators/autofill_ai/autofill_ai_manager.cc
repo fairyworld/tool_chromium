@@ -665,7 +665,8 @@ bool AutofillAiManager::ShouldDisplayIph(const FormStructure& form,
   }
 
   return std::ranges::any_of(attributes_in_form, [](const auto& p) {
-    return AttributesMeetImportConstraints(p.first, p.second);
+    return !p.first.read_only() &&
+           AttributesMeetImportConstraints(p.first, p.second);
   });
 }
 
