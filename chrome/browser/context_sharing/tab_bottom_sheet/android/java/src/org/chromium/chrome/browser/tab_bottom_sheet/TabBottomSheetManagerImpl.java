@@ -525,6 +525,10 @@ public class TabBottomSheetManagerImpl implements TabBottomSheetManager {
         return mNativeInterfaceDelegate;
     }
 
+    public void attachNativeInterfaceDelegateForTesting(NativeInterfaceDelegate delegate) {
+        mNativeInterfaceDelegate = delegate;
+    }
+
     private boolean mSuppressBottomSheetForTesting;
 
     public void suppressBottomSheetForTesting(boolean suppress) {
