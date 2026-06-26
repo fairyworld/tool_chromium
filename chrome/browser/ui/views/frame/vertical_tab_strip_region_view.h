@@ -17,11 +17,11 @@
 #include "chrome/browser/ui/tabs/tab_data.h"
 #include "chrome/browser/ui/tabs/vertical_tab_strip_state.h"
 #include "chrome/browser/ui/views/frame/tab_strip_region_view.h"
+#include "chrome/browser/ui/views/tabs/common/tab_strip_collection_controller.h"
+#include "chrome/browser/ui/views/tabs/common/tab_strip_view.h"
 #include "chrome/browser/ui/views/tabs/hovercard/tab_hover_card_controller.h"
 #include "chrome/browser/ui/views/tabs/shared/drop_arrow.h"
-#include "chrome/browser/ui/views/tabs/vertical/vertical_tab_strip_controller.h"
 #include "chrome/browser/ui/views/tabs/vertical/vertical_tab_strip_expand_on_hover_lock.h"
-#include "chrome/browser/ui/views/tabs/vertical/vertical_tab_strip_view.h"
 #include "components/tabs/public/tab_interface.h"
 #include "ui/base/interaction/element_tracker.h"
 #include "ui/base/metadata/metadata_header_macros.h"
@@ -35,8 +35,8 @@ class BrowserView;
 class HoverTabSelector;
 class RootTabCollectionNode;
 class TabDragContext;
-class VerticalUnpinnedTabContainerView;
-class VerticalPinnedTabContainerView;
+class UnpinnedTabContainerView;
+class PinnedTabContainerView;
 class VerticalTabStripBottomContainer;
 class VerticalTabStripTopContainer;
 class ShadowFrameView;
@@ -84,8 +84,8 @@ class VerticalTabStripRegionView final
       delete;
   ~VerticalTabStripRegionView() override;
 
-  VerticalPinnedTabContainerView* GetPinnedTabsContainer();
-  VerticalUnpinnedTabContainerView* GetUnpinnedTabsContainer();
+  PinnedTabContainerView* GetPinnedTabsContainer();
+  UnpinnedTabContainerView* GetUnpinnedTabsContainer();
 
   VerticalTabStripTopContainer* GetTopContainer() {
     return top_button_container_;
@@ -95,7 +95,7 @@ class VerticalTabStripRegionView final
     return bottom_button_container_;
   }
 
-  VerticalTabStripController* GetVerticalTabStripController() {
+  TabStripCollectionController* GetTabStripCollectionController() {
     return tab_strip_controller_.get();
   }
 
@@ -303,7 +303,7 @@ class VerticalTabStripRegionView final
 
   raw_ptr<VerticalTabStripTopContainer> top_button_container_ = nullptr;
   raw_ptr<views::Separator> top_button_separator_ = nullptr;
-  raw_ptr<VerticalTabStripView> tab_strip_view_ = nullptr;
+  raw_ptr<TabStripView> tab_strip_view_ = nullptr;
   raw_ptr<VerticalTabStripBottomContainer> bottom_button_container_ = nullptr;
   raw_ptr<views::View> gemini_button_ = nullptr;
   raw_ptr<views::ResizeArea> resize_area_ = nullptr;
@@ -313,11 +313,11 @@ class VerticalTabStripRegionView final
 
   // The drag handler is a view (required for capturing mouse inputs during
   // a drag loop) owned by the tab strip's View.
-  raw_ptr<VerticalTabDragHandler> drag_handler_ = nullptr;
+  raw_ptr<TabDragHandler> drag_handler_ = nullptr;
 
   std::unique_ptr<DropArrow> drop_arrow_;
 
-  std::unique_ptr<VerticalTabStripController> tab_strip_controller_;
+  std::unique_ptr<TabStripCollectionController> tab_strip_controller_;
   std::unique_ptr<RootTabCollectionNode> root_node_;
 
   const raw_ptr<TabStripModel> tab_strip_model_ = nullptr;

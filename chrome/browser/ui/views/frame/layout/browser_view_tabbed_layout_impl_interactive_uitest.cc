@@ -34,7 +34,7 @@
 #include "chrome/browser/ui/views/frame/top_container_view.h"
 #include "chrome/browser/ui/views/frame/vertical_tab_strip_region_view.h"
 #include "chrome/browser/ui/views/side_panel/side_panel.h"
-#include "chrome/browser/ui/views/tabs/vertical/vertical_tab_strip_controller.h"
+#include "chrome/browser/ui/views/tabs/common/tab_strip_collection_controller.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/interaction/interactive_browser_test.h"
@@ -753,7 +753,7 @@ class BrowserViewTabbedLayoutImplContentLayoutUiTest
         CheckView(
             kTabStripRegionElementId,
             [](VerticalTabStripRegionView* region) {
-              return region->GetVerticalTabStripController()
+              return region->GetTabStripCollectionController()
                   ->GetStateController()
                   ->IsCollapsed();
             },

@@ -39,18 +39,18 @@
 #include "chrome/browser/ui/views/frame/custom_corners_background.h"
 #include "chrome/browser/ui/views/frame/shadow_frame_view.h"
 #include "chrome/browser/ui/views/frame/tab_strip_region_view.h"
+#include "chrome/browser/ui/views/tabs/common/pinned_tab_container_view.h"
+#include "chrome/browser/ui/views/tabs/common/root_tab_collection_node.h"
+#include "chrome/browser/ui/views/tabs/common/tab_collection_node.h"
+#include "chrome/browser/ui/views/tabs/common/tab_drag_handler.h"
+#include "chrome/browser/ui/views/tabs/common/tab_strip_collection_controller.h"
+#include "chrome/browser/ui/views/tabs/common/tab_strip_view.h"
+#include "chrome/browser/ui/views/tabs/common/tab_view.h"
+#include "chrome/browser/ui/views/tabs/common/unpinned_tab_container_view.h"
 #include "chrome/browser/ui/views/tabs/shared/drop_arrow.h"
-#include "chrome/browser/ui/views/tabs/vertical/root_tab_collection_node.h"
-#include "chrome/browser/ui/views/tabs/vertical/tab_collection_node.h"
 #include "chrome/browser/ui/views/tabs/vertical/top_container_button.h"
-#include "chrome/browser/ui/views/tabs/vertical/vertical_pinned_tab_container_view.h"
-#include "chrome/browser/ui/views/tabs/vertical/vertical_tab_drag_handler.h"
 #include "chrome/browser/ui/views/tabs/vertical/vertical_tab_strip_bottom_container.h"
-#include "chrome/browser/ui/views/tabs/vertical/vertical_tab_strip_controller.h"
 #include "chrome/browser/ui/views/tabs/vertical/vertical_tab_strip_top_container.h"
-#include "chrome/browser/ui/views/tabs/vertical/vertical_tab_strip_view.h"
-#include "chrome/browser/ui/views/tabs/vertical/vertical_tab_view.h"
-#include "chrome/browser/ui/views/tabs/vertical/vertical_unpinned_tab_container_view.h"
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/tabs/public/tab_group.h"
@@ -221,12 +221,11 @@ VerticalTabStripRegionView::~VerticalTabStripRegionView() {
   state_controller_->SetDelegate(nullptr);
 }
 
-VerticalPinnedTabContainerView*
-VerticalTabStripRegionView::GetPinnedTabsContainer() {
+PinnedTabContainerView* VerticalTabStripRegionView::GetPinnedTabsContainer() {
   return tab_strip_view_->GetPinnedTabsContainer();
 }
 
-VerticalUnpinnedTabContainerView*
+UnpinnedTabContainerView*
 VerticalTabStripRegionView::GetUnpinnedTabsContainer() {
   return tab_strip_view_->GetUnpinnedTabsContainer();
 }
@@ -558,12 +557,12 @@ void VerticalTabStripRegionView::InitializeTabStrip() {
 
   TabStripModel* tab_strip_model = browser_view_->browser()->GetTabStripModel();
   CHECK(tab_strip_model);
-  auto drag_handler = std::make_unique<VerticalTabDragHandlerImpl>(
+  auto drag_handler = std::make_unique<TabDragHandlerImpl>(
       *tab_strip_model, *root_node_.get(), *this);
   drag_handler_ = drag_handler.get();
 
   CHECK(!tab_strip_controller_);
-  tab_strip_controller_ = std::make_unique<VerticalTabStripController>(
+  tab_strip_controller_ = std::make_unique<TabStripCollectionController>(
       tab_strip_model, browser_view_, *AddChildView(std::move(drag_handler)),
       hover_card_controller_.get(), std::move(tab_menu_model_factory));
 
@@ -630,8 +629,7 @@ void VerticalTabStripRegionView::UpdateLoadingAnimations(
   for (tabs::TabInterface* tab : *tab_strip_model_) {
     const TabCollectionNode* node =
         root_node_->GetNodeForHandle(tab->GetHandle());
-    VerticalTabView* tab_view =
-        views::AsViewClass<VerticalTabView>(node->view());
+    TabView* tab_view = views::AsViewClass<TabView>(node->view());
     CHECK(tab_view);
     tab_view->StepLoadingAnimation(elapsed_time);
   }
@@ -666,7 +664,7 @@ const tabs::TabData& VerticalTabStripRegionView::GetTabData(
   const TabCollectionNode* node = root_node_->GetNodeForHandle(tab);
   CHECK(node);
 
-  VerticalTabView* tab_view = views::AsViewClass<VerticalTabView>(node->view());
+  TabView* tab_view = views::AsViewClass<TabView>(node->view());
   CHECK(tab_view);
 
   return tab_view->data();
@@ -719,7 +717,7 @@ TabDragContext* VerticalTabStripRegionView::GetDragContext() {
 std::optional<BrowserRootView::DropIndex>
 VerticalTabStripRegionView::GetDropIndex(const ui::DropTargetEvent& event) {
   // Check pinned tabs.
-  VerticalPinnedTabContainerView* pinned_container = GetPinnedTabsContainer();
+  PinnedTabContainerView* pinned_container = GetPinnedTabsContainer();
   if (pinned_container && !pinned_container->children().empty()) {
     gfx::Point loc_in_pinned = views::View::ConvertPointToTarget(
         this, pinned_container, event.location());
@@ -734,8 +732,7 @@ VerticalTabStripRegionView::GetDropIndex(const ui::DropTargetEvent& event) {
   }
 
   // Check unpinned tabs.
-  VerticalUnpinnedTabContainerView* unpinned_container =
-      GetUnpinnedTabsContainer();
+  UnpinnedTabContainerView* unpinned_container = GetUnpinnedTabsContainer();
   if (unpinned_container && !unpinned_container->children().empty()) {
     gfx::Point loc_in_unpinned = views::View::ConvertPointToTarget(
         this, unpinned_container, event.location());
@@ -960,10 +957,9 @@ void VerticalTabStripRegionView::ClickEventHandler::OnMouseEvent(
 
 views::View* VerticalTabStripRegionView::SetTabStripView(
     std::unique_ptr<views::View> view) {
-  CHECK(views::IsViewClass<VerticalTabStripView>(view.get()));
+  CHECK(views::IsViewClass<TabStripView>(view.get()));
 
-  tab_strip_view_ =
-      static_cast<VerticalTabStripView*>(AddChildView(std::move(view)));
+  tab_strip_view_ = static_cast<TabStripView*>(AddChildView(std::move(view)));
   tab_strip_view_->SetProperty(
       views::kFlexBehaviorKey,
       views::FlexSpecification(views::MinimumFlexSizeRule::kScaleToMinimum,
