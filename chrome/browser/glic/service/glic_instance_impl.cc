@@ -126,6 +126,12 @@ BASE_FEATURE(kGlicUnbindOnClose, base::FEATURE_DISABLED_BY_DEFAULT);
 
 namespace {
 
+// Invocation sources for which ZSS warming should be disabled.
+constexpr auto kZssWarmingBlocklist = std::to_array<mojom::InvocationSource>({
+    mojom::InvocationSource::kAutoOpenedForPdf,
+    mojom::InvocationSource::kPromotionPage,
+});
+
 EmbedderKey CreateSidePanelEmbedderKey(tabs::TabInterface* tab) {
   CHECK(tab);
   return EmbedderKey(tab);
@@ -409,7 +415,7 @@ void GlicInstanceImpl::Show(const ShowOptions& options) {
     SetActiveEmbedderAndNotifyVisibilityChange(new_key);
   }
 
-  MaybeWarmZeroStateSuggestions();
+  MaybeWarmZeroStateSuggestions(options.invocation_source);
 
   MaybeShowHostUi(embedder_to_show, options.invocation_source,
                   options.prompt_suggestion, options.fre_override);
@@ -1173,10 +1179,22 @@ void GlicInstanceImpl::MaybeDeactivateEmbedder(EmbedderKey key) {
   }
 }
 
-void GlicInstanceImpl::MaybeWarmZeroStateSuggestions() {
+void GlicInstanceImpl::MaybeWarmZeroStateSuggestions(
+    mojom::InvocationSource invocation_source) {
   if (conversation_id() ||
       !GlicEnabling::IsEnabledAndConsentForProfile(profile_) ||
       !IsZeroStateSuggestionsEnabled()) {
+    return;
+  }
+
+  for (auto blocked_source : kZssWarmingBlocklist) {
+    if (blocked_source == invocation_source) {
+      zss_warming_disabled_ = true;
+      break;
+    }
+  }
+
+  if (zss_warming_disabled_) {
     return;
   }
 

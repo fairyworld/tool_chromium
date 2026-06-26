@@ -27,6 +27,7 @@
 #include "chrome/browser/glic/host/webui_contents_container.h"
 #include "chrome/browser/glic/public/features.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
+#include "chrome/browser/glic/public/glic_invoke_options.h"
 #include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/glic/public/glic_keyed_service_factory.h"
 #include "chrome/browser/glic/service/glic_instance_coordinator_impl.h"
@@ -636,6 +637,37 @@ IN_PROC_BROWSER_TEST_P(
   ASSERT_OK(OpenGlicForActiveTab());
   PreventDeletionOnClose();
   ExecuteJsTest();
+}
+
+IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithContextualCueing,
+                       testNoZssWarmingForPromotionPage) {
+  tabs::TabInterface* tab1 = GetTabListInterface()->GetActiveTab();
+
+  // 1. Initial Open via Blocked Source (kPromotionPage)
+  coordinator().Toggle(GetBrowser(), /*prevent_close=*/true,
+                       mojom::InvocationSource::kPromotionPage);
+  ASSERT_OK(WaitForGlicOpen());
+
+  // Since warming is disabled for the promotion page, no calls to the cueing
+  // service should have occurred.
+  EXPECT_EQ(fake_cueing_service()->focused_tab_call_count(), 0);
+  EXPECT_EQ(fake_cueing_service()->pinned_tabs_call_count(), 0);
+
+  // 2. Simulate showing Glic again with a different invocation source
+  // (kTopChromeButton) that would normally trigger warming, targeting the same
+  // active tab.
+  coordinator().Invoke(GlicInvokeOptions(
+      Target(*tab1), mojom::InvocationSource::kTopChromeButton));
+
+  // Warming should still be skipped (call count remains 0) because warming was
+  // permanently disabled by the initial kPromotionPage open.
+  EXPECT_EQ(fake_cueing_service()->focused_tab_call_count(), 0);
+  EXPECT_EQ(fake_cueing_service()->pinned_tabs_call_count(), 0);
+
+  // 3. However, if the web client explicitly requests ZSS, it should still get
+  // results.
+  ExecuteJsTest();
+  EXPECT_GE(fake_cueing_service()->focused_tab_call_count(), 1);
 }
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithContextualCueing,

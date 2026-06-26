@@ -587,6 +587,13 @@ class ApiTests extends ApiTestFixtureBase {
     assertEquals(0, suggestions.suggestions.length);
   }
 
+  async testNoZssWarmingForPromotionPage() {
+    assertDefined(this.host.getZeroStateSuggestionsForFocusedTab);
+    const suggestions = await this.host.getZeroStateSuggestionsForFocusedTab();
+    assertDefined(suggestions);
+    assertEquals(3, suggestions.suggestions.length);
+  }
+
   async testGetZeroStateSuggestionsApi() {
     assertDefined(this.host.getZeroStateSuggestions);
     const sequence = observeSequence<ZeroStateSuggestionsV2>(

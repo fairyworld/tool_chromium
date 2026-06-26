@@ -335,7 +335,7 @@ class GlicInstanceImpl : public GlicInstance,
           callback,
       std::vector<std::string> returned_suggestions);
   void MaybeDeactivateEmbedder(EmbedderKey key);
-  void MaybeWarmZeroStateSuggestions();
+  void MaybeWarmZeroStateSuggestions(mojom::InvocationSource invocation_source);
 
   bool IsActiveEmbedder(EmbedderKey key) const;
   bool ShouldShowInactiveSidePanel(const SidePanelShowOptions& options) const;
@@ -412,6 +412,7 @@ class GlicInstanceImpl : public GlicInstance,
   base::ScopedObservation<GlobalBrowserCollection, BrowserCollectionObserver>
       browser_collection_observation_{this};
   base::ScopedObservation<Host, Host::Observer> host_observation_{this};
+  bool zss_warming_disabled_ = false;
 
   std::unique_ptr<GlicZeroStateSuggestionsManager>
       zero_state_suggestions_manager_;
