@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// Note: This header should be compilable as C.
-
 #ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_THUNKS_H_
 #define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_THUNKS_H_
 
@@ -450,9 +448,6 @@ struct MojoSystemThunks {
 
 typedef struct MojoSystemThunks MojoSystemThunks32;
 
-#ifdef __cplusplus
-#endif  // __cplusplus
-
 MOJO_LEGACY_SYSTEM_EXPORT const struct MojoSystemThunks2*
 MojoEmbedderGetSystemThunks2();
 
@@ -461,9 +456,6 @@ MojoEmbedderGetSystemThunks32();
 
 MOJO_LEGACY_SYSTEM_EXPORT void MojoEmbedderSetSystemThunks(
     const struct MojoSystemThunks2* system_thunks);
-
-#ifdef __cplusplus
-#endif  // __cplusplus
 
 }  // namespace mojo_legacy
 

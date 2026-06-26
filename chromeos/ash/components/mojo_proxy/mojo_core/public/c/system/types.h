@@ -4,8 +4,6 @@
 
 // This file contains types and constants/macros common to different Mojo system
 // APIs.
-//
-// Note: This header should be compilable as C.
 
 #ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_TYPES_H_
 #define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_TYPES_H_
@@ -35,69 +33,56 @@ inline constexpr MojoHandle MOJO_LEGACY_HANDLE_INVALID = 0;
 // (|MOJO_LEGACY_RESULT_OK|); all non-zero values should be considered as
 // error/failure codes (even if the value is not recognized).
 //   |MOJO_LEGACY_RESULT_OK| - Not an error; returned on success.
-//   |MOJO_LEGACY_RESULT_CANCELLED| - Operation was cancelled, typically by the
-//   caller. |MOJO_LEGACY_RESULT_UNKNOWN| - Unknown error (e.g., if not enough
-//   information is
-//       available for a more specific error).
+//   |MOJO_LEGACY_RESULT_CANCELLED| - Operation was cancelled, typically by
+//       the caller.
+//   |MOJO_LEGACY_RESULT_UNKNOWN| - Unknown error (e.g., if not enough
+//       information is available for a more specific error).
 //   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| - Caller specified an invalid
-//   argument. This
-//       differs from |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| in that the
-//       former indicates arguments that are invalid regardless of the state of
-//       the system.
+//       argument. This differs from |MOJO_LEGACY_RESULT_FAILED_PRECONDITION|
+//       in that the former indicates arguments that are invalid regardless
+//       of the state of the system.
 //   |MOJO_LEGACY_RESULT_DEADLINE_EXCEEDED| - Deadline expired before the
-//   operation
-//       could complete.
-//   |MOJO_LEGACY_RESULT_NOT_FOUND| - Some requested entity was not found (i.e.,
-//   does
-//       not exist).
+//       operation could complete.
+//   |MOJO_LEGACY_RESULT_NOT_FOUND| - Some requested entity was not found
+//       (i.e., does not exist).
 //   |MOJO_LEGACY_RESULT_ALREADY_EXISTS| - Some entity or condition that we
-//   attempted
-//       to create already exists.
+//       attempted to create already exists.
 //   |MOJO_LEGACY_RESULT_PERMISSION_DENIED| - The caller does not have
-//   permission to
-//       for the operation (use |MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED| for
-//       rejections caused by exhausting some resource instead).
+//       permission for the operation (use
+//       |MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED| for rejections caused by
+//       exhausting some resource instead).
 //   |MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED| - Some resource required for the
-//   call
-//       (possibly some quota) has been exhausted.
+//       call (possibly some quota) has been exhausted.
 //   |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| - The system is not in a state
-//   required
-//       for the operation (use this if the caller must do something to rectify
-//       the state before retrying).
+//       required for the operation (use this if the caller must do something
+//       to rectify the state before retrying).
 //   |MOJO_LEGACY_RESULT_ABORTED| - The operation was aborted by the system,
-//   possibly
-//       due to a concurrency issue (use this if the caller may retry at a
-//       higher level).
+//       possibly due to a concurrency issue (use this if the caller may
+//       retry at a higher level).
 //   |MOJO_LEGACY_RESULT_OUT_OF_RANGE| - The operation was attempted past the
-//   valid
-//       range. Unlike |MOJO_LEGACY_RESULT_INVALID_ARGUMENT|, this indicates
-//       that the operation may be/become valid depending on the system state.
-//       (This error is similar to |MOJO_LEGACY_RESULT_FAILED_PRECONDITION|, but
-//       is more specific.)
+//       valid range. Unlike |MOJO_LEGACY_RESULT_INVALID_ARGUMENT|, this
+//       indicates that the operation may be/become valid depending on the
+//       system state. (This error is similar to
+//       |MOJO_LEGACY_RESULT_FAILED_PRECONDITION|, but is more specific.)
 //   |MOJO_LEGACY_RESULT_UNIMPLEMENTED| - The operation is not implemented,
-//   supported,
-//       or enabled.
+//       supported, or enabled.
 //   |MOJO_LEGACY_RESULT_INTERNAL| - Internal error: this should never happen
-//   and
-//       indicates that some invariant expected by the system has been broken.
-//   |MOJO_LEGACY_RESULT_UNAVAILABLE| - The operation is (temporarily) currently
-//       unavailable. The caller may simply retry the operation (possibly with a
-//       backoff).
+//       and indicates that some invariant expected by the system has been
+//       broken.
+//   |MOJO_LEGACY_RESULT_UNAVAILABLE| - The operation is (temporarily)
+//       currently unavailable. The caller may simply retry the operation
+//       (possibly with a backoff).
 //   |MOJO_LEGACY_RESULT_DATA_LOSS| - Unrecoverable data loss or corruption.
 //   |MOJO_LEGACY_RESULT_BUSY| - One of the resources involved is currently
-//   being used
-//       (possibly on another thread) in a way that prevents the current
-//       operation from proceeding, e.g., if the other operation may result in
-//       the resource being invalidated.
+//       being used (possibly on another thread) in a way that prevents the
+//       current operation from proceeding, e.g., if the other operation may
+//       result in the resource being invalidated.
 //   |MOJO_LEGACY_RESULT_SHOULD_WAIT| - The request cannot currently be
-//   completed
-//       (e.g., if the data requested is not yet available). The caller should
-//       wait for it to be feasible using a trap.
+//       completed (e.g., if the data requested is not yet available). The
+//       caller should wait for it to be feasible using a trap.
 //
 // The codes from |MOJO_LEGACY_RESULT_OK| to |MOJO_LEGACY_RESULT_DATA_LOSS| come
 // from Google3's canonical error codes.
-//
-// LINT.IfChange(MojoResult)
 
 typedef uint32_t MojoResult;
 
@@ -140,8 +125,6 @@ inline constexpr MojoResult MOJO_LEGACY_RESULT_SHOULD_WAIT = 17;
 #define MOJO_LEGACY_RESULT_BUSY ((MojoResult)16)
 #define MOJO_LEGACY_RESULT_SHOULD_WAIT ((MojoResult)17)
 #endif
-
-// LINT.ThenChange(//mojo/public/cpp/system/result_for_metrics.h:MojoResultForMetrics)
 
 // Flags passed to |MojoInitialize()| via |MojoInitializeOptions|.
 typedef uint32_t MojoInitializeFlags;
@@ -237,27 +220,25 @@ MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoShutdownOptions) == 8,
 // |MojoHandleSignals|: Used to specify signals that can be watched for on a
 // handle (and which can be triggered), e.g., the ability to read or write to
 // the handle.
-//   |MOJO_LEGACY_HANDLE_SIGNAL_NONE| - No flags. A registered watch will always
-//   fail
-//       to arm with |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| when watching for
-//       this.
-//   |MOJO_LEGACY_HANDLE_SIGNAL_READABLE| - Can read (e.g., a message) from the
-//   handle. |MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE| - Can write (e.g., a message)
-//   to the handle. |MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED| - The peer handle is
-//   closed. |MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE| - Can read data from
-//   a data pipe
-//       consumer handle (implying MOJO_LEGACY_HANDLE_SIGNAL_READABLE is also
-//       set), AND there is some nonzero quantity of new data available on the
-//       pipe since the last |MojoReadData()| or |MojoBeginReadData()| call on
+//   |MOJO_LEGACY_HANDLE_SIGNAL_NONE| - No flags. A registered watch will
+//       always fail to arm with |MOJO_LEGACY_RESULT_FAILED_PRECONDITION|
+//       when watching for this.
+//   |MOJO_LEGACY_HANDLE_SIGNAL_READABLE| - Can read (e.g., a message) from
 //       the handle.
+//   |MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE| - Can write (e.g., a message) to
+//       the handle.
+//   |MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED| - The peer handle is closed.
+//   |MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE| - Can read data from a
+//       data pipe consumer handle (implying
+//       MOJO_LEGACY_HANDLE_SIGNAL_READABLE is also set), AND there is some
+//       nonzero quantity of new data available on the pipe since the last
+//       |MojoReadData()| or |MojoBeginReadData()| call on the handle.
 //   |MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE| - The peer handle exists in a
-//   remote
-//       execution context (e.g. in another process.) Note that this signal is
-//       maintained with best effort but may at any time be slightly out of sync
-//       with the actual location of the peer handle.
-//   |MOJO_LEGACY_HANDLE_SIGNAL_QUOTA_EXCEEDED| - One or more quotas set on the
-//   handle
-//       is currently exceeded.
+//       remote execution context (e.g. in another process.) Note that this
+//       signal is maintained with best effort but may at any time be
+//       slightly out of sync with the actual location of the peer handle.
+//   |MOJO_LEGACY_HANDLE_SIGNAL_QUOTA_EXCEEDED| - One or more quotas set on
+//       the handle is currently exceeded.
 
 typedef uint32_t MojoHandleSignals;
 

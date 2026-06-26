@@ -362,7 +362,6 @@ MojoResult MojoSetDefaultProcessErrorHandlerImpl(
   return g_core->SetDefaultProcessErrorHandler(handler, options);
 }
 
-
 MojoSystemThunks2 g_thunks = {sizeof(g_thunks),
                               MojoInitializeImpl,
                               MojoGetTimeTicksNowImpl,

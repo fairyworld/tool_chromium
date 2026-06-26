@@ -3,8 +3,6 @@
 // found in the LICENSE file.
 
 // This file contains types/constants and functions specific to shared buffers.
-//
-// Note: This header should be compilable as C.
 
 #ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_BUFFER_H_
 #define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_BUFFER_H_

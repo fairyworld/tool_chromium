@@ -276,9 +276,9 @@ MojoAddTrigger(MojoHandle trap_handle,
 // Returns:
 //   |MOJO_LEGACY_RESULT_OK| if the trigger has been removed.
 //   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |trap_handle| is not a trap
-//   handle. |MOJO_LEGACY_RESULT_NOT_FOUND| if there is no trigger registered on
-//   this trap for
-//       the given value of |context|.
+//       handle.
+//   |MOJO_LEGACY_RESULT_NOT_FOUND| if there is no trigger registered on
+//       this trap for the given value of |context|.
 MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoRemoveTrigger(MojoHandle trap_handle,
                   uintptr_t context,

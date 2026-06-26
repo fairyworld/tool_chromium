@@ -49,7 +49,6 @@ MojoResult NotImplemented(const char* name) {
       ? g_thunks.name(__VA_ARGS__)                  \
       : NotImplemented(#name)
 
-
 MojoResult MojoInitialize(const struct MojoInitializeOptions* options) {
   return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
 }

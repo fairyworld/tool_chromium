@@ -4,8 +4,6 @@
 
 // This file contains types/functions and constants for platform handle wrapping
 // and unwrapping APIs.
-//
-// Note: This header should be compilable as C.
 
 #ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_PLATFORM_HANDLE_H_
 #define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_PLATFORM_HANDLE_H_

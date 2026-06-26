@@ -4,8 +4,6 @@
 
 // This file contains type and function definitions relevant to Mojo invitation
 // APIs.
-//
-// Note: This header should be compilable as C.
 
 #ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_INVITATION_H_
 #define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_INVITATION_H_
