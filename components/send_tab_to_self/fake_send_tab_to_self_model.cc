@@ -52,6 +52,18 @@ FakeSendTabToSelfModel::GetUnopenedEntriesTargetedToLocalDevice() const {
   return unopened_entries;
 }
 
+std::vector<const SendTabToSelfEntry*>
+FakeSendTabToSelfModel::GetOpenedEntriesTargetedToLocalDevice() const {
+  std::vector<const SendTabToSelfEntry*> opened_entries;
+  for (const auto& [guid, entry] : entries_) {
+    if (entry->GetTargetDeviceSyncCacheGuid() == local_cache_guid_ &&
+        entry->IsOpened()) {
+      opened_entries.push_back(entry.get());
+    }
+  }
+  return opened_entries;
+}
+
 const SendTabToSelfEntry* FakeSendTabToSelfModel::SendEntry(
     const GURL& url,
     const std::string& title,

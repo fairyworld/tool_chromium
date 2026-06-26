@@ -64,6 +64,10 @@ class SendTabToSelfModel {
   virtual std::vector<const SendTabToSelfEntry*>
   GetUnopenedEntriesTargetedToLocalDevice() const = 0;
 
+  // Returns opened entries targeted to the local device.
+  virtual std::vector<const SendTabToSelfEntry*>
+  GetOpenedEntriesTargetedToLocalDevice() const = 0;
+
   // Adds `url` at the top of the entries. The entry title will be a
   // trimmed copy of `title`. Allows clients to modify the state of the model
   // as driven by user behaviors.

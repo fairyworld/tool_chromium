@@ -422,6 +422,17 @@ SendTabToSelfBridge::GetUnopenedEntriesTargetedToLocalDevice() const {
   return unopened_entries;
 }
 
+std::vector<const SendTabToSelfEntry*>
+SendTabToSelfBridge::GetOpenedEntriesTargetedToLocalDevice() const {
+  std::vector<const SendTabToSelfEntry*> opened_entries;
+  for (const auto& [guid, entry] : entries_) {
+    if (IsTargetedToLocalDevice(*entry) && entry->IsOpened()) {
+      opened_entries.push_back(entry.get());
+    }
+  }
+  return opened_entries;
+}
+
 const SendTabToSelfEntry* SendTabToSelfBridge::SendEntry(
     const GURL& url,
     const std::string& title,

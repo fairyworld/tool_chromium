@@ -399,16 +399,15 @@ using ScopedTabGroupSyncObservation =
     return nil;
   }
 
-  // If the WebState has SendTabToSelfTabCardLabelData attached (indicating it
-  // was auto-opened via SendTabToSelf), return the formatted label (e.g., "From
-  // <device>").
-  SendTabToSelfTabCardLabelData* labelData =
-      SendTabToSelfTabCardLabelData::FromWebState(webState);
-  if (!labelData) {
+  // If the WebState has a valid Send Tab to Self label text (applicable for
+  // both realized and unrealized WebStates), return the formatted label.
+  NSString* labelText =
+      SendTabToSelfTabCardLabelData::GetLabelTextForWebState(webState);
+  if (!labelText) {
     return nil;
   }
   ActivityLabelData* data = [[ActivityLabelData alloc] init];
-  data.labelString = labelData->GetLabelText();
+  data.labelString = labelText;
   return data;
 }
 

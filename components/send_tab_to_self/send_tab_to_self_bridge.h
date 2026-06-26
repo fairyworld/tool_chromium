@@ -101,6 +101,8 @@ class SendTabToSelfBridge : public syncer::DataTypeSyncBridge,
       std::string_view guid) const override;
   std::vector<const SendTabToSelfEntry*>
   GetUnopenedEntriesTargetedToLocalDevice() const override;
+  std::vector<const SendTabToSelfEntry*> GetOpenedEntriesTargetedToLocalDevice()
+      const override;
   const SendTabToSelfEntry* SendEntry(
       const GURL& url,
       const std::string& title,
