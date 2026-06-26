@@ -2321,10 +2321,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills,
       mojom::SkillSource::kFirstParty, "contextual_skill_description_2",
       /*curated_by=*/std::nullopt, /*image_url=*/GURL("https://example.com")));
 
-  GlicInstance* instance =
-      GlicKeyedServiceFactory::GetGlicKeyedService(GetProfile())
-          ->instance_coordinator()
-          .GetActiveInstance();
+  GlicInstanceImpl* instance = GetOnlyGlicInstance();
   ASSERT_TRUE(instance);
   instance->host().NotifyContextualSkillsChanged(std::move(skills_batch_1));
 
