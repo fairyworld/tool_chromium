@@ -76,6 +76,9 @@ class PromosManagerCoordinatorTest : public PlatformTest {
   void TearDown() override {
     [coordinator_ stop];
     [scene_state_ shutdown];
+    coordinator_ = nil;
+    mock_pip_handler_ = nil;
+    mock_promos_manager_handler_ = nil;
     scene_state_ = nil;
     PlatformTest::TearDown();
   }
