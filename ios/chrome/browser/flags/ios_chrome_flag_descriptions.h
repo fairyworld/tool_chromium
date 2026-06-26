@@ -1803,12 +1803,6 @@ inline constexpr char kShowAutofillTypePredictionsDescription[] =
     "Annotates web forms with Autofill field type predictions as placeholder "
     "text.";
 
-inline constexpr char kShowTabGroupInGridOnStartName[] =
-    "Show tab group in grid on start";
-inline constexpr char kShowTabGroupInGridOnStartDescription[] =
-    "Show tab group in grid on start if the last activation is within a "
-    "specific time interval";
-
 inline constexpr char kSkipDefaultBrowserPromoInFirstRunName[] =
     "Skip the FRE Default Browser Promo in EEA";
 inline constexpr char kSkipDefaultBrowserPromoInFirstRunDescription[] =

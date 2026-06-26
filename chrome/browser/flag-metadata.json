@@ -8719,11 +8719,6 @@
     "expiry_milestone": 140
   },
   {
-    "name": "show-tab-group-in-grid-on-start",
-    "owners": [ "achara@google.com", "ewannpv@google.com", "bling-flags@google.com" ],
-    "expiry_milestone": 155
-  },
-  {
     "name": "show-tab-groups-mac-system-menu",
     "owners": ["dominicaustria@google.com", "top-chrome-desktop-ui@google.com"],
     "expiry_milestone": 155
