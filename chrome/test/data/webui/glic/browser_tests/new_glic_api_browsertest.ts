@@ -128,6 +128,28 @@ class ApiTests extends ApiTestFixtureBase {
     assertEquals(data.url, url);
   }
 
+  async testActivateTabWithUrl() {
+    assertDefined(this.host.createTab);
+    assertDefined(this.host.activateTabWithUrl);
+    const prodUrl = location.href + '#activate_prod';
+    const createdProd = await this.host.createTab(prodUrl, {});
+    assertEquals(createdProd.url, prodUrl);
+
+    // Open another tab so prodUrl is no longer the active tab.
+    const blankUrl = location.href + '#blank';
+    const createdBlank = await this.host.createTab(blankUrl, {});
+    assertEquals(createdBlank.url, blankUrl);
+
+    // Activating with autopush URL but matching prod pattern should deduplicate
+    // and return prod tab.
+    const autopushUrl = location.href + '#activate_autopush';
+    const activated = await this.host.activateTabWithUrl(
+        autopushUrl, {pattern: '*activate_prod*'});
+    assertDefined(activated);
+    assertEquals(activated.tabId, createdProd.tabId);
+    assertEquals(activated.url, prodUrl);
+  }
+
   async testCreateTabFailsWithUnsupportedScheme() {
     assertDefined(this.host.createTab);
 

@@ -757,12 +757,19 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testCreateTabSimple) {
 // response). Also, tab group inheritance is not supported by default on
 // Android.
 #if BUILDFLAG(IS_ANDROID)
+#define MAYBE_testActivateTabWithUrl DISABLED_testActivateTabWithUrl
 #define MAYBE_testCreateTab DISABLED_testCreateTab
 #define MAYBE_testCreateTabInBackground DISABLED_testCreateTabInBackground
 #else
+#define MAYBE_testActivateTabWithUrl testActivateTabWithUrl
 #define MAYBE_testCreateTab testCreateTab
 #define MAYBE_testCreateTabInBackground testCreateTabInBackground
 #endif
+
+IN_PROC_BROWSER_TEST_P(NewGlicApiTest, MAYBE_testActivateTabWithUrl) {
+  ASSERT_OK(OpenGlicForActiveTab());
+  ExecuteJsTest();
+}
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiTest, MAYBE_testCreateTab) {
   ASSERT_OK(OpenGlicForActiveTab());
