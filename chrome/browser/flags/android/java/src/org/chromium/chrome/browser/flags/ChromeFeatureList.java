@@ -691,6 +691,8 @@ public abstract class ChromeFeatureList {
             "TabStripAutoSelectOnCloseChange";
     public static final String TAB_STRIP_HEIGHT_TRANSITION_GLITCH_FIX =
             "TabStripHeightTransitionGlitchFix";
+    public static final String TAB_STRIP_LAYOUT_TRANSITION_DEBOUNCE_FIX =
+            "TabStripLayoutTransitionDebounceFix";
     public static final String TAB_SWITCHER_DRAG_DROP_ANDROID = "TabSwitcherDragDropAndroid";
     public static final String TAB_SWITCHER_GROUP_SUGGESTIONS_ANDROID =
             "TabSwitcherGroupSuggestionsAndroid";
@@ -1186,6 +1188,8 @@ public abstract class ChromeFeatureList {
                     /* defaultValueInTests= */ true);
     public static final CachedFlag sTabStripHeightTransitionGlitchFix =
             newCachedFlag(TAB_STRIP_HEIGHT_TRANSITION_GLITCH_FIX, /* defaultValue= */ true);
+    public static final CachedFlag sTabStripLayoutTransitionDebounceFix =
+            newCachedFlag(TAB_STRIP_LAYOUT_TRANSITION_DEBOUNCE_FIX, /* defaultValue= */ true);
     public static final CachedFlag sTabWindowManagerReportIndicesMismatch =
             newCachedFlag(TAB_WINDOW_MANAGER_REPORT_INDICES_MISMATCH, true);
     public static final CachedFlag sTestDefaultDisabled =
@@ -1408,6 +1412,7 @@ public abstract class ChromeFeatureList {
                     sTabClosureMethodRefactor,
                     sTabStorageSqlitePrototype,
                     sTabStripHeightTransitionGlitchFix,
+                    sTabStripLayoutTransitionDebounceFix,
                     sTabWindowManagerReportIndicesMismatch,
                     sThreeDotMenuBackButton,
                     sToolbarCaptureFixForSPAs,
