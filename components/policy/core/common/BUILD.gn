@@ -47,7 +47,6 @@ source_set("util") {
   deps = [
     "//base",
     "//net",
-    "//ui/base",
   ]
 
   if (is_chromeos) {

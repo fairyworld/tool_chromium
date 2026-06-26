@@ -41,6 +41,7 @@
 #include "google_apis/gaia/gaia_urls.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "third_party/abseil-cpp/absl/cleanup/cleanup.h"
+#include "ui/base/device_form_factor.h"
 
 namespace em = enterprise_management;
 
@@ -2123,6 +2124,23 @@ void CloudPolicyClient::CreateDeviceRegisterRequest(
 void CloudPolicyClient::CreateUniqueRequestJob(
     std::unique_ptr<RegistrationJobConfiguration> config) {
   unique_request_job_ = service_->CreateJob(std::move(config));
+}
+
+em::FormFactor GetFormFactor() {
+  switch (ui::GetDeviceFormFactor()) {
+    case ui::DEVICE_FORM_FACTOR_DESKTOP:
+      return em::FORM_FACTOR_DESKTOP;
+    case ui::DEVICE_FORM_FACTOR_PHONE:
+      return em::FORM_FACTOR_PHONE;
+    case ui::DEVICE_FORM_FACTOR_TABLET:
+      return em::FORM_FACTOR_TABLET;
+    case ui::DEVICE_FORM_FACTOR_TV:
+      return em::FORM_FACTOR_TV;
+    case ui::DEVICE_FORM_FACTOR_AUTOMOTIVE:
+      return em::FORM_FACTOR_AUTOMOTIVE;
+    default:
+      return em::FORM_FACTOR_UNSPECIFIED;
+  }
 }
 
 }  // namespace policy

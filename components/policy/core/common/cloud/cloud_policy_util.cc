@@ -82,8 +82,6 @@
 #include "base/ios/device_util.h"
 #endif
 
-#include "ui/base/device_form_factor.h"
-
 namespace policy {
 
 namespace em = enterprise_management;
@@ -315,22 +313,6 @@ bool IsUserLevelPolicyType(const std::string& policy_type) {
          policy_type == dm_protocol::kChromeExtensionInstallUserCloudPolicyType;
 }
 
-em::FormFactor GetFormFactor() {
-  switch (ui::GetDeviceFormFactor()) {
-    case ui::DEVICE_FORM_FACTOR_DESKTOP:
-      return em::FORM_FACTOR_DESKTOP;
-    case ui::DEVICE_FORM_FACTOR_PHONE:
-      return em::FORM_FACTOR_PHONE;
-    case ui::DEVICE_FORM_FACTOR_TABLET:
-      return em::FORM_FACTOR_TABLET;
-    case ui::DEVICE_FORM_FACTOR_TV:
-      return em::FORM_FACTOR_TV;
-    case ui::DEVICE_FORM_FACTOR_AUTOMOTIVE:
-      return em::FORM_FACTOR_AUTOMOTIVE;
-    default:
-      return em::FORM_FACTOR_UNSPECIFIED;
-  }
-}
 
 std::string PolicyTypeLogPrefix(std::string_view policy_type,
                                 std::string_view settings_entity_id) {
