@@ -544,7 +544,7 @@ public class TabCollectionTabModelImpl extends TabModelJniBridge {
 
     @Override
     public void commitAllTabClosures() {
-        if (!supportsPendingClosures()) return;
+        if (!supportsPendingClosures() || !mPendingTabClosureManager.hasPendingClosures()) return;
 
         mPendingTabClosureManager.commitAllTabClosures();
         for (TabModelObserver obs : mTabModelObservers) obs.allTabsClosureCommitted(isIncognito());
