@@ -21271,27 +21271,6 @@
             ]
         }
     ],
-    "RustyBmpFeature": [
-        {
-            "platforms": [
-                "android",
-                "android_webview",
-                "chromeos",
-                "ios",
-                "linux",
-                "mac",
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "RustyBmpExperimentForTests",
-                    "enable_features": [
-                        "RustyBmpFeature"
-                    ]
-                }
-            ]
-        }
-    ],
     "SQLitePersistentCookieStoreEarlyInit": [
         {
             "platforms": [
