@@ -625,49 +625,24 @@ SuggestionsContext BuildSuggestionsContext(
 // Triggers the possible import of submitted data at submission time.
 void MaybeImportFromSubmittedForm(AutofillClient& client,
                                   ukm::SourceId ukm_source_id,
-                                  const FormStructure& form_structure) {
+                                  const FormStructure& form) {
   // This intentionally happens prior to `ImportAndProcessFormData()`. See
   // crbug.com/381205586.
   ProfileTokenQuality::SaveObservationsForFilledFormForAllSubmittedProfiles(
-      form_structure, client.GetPersonalDataManager().address_data_manager());
+      form, client.GetPersonalDataManager().address_data_manager());
 
   AutofillAiManager* const ai_manager = client.GetAutofillAiManager();
   const bool autofill_ai_shows_bubble =
-      ai_manager && ai_manager->OnFormSubmitted(form_structure, ukm_source_id);
+      ai_manager && ai_manager->OnFormSubmitted(form, ukm_source_id);
   if (!autofill_ai_shows_bubble) {
     // Update Personal Data with the form's submitted data.
     client.GetFormDataImporter()->ImportAndProcessFormData(
-        form_structure, client.IsAutofillProfileEnabled(),
+        form, client.IsAutofillProfileEnabled(),
         client.GetPaymentsAutofillClient()->IsAutofillPaymentMethodsEnabled(),
         ukm_source_id);
   }
-
-  std::vector<FormFieldData> fields_for_autocomplete = base::ToVector(
-      form_structure,
-      [&](const std::unique_ptr<AutofillField>& autofill_field) {
-        FormFieldData field = *autofill_field;
-        FieldType cc_type = autofill_field->Type().GetCreditCardType();
-        if (cc_type == CREDIT_CARD_VERIFICATION_CODE ||
-            cc_type == CREDIT_CARD_STANDALONE_VERIFICATION_CODE) {
-          // However, if Autofill has recognized a field as CVC, that shouldn't
-          // be saved.
-          field.set_should_autocomplete(false);
-        }
-        if (autofill_field->Type().GetLoyaltyCardType() ==
-                LOYALTY_MEMBERSHIP_ID &&
-            autofill_field->last_modifier() == FieldModifier::kAutofill) {
-          // Only store loyalty cards values in Autocomplete if they were filled
-          // manually.
-          field.set_should_autocomplete(false);
-        }
-        return field;
-      });
-
-  // TODO crbug.com/40100455 - Eliminate `form_for_autocomplete`.
-  FormData form_for_autocomplete = form_structure.ToFormData();
-  form_for_autocomplete.set_fields(std::move(fields_for_autocomplete));
   client.GetSingleFieldFillRouter().OnWillSubmitForm(
-      form_for_autocomplete, &form_structure, client.IsAutocompleteEnabled());
+      form.ToFormData(), &form, client.IsAutocompleteEnabled());
 }
 
 // Generates a compose suggestion for the given `form` and `field` if conditions
