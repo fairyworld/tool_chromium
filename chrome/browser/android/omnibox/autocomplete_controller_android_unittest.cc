@@ -144,6 +144,6 @@ TEST_F(AutocompleteControllerAndroidTest, Start_InKeywordMode) {
                   Property(&AutocompleteInput::in_keyword_mode, Eq(true)))));
 
   controller()->Start(env, nullptr, u"query", -1, "", url, OEP::OTHER,
-                      omnibox::TOOL_MODE_UNSPECIFIED, false, true, true, false,
+                      omnibox::TOOL_MODE_UNSPECIFIED, false, true, false,
                       true);
 }

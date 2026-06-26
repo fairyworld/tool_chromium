@@ -709,12 +709,9 @@ void OmniboxEditModel::StartAutocomplete(bool prevent_inline_autocomplete) {
   input_.set_prevent_inline_autocomplete(prevent_inline_autocomplete ||
                                          just_deleted_text_ ||
                                          paste_state_ != PasteState::kNone);
-  input_.set_prefer_keyword(is_keyword_selected());
   input_.set_allow_exact_keyword_match(is_keyword_selected() ||
                                        allow_exact_keyword_match_);
-  input_.set_in_keyword_mode(
-      keyword_mode_entry_method_ !=
-      metrics::OmniboxEventProto_KeywordModeEntryMethod_INVALID);
+  input_.set_in_keyword_mode(is_keyword_selected());
   if (std::optional<lens::proto::LensOverlaySuggestInputs> suggest_inputs =
           controller_->client()->GetLensOverlaySuggestInputs()) {
     input_.set_lens_overlay_suggest_inputs(*suggest_inputs);
@@ -2573,7 +2570,6 @@ void OmniboxEditModel::AcceptInput(WindowOpenDisposition disposition,
         controller_->client()->ShouldDefaultTypedNavigationsToHttps(), 0,
         false);
     input.set_prevent_inline_autocomplete(input_.prevent_inline_autocomplete());
-    input.set_prefer_keyword(input_.prefer_keyword());
     input.set_in_keyword_mode(input_.in_keyword_mode());
     input.set_allow_exact_keyword_match(input_.allow_exact_keyword_match());
     input.set_omit_asynchronous_matches(input_.omit_asynchronous_matches());

@@ -441,7 +441,7 @@ void BaseSearchProviderTest::RunTest(base::span<const TestData> cases,
     AutocompleteInput input(std::u16string(test_case.input),
                             metrics::OmniboxEventProto::OTHER,
                             ChromeAutocompleteSchemeClassifier(profile_.get()));
-    input.set_prefer_keyword(prefer_keyword);
+    input.set_in_keyword_mode(prefer_keyword);
     provider_->Start(input, false);
     matches = provider_->matches();
     SCOPED_TRACE(base::StrCat(
@@ -495,8 +495,7 @@ void BaseSearchProviderTest::QueryForInput(const std::u16string& text,
   AutocompleteInput input(text, metrics::OmniboxEventProto::OTHER,
                           ChromeAutocompleteSchemeClassifier(profile_.get()));
   input.set_prevent_inline_autocomplete(prevent_inline_autocomplete);
-  input.set_prefer_keyword(prefer_keyword);
-  input.set_in_keyword_mode(keyword_mode);
+  input.set_in_keyword_mode(prefer_keyword || keyword_mode);
 
   QueryForInput(input);
 }
@@ -4149,7 +4148,6 @@ TEST_F(SearchProviderTest, VerbatimAimSuggestion) {
 TEST_F(SearchProviderTest, DoesNotProvideOnFocus) {
   AutocompleteInput input(u"f", metrics::OmniboxEventProto::OTHER,
                           ChromeAutocompleteSchemeClassifier(profile_.get()));
-  input.set_prefer_keyword(true);
   input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
   provider_->Start(input, false);
   EXPECT_TRUE(provider_->matches().empty());
@@ -4158,7 +4156,6 @@ TEST_F(SearchProviderTest, DoesNotProvideOnFocus) {
 TEST_F(SearchProviderTest, SendsWarmUpRequestOnFocus) {
   AutocompleteInput input(u"f", metrics::OmniboxEventProto::OTHER,
                           ChromeAutocompleteSchemeClassifier(profile_.get()));
-  input.set_prefer_keyword(true);
   input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
 
   provider_->Start(input, false);

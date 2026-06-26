@@ -1370,7 +1370,6 @@ TEST_F(HistoryURLProviderTest, KeywordModeExtractUserInput) {
     AutocompleteInput input(input_text, metrics::OmniboxEventProto::OTHER,
                             TestSchemeClassifier());
     if (input_prefer_keyword_mode) {
-      input.set_prefer_keyword(true);
       input.set_in_keyword_mode(true);
     }
 
@@ -1439,7 +1438,6 @@ TEST_F(HistoryURLProviderTest, MaxMatches) {
 
   // Turn keyword mode on. we should be able to get more matches now.
   input.set_in_keyword_mode(true);
-  input.set_prefer_keyword(true);
   provider_->Start(input, false);
   if (!provider_->done()) {
     base::RunLoop loop{base::RunLoop::Type::kNestableTasksAllowed};

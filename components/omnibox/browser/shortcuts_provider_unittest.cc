@@ -546,7 +546,7 @@ TEST_F(ShortcutsProviderTest, SimpleSingleMatchKeyword) {
                         std::u16string expected_autocompletion) {
     AutocompleteInput input(text, metrics::OmniboxEventProto::OTHER,
                             TestSchemeClassifier());
-    input.set_prefer_keyword(prefer_keyword);
+    input.set_in_keyword_mode(prefer_keyword);
 
     ExpectedURLs expected_urls;
     expected_urls.push_back(

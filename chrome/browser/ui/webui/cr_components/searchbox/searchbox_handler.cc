@@ -1068,7 +1068,7 @@ void SearchboxHandler::QueryAutocompleteWithSuggestInventory(
   autocomplete_input.set_prevent_inline_autocomplete(
       prevent_inline_autocomplete);
   // Disable keyword matches as NTP realbox has no UI affordance for it.
-  autocomplete_input.set_prefer_keyword(false);
+  autocomplete_input.set_in_keyword_mode(false);
   autocomplete_input.set_allow_exact_keyword_match(false);
   // Set the lens overlay suggest inputs, if available.
   if (std::optional<lens::proto::LensOverlaySuggestInputs> suggest_inputs =
