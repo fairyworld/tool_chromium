@@ -750,4 +750,34 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, CloseOnWindowFocusLost) {
   WaitForDestruction(std::move(tracker));
 }
 
+IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
+                       MultipleUnboundedElementsDismissesFirst) {
+  GURL url(embedded_test_server()->GetURL("/title1.html"));
+  EXPECT_TRUE(NavigateToURL(shell(), url));
+
+  std::string script = R"JS(
+    document.body.innerHTML = `
+      <div id="first" style="width:50px; height:50px;" unbounded></div>
+      <div id="second" style="width:50px; height:50px;" unbounded></div>
+    `;
+    const first = document.getElementById('first');
+    const second = document.getElementById('second');
+    let results = [];
+    first.showUnboundedElement()
+      .then(() => {
+        results.push(getComputedStyle(first).visibility);
+        results.push(getComputedStyle(second).visibility);
+        return second.showUnboundedElement();
+      })
+      .then(() => {
+        results.push(getComputedStyle(first).visibility);
+        results.push(getComputedStyle(second).visibility);
+        return results.join(',');
+      });
+  )JS";
+
+  EXPECT_EQ("visible,hidden,hidden,visible",
+            EvalJs(primary_main_frame_host(), script).ExtractString());
+}
+
 }  // namespace content

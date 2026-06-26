@@ -143,6 +143,10 @@ UnboundedSurfaceWindowMac::~UnboundedSurfaceWindowMac() {
   GetHostFrameSinkManager()->InvalidateFrameSinkId(frame_sink_id_, this, {});
 }
 
+base::WeakPtr<UnboundedSurfaceWindow> UnboundedSurfaceWindowMac::GetWeakPtr() {
+  return weak_ptr_factory_.GetWeakPtr();
+}
+
 UnboundedSurfaceWindowMac::DisplayInfo
 UnboundedSurfaceWindowMac::GetDisplayInfo() const {
   DisplayInfo info;
@@ -410,7 +414,7 @@ void UnboundedSurfaceWindowMac::Dismiss() {
     base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
         FROM_HERE,
         base::BindOnce(&RenderWidgetHostViewBase::DestroyUnboundedSurface,
-                       parent_view_->GetWeakPtr()));
+                       parent_view_->GetWeakPtr(), GetWeakPtr()));
   }
 }
 
