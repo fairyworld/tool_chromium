@@ -1022,7 +1022,7 @@ bool IsSharedStorageWritableEligibleForNavigationRequest(
 std::optional<base::SafeRef<RenderFrameHostImpl>>
 GetRenderFrameHostForBackForwardCacheRestore(FrameTreeNode* frame_tree_node,
                                              NavigationEntryImpl* entry) {
-  if (!entry) {
+  if (!entry || !frame_tree_node->frame_tree().is_primary()) {
     return std::nullopt;
   }
 
@@ -3356,13 +3356,13 @@ bool NavigationRequest::ShouldAddDeviceBoundSessionObserver() {
   // prerendering a main frame, as the device-bound session change information
   // will only be used to determine if a page can be restored from back/forward
   // cache, so subframe navigation can be ignored.
-  return frame_tree_node_->navigator()
-             .controller()
-             .GetBackForwardCache()
-             .should_allow_storing_pages_with_cache_control_no_store() &&
+  return (IsInPrimaryMainFrame() || IsInPrerenderedMainFrame()) &&
          !IsPageActivation() && !IsSameDocument() &&
-         (IsInPrimaryMainFrame() || IsInPrerenderedMainFrame()) &&
-         common_params_->url.SchemeIsHTTPOrHTTPS();
+         common_params_->url.SchemeIsHTTPOrHTTPS() &&
+         frame_tree_node_->current_frame_host()
+             ->delegate()
+             ->GetBackForwardCache()
+             .should_allow_storing_pages_with_cache_control_no_store();
 }
 
 void NavigationRequest::StartNavigation() {
@@ -6888,6 +6888,7 @@ void NavigationRequest::AddOldPageInfoToCommitParamsIfNeeded() {
   // will send our best guess by checking if the page can be persisted at this
   // point.
   bool can_store_old_page_in_bfcache =
+      frame_tree_node_->frame_tree().is_primary() &&
       frame_tree_node_->frame_tree()
           .controller()
           .GetBackForwardCache()

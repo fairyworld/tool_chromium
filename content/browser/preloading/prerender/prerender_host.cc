@@ -21,6 +21,7 @@
 #include "base/time/time.h"
 #include "base/trace_event/named_trigger.h"
 #include "base/trace_event/typed_macros.h"
+#include "content/browser/back_forward_cache/back_forward_cache_impl.h"
 #include "content/browser/client_hints/client_hints.h"
 #include "content/browser/devtools/devtools_instrumentation.h"
 #include "content/browser/preloading/prefetch/no_vary_search_helper.h"
@@ -218,6 +219,11 @@ void PrerenderHost::PrerenderFrameTreeDelegate::DidStopLoading() {
 
 bool PrerenderHost::PrerenderFrameTreeDelegate::IsHidden() {
   return true;
+}
+
+BackForwardCacheImpl&
+PrerenderHost::PrerenderFrameTreeDelegate::GetBackForwardCache() {
+  NOTREACHED();
 }
 
 FrameTree* PrerenderHost::PrerenderFrameTreeDelegate::LoadingTree() {

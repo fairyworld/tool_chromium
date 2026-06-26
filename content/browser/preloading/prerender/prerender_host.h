@@ -41,6 +41,7 @@ enum class WebClientHintsType;
 
 namespace content {
 
+class BackForwardCacheImpl;
 class DevToolsPrerenderAttempt;
 class FrameTreeNode;
 class NavigationHandle;
@@ -492,6 +493,7 @@ class CONTENT_EXPORT PrerenderHost {
     PrerenderHostId GetPrerenderHostId() override;
 
     // NavigationControllerDelegate
+    BackForwardCacheImpl& GetBackForwardCache() override;
     void NotifyNavigationStateChangedFromController(
         InvalidateTypes changed_flags) override {}
     void NotifyBeforeFormRepostWarningShow() override {}

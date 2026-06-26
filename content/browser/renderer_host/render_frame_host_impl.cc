@@ -2745,22 +2745,18 @@ RenderFrameHostImpl::RenderFrameHostImpl(
 
   SiteInstanceGroupId sig_id = site_instance_->group()->GetId();
   bool rfh_in_bfcache =
-      frame_tree->controller()
-          .GetBackForwardCache()
+      GetBackForwardCache()
           .IsRenderFrameHostWithSIGInBackForwardCacheForDebugging(sig_id);
   bool rfph_in_bfcache =
-      frame_tree->controller()
-          .GetBackForwardCache()
+      GetBackForwardCache()
           .IsRenderFrameProxyHostWithSIGInBackForwardCacheForDebugging(sig_id);
   bool rvh_in_bfcache =
-      frame_tree->controller()
-          .GetBackForwardCache()
+      GetBackForwardCache()
           .IsRenderViewHostWithMapIdInBackForwardCacheForDebugging(
               *render_view_host_);
   bool related_site_instance_in_bfcache =
-      frame_tree->controller()
-          .GetBackForwardCache()
-          .IsRelatedSiteInstanceInBackForwardCacheForDebugging(*site_instance_);
+      GetBackForwardCache().IsRelatedSiteInstanceInBackForwardCacheForDebugging(
+          *site_instance_);
   if (rfh_in_bfcache || rfph_in_bfcache || rvh_in_bfcache ||
       related_site_instance_in_bfcache) {
     SCOPED_CRASH_KEY_BOOL("rvh-double", "rfh_in_bfcache", rfh_in_bfcache);
@@ -18542,10 +18538,7 @@ void RenderFrameHostImpl::
 }
 
 BackForwardCacheImpl& RenderFrameHostImpl::GetBackForwardCache() {
-  return GetOutermostMainFrame()
-      ->frame_tree()
-      ->controller()
-      .GetBackForwardCache();
+  return delegate_->GetBackForwardCache();
 }
 
 FrameTreeNode* RenderFrameHostImpl::GetFrameTreeNodeForUnload() {
