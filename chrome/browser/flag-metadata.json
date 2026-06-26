@@ -8610,16 +8610,6 @@
     "expiry_milestone": 170
   },
   {
-    "name": "settings-multi-column",
-    "owners": ["hidehiko@chromium.org"],
-    "expiry_milestone": 170
-  },
-  {
-    "name": "settings-single-activity",
-    "owners": ["hidehiko@chromium.org"],
-    "expiry_milestone": 170
-  },
-  {
     "name": "share-ablation-hide-share-in-toolbar",
     "owners": [ "stkhapugin@google.com", "bling-search@google.com"],
     "expiry_milestone": 150

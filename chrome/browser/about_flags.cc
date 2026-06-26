@@ -7471,14 +7471,6 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kSettingsInTabDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(chrome::android::kSettingsInTab)},
 
-    {"settings-multi-column", flag_descriptions::kSettingsMultiColumnName,
-     flag_descriptions::kSettingsMultiColumnDescription, kOsAndroid,
-     FEATURE_VALUE_TYPE(chrome::android::kSettingsMultiColumn)},
-
-    {"settings-single-activity", flag_descriptions::kSettingsSingleActivityName,
-     flag_descriptions::kSettingsSingleActivityDescription, kOsAndroid,
-     FEATURE_VALUE_TYPE(chrome::android::kSettingsSingleActivity)},
-
     {"android-settings-containment",
      flag_descriptions::kAndroidSettingsContainmentName,
      flag_descriptions::kAndroidSettingsContainmentDescription, kOsAndroid,

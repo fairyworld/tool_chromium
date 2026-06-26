@@ -1375,19 +1375,6 @@ inline constexpr char kSettingsInTabName[] = "Settings in Tab";
 inline constexpr char kSettingsInTabDescription[] =
     "Allows the Chrome Settings UI to appear in a tab on Android.";
 
-inline constexpr char kSettingsMultiColumnName[] =
-    "Use MultiColumn mode in Chrome settings";
-inline constexpr char kSettingsMultiColumnDescription[] =
-    "If the window of the clank is large enough, settings page will have two "
-    "column style, the main menu will be put at the left pane, and detailed "
-    "page will be shown at the right pane. This is expected to be used with "
-    "settings-single-activity mode.";
-
-inline constexpr char kSettingsSingleActivityName[] =
-    "Use SingleActivity mode in Chrome settings";
-inline constexpr char kSettingsSingleActivityDescription[] =
-    "On transition of the page, instead of stacking a new Activity as a task, "
-    "reuse the Activity and switch the contained fragment.";
 
 inline constexpr char kSeparateWebAppShortcutBadgeIconName[] =
     "Separate Web App Shortcut Badge Icon";
