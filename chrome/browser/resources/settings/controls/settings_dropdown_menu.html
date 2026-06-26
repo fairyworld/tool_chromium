@@ -25,7 +25,7 @@
 </template>
 <select class="md-select" id="dropdownMenu" on-change="onChange_"
     aria-label$="[[label]]" part="select"
-    disabled="[[shouldDisableMenu_(disabled, menuOptions.*, pref)]]">
+    disabled="[[shouldDisableMenu_(disabled, menuOptions.*, pref.*)]]">
   <template is="dom-repeat" items="[[menuOptions]]">
     <option value="[[item.value]]" hidden="[[item.hidden]]"
         search-hint$="[[item.searchHint]]">
@@ -33,7 +33,7 @@
     </option>
   </template>
   <option value="[[notFoundValue]]"
-      disabled="[[!showNotFoundValue_(menuOptions, pref)]]">
+      disabled="[[!showNotFoundValue_(menuOptions, pref.value)]]">
     $i18n{custom}
   </option>
 </select>

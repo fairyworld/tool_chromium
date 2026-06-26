@@ -18,9 +18,8 @@ import '/shared/settings/controls/cr_policy_pref_indicator.js';
 import {assert} from '//resources/js/assert.js';
 import {microTask, PolymerElement} from '//resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import {CrPolicyPrefMixin} from '/shared/settings/controls/cr_policy_pref_mixin.js';
+import {PrefControlMixin} from '/shared/settings/controls/pref_control_mixin.js';
 import {prefToString, stringToPrefValue} from '/shared/settings/prefs/pref_util.js';
-import {PrefService} from '/shared/settings/prefs2/pref_service.js';
-import {PrefServiceObserverMixin} from '/shared/settings/prefs2/pref_service_observer_mixin.js';
 
 import {getTemplate} from './settings_dropdown_menu.html.js';
 
@@ -45,7 +44,7 @@ export interface SettingsDropdownMenuElement {
 }
 
 const SettingsDropdownMenuElementBase =
-    CrPolicyPrefMixin(PrefServiceObserverMixin(PolymerElement));
+    CrPolicyPrefMixin(PrefControlMixin(PolymerElement));
 
 export class SettingsDropdownMenuElement extends
     SettingsDropdownMenuElementBase {
@@ -71,12 +70,6 @@ export class SettingsDropdownMenuElement extends
         value: false,
       },
 
-      prefKey: {
-        type: String,
-        observer: 'prefKeyChanged_',
-      },
-
-      pref: Object,
 
       /**
        * If true, do not automatically set the preference value. This allows the
@@ -111,31 +104,18 @@ export class SettingsDropdownMenuElement extends
 
   static get observers() {
     return [
-      'updateSelected_(menuOptions, value, pref)',
+      'updateSelected_(menuOptions, value)',
+      'updateSelected_(menuOptions, pref.value.*)',
     ];
   }
 
   declare menuOptions: DropdownMenuOptionList;
   declare disabled: boolean;
-  declare prefKey: string;
-  declare pref: chrome.settingsPrivate.PrefObject|undefined;
+
   declare noSetPref: boolean;
   declare notFoundValue: string;
   declare label: string;
   declare value: string;
-
-  private prefObserverId_: number|null = null;
-
-  private prefKeyChanged_(newKey: string) {
-    if (this.prefObserverId_ !== null) {
-      this.removePrefObserver(this.prefObserverId_);
-      this.prefObserverId_ = null;
-    }
-
-    this.prefObserverId_ = this.addPrefObserver(newKey, pref => {
-      this.pref = pref;
-    });
-  }
 
   override focus() {
     this.$.dropdownMenu.focus();
@@ -148,7 +128,7 @@ export class SettingsDropdownMenuElement extends
     const selected = this.$.dropdownMenu.value;
     const prefValue = stringToPrefValue(selected, this.pref);
     if (prefValue !== undefined) {
-      PrefService.getInstance().setPrefValue(this.prefKey, prefValue);
+      this.set('pref.value', prefValue);
     }
   }
 
@@ -168,7 +148,7 @@ export class SettingsDropdownMenuElement extends
       return;
     }
 
-    if (!this.noSetPref && this.prefKey) {
+    if (!this.noSetPref && this.pref) {
       this.sendPrefChange();
     }
 
@@ -220,17 +200,19 @@ export class SettingsDropdownMenuElement extends
     return prefToString(this.pref);
   }
 
-  private showNotFoundValue_(): boolean {
-    if (this.menuOptions === undefined || this.pref === undefined) {
+  private showNotFoundValue_(
+      menuOptions: DropdownMenuOptionList|null|undefined,
+      prefValue: string): boolean {
+    if (menuOptions === undefined || prefValue === undefined) {
       return false;
     }
 
     // Don't show "Custom" before the options load.
-    if (this.menuOptions === null || this.menuOptions.length === 0) {
+    if (menuOptions === null || menuOptions.length === 0) {
       return false;
     }
 
-    const option = this.menuOptions.find((menuItem) => {
+    const option = menuOptions.find((menuItem) => {
       return menuItem.value.toString() === this.prefStringValue_();
     });
     return !option;

@@ -583,9 +583,8 @@ export class SettingsAppearancePageElement extends
     return previousIsVisible && nextIsVisible;
   }
 
-  private onTabStripPositionChanged_(event: Event) {
-    const dropdown = event.target as SettingsDropdownMenuElement;
-    const enabled = dropdown.getSelectedValue() === 'true';
+  private onTabStripPositionChanged_() {
+    const enabled = this.getPref<boolean>('vertical_tabs.enabled').value;
     this.appearanceBrowserProxy_.recordVerticalTabStripModeChanged(enabled);
   }
 
