@@ -373,7 +373,7 @@ void TaskManagerView::SearchBarOnInputChanged(std::u16string_view query) {
 }
 
 TaskManagerView::TaskManagerView(StartAction start_action)
-    : table_config_(GetTableConfigs()), is_always_on_top_(false) {
+    : is_always_on_top_(false) {
   task_manager::RecordNewOpenEvent(start_action);
   set_use_custom_frame(false);
   SetHasWindowSizeControls(true);
@@ -394,13 +394,6 @@ TaskManagerView::TaskManagerView(StartAction start_action)
 // static
 TaskManagerView* TaskManagerView::GetInstanceForTests() {
   return g_task_manager_view;
-}
-
-// static
-TaskManagerView::TableConfigs TaskManagerView::GetTableConfigs() {
-  return TableConfigs{
-      .table_refresh = true,
-  };
 }
 
 void TaskManagerView::TabSelectedAt(int index) {
@@ -631,22 +624,20 @@ void TaskManagerView::Init() {
       /*header_sort_state=*/true);
   tab_table->SetHeaderStyle(header_style);
 
-  if (table_config_.table_refresh) {
-    views::TableStyle table_style = {
-        .background_tokens =
-            views::TableBackgroundStyle{
-                .background = kColorTaskManagerTableBackground,
-                .alternate = kColorTaskManagerTableBackgroundAlternate,
-                .selected_focused =
-                    kColorTaskManagerTableBackgroundSelectedFocused,
-                .selected_unfocused =
-                    kColorTaskManagerTableBackgroundSelectedUnfocused,
-            },
-        .icons_have_background = true,
-        .inset_focus_ring = true,
-    };
-    tab_table->SetTableStyle(table_style);
-  }
+  views::TableStyle table_style = {
+      .background_tokens =
+          views::TableBackgroundStyle{
+              .background = kColorTaskManagerTableBackground,
+              .alternate = kColorTaskManagerTableBackgroundAlternate,
+              .selected_focused =
+                  kColorTaskManagerTableBackgroundSelectedFocused,
+              .selected_unfocused =
+                  kColorTaskManagerTableBackgroundSelectedUnfocused,
+          },
+      .icons_have_background = true,
+      .inset_focus_ring = true,
+  };
+  tab_table->SetTableStyle(table_style);
 
   // Margins around all contents
   const gfx::Insets dialog_insets =

@@ -119,20 +119,9 @@ class TaskManagerView : public TableViewDelegate,
   static TaskManagerView* GetInstanceForTests();
 
  private:
-  // Used for the TaskManagerDesktopRefresh.
-  // Determines how the UI for the TaskManager is rendered. Each boolean
-  // controls a specific deviation from the original TaskManager UI.
-  // TODO(crbug.com/364926055): Remove after feature is enabled by default.
-  struct TableConfigs {
-    bool table_refresh;
-  };
-
   friend class TaskManagerViewTest;
 
   explicit TaskManagerView(StartAction start_action = StartAction::kOther);
-
-  // Returns flags that describe how the TaskManagerView should be rendered.
-  static TableConfigs GetTableConfigs();
 
   // Creates the header for the view.
   void CreateHeader(const ChromeLayoutProvider* provider);
@@ -190,9 +179,6 @@ class TaskManagerView : public TableViewDelegate,
   std::unique_ptr<views::MenuRunner> menu_runner_;
 
   raw_ptr<views::TableView> tab_table_ = nullptr;
-
-  // Specifications on how to layout the table.
-  TableConfigs table_config_;
 
   // all possible columns, not necessarily visible.
   std::vector<ui::TableColumn> columns_;
