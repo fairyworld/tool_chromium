@@ -2458,13 +2458,6 @@ public class LocationBarMediatorTest {
     }
 
     @Test
-    public void testHintZeroSuggestRefresh_nullTab() {
-        doReturn(null).when(mLocationBarDataProvider).getTab();
-        mMediator.hintZeroSuggestRefresh();
-        verify(mAutocompleteCoordinator).prefetchZeroSuggestResults(null);
-    }
-
-    @Test
     public void testZoomButtonClicked() {
         mMediator.onFinishNativeInitialization();
         doReturn(mWebContents).when(mTab).getWebContents();

@@ -2477,8 +2477,9 @@ class LocationBarMediator
 
     @Override
     public void hintZeroSuggestRefresh() {
-        if (mAutocompleteCoordinator == null) return;
-        mAutocompleteCoordinator.prefetchZeroSuggestResults(mLocationBarDataProvider.getTab());
+        if (mAutocompleteCoordinator == null || !mNativeInitialized) return;
+        AutocompleteCoordinator.prefetchZeroSuggestResults(
+                assumeNonNull(mProfileSupplier.get()), mLocationBarDataProvider);
     }
 
     // TemplateUrlService.TemplateUrlServiceObserver implementation
