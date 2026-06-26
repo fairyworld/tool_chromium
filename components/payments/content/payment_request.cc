@@ -973,11 +973,8 @@ void PaymentRequest::OnPaymentResponseError(
 
   reject_show_error_message_ = error_message;
 
-  if (base::FeatureList::IsEnabled(
-          features::kPaymentRequestSupportReportingAppError)) {
-    reject_show_error_reason_ =
-        ConvertPaymentEventResponseTypeToErrorReason(error);
-  }
+  reject_show_error_reason_ =
+      ConvertPaymentEventResponseTypeToErrorReason(error);
 
   ShowErrorMessageAndAbortPayment();
 }
