@@ -103,6 +103,7 @@ if (!is_android) {
       "//chrome/browser/prefs",
       "//chrome/browser/search_engines",
       "//chrome/browser/sharing_hub",
+      "//chrome/browser/spellchecker",
       "//chrome/browser/ui:accelerator_table",
       "//chrome/browser/ui:browser_action_prefs_listener",
       "//chrome/browser/ui:browser_element_identifiers",
@@ -146,6 +147,7 @@ if (!is_android) {
       "//chrome/browser/ui/webui/inspect",
       "//components/commerce/core:metrics",
       "//components/multistep_filter/core:features",
+      "//components/spellcheck/browser",
     ]
     if (is_mac) {
       deps += [ "//chrome/browser:global_keyboard_shortcuts_mac" ]

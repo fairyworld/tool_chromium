@@ -8,6 +8,7 @@
 #include <optional>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "base/check_deref.h"
 #include "base/check_op.h"
@@ -61,6 +62,7 @@
 #include "chrome/browser/shell_integration.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_ui_util.h"
+#include "chrome/browser/spellchecker/spellcheck_service.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/actions/actions_util.h"
@@ -181,6 +183,7 @@
 #include "components/omnibox/browser/vector_icons.h"
 #include "components/password_manager/core/browser/manage_passwords_referrer.h"
 #include "components/policy/core/common/policy_pref_names.h"
+#include "components/prefs/pref_member.h"
 #include "components/prefs/pref_service.h"
 #include "components/record_replay/core/common/record_replay_features.h"
 #include "components/saved_tab_groups/public/features.h"
@@ -188,6 +191,8 @@
 #include "components/search_engines/template_url_service.h"
 #include "components/signin/public/base/signin_metrics.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
+#include "components/spellcheck/browser/pref_names.h"
+#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/tabs/public/tab_interface.h"
@@ -3878,6 +3883,72 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionPerformance)
           .Build());
+
+#if BUILDFLAG(ENABLE_SPELLCHECK) && !BUILDFLAG(IS_MAC)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                Profile* const profile = bwi->GetProfile();
+                if (!profile) {
+                  return;
+                }
+                PrefService* prefs = profile->GetPrefs();
+                bool spellcheck_enabled =
+                    prefs->GetBoolean(spellcheck::prefs::kSpellCheckEnable);
+                bool enhanced_spellcheck_enabled = prefs->GetBoolean(
+                    spellcheck::prefs::kSpellCheckUseSpellingService);
+
+                if (spellcheck_enabled && !enhanced_spellcheck_enabled) {
+                  // User is turning off spell check.
+                  prefs->SetBoolean(spellcheck::prefs::kSpellCheckEnable,
+                                    false);
+                } else if (enhanced_spellcheck_enabled) {
+                  // User is choosing 'basic' over 'enhanced'.
+                  prefs->SetBoolean(spellcheck::prefs::kSpellCheckEnable, true);
+                  prefs->SetBoolean(
+                      spellcheck::prefs::kSpellCheckUseSpellingService, false);
+                } else {
+                  // User is turning on spell check.
+                  prefs->SetBoolean(spellcheck::prefs::kSpellCheckEnable, true);
+                }
+              },
+              bwi))
+          .SetText(l10n_util::GetStringUTF16(
+              IDS_CONTENT_CONTEXT_CHECK_SPELLING_WHILE_TYPING))
+          .SetActionId(kActionCheckSpellingWhileTyping)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                Profile* const profile = bwi->GetProfile();
+                if (!profile) {
+                  return;
+                }
+                std::vector<SpellcheckService::Dictionary> dictionaries;
+                SpellcheckService::GetDictionaries(profile, &dictionaries);
+
+                std::vector<std::string> all_languages;
+                for (const auto& dictionary : dictionaries) {
+                  all_languages.push_back(dictionary.language);
+                }
+
+                StringListPrefMember dictionaries_pref;
+                dictionaries_pref.Init(
+                    spellcheck::prefs::kSpellCheckDictionaries,
+                    profile->GetPrefs());
+                dictionaries_pref.SetValue(all_languages);
+              },
+              bwi))
+          .SetText(l10n_util::GetStringUTF16(
+              IDS_CONTENT_CONTEXT_SPELLCHECK_MULTI_LINGUAL))
+          .SetActionId(kActionSpellcheckMultiLingual)
+          .Build());
+#endif
 }
 
 void BrowserActions::AddListeners() {

@@ -517,7 +517,7 @@ const std::map<int, int>& GetIdcToUmaMap(UmaEnumIdLookupType type) {
        {IDC_CONTENT_CONTEXT_SEARCHWEBFORIMAGE, 57},
        {IDC_SPELLCHECK_SUGGESTION_0, 58},
        {IDC_SPELLCHECK_ADD_TO_DICTIONARY, 59},
-       {IDC_SPELLPANEL_TOGGLE, 60},
+       // Removed: {IDC_SPELLPANEL_TOGGLE, 60},
        {IDC_CONTENT_CONTEXT_OPEN_ORIGINAL_IMAGE_NEW_TAB, 61},
        {kWritingDirectionMenuId, 62},
        {IDC_WRITING_DIRECTION_DEFAULT, 63},
@@ -3470,7 +3470,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
       return navigation_allowed &&
              IsOpenLinkAllowedByDlp(selection_navigation_url_);
 
-    case IDC_SPELLPANEL_TOGGLE:
     case IDC_CONTENT_CONTEXT_LANGUAGE_SETTINGS:
     case IDC_SEND_TAB_TO_SELF:
       return true;

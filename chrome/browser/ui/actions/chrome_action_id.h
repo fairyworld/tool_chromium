@@ -201,7 +201,6 @@
   E(kActionSpellcheckLanguagesFirst, IDC_SPELLCHECK_LANGUAGES_FIRST) \
   E(kActionSpellcheckLanguagesLast, IDC_SPELLCHECK_LANGUAGES_LAST) \
   E(kActionCheckSpellingWhileTyping, IDC_CHECK_SPELLING_WHILE_TYPING) \
-  E(kActionSpellpanelToggle, IDC_SPELLPANEL_TOGGLE) \
   E(kActionSpellcheckAddToDictionary, IDC_SPELLCHECK_ADD_TO_DICTIONARY) \
   E(kActionSpellcheckMultiLingual, IDC_SPELLCHECK_MULTI_LINGUAL) \
   E(kActionSpellcheckRemoveFromDictionary, \
