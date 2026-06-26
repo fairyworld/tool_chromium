@@ -176,7 +176,7 @@ void BrowserInfoBarManager::Show(
     return;
   }
   CHECK(contents);
-  CHECK(it->second.scope() == InfoBarScope::kCurrentTab);
+  CHECK(it->second.scope() == InfoBarScope::kTab);
 
   auto* manager = ContentInfoBarManager::FromWebContents(contents);
   if (!manager) {
@@ -235,7 +235,7 @@ void BrowserInfoBarManager::Hide(
 
   const InfoBarSpec& spec = it->second;
 
-  if (spec.scope() == InfoBarScope::kCurrentTab) {
+  if (spec.scope() == InfoBarScope::kTab) {
     auto* manager = GetActiveTabInfoBarManager();
     if (!manager) {
       return;

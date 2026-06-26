@@ -55,7 +55,7 @@ IN_PROC_BROWSER_TEST_F(BrowserInfoBarManagerBrowserTest,
   const auto identifier = InfoBarDelegate::TEST_INFOBAR;
   auto spec = InfoBarSpec::Builder(identifier)
                   .SetMessageText(u"Test Message")
-                  .SetScope(InfoBarScope::kCurrentTab)
+                  .SetScope(InfoBarScope::kTab)
                   .Build();
 
   manager()->Register(std::move(spec));
@@ -80,7 +80,7 @@ IN_PROC_BROWSER_TEST_F(BrowserInfoBarManagerBrowserTest,
   const auto identifier = InfoBarDelegate::TEST_INFOBAR;
   auto spec = InfoBarSpec::Builder(identifier)
                   .SetMessageText(u"Test Message")
-                  .SetScope(InfoBarScope::kCurrentTab)
+                  .SetScope(InfoBarScope::kTab)
                   .Build();
 
   manager()->Register(std::move(spec));
@@ -102,7 +102,7 @@ IN_PROC_BROWSER_TEST_F(BrowserInfoBarManagerBrowserTest, ButtonConfiguration) {
   auto spec =
       InfoBarSpec::Builder(identifier)
           .SetMessageText(u"Test Message")
-          .SetScope(InfoBarScope::kCurrentTab)
+          .SetScope(InfoBarScope::kTab)
           .AddOkButton(u"Custom OK",
                        base::BindLambdaForTesting(
                            [&](content::WebContents*) { ok_called = true; }))

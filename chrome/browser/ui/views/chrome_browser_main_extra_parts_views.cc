@@ -203,7 +203,7 @@ void ChromeBrowserMainExtraPartsViews::
               .SetIcon(features::IsRoundedIconsEnabled()
                            ? vector_icons::kSettingsIcon
                            : vector_icons::kSettingsChromeRefreshOldIcon)
-              .SetScope(infobars::InfoBarScope::kCurrentTab)
+              .SetScope(infobars::InfoBarScope::kTab)
               .AddOkButton(
                   l10n_util::GetStringUTF16(
                       IDS_COLLECTED_COOKIES_INFOBAR_BUTTON),
