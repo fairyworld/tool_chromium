@@ -139,6 +139,16 @@ void RecordInvokeEntryPointMetrics(EntryPoint entry_point) {
       break;
   }
 }
+
+class Require1PSkillRefreshObserver : public skills::SkillsService::Observer {
+ public:
+  Require1PSkillRefreshObserver() = default;
+  ~Require1PSkillRefreshObserver() override = default;
+
+  // skills::SkillsService::Observer:
+  bool Require1PSkillRefresh() override { return true; }
+};
+
 }  // namespace
 
 DEFINE_USER_DATA(IndigoPageActionController);
@@ -587,6 +597,21 @@ void IndigoPageActionController::UpdateEntryPointsState() {
       page_action_controller_->ShowSuggestionChip(kActionIndigo);
     }
     base::RecordAction(base::UserMetricsAction("Indigo.PageAction.Show"));
+
+    // Refresh discovery skills to make sure the latest skills are available for
+    // the user.
+    if (content::WebContents* web_contents = tab().GetContents()) {
+      if (Profile* profile =
+              Profile::FromBrowserContext(web_contents->GetBrowserContext())) {
+        if (skills::SkillsService* skills_service =
+                skills::SkillsServiceFactory::GetForProfile(profile)) {
+          Require1PSkillRefreshObserver observer;
+          skills_service->AddObserver(&observer);
+          skills_service->RefreshDiscoverySkills();
+          skills_service->RemoveObserver(&observer);
+        }
+      }
+    }
   } else {
     page_action_controller_->Hide(kActionIndigo);
   }
