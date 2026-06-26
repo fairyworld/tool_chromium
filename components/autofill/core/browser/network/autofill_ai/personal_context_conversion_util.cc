@@ -243,9 +243,9 @@ EntityInstance PersonalContextShipmentToEntityInstance(
   AddStringAttribute(kShipmentCarrierName, shipment.carrier_name(), attributes);
   AddStringAttribute(kShipmentCarrierDomain, shipment.carrier_domain(),
                      attributes);
-  if (shipment.has_estimated_delivery_date()) {
-    AddAttribute(kShipmentEstimatedDeliveryDate,
-                 FormatDate(shipment.estimated_delivery_date()), attributes);
+  if (shipment.has_ship_date()) {
+    AddAttribute(kShipmentShippedDate, FormatDate(shipment.ship_date()),
+                 attributes);
   }
   if (shipment.associated_order_ids_size() > 0) {
     std::vector<std::string> order_ids(shipment.associated_order_ids().begin(),

@@ -178,7 +178,7 @@ constexpr AttributeType::DataType AttributeType::data_type() const {
     case AttributeTypeName::kOrderDate:
     case AttributeTypeName::kPassportExpirationDate:
     case AttributeTypeName::kPassportIssueDate:
-    case AttributeTypeName::kShipmentEstimatedDeliveryDate:
+    case AttributeTypeName::kShipmentShippedDate:
       return DataType::kDate;
     case AttributeTypeName::kDriversLicenseState:
     case AttributeTypeName::kVehiclePlateState:
@@ -299,7 +299,7 @@ constexpr std::optional<FieldType> AttributeType::field_type() const {
       return SHIPMENT_TRACKING_NUMBER;
     case AttributeTypeName::kShipmentDeliveryZipCode:
       return ADDRESS_HOME_ZIP;
-    case AttributeTypeName::kShipmentEstimatedDeliveryDate:
+    case AttributeTypeName::kShipmentShippedDate:
     case AttributeTypeName::kShipmentOrderIds:
     case AttributeTypeName::kShipmentOrderDates:
     case AttributeTypeName::kShipmentMerchantName:

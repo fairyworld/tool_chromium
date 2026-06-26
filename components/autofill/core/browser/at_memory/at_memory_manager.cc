@@ -228,6 +228,7 @@ Suggestion::Icon GetIconForMemoryDataType(
     case accessibility_annotator::MemoryDataType::kShipmentCarrierDomain:
     case accessibility_annotator::MemoryDataType::
         kShipmentEstimatedDeliveryDate:
+    case accessibility_annotator::MemoryDataType::kShipmentShippedDate:
     case accessibility_annotator::MemoryDataType::kUnknown:
       return Suggestion::Icon::kNoIcon;
   }
@@ -429,6 +430,7 @@ bool IsSpiiMemoryDataType(accessibility_annotator::MemoryDataType type) {
     case accessibility_annotator::MemoryDataType::kShipmentCarrierDomain:
     case accessibility_annotator::MemoryDataType::
         kShipmentEstimatedDeliveryDate:
+    case accessibility_annotator::MemoryDataType::kShipmentShippedDate:
     case accessibility_annotator::MemoryDataType::kUnknown:
       return false;
   }

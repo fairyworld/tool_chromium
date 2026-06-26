@@ -1055,8 +1055,8 @@
   <message name="IDS_AUTOFILL_AI_SHIPMENT_CARRIER_DOMAIN_ATTRIBUTE_NAME" desc="Used as a general label for the shipment carrier domain attribute." translateable="false">
     Carrier domain
   </message>
-  <message name="IDS_AUTOFILL_AI_SHIPMENT_ESTIMATED_DELIVERY_DATE_ATTRIBUTE_NAME" desc="Used as a general label for the shipment estimated delivery date attribute." translateable="false">
-    Estimated delivery date
+  <message name="IDS_AUTOFILL_AI_SHIPMENT_SHIPPED_DATE_ATTRIBUTE_NAME" desc="Used as a general label for the shipment shipped date attribute." translateable="false">
+    Shipped date
   </message>
   <message name="IDS_AUTOFILL_AI_SHIPMENT_ORDER_IDS_ATTRIBUTE_NAME" desc="Used as a general label for the shipment order ids attribute." translateable="false">
     Order ids
