@@ -102,6 +102,8 @@
 
 namespace {
 
+using ::base::Bucket;
+using ::base::BucketsAre;
 using ::testing::_;
 using ::testing::Bool;
 using ::testing::Eq;
@@ -2766,6 +2768,11 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
       // Do not sign in to proceed to the feature showcase immediately.
       CompleteIntroStep(/*sign_in=*/false),
       WaitForWebContentsNavigation(kWebContentsId, GetFeatureShowcaseUrl()));
+
+  EXPECT_THAT(histogram_tester().GetAllSamples(
+                  "ProfilePicker.FREFlow.FeatureShowcase.StepEligible"),
+              BucketsAre(Bucket(FeatureShowcaseStep::kDefaultBrowser, 1),
+                         Bucket(FeatureShowcaseStep::kGoogleLens, 1)));
 
   histogram_tester().ExpectUniqueSample(
       "ProfilePicker.FREFlow.FeatureShowcase.StepShown",

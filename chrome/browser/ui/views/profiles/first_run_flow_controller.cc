@@ -693,21 +693,25 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
       return;
     }
 
+    for (const std::string& step_id : eligible_steps_) {
+      base::UmaHistogramEnumeration(
+          "ProfilePicker.FREFlow.FeatureShowcase.StepEligible",
+          GetFeatureShowcaseStep(step_id));
+    }
+
+#if BUILDFLAG(IS_WIN)
     if (std::find(eligible_steps_.begin(), eligible_steps_.end(),
                   kFeatureShowcaseDefaultBrowserStepIdentifier) !=
         eligible_steps_.end()) {
-#if BUILDFLAG(IS_WIN)
       browser_util::ShouldOfferToPin(
           ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()),
           browser_util::PinAppToTaskbarChannel::kFirstRunExperience,
           base::BindOnce(
               &FeatureShowcaseStepController::OnCanPinToTaskbarResult,
               weak_ptr_factory_.GetWeakPtr(), eligible_steps));
-#else
-      ShowScreen(eligible_steps_, /*can_pin=*/false);
-#endif
       return;
     }
+#endif
 
     ShowScreen(eligible_steps_, /*can_pin=*/false);
   }
