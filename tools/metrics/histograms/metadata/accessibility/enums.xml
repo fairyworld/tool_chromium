@@ -2168,6 +2168,7 @@ Unknown properties are collapsed to zero. -->
   <int value="4" label="Skipped: Distilled HTML Exceeds Size Limit"/>
   <int value="5" label="Error: Tree Building Failed / Null Root"/>
   <int value="6" label="Error: Original AXTree Text is Empty"/>
+  <int value="7" label="Error: Malformed Distilled HTML"/>
 </enum>
 
 <!-- LINT.ThenChange(//chrome/common/read_anything/distillation_evaluator.mojom:EvaluationStatus) -->
