@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/safe_browsing/content/browser/client_side_phishing_model.h"
+#include "components/safe_browsing/core/browser/client_side_phishing_model.h"
 
 #include <stdint.h>
 
@@ -17,7 +17,6 @@
 #include "base/logging.h"
 #include "base/memory/read_only_shared_memory_region.h"
 #include "base/memory/shared_memory_mapping.h"
-#include "base/memory/singleton.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/numerics/byte_conversions.h"
 #include "base/strings/string_number_conversions.h"
@@ -27,15 +26,10 @@
 #include "components/optimization_guide/core/delivery/optimization_guide_model_provider.h"
 #include "components/optimization_guide/core/optimization_guide_util.h"
 #include "components/optimization_guide/proto/client_side_phishing_model_metadata.pb.h"
-#include "components/optimization_guide/proto/models.pb.h"
-#include "components/safe_browsing/core/common/fbs/client_model_generated.h"
 #include "components/safe_browsing/core/common/features.h"
-#include "components/safe_browsing/core/common/proto/client_model.pb.h"
+#include "components/safe_browsing/core/common/phishing_classifier/flatbuffer_utils.h"
 #include "components/safe_browsing/core/common/safebrowsing_switches.h"
-#include "content/public/browser/browser_task_traits.h"
-#include "content/public/browser/browser_thread.h"
 #include "crypto/hash.h"
-#include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "third_party/zlib/google/compression_utils.h"
 
 namespace safe_browsing {
@@ -43,25 +37,27 @@ namespace safe_browsing {
 namespace {
 
 void ReturnModelOverrideFailure(
+    scoped_refptr<base::SequencedTaskRunner> ui_task_runner,
     base::OnceCallback<void(std::pair<std::string, base::File>)> callback) {
-  content::GetUIThreadTaskRunner({})->PostTask(
+  ui_task_runner->PostTask(
       FROM_HERE, base::BindOnce(std::move(callback),
                                 std::make_pair(std::string(), base::File())));
 }
 
 void ReadOverridenModel(
     base::FilePath path,
+    scoped_refptr<base::SequencedTaskRunner> ui_task_runner,
     base::OnceCallback<void(std::pair<std::string, base::File>)> callback) {
   if (path.empty()) {
     VLOG(2) << "Failed to override model. Path is empty. Path is " << path;
-    ReturnModelOverrideFailure(std::move(callback));
+    ReturnModelOverrideFailure(ui_task_runner, std::move(callback));
     return;
   }
 
   std::string contents;
   if (!base::ReadFileToString(path.AppendASCII("client_model.pb"), &contents)) {
     VLOG(2) << "Failed to override model. Could not read model data.";
-    ReturnModelOverrideFailure(std::move(callback));
+    ReturnModelOverrideFailure(ui_task_runner, std::move(callback));
     return;
   }
 
@@ -69,7 +65,7 @@ void ReadOverridenModel(
                           base::File::FLAG_OPEN | base::File::FLAG_READ);
   // `tflite_model` is allowed to be invalid, when testing a DOM-only model.
 
-  content::GetUIThreadTaskRunner({})->PostTask(
+  ui_task_runner->PostTask(
       FROM_HERE,
       base::BindOnce(std::move(callback),
                      std::make_pair(contents, std::move(tflite_model))));
@@ -205,8 +201,10 @@ TargetEmbedding::TargetEmbedding(tflite::task::vision::FeatureVector embedding,
 // --- ClientSidePhishingModel methods ---
 
 ClientSidePhishingModel::ClientSidePhishingModel(
-    optimization_guide::OptimizationGuideModelProvider* opt_guide)
+    optimization_guide::OptimizationGuideModelProvider* opt_guide,
+    scoped_refptr<base::SequencedTaskRunner> ui_task_runner)
     : opt_guide_(opt_guide),
+      ui_task_runner_(ui_task_runner),
       background_task_runner_(base::ThreadPool::CreateSequencedTaskRunner(
           {base::MayBlock(), base::TaskPriority::BEST_EFFORT})),
       beginning_time_(base::TimeTicks::Now()) {
@@ -249,7 +247,7 @@ void ClientSidePhishingModel::OnModelUpdated(
       // Run callback to remove models from the renderer process. When a
       // callback is called and there are no models in this class while the
       // model type is set, it's expected that it's asked to remove the models.
-      content::GetUIThreadTaskRunner({})->PostTask(
+      ui_task_runner_->PostTask(
           FROM_HERE,
           base::BindOnce(&ClientSidePhishingModel::NotifyCallbacksOnUI,
                          weak_ptr_factory_.GetWeakPtr()));
@@ -277,7 +275,7 @@ void ClientSidePhishingModel::OnModelUpdated(
             FROM_HERE, base::BindOnce(&CloseModelFile,
                                       std::move(*image_embedding_model_)));
       }
-      content::GetUIThreadTaskRunner({})->PostTask(
+      ui_task_runner_->PostTask(
           FROM_HERE,
           base::BindOnce(&ClientSidePhishingModel::NotifyCallbacksOnUI,
                          weak_ptr_factory_.GetWeakPtr()));
@@ -332,7 +330,7 @@ void ClientSidePhishingModel::UnsubscribeToImageEmbedderOptimizationGuide() {
 
       // We will only notify if there was an image embedding model available, so
       // the renderer can remove it.
-      content::GetUIThreadTaskRunner({})->PostTask(
+      ui_task_runner_->PostTask(
           FROM_HERE,
           base::BindOnce(&ClientSidePhishingModel::NotifyCallbacksOnUI,
                          weak_ptr_factory_.GetWeakPtr()));
@@ -354,7 +352,7 @@ void ClientSidePhishingModel::UnsubscribeToImageClassifierOptimizationGuide() {
       // Run callback to remove models from the renderer process. When a
       // callback is called and there are no models in this class while the
       // model type is set, it's expected that it's asked to remove the models.
-      content::GetUIThreadTaskRunner({})->PostTask(
+      ui_task_runner_->PostTask(
           FROM_HERE,
           base::BindOnce(&ClientSidePhishingModel::NotifyCallbacksOnUI,
                          weak_ptr_factory_.GetWeakPtr()));
@@ -485,7 +483,7 @@ void ClientSidePhishingModel::OnModelAndVisualTfLiteFileLoaded(
                  "embedding model version value";
     }
 
-    content::GetUIThreadTaskRunner({})->PostTask(
+    ui_task_runner_->PostTask(
         FROM_HERE, base::BindOnce(&ClientSidePhishingModel::NotifyCallbacksOnUI,
                                   weak_ptr_factory_.GetWeakPtr()));
   }
@@ -570,7 +568,7 @@ void ClientSidePhishingModel::OnImageEmbeddingModelFileAndEmbeddingListLoaded(
   // There is no use of the image embedding model if the visual trigger model is
   // not present, so we will only send to the renderer when that is the case.
   if (visual_tflite_model_ && image_embedding_model_) {
-    content::GetUIThreadTaskRunner({})->PostTask(
+    ui_task_runner_->PostTask(
         FROM_HERE, base::BindOnce(&ClientSidePhishingModel::NotifyCallbacksOnUI,
                                   weak_ptr_factory_.GetWeakPtr()));
   }
@@ -676,67 +674,6 @@ bool ClientSidePhishingModel::IsEnabled() const {
 }
 
 // static
-bool ClientSidePhishingModel::VerifyCSDFlatBufferIndicesAndFields(
-    const flat::ClientSideModel* model) {
-  const flat::TfLiteModelMetadata* metadata = model->tflite_metadata();
-  if (!metadata) {
-    return false;
-  }
-
-  const flatbuffers::Vector<flatbuffers::Offset<flat::Hash>>* hashes =
-      model->hashes();
-  if (!hashes) {
-    return false;
-  }
-
-  const flatbuffers::Vector<flatbuffers::Offset<flat::ClientSideModel_::Rule>>*
-      rules = model->rule();
-  if (!rules) {
-    return false;
-  }
-  for (const flat::ClientSideModel_::Rule* rule : *model->rule()) {
-    if (!rule || !rule->feature()) {
-      return false;
-    }
-    for (int32_t feature : *rule->feature()) {
-      if (feature < 0 || feature >= static_cast<int32_t>(hashes->size())) {
-        return false;
-      }
-    }
-  }
-
-  const flatbuffers::Vector<int32_t>* page_terms = model->page_term();
-  if (!page_terms) {
-    return false;
-  }
-  for (int32_t page_term_idx : *page_terms) {
-    if (page_term_idx < 0 ||
-        page_term_idx >= static_cast<int32_t>(hashes->size())) {
-      return false;
-    }
-  }
-
-  const flatbuffers::Vector<uint32_t>* page_words = model->page_word();
-  if (!page_words) {
-    return false;
-  }
-
-  const flatbuffers::Vector<
-      flatbuffers::Offset<flat::TfLiteModelMetadata_::Threshold>>* thresholds =
-      metadata->thresholds();
-  if (!thresholds) {
-    return false;
-  }
-  for (const flat::TfLiteModelMetadata_::Threshold* threshold : *thresholds) {
-    if (!threshold || !threshold->label()) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-// static
 std::string ClientSidePhishingModel::GetHashFromEmbedding(
     const std::vector<float>& embedding_values) {
   crypto::hash::Hasher hasher(crypto::hash::HashKind::kSha256);
@@ -821,15 +758,15 @@ void ClientSidePhishingModel::SetModelStringForTesting(
   }
 
   if (model_valid || tflite_valid) {
-    content::GetUIThreadTaskRunner({})->PostTask(
+    ui_task_runner_->PostTask(
         FROM_HERE, base::BindOnce(&ClientSidePhishingModel::NotifyCallbacksOnUI,
-                                  base::Unretained(this)));
+                                  weak_ptr_factory_.GetWeakPtr()));
   }
 }
 
 void ClientSidePhishingModel::NotifyCallbacksOnUI() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+  DCHECK(ui_task_runner_->RunsTasksInCurrentSequence());
   callbacks_.Notify();
 }
 
@@ -864,9 +801,10 @@ void ClientSidePhishingModel::MaybeOverrideModel() {
     base::ThreadPool::PostTask(
         FROM_HERE, {base::MayBlock()},
         base::BindOnce(
-            &ReadOverridenModel, overriden_model_directory,
+            &ReadOverridenModel, overriden_model_directory, ui_task_runner_,
             base::BindOnce(&ClientSidePhishingModel::OnGetOverridenModelData,
-                           base::Unretained(this), CSDModelType::kFlatbuffer)));
+                           weak_ptr_factory_.GetWeakPtr(),
+                           CSDModelType::kFlatbuffer)));
   }
 }
 
@@ -913,7 +851,7 @@ void ClientSidePhishingModel::OnGetOverridenModelData(
 
   VLOG(0) << "Model overridden successfully";
 
-  content::GetUIThreadTaskRunner({})->PostTask(
+  ui_task_runner_->PostTask(
       FROM_HERE, base::BindOnce(&ClientSidePhishingModel::NotifyCallbacksOnUI,
                                 weak_ptr_factory_.GetWeakPtr()));
 }

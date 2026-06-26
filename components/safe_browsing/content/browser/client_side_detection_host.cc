@@ -40,7 +40,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/content/browser/client_side_detection_feature_cache.h"
 #include "components/safe_browsing/content/browser/client_side_detection_service.h"
-#include "components/safe_browsing/content/browser/client_side_phishing_model.h"
 #include "components/safe_browsing/content/browser/content_unsafe_resource_util.h"
 #include "components/safe_browsing/content/browser/credit_card_form_event.h"
 #include "components/safe_browsing/content/common/safe_browsing.mojom.h"

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/safe_browsing/content/browser/client_side_phishing_model.h"
+#include "components/safe_browsing/core/browser/client_side_phishing_model.h"
 
 #include <string>
 #include <utility>
@@ -26,6 +26,7 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_command_line.h"
 #include "base/test/scoped_feature_list.h"
+#include "base/test/task_environment.h"
 #include "build/build_config.h"
 #include "components/optimization_guide/core/delivery/model_util.h"
 #include "components/optimization_guide/core/delivery/test_model_info_builder.h"
@@ -36,8 +37,6 @@
 #include "components/safe_browsing/core/common/fbs/client_model_generated.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/safe_browsing/core/common/proto/client_model.pb.h"
-#include "content/public/test/browser_task_environment.h"
-#include "content/public/test/test_renderer_host.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace safe_browsing {
@@ -117,29 +116,30 @@ class ClientSidePhishingModelObserverTracker
   raw_ptr<optimization_guide::OptimizationTargetModelObserver> model_observer_;
 };
 
-class ClientSidePhishingModelTest : public content::RenderViewHostTestHarness {
+class ClientSidePhishingModelTest : public testing::Test {
  public:
   ClientSidePhishingModelTest() = default;
 
   void SetUp() override {
-    content::RenderViewHostTestHarness::SetUp();
+    testing::Test::SetUp();
 
     model_observer_tracker_ =
         std::make_unique<ClientSidePhishingModelObserverTracker>();
     client_side_phishing_model_ = std::make_unique<ClientSidePhishingModel>(
-        model_observer_tracker_.get());
+        model_observer_tracker_.get(),
+        base::SequencedTaskRunner::GetCurrentDefault());
   }
 
   void TearDown() override {
-    content::RenderViewHostTestHarness::TearDown();
     client_side_phishing_model_.reset();
     model_observer_tracker_.reset();
+    testing::Test::TearDown();
   }
 
   void SendEmptyModelInfoUpdate(
       optimization_guide::proto::OptimizationTarget optimization_target) {
     model_observer_tracker_->SendEmptyModelInfoUpdate(optimization_target);
-    task_environment()->RunUntilIdle();
+    task_environment_.RunUntilIdle();
   }
 
   void ValidateModel(
@@ -148,7 +148,7 @@ class ClientSidePhishingModelTest : public content::RenderViewHostTestHarness {
     model_observer_tracker_->NotifyModelFileUpdate(
         optimization_guide::proto::OPTIMIZATION_TARGET_CLIENT_SIDE_PHISHING,
         model_file_path, additional_file_path);
-    task_environment()->RunUntilIdle();
+    task_environment_.RunUntilIdle();
   }
 
   void ValidateImageEmbeddingModel(
@@ -158,7 +158,7 @@ class ClientSidePhishingModelTest : public content::RenderViewHostTestHarness {
         optimization_guide::proto::
             OPTIMIZATION_TARGET_CLIENT_SIDE_PHISHING_IMAGE_EMBEDDER,
         image_embedding_model_file_path, additional_file_path);
-    task_environment()->RunUntilIdle();
+    task_environment_.RunUntilIdle();
   }
 
   void ValidateTargetEmbeddings(
@@ -188,6 +188,7 @@ class ClientSidePhishingModelTest : public content::RenderViewHostTestHarness {
   base::HistogramTester& histogram_tester() { return histogram_tester_; }
 
  private:
+  base::test::TaskEnvironment task_environment_;
   base::HistogramTester histogram_tester_;
 
   std::unique_ptr<ClientSidePhishingModelObserverTracker>
@@ -757,12 +758,13 @@ TEST_F(ClientSidePhishingModelTest, FlatbufferOnFollowingUpdate) {
 }
 
 class ClientSidePhishingModelFeatureTest
-    : public content::RenderViewHostTestHarness,
+    : public testing::Test,
       public testing::WithParamInterface<bool> {
  public:
   bool is_feature_enabled() const { return GetParam(); }
 
   void SetUp() override {
+    testing::Test::SetUp();
     if (is_feature_enabled()) {
       feature_list_.InitAndEnableFeature(
           kClientSideDetectionOnlyESBClassification);
@@ -770,7 +772,6 @@ class ClientSidePhishingModelFeatureTest
       feature_list_.InitAndDisableFeature(
           kClientSideDetectionOnlyESBClassification);
     }
-    content::RenderViewHostTestHarness::SetUp();
     model_observer_tracker_ =
         std::make_unique<ClientSidePhishingModelObserverTracker>();
   }
@@ -778,10 +779,11 @@ class ClientSidePhishingModelFeatureTest
   void TearDown() override {
     client_side_phishing_model_.reset();
     model_observer_tracker_.reset();
-    content::RenderViewHostTestHarness::TearDown();
+    testing::Test::TearDown();
   }
 
  protected:
+  base::test::TaskEnvironment task_environment_;
   base::test::ScopedFeatureList feature_list_;
   std::unique_ptr<ClientSidePhishingModelObserverTracker>
       model_observer_tracker_;
@@ -789,8 +791,9 @@ class ClientSidePhishingModelFeatureTest
 };
 
 TEST_P(ClientSidePhishingModelFeatureTest, SubscriptionOnCreation) {
-  client_side_phishing_model_ =
-      std::make_unique<ClientSidePhishingModel>(model_observer_tracker_.get());
+  client_side_phishing_model_ = std::make_unique<ClientSidePhishingModel>(
+      model_observer_tracker_.get(),
+      base::SequencedTaskRunner::GetCurrentDefault());
 
   if (is_feature_enabled()) {
     EXPECT_FALSE(client_side_phishing_model_

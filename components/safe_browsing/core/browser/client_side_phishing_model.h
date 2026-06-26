@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_SAFE_BROWSING_CONTENT_BROWSER_CLIENT_SIDE_PHISHING_MODEL_H_
-#define COMPONENTS_SAFE_BROWSING_CONTENT_BROWSER_CLIENT_SIDE_PHISHING_MODEL_H_
+#ifndef COMPONENTS_SAFE_BROWSING_CORE_BROWSER_CLIENT_SIDE_PHISHING_MODEL_H_
+#define COMPONENTS_SAFE_BROWSING_CORE_BROWSER_CLIENT_SIDE_PHISHING_MODEL_H_
 
 #include <memory>
 
@@ -14,9 +14,7 @@
 #include "base/memory/read_only_shared_memory_region.h"
 #include "base/memory/weak_ptr.h"
 #include "base/sequence_checker.h"
-#include "base/synchronization/lock.h"
 #include "base/task/sequenced_task_runner.h"
-#include "base/task/thread_pool.h"
 #include "base/thread_annotations.h"
 #include "components/optimization_guide/core/delivery/optimization_target_model_observer.h"
 #include "components/safe_browsing/core/browser/csd_model_type.h"
@@ -52,7 +50,8 @@ class ClientSidePhishingModel
     : public optimization_guide::OptimizationTargetModelObserver {
  public:
   ClientSidePhishingModel(
-      optimization_guide::OptimizationGuideModelProvider* opt_guide);
+      optimization_guide::OptimizationGuideModelProvider* opt_guide,
+      scoped_refptr<base::SequencedTaskRunner> ui_task_runner);
 
   ~ClientSidePhishingModel() override;
 
@@ -77,9 +76,6 @@ class ClientSidePhishingModel
 
   // Returns whether we currently have a model.
   bool IsEnabled() const;
-
-  static bool VerifyCSDFlatBufferIndicesAndFields(
-      const flat::ClientSideModel* model);
 
   // Returns the hash of an embedding.
   static std::string GetHashFromEmbedding(const std::vector<float>& embedding);
@@ -217,6 +213,7 @@ class ClientSidePhishingModel
   std::optional<int> img_embedding_input_width_;
   std::optional<int> img_embedding_input_height_;
 
+  scoped_refptr<base::SequencedTaskRunner> ui_task_runner_;
   scoped_refptr<base::SequencedTaskRunner> background_task_runner_;
 
   // If the users subscribe to ESB, the code will add an observer to the
@@ -241,4 +238,4 @@ class ClientSidePhishingModel
 
 }  // namespace safe_browsing
 
-#endif  // COMPONENTS_SAFE_BROWSING_CONTENT_BROWSER_CLIENT_SIDE_PHISHING_MODEL_H_
+#endif  // COMPONENTS_SAFE_BROWSING_CORE_BROWSER_CLIENT_SIDE_PHISHING_MODEL_H_
