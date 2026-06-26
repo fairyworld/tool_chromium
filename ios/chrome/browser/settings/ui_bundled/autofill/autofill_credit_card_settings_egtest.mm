@@ -590,9 +590,8 @@ id<GREYMatcher> BottomToolbar() {
   [[EarlGrey selectElementWithMatcher:chrome_test_util::
                                           SettingsBottomToolbarDeleteButton()]
       performAction:grey_tap()];
-  [[EarlGrey selectElementWithMatcher:chrome_test_util::
-                                          SettingsBottomToolbarDeleteButton()]
-      assertWithMatcher:grey_nil()];
+  [ChromeEarlGrey waitForUIElementToDisappearWithMatcher:
+                      chrome_test_util::SettingsBottomToolbarDeleteButton()];
   // If the done button in the nav bar is enabled it is no longer in edit
   // mode.
   [[EarlGrey selectElementWithMatcher:SettingsDoneButton()]
