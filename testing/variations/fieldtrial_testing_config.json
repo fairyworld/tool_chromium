@@ -14455,21 +14455,6 @@
             ]
         }
     ],
-    "IOSShowTabGroupInGridOnStart": [
-        {
-            "platforms": [
-                "ios"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "ShowTabGroupInGridOnStart"
-                    ]
-                }
-            ]
-        }
-    ],
     "IOSSkipCookieCaching": [
         {
             "platforms": [
@@ -14527,21 +14512,6 @@
                     },
                     "enable_features": [
                         "IOSSyncedSetUp"
-                    ]
-                }
-            ]
-        }
-    ],
-    "IOSTabGroupColorOnSurface": [
-        {
-            "platforms": [
-                "ios"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled_20260211",
-                    "enable_features": [
-                        "TabGroupColorOnSurface"
                     ]
                 }
             ]

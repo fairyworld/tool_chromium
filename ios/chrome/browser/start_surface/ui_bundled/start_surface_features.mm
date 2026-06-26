@@ -12,7 +12,7 @@ constexpr base::TimeDelta kDefaultShowTabGroupInGridInactiveDuration =
     base::Hours(1);
 }  // anonymous namespace
 
-BASE_FEATURE(kShowTabGroupInGridOnStart, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kShowTabGroupInGridOnStart, base::FEATURE_ENABLED_BY_DEFAULT);
 
 const char kShowTabGroupInGridInactiveDurationInSeconds[] =
     "ShowTabGridInactiveDurationInSeconds";
