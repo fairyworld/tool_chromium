@@ -95,9 +95,10 @@ SendTabToSelfTabCardLabelData::SendTabToSelfTabCardLabelData(
     web::WebState* web_state,
     const std::string& sender_device_name,
     base::Time creation_time)
-    : sender_device_name_(sender_device_name), creation_time_(creation_time) {
+    : sender_device_name_(base::UTF8ToUTF16(sender_device_name)),
+      creation_time_(creation_time) {
   // Registers as an observer to detect when the tab is shown to the user.
-  scoped_observation_.Observe(web_state);
+  web_state_observation_.Observe(web_state);
 }
 
 SendTabToSelfTabCardLabelData::~SendTabToSelfTabCardLabelData() = default;
@@ -148,15 +149,14 @@ NSString* SendTabToSelfTabCardLabelData::GetLabelTextForWebState(
                       entry->GetOpenedTime());
   }
 
-  return GetLabelText(entry->GetDeviceName());
+  return GetLabelText(base::UTF8ToUTF16(entry->GetDeviceName()));
 }
 
 // static
 NSString* SendTabToSelfTabCardLabelData::GetLabelText(
-    const std::string& device_name) {
+    const std::u16string& device_name) {
   return l10n_util::GetNSStringF(
-      IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_SUBTITLE,
-      base::UTF8ToUTF16(device_name));
+      IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_SUBTITLE, device_name);
 }
 
 #pragma mark - web::WebStateObserver
@@ -168,5 +168,7 @@ void SendTabToSelfTabCardLabelData::WasShown(web::WebState* web_state) {
 
 void SendTabToSelfTabCardLabelData::WebStateDestroyed(
     web::WebState* web_state) {
-  scoped_observation_.Reset();
+  // Must reset the observation when the WebState is destroyed, to prevent the
+  // destructor from attempting to remove the observer from a dying WebState.
+  web_state_observation_.Reset();
 }

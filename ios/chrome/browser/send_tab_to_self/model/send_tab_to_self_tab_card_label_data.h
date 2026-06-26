@@ -39,7 +39,7 @@ class SendTabToSelfTabCardLabelData
   friend class web::WebStateUserData<SendTabToSelfTabCardLabelData>;
 
   // Returns the formatted localized label string for the given device name.
-  static NSString* GetLabelText(const std::string& device_name);
+  static NSString* GetLabelText(const std::u16string& device_name);
 
   SendTabToSelfTabCardLabelData(web::WebState* web_state,
                                 const std::string& sender_device_name,
@@ -50,8 +50,8 @@ class SendTabToSelfTabCardLabelData
   void WebStateDestroyed(web::WebState* web_state) override;
 
   base::ScopedObservation<web::WebState, web::WebStateObserver>
-      scoped_observation_{this};
-  std::string sender_device_name_;
+      web_state_observation_{this};
+  std::u16string sender_device_name_;
   base::Time creation_time_;
 };
 
