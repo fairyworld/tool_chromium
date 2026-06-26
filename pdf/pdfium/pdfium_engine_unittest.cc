@@ -3276,7 +3276,8 @@ class PDFiumEngineInkDrawTextTest : public PDFiumTestBase {
     FPDF_PAGEOBJECT new_obj =
         FPDFPage_GetObject(page.GetPage(), new_obj_count - 1);
 
-    ASSERT_EQ(2, FPDFPageObj_CountMarks(new_obj));
+    const bool is_ascii = base::IsStringASCII(text_data.text);
+    ASSERT_EQ(is_ascii ? 1 : 2, FPDFPageObj_CountMarks(new_obj));
 
     FPDF_PAGEOBJECTMARK mark1 = FPDFPageObj_GetMark(new_obj, 0);
     ASSERT_EQ(kInkTextAnnotationIdentifierKey,
@@ -3284,10 +3285,12 @@ class PDFiumEngineInkDrawTextTest : public PDFiumTestBase {
     EXPECT_THAT(GetPageObjectMarkIntParam(mark1, "TextboxId"),
                 Optional(expected_textbox_id));
 
-    FPDF_PAGEOBJECTMARK mark2 = FPDFPageObj_GetMark(new_obj, 1);
-    ASSERT_EQ("Span", base::UTF16ToUTF8(GetPageObjectMarkName(mark2)));
-    EXPECT_THAT(GetPageObjectMarkBlobParam(mark2, "ActualText"),
-                Optional(ResultOf(UTF16BEBlobToString, text_data.text)));
+    if (!is_ascii) {
+      FPDF_PAGEOBJECTMARK mark2 = FPDFPageObj_GetMark(new_obj, 1);
+      ASSERT_EQ("Span", base::UTF16ToUTF8(GetPageObjectMarkName(mark2)));
+      EXPECT_THAT(GetPageObjectMarkBlobParam(mark2, "ActualText"),
+                  Optional(ResultOf(UTF16BEBlobToString, text_data.text)));
+    }
   }
 };
 
@@ -4062,7 +4065,7 @@ TEST_P(PDFiumEngineInkDrawTextTest, DrawTextSavesMetadata) {
   std::string textbox_id;
   for (int i = 0; i < obj_count; ++i) {
     FPDF_PAGEOBJECT obj = FPDFPage_GetObject(pdf_page, i);
-    ASSERT_EQ(2, FPDFPageObj_CountMarks(obj));
+    ASSERT_EQ(1, FPDFPageObj_CountMarks(obj));
 
     FPDF_PAGEOBJECTMARK mark = FPDFPageObj_GetMark(obj, 0);
     EXPECT_EQ(kInkTextAnnotationIdentifierKey,
@@ -4258,6 +4261,30 @@ TEST_P(PDFiumEngineInkDrawTextTest, DrawTextWrapsTextboxId) {
   // Third draw: Should use 1.
   DrawAndVerifyMarks(engine.get(), page, font_id, text_data, InkTextId(102),
                      /*expected_textbox_id=*/1);
+}
+
+TEST_P(PDFiumEngineInkDrawTextTest, DrawTextNonASCII) {
+  NiceMock<TestClient> client(/*use_skia_renderer=*/GetParam());
+  std::unique_ptr<PDFiumEngine> engine =
+      InitializeEngine(&client, FILE_PATH_LITERAL("blank.pdf"));
+  ASSERT_TRUE(engine);
+  int page_count = FPDF_GetPageCount(engine->doc());
+  ASSERT_EQ(page_count, 1);
+
+  constexpr int kPageIndex = 0;
+  PDFiumPage& page = GetPDFiumPage(*engine, kPageIndex);
+
+  FontId font_id = AddDefaultFont(engine.get());
+  constexpr std::string_view kNonAsciiTextToDraw = "Héllo!";
+  DrawTextData text_data =
+      GetGlyphsForText(kNonAsciiTextToDraw, /*font_size=*/10.0f);
+  ASSERT_FALSE(text_data.glyphs.empty());
+  ASSERT_FALSE(text_data.glyph_positions.empty());
+
+  engine->set_next_textbox_id_for_testing(0);
+
+  DrawAndVerifyMarks(engine.get(), page, font_id, text_data, InkTextId(100),
+                     /*expected_textbox_id=*/0);
 }
 
 TEST_P(PDFiumEngineInkDrawTextTest, DrawTextAndDiscardStrokes) {
