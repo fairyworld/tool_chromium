@@ -254,6 +254,31 @@ void SetGlicCapability(AccountCapabilitiesTestMutator& mutator, bool enabled) {
   mutator.set_can_use_model_execution_features(enabled);
 }
 
+ScopedGlicCapability::ScopedGlicCapability(Profile* profile, bool enabled)
+    : profile_(profile) {
+  auto* const identity_manager = IdentityManagerFactory::GetForProfile(profile);
+  AccountInfo primary_account =
+      identity_manager->FindExtendedAccountInfoByAccountId(
+          identity_manager->GetPrimaryAccountId(signin::ConsentLevel::kSignin));
+
+  if (base::FeatureList::IsEnabled(
+          switches::kGlicEligibilitySeparateAccountCapability)) {
+    original_enabled_ =
+        primary_account.GetAccountCapabilities().can_use_gemini_in_chrome() ==
+        signin::Tribool::kTrue;
+  } else {
+    original_enabled_ =
+        primary_account.GetAccountCapabilities()
+            .can_use_model_execution_features() == signin::Tribool::kTrue;
+  }
+
+  SetGlicCapability(profile_, enabled);
+}
+
+ScopedGlicCapability::~ScopedGlicCapability() {
+  SetGlicCapability(profile_, original_enabled_);
+}
+
 void SetFRECompletion(Profile* profile, prefs::FreStatus fre_status) {
   glic::GlicKeyedService::Get(profile)->enabling().SetCompletedFre(fre_status);
 }
