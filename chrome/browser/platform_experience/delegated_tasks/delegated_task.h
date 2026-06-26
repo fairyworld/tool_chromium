@@ -5,6 +5,9 @@
 #ifndef CHROME_BROWSER_PLATFORM_EXPERIENCE_DELEGATED_TASKS_DELEGATED_TASK_H_
 #define CHROME_BROWSER_PLATFORM_EXPERIENCE_DELEGATED_TASKS_DELEGATED_TASK_H_
 
+#include <optional>
+#include <string_view>
+
 #include "base/command_line.h"
 #include "base/time/time.h"
 
@@ -25,6 +28,9 @@ enum class DelegatedTaskType {
   kRegisterSearchPromotion = 0,
   kMaxValue = kRegisterSearchPromotion,
 };
+
+std::optional<DelegatedTaskType> ParseDelegatedTaskType(
+    std::string_view task_name);
 
 // Interface/Base class defining a delegated logic task. Concrete
 // implementations define the task type, timeout, and exit code interpretation.
