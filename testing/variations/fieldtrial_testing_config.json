@@ -14294,21 +14294,6 @@
             ]
         }
     ],
-    "IOSOpenEditGroupViewByTappingTitle": [
-        {
-            "platforms": [
-                "ios"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "OpenEditGroupViewByTappingTitle"
-                    ]
-                }
-            ]
-        }
-    ],
     "IOSPageActionMenuAuthFlow": [
         {
             "platforms": [
@@ -17957,6 +17942,21 @@
                     "name": "Enabled",
                     "enable_features": [
                         "OpenDownloadInFilesAppIfNoHandlerFound"
+                    ]
+                }
+            ]
+        }
+    ],
+    "OpenEditGroupViewByTappingTitle": [
+        {
+            "platforms": [
+                "ios"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "OpenEditGroupViewByTappingTitle"
                     ]
                 }
             ]
