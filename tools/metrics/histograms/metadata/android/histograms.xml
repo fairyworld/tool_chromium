@@ -3141,16 +3141,6 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Android.Intent.TrustedTransitionTypeUsed"
-    enum="IntentTransitionType" expires_after="2027-06-09">
-  <owner>mthiesse@chromium.org</owner>
-  <owner>yfriedman@google.com</owner>
-  <summary>
-    Records whether, and why, we used a trusted TransitionType on an Intent
-    coming from another app.
-  </summary>
-</histogram>
-
 <histogram
     name="Android.IsolatedSplits.ClassLoaderReplaced.{AndroidFeatureModuleName}"
     enum="BooleanYesNo" expires_after="2023-06-26">
