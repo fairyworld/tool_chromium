@@ -4612,26 +4612,9 @@
             ],
             "experiments": [
                 {
-                    "name": "Enabled_20260302",
+                    "name": "WithOptimization_20260625",
                     "enable_features": [
-                        "BusyLoopLessWhenCompositorGesture"
-                    ]
-                }
-            ]
-        }
-    ],
-    "BusyLoopOnMainThread": [
-        {
-            "platforms": [
-                "android"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled_2ms",
-                    "params": {
-                        "busy_loop_for": "2ms"
-                    },
-                    "enable_features": [
+                        "BusyLoopLessWhenCompositorGesture",
                         "BusyLoopOnMainThread"
                     ]
                 }
