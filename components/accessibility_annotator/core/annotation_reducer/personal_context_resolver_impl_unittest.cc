@@ -80,7 +80,7 @@ TEST_F(PersonalContextResolverImplTest, QuerySendsCorrectRequest) {
         EXPECT_EQ(request.supported_local_data_types(0),
                   personal_context::proto::MEMORY_DATA_TYPE_NAME_FULL);
         EXPECT_EQ(options.request_timeout, base::Seconds(30));
-      }); // Changed from })) to })
+      });
 
   resolver.Query(query, base::DoNothing());
 }
