@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 
+#include "components/metrics/private_metrics/private_insights/fcp_http_client.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/federated_compute/src/fcp/client/attestation/attestation_verifier.h"
 #include "third_party/federated_compute/src/fcp/client/example_query_result.pb.h"
@@ -25,7 +26,8 @@ TEST(FcpSimpleTaskEnvironmentTest, CreateExampleIterator) {
   (*query_result.mutable_vector_data()->mutable_vectors())["example"] = values;
 
   scoped_refptr<FcpSimpleTaskEnvironment> task_env =
-      base::MakeRefCounted<FcpSimpleTaskEnvironment>("base_dir", "cache_dir");
+      base::MakeRefCounted<FcpSimpleTaskEnvironment>("base_dir", "cache_dir",
+                                                     nullptr);
   task_env->result() = query_result;
 
   google::internal::federated::plan::ExampleSelector selector;
@@ -56,7 +58,8 @@ TEST(FcpSimpleTaskEnvironmentTest, CreateExampleIterator) {
 
 TEST(FcpSimpleTaskEnvironmentTest, CreateAttestationVerifier) {
   scoped_refptr<FcpSimpleTaskEnvironment> task_env =
-      base::MakeRefCounted<FcpSimpleTaskEnvironment>("base_dir", "cache_dir");
+      base::MakeRefCounted<FcpSimpleTaskEnvironment>("base_dir", "cache_dir",
+                                                     nullptr);
 
   auto verifier = task_env->CreateAttestationVerifier();
   ASSERT_NE(verifier, nullptr);
@@ -75,6 +78,14 @@ TEST(FcpSimpleTaskEnvironmentTest, CreateAttestationVerifier) {
       verifier->Verify(access_policy, signed_endorsements, encryption_config);
 
   ASSERT_TRUE(result.ok());
+}
+
+TEST(FcpSimpleTaskEnvironmentTest, CreateHttpClient) {
+  scoped_refptr<FcpSimpleTaskEnvironment> task_env =
+      base::MakeRefCounted<FcpSimpleTaskEnvironment>("base_dir", "cache_dir",
+                                                     nullptr);
+  auto http_client = task_env->CreateHttpClient();
+  EXPECT_NE(http_client, nullptr);
 }
 
 }  // namespace private_insights

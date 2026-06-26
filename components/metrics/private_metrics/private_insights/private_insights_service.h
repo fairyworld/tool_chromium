@@ -23,6 +23,10 @@
 
 class PrefService;
 
+namespace network {
+class SharedURLLoaderFactory;
+}
+
 namespace private_insights {
 
 class FcpEventPublisher;
@@ -99,8 +103,10 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   };
   // LINT.ThenChange(//tools/metrics/histograms/metadata/private_metrics/enums.xml:PrivateInsightsTriggerUploadOutcome)
 
-  PrivateInsightsService(PrefService* local_state,
-                         const base::FilePath& profile_dir);
+  PrivateInsightsService(
+      PrefService* local_state,
+      const base::FilePath& profile_dir,
+      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory);
   ~PrivateInsightsService() override;
 
   PrivateInsightsService(const PrivateInsightsService&) = delete;

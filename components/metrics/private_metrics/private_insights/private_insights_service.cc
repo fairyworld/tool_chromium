@@ -19,12 +19,14 @@
 #include "components/metrics/private_metrics/private_insights/fcp_event_publisher.h"
 #include "components/metrics/private_metrics/private_insights/fcp_files.h"
 #include "components/metrics/private_metrics/private_insights/fcp_flags.h"
+#include "components/metrics/private_metrics/private_insights/fcp_http_client.h"
 #include "components/metrics/private_metrics/private_insights/fcp_log_manager.h"
 #include "components/metrics/private_metrics/private_insights/fcp_simple_task_environment.h"
 #include "components/metrics/private_metrics/private_insights/private_insights_features.h"
 #include "components/prefs/pref_service.h"
 #include "components/version_info/version_info.h"
 #include "google_apis/google_api_keys.h"
+#include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "third_party/abseil-cpp/absl/status/statusor.h"
 #include "third_party/federated_compute/src/fcp/client/fl_runner.h"
 
@@ -102,7 +104,8 @@ ParseFederatedComputationResult(
 
 PrivateInsightsService::PrivateInsightsService(
     PrefService* local_state,
-    const base::FilePath& profile_dir)
+    const base::FilePath& profile_dir,
+    scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory)
     : local_state_(local_state), profile_dir_(profile_dir) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   CHECK(local_state_);
@@ -111,8 +114,17 @@ PrivateInsightsService::PrivateInsightsService(
       profile_dir_.AppendASCII("PrivateInsights");
   base::FilePath base_dir = private_insights_dir.AppendASCII("base_dir");
   base::FilePath cache_dir = private_insights_dir.AppendASCII("cache_dir");
+
+  std::unique_ptr<SharedURLLoaderFactoryProxy> url_loader_factory_proxy;
+  if (url_loader_factory) {
+    url_loader_factory_proxy = std::make_unique<SharedURLLoaderFactoryProxy>(
+        std::move(url_loader_factory),
+        base::SequencedTaskRunner::GetCurrentDefault());
+  }
+
   fcp_task_env_ = base::MakeRefCounted<FcpSimpleTaskEnvironment>(
-      base_dir.AsUTF8Unsafe(), cache_dir.AsUTF8Unsafe());
+      base_dir.AsUTF8Unsafe(), cache_dir.AsUTF8Unsafe(),
+      std::move(url_loader_factory_proxy));
 }
 
 PrivateInsightsService::~PrivateInsightsService() {

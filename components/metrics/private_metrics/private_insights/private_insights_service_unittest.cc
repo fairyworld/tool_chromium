@@ -16,6 +16,8 @@
 #include "components/metrics/private_metrics/private_insights/private_insights_features.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
+#include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
+#include "services/network/test/test_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace private_insights {
@@ -30,6 +32,9 @@ class PrivateInsightsServiceTest : public testing::Test {
     feature_list_.InitAndEnableFeatureWithParameters(
         kPrivateInsightsFeature,
         {{"fcp_server_uri", "https://example.com/test"}});
+    test_shared_url_loader_factory_ =
+        base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
+            &test_url_loader_factory_);
   }
 
   void TearDown() override {
@@ -53,13 +58,17 @@ class PrivateInsightsServiceTest : public testing::Test {
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
   base::ScopedTempDir tmp_profile_dir_;
   base::test::ScopedFeatureList feature_list_;
+  network::TestURLLoaderFactory test_url_loader_factory_;
+  scoped_refptr<network::SharedURLLoaderFactory>
+      test_shared_url_loader_factory_;
 };
 
 TEST_F(PrivateInsightsServiceTest,
        TriggerUploadSkipsPostingTaskWhenAlreadyRunning) {
   base::HistogramTester histogram_tester;
   TestingPrefServiceSimple local_state;
-  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath());
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
+                                 test_shared_url_loader_factory_);
 
   // First call: should post the task.
   service.TriggerUpload();
@@ -114,7 +123,8 @@ TEST_F(PrivateInsightsServiceTest, MetricsChoiceCoupling) {
 
   // When Init() is NOT called, UMA choice changes should be ignored.
   PrivateInsightsService uninit_service(&local_state,
-                                        tmp_profile_dir_.GetPath());
+                                        tmp_profile_dir_.GetPath(),
+                                        test_shared_url_loader_factory_);
   EXPECT_FALSE(uninit_service.upload_timer_.IsRunning());
   local_state.SetBoolean(metrics::prefs::kMetricsReportingEnabled, true);
   EXPECT_FALSE(uninit_service.upload_timer_.IsRunning());
@@ -122,7 +132,8 @@ TEST_F(PrivateInsightsServiceTest, MetricsChoiceCoupling) {
   local_state.SetBoolean(metrics::prefs::kMetricsReportingEnabled, false);
 
   // When Init() IS called, UMA choice changes should start/stop the service.
-  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath());
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
+                                 test_shared_url_loader_factory_);
   service.Init();
   EXPECT_FALSE(service.upload_timer_.IsRunning());
 
@@ -151,7 +162,8 @@ TEST_F(PrivateInsightsServiceTest, MetricsChoiceRespectedOnStartup) {
     local_state.registry()->RegisterBooleanPref(
         metrics::prefs::kMetricsReportingEnabled, false);
 
-    PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath());
+    PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
+                                   test_shared_url_loader_factory_);
     EXPECT_FALSE(service.upload_timer_.IsRunning());
 
     service.Init();
@@ -166,7 +178,8 @@ TEST_F(PrivateInsightsServiceTest, MetricsChoiceRespectedOnStartup) {
     local_state.registry()->RegisterBooleanPref(
         metrics::prefs::kMetricsReportingEnabled, true);
 
-    PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath());
+    PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
+                                   test_shared_url_loader_factory_);
     EXPECT_FALSE(service.upload_timer_.IsRunning());
 
     service.Init();
@@ -184,7 +197,8 @@ TEST_F(PrivateInsightsServiceTest, UploadSkippedWhenServerUriEmpty) {
 
   base::HistogramTester histogram_tester;
   TestingPrefServiceSimple local_state;
-  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath());
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
+                                 test_shared_url_loader_factory_);
 
   service.TriggerUpload();
 

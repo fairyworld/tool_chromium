@@ -17,7 +17,7 @@ class FcpHttpClientTest : public testing::Test {
 };
 
 TEST_F(FcpHttpClientTest, CanInstantiate) {
-  FcpHttpClient client;
+  FcpHttpClient client(nullptr);
   EXPECT_NE(&client, nullptr);
 }
 

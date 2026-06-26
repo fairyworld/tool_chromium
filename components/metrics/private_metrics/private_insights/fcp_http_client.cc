@@ -4,6 +4,9 @@
 
 #include "components/metrics/private_metrics/private_insights/fcp_http_client.h"
 
+#include "base/functional/bind.h"
+#include "base/task/sequenced_task_runner.h"
+
 namespace private_insights {
 
 namespace {
@@ -30,7 +33,27 @@ class FcpHttpRequestHandle : public fcp::client::http::HttpRequestHandle {
 
 }  // namespace
 
-FcpHttpClient::FcpHttpClient() = default;
+SharedURLLoaderFactoryProxy::SharedURLLoaderFactoryProxy(
+    scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
+    scoped_refptr<base::SequencedTaskRunner> ui_task_runner)
+    : url_loader_factory_(std::move(url_loader_factory)),
+      ui_task_runner_(std::move(ui_task_runner)) {}
+
+SharedURLLoaderFactoryProxy::~SharedURLLoaderFactoryProxy() {
+  if (url_loader_factory_) {
+    ui_task_runner_->PostTask(
+        FROM_HERE,
+        base::BindOnce(
+            [](scoped_refptr<network::SharedURLLoaderFactory> factory) {
+              // Body is intentionally empty; factory will be destructed here.
+            },
+            std::move(url_loader_factory_)));
+  }
+}
+
+FcpHttpClient::FcpHttpClient(SharedURLLoaderFactoryProxy* url_loader_factory)
+    : url_loader_factory_proxy_(url_loader_factory) {}
+
 FcpHttpClient::~FcpHttpClient() = default;
 
 std::unique_ptr<fcp::client::http::HttpRequestHandle>

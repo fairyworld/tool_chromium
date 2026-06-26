@@ -32,9 +32,13 @@ class SingleExampleIterator : public fcp::client::ExampleIterator {
 
 }  // namespace
 
-FcpSimpleTaskEnvironment::FcpSimpleTaskEnvironment(std::string base_dir,
-                                                   std::string cache_dir)
-    : base_dir_(std::move(base_dir)), cache_dir_(std::move(cache_dir)) {}
+FcpSimpleTaskEnvironment::FcpSimpleTaskEnvironment(
+    std::string base_dir,
+    std::string cache_dir,
+    std::unique_ptr<SharedURLLoaderFactoryProxy> url_loader_factory_proxy)
+    : base_dir_(std::move(base_dir)),
+      cache_dir_(std::move(cache_dir)),
+      url_loader_factory_proxy_(std::move(url_loader_factory_proxy)) {}
 
 FcpSimpleTaskEnvironment::~FcpSimpleTaskEnvironment() = default;
 
@@ -59,7 +63,7 @@ bool FcpSimpleTaskEnvironment::TrainingConditionsSatisfied() {
 
 std::unique_ptr<fcp::client::http::HttpClient>
 FcpSimpleTaskEnvironment::CreateHttpClient() {
-  return std::make_unique<FcpHttpClient>();
+  return std::make_unique<FcpHttpClient>(url_loader_factory_proxy_.get());
 }
 
 std::unique_ptr<fcp::client::attestation::AttestationVerifier>
