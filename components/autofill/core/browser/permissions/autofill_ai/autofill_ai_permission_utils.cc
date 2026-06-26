@@ -530,7 +530,8 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
       }
       break;
     }
-    case AutofillAiAction::kAmbientAutofill: {
+    case AutofillAiAction::kAmbientAutofill:
+    case AutofillAiAction::kTypeSupportsAmbientAutofillData: {
       if (base::FeatureList::IsEnabled(
               features::debug::kAutofillAmbientAutofillSkipEligibilityChecks)) {
         return true;
@@ -562,7 +563,6 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
     case AutofillAiAction::kServerClassificationModel:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
     case AutofillAiAction::kWalletDataSharingPromotion:
-    case AutofillAiAction::kTypeSupportsAmbientAutofillData:
       break;
   }
   return true;
