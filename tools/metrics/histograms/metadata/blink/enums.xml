@@ -6574,10 +6574,10 @@ Called by update_use_counter_feature_enum.py.-->
   <int value="5831" label="SubtleCryptoEncapsulateBits"/>
   <int value="5832" label="SubtleCryptoDecapsulateKey"/>
   <int value="5833" label="SubtleCryptoDecapsulateBits"/>
-  <int value="5834" label="CSSDiscardedVarWithValidArgumentGrammar"/>
-  <int value="5835" label="CSSDiscardedAttrWithValidArgumentGrammar"/>
-  <int value="5836" label="CSSDiscardedEnvWithValidArgumentGrammar"/>
-  <int value="5837" label="CSSDiscardedIfWithValidArgumentGrammar"/>
+  <int value="5834" label="OBSOLETE_CSSDiscardedVarWithValidArgumentGrammar"/>
+  <int value="5835" label="OBSOLETE_CSSDiscardedAttrWithValidArgumentGrammar"/>
+  <int value="5836" label="OBSOLETE_CSSDiscardedEnvWithValidArgumentGrammar"/>
+  <int value="5837" label="OBSOLETE_CSSDiscardedIfWithValidArgumentGrammar"/>
   <int value="5838" label="HttpOnlyCookieShadowedByNonHttpOnlyPartitioned"/>
   <int value="5839" label="XRMeshDetection"/>
   <int value="5840" label="XRFrameDetectedMeshes"/>
