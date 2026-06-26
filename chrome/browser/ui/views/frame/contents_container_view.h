@@ -12,6 +12,7 @@
 #include "base/scoped_observation.h"
 #include "chrome/browser/devtools/devtools_contents_resizing_strategy.h"
 #include "chrome/browser/ui/views/frame/tab_modal_dialog_host.h"
+#include "ui/gfx/geometry/rounded_corners_f.h"
 #include "ui/views/focus/external_focus_tracker.h"
 #include "ui/views/layout/delegating_layout_manager.h"
 #include "ui/views/view.h"
@@ -138,6 +139,8 @@ class ContentsContainerView : public views::View,
   void SetTargetContentBounds(
       std::optional<gfx::Outsets> target_contents_bounds);
 
+  void SetDefaultRoundedCorners(const gfx::RoundedCornersF& corner_overrides);
+
  private:
   void UpdateContentsClip();
 
@@ -147,7 +150,8 @@ class ContentsContainerView : public views::View,
   void UpdateDevToolsDockedPlacement();
 
   void UpdateBorderRoundedCorners();
-  void ClearBorderRoundedCorners();
+  void ResetBorderRoundedCorners();
+  void SetBorderRoundedCornersFrom(const gfx::RoundedCornersF& default_corners);
 
   // views::View:
   void ChildVisibilityChanged(View* child) override;
@@ -226,6 +230,10 @@ class ContentsContainerView : public views::View,
   // It is non-empty when the contents are larger than the visible region during
   // browser animations (see `SetTargetContentWidth()`).
   mutable gfx::Rect contents_clip_rect_;
+
+  // This is used in Glass mode to cut out part of the UI to show the glass
+  // frame. These values will be used as a minimum.
+  gfx::RoundedCornersF rounded_corner_overrides_;
 
   DevToolsContentsResizingStrategy strategy_;
   base::ScopedObservation<View, ViewObserver> view_bounds_observer_{this};

@@ -42,6 +42,7 @@
 #include "ui/compositor/layer.h"
 #include "ui/gfx/geometry/insets.h"
 #include "ui/gfx/geometry/rect.h"
+#include "ui/gfx/geometry/rounded_corners_f.h"
 #include "ui/views/border.h"
 #include "ui/views/layout/delegating_layout_manager.h"
 #include "ui/views/layout/fill_layout.h"
@@ -207,7 +208,7 @@ void ContentsContainerView::UpdateBorderAndOverlay(bool is_in_split,
   if (!is_in_split) {
     if (split_changed) {
       SetBorder(nullptr);
-      ClearBorderRoundedCorners();
+      ResetBorderRoundedCorners();
 
       mini_toolbar_->SetVisible(false);
       container_outline_->SetVisible(false);
@@ -240,11 +241,12 @@ void ContentsContainerView::UpdateBorderAndOverlay(bool is_in_split,
 #endif  //  BUILDFLAG(IS_CHROMEOS)
 }
 
-void ContentsContainerView::UpdateBorderRoundedCorners() {
+void ContentsContainerView::SetBorderRoundedCornersFrom(
+    const gfx::RoundedCornersF& default_corners) {
   // Update devtools rounded corners. Note, devtools exists behind the contents
   // view so all devtools corners are rounded.
-  devtools_web_view_->holder()->SetCornerRadii(kContentRoundedCorners);
-  devtools_scrim_view_->SetRoundedCorners(kContentRoundedCorners);
+  devtools_web_view_->holder()->SetCornerRadii(default_corners);
+  devtools_scrim_view_->SetRoundedCorners(default_corners);
 
   const bool devtools_in_upper_left =
       devtools_web_view_->GetVisible() &&
@@ -262,18 +264,18 @@ void ContentsContainerView::UpdateBorderRoundedCorners() {
        current_devtools_docked_placement_ == DevToolsDockedPlacement::kRight);
 
   const gfx::RoundedCornersF content_upper_rounded_corners =
-      gfx::RoundedCornersF{devtools_in_upper_left ? 0 : kContentCornerRadius,
-                           devtools_in_upper_right ? 0 : kContentCornerRadius,
-                           0, 0};
+      gfx::RoundedCornersF{
+          devtools_in_upper_left ? 0 : default_corners.upper_left(),
+          devtools_in_upper_right ? 0 : default_corners.upper_right(), 0, 0};
   const gfx::RoundedCornersF content_lower_rounded_corners =
-      gfx::RoundedCornersF{0, 0,
-                           devtools_in_lower_right ? 0 : kContentCornerRadius,
-                           devtools_in_lower_left ? 0 : kContentCornerRadius};
-  const gfx::RoundedCornersF content_rounded_corners =
-      gfx::RoundedCornersF{devtools_in_upper_left ? 0 : kContentCornerRadius,
-                           devtools_in_upper_right ? 0 : kContentCornerRadius,
-                           devtools_in_lower_right ? 0 : kContentCornerRadius,
-                           devtools_in_lower_left ? 0 : kContentCornerRadius};
+      gfx::RoundedCornersF{
+          0, 0, devtools_in_lower_right ? 0 : default_corners.lower_right(),
+          devtools_in_lower_left ? 0 : default_corners.lower_left()};
+  const gfx::RoundedCornersF content_rounded_corners = gfx::RoundedCornersF{
+      devtools_in_upper_left ? 0 : default_corners.upper_left(),
+      devtools_in_upper_right ? 0 : default_corners.upper_right(),
+      devtools_in_lower_right ? 0 : default_corners.lower_right(),
+      devtools_in_lower_left ? 0 : default_corners.lower_left()};
 
   auto radii = new_tab_footer_view_ && new_tab_footer_view_->GetVisible()
                    ? content_upper_rounded_corners
@@ -309,37 +311,12 @@ void ContentsContainerView::UpdateBorderRoundedCorners() {
   }
 }
 
-void ContentsContainerView::ClearBorderRoundedCorners() {
-  constexpr gfx::RoundedCornersF kNoRoundedCorners = gfx::RoundedCornersF{0};
+void ContentsContainerView::UpdateBorderRoundedCorners() {
+  SetBorderRoundedCornersFrom(kContentRoundedCorners);
+}
 
-  devtools_web_view_->holder()->SetCornerRadii(kNoRoundedCorners);
-  devtools_scrim_view_->SetRoundedCorners(kNoRoundedCorners);
-
-  contents_view_->SetBackgroundRadii(kNoRoundedCorners);
-  contents_view_->holder()->SetCornerRadii(kNoRoundedCorners);
-
-  if (new_tab_footer_view_) {
-    new_tab_footer_view_->holder()->SetCornerRadii(kNoRoundedCorners);
-  }
-
-  contents_scrim_view_->SetRoundedCorners(kNoRoundedCorners);
-
-  if (actor_overlay_web_view_) {
-    actor_overlay_web_view_->holder()->SetCornerRadii(kNoRoundedCorners);
-  }
-
-  if (ai_overlay_dialog_view_) {
-    ai_overlay_dialog_view_->holder()->SetCornerRadii(kNoRoundedCorners);
-  }
-
-  if (glic_selection_overlay_view_) {
-    glic_selection_overlay_view_->layer()->SetRoundedCornerRadius(
-        kNoRoundedCorners);
-  }
-
-  if (glic_border_) {
-    glic_border_->SetRoundedCorners(kNoRoundedCorners);
-  }
+void ContentsContainerView::ResetBorderRoundedCorners() {
+  SetBorderRoundedCornersFrom(rounded_corner_overrides_);
 }
 
 void ContentsContainerView::ChildVisibilityChanged(View* child) {
@@ -466,6 +443,18 @@ void ContentsContainerView::SetTargetContentBounds(
 
   target_content_bounds_ = target_content_bounds;
   InvalidateLayout(/*avoid_propagate_during_layout=*/true);
+}
+
+void ContentsContainerView::SetDefaultRoundedCorners(
+    const gfx::RoundedCornersF& corner_overrides) {
+  if (corner_overrides == rounded_corner_overrides_) {
+    return;
+  }
+
+  rounded_corner_overrides_ = corner_overrides;
+  if (!is_in_split_) {
+    ResetBorderRoundedCorners();
+  }
 }
 
 void ContentsContainerView::UpdateContentsClip() {

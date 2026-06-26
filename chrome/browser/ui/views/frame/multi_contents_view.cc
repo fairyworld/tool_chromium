@@ -204,12 +204,25 @@ ContentsContainerView* MultiContentsView::GetInactiveContentsContainerView()
   return contents_container_views_[GetInactiveIndex()];
 }
 
-const gfx::RoundedCornersF& MultiContentsView::background_radii() const {
+const gfx::RoundedCornersF& MultiContentsView::GetBackgroundRadii() const {
   return background_view_->GetRoundedCorners();
 }
 
 void MultiContentsView::SetBackgroundRadii(const gfx::RoundedCornersF& radii) {
+  if (radii == GetBackgroundRadii()) {
+    return;
+  }
+
   background_view_->SetRoundedCorners(radii);
+  if (IsInSplitView()) {
+    for (auto* contents : contents_container_views_) {
+      contents->SetDefaultRoundedCorners(gfx::RoundedCornersF());
+    }
+  } else {
+    GetActiveContentsContainerView()->SetDefaultRoundedCorners(radii);
+    GetInactiveContentsContainerView()->SetDefaultRoundedCorners(
+        gfx::RoundedCornersF());
+  }
 }
 
 ContentsContainerView* MultiContentsView::GetContentsContainerViewFor(
@@ -541,16 +554,9 @@ void MultiContentsView::BeforeApplyLayout(const views::ProposedLayout& layout) {
   }
 
   if (!IsInSplitView()) {
-    auto* const contents = GetActiveContentsContainerView();
-    contents->SetTargetContentBounds(
-        -target_content_bounds_->clipped_area.ToOutsets());
-
-    // Clear out the other contents just in case.
-    for (auto* other : contents_container_views_) {
-      if (other != contents) {
-        other->SetTargetContentBounds(std::nullopt);
-      }
-    }
+    const auto outsets = -target_content_bounds_->clipped_area.ToOutsets();
+    GetActiveContentsContainerView()->SetTargetContentBounds(outsets);
+    GetInactiveContentsContainerView()->SetTargetContentBounds(std::nullopt);
     return;
   }
 

@@ -41,6 +41,7 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/gfx/geometry/insets.h"
 #include "ui/gfx/geometry/outsets.h"
+#include "ui/gfx/geometry/rounded_corners_f.h"
 #include "ui/gfx/geometry/size.h"
 #include "ui/views/controls/separator.h"
 #include "ui/views/view_class_properties.h"
@@ -1154,6 +1155,25 @@ BrowserViewTabbedLayoutImpl::CalculateProposedLayout(
     }
   }
 
+  if (features::IsGlassFrameEnabled()) {
+    gfx::RoundedCornersF content_corners;
+    if (layout_data_->tab_strip_type == TabStripType::kVertical &&
+        !is_fullscreen(layout_data_->window_state) &&
+        layout_data_->vertical_tab_strip_animation.bottom_corner == 1.0) {
+      // Note that this will set a lower leading corner on the multi contents
+      // view even if there's a shadow box, but since the curve is effectively
+      // the same this will not produce a visual bug.
+      const int radius =
+          views().vertical_tab_strip_bottom_corner->GetCornerRadius();
+      if (base::i18n::IsRTL()) {
+        content_corners.set_lower_right(radius);
+      } else {
+        content_corners.set_lower_left(radius);
+      }
+    }
+    views().multi_contents_view->SetBackgroundRadii(content_corners);
+  }
+
   // Make final visual adjustments required for child views to paint.
   if (layout_data_->tab_strip_type == TabStripType::kVertical) {
     // Need to know the toolbar height relative to the tabstrip, so that
@@ -1524,9 +1544,10 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
     // Do corner cutouts and transparency.
     if (features::IsGlassFrameEnabled()) {
       views().vertical_tab_strip_top_corner->SetAlpha(frame_color.opacity);
-      // Set bottom corner alpha when proper cutout is available from the
-      // contents and side panel.
-      // views().vertical_tab_strip_bottom_corner->SetAlpha(glass_alpha);
+      views().vertical_tab_strip_bottom_corner->SetAlpha(
+          layout_data_->vertical_tab_strip_animation.bottom_corner == 1.0
+              ? frame_color.opacity
+              : 1.0f);
       vertical_tabs_background->SetCutoutFrom(tab_strip_cutout_views);
     }
   } else if (layout_data_->tab_strip_type == TabStripType::kHorizontal &&

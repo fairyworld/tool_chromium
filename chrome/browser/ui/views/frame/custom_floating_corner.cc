@@ -155,14 +155,17 @@ SkPath CustomFloatingCorner::GetBackgroundPath(
   return GetCornerPath(visual_corner, in_bounds, stroke_insets);
 }
 
+int CustomFloatingCorner::GetCornerRadius() const {
+  return GetLayoutProvider()->GetCornerRadiusMetric(corner_radius_token_);
+}
+
 gfx::Size CustomFloatingCorner::CalculatePreferredSize(
     const views::SizeBounds& available_size) const {
   // This can return nullptr when there is no Widget (for context, see
   // http://crbug.com/40178332). The nullptr dereference does not always
   // crash due to compiler optimizations, so CHECKing here ensures we crash.
   CHECK(GetLayoutProvider());
-  const float corner_radius =
-      GetLayoutProvider()->GetCornerRadiusMetric(corner_radius_token_);
+  const float corner_radius = GetCornerRadius();
   const float horizontal_size =
       corner_radius + (stroke_ ? views::Separator::kThickness : 0);
   const float vertical_size =
