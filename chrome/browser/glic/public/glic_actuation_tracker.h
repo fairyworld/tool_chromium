@@ -11,14 +11,21 @@ namespace content {
 class WebContents;
 }
 
+namespace performance_manager {
+enum class GlicActuationState;
+}
+
 namespace glic {
+
+using GlicActuationState = performance_manager::GlicActuationState;
 
 // Tracks the Glic actuation state across all WebContents.
 // Used by Performance Manager's PageLiveStateDecoratorHelper to adjust Priority
 // Voting.
 class GlicActuationTracker {
  public:
-  using Callback = base::RepeatingCallback<void(content::WebContents*, bool)>;
+  using Callback =
+      base::RepeatingCallback<void(content::WebContents*, GlicActuationState)>;
 
   static GlicActuationTracker* GetInstance();
 
@@ -30,10 +37,11 @@ class GlicActuationTracker {
   base::CallbackListSubscription AddActuatingChangedCallback(Callback observer);
 
   void NotifyActuatingChanged(content::WebContents* web_contents,
-                              bool is_actuating);
+                              GlicActuationState state);
 
  private:
-  base::RepeatingCallbackList<void(content::WebContents*, bool)>
+  base::RepeatingCallbackList<void(content::WebContents*, GlicActuationState)>
+
       actuating_changed_callbacks_;
 };
 

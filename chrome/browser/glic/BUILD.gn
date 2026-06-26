@@ -106,6 +106,7 @@ source_set("glic") {
     "//chrome/browser/ui/side_panel",
     "//chrome/common",
     "//components/actor/core:task_id",
+    "//components/performance_manager",
     "//components/skills/public:mojo_bindings",
     "//components/tabs:public",
     "//components/user_education/common",

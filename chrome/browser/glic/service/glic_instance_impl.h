@@ -285,6 +285,8 @@ class GlicInstanceImpl : public GlicInstance,
   // GlicActorTaskManager::Delegate:
   void OnTabAddedToTask(actor::TaskId task_id,
                         const tabs::TabInterface::Handle& tab_handle) override;
+  void OnTaskTabsVisibilityChanged(actor::TaskId task_id,
+                                   bool has_visible_tab) override;
   void OnTaskIdChanged(std::optional<int> task_id) override;
 
  private:

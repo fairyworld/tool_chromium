@@ -18,6 +18,8 @@ namespace {
 class ActiveTabObserver;
 }
 
+enum class GlicActuationState;
+
 class PageLiveStateDecoratorHelper
     : public MediaStreamCaptureIndicator::Observer,
       public PerformanceManagerObserver,
@@ -58,7 +60,7 @@ class PageLiveStateDecoratorHelper
   class WebContentsObserver;
 
   void OnGlicActuatingChanged(content::WebContents* web_contents,
-                              bool is_actuating);
+                              GlicActuationState state);
 
   // Linked list of WebContentsObservers created by this
   // PageLiveStateDecoratorHelper. Each WebContentsObservers removes itself from

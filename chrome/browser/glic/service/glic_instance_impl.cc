@@ -1631,6 +1631,11 @@ void GlicInstanceImpl::OnTabAddedToTask(
                                  /*success=*/true, tab);
 }
 
+void GlicInstanceImpl::OnTaskTabsVisibilityChanged(actor::TaskId task_id,
+                                                   bool has_visible_tab) {
+  host_.OnTaskTabsVisibilityChanged(has_visible_tab);
+}
+
 void GlicInstanceImpl::OnTaskIdChanged(std::optional<int> task_id) {
   NotifyInstanceChanged();
 }

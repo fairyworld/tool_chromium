@@ -388,9 +388,9 @@ void PageLiveStateDecoratorHelper::OnPageNodeCreatedForWebContents(
 
 void PageLiveStateDecoratorHelper::OnGlicActuatingChanged(
     content::WebContents* web_contents,
-    bool is_actuating) {
+    GlicActuationState state) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  PageLiveStateDecorator::SetIsGlicActuating(web_contents, is_actuating);
+  PageLiveStateDecorator::SetGlicActuationState(web_contents, state);
 }
 
 }  // namespace performance_manager

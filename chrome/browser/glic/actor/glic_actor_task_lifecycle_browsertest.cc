@@ -6,6 +6,7 @@
 #include "base/test/test_future.h"
 #include "chrome/browser/actor/actor_test_util.h"
 #include "chrome/browser/glic/actor/new_glic_actor_functional_browsertest.h"
+#include "chrome/browser/glic/public/glic_side_panel_coordinator.h"
 #include "chrome/browser/glic/public/service/glic_instance_coordinator.h"
 #include "chrome/browser/glic/service/glic_instance_impl.h"
 #include "components/actor/public/mojom/actor_types.mojom.h"
@@ -588,6 +589,9 @@ IN_PROC_BROWSER_TEST_F(GlicActorTaskLifecycleFunctionalBrowserTest,
   GlicInstanceImpl* instance = GetInstanceImpl();
   ASSERT_TRUE(instance);
   ASSERT_OK(WaitForGlicClient(instance));
+  GlicSidePanelCoordinator* coordinator =
+      GlicSidePanelCoordinator::GetForTab(active_tab());
+  bool supports_peek = coordinator && coordinator->SupportsPeek();
 
   content::WebContents* webui_contents = instance->host().webui_contents();
   ASSERT_TRUE(webui_contents);
@@ -624,11 +628,25 @@ IN_PROC_BROWSER_TEST_F(GlicActorTaskLifecycleFunctionalBrowserTest,
   EXPECT_OK(RunUntilImportanceIs(
       guest_rph, content::ChildProcessImportance::NOT_PERCEPTIBLE));
 #endif
-
   ExecuteJsTest();
 
   // Task is now created and actuating. The process priority should be boosted.
   EXPECT_TRUE(instance->IsActuating());
+
+  // On platforms that do not support peek mode, the side panel re-opens when
+  // a tab is added to the actuation. Close it again to test priority boosting
+  // when hidden.
+  if (!supports_peek) {
+    ToggleGlicForActiveTab();
+    EXPECT_OK(WaitForGlicClose());
+    EXPECT_OK(
+        WaitForWebUiContentsVisibility(instance, content::Visibility::HIDDEN));
+    EXPECT_EQ(guest_contents->GetVisibility(), content::Visibility::HIDDEN);
+  } else {
+    EXPECT_EQ(webui_contents->GetVisibility(), content::Visibility::HIDDEN);
+    EXPECT_EQ(guest_contents->GetVisibility(), content::Visibility::HIDDEN);
+  }
+
 #if !BUILDFLAG(IS_ANDROID)
   EXPECT_OK(
       RunUntilPriorityIs(webui_rph, base::Process::Priority::kUserBlocking));
@@ -641,11 +659,31 @@ IN_PROC_BROWSER_TEST_F(GlicActorTaskLifecycleFunctionalBrowserTest,
                                  content::ChildProcessImportance::IMPORTANT));
 #endif
 
+  // Open a second tab to make the initial tab hidden. The priority of glic
+  // renderers should lower, but not drop to best effort.
+  auto* first_tab = active_tab();
+  auto* second_tab = CreateAndActivateTab(GURL("about:blank"));
+  ASSERT_TRUE(second_tab);
+  ASSERT_NE(second_tab, first_tab);
+  EXPECT_EQ(active_tab(), second_tab);
+
+#if !BUILDFLAG(IS_ANDROID)
+  EXPECT_OK(
+      RunUntilPriorityIs(webui_rph, base::Process::Priority::kUserVisible));
+  EXPECT_OK(
+      RunUntilPriorityIs(guest_rph, base::Process::Priority::kUserVisible));
+#else
+  EXPECT_OK(RunUntilImportanceIs(webui_rph,
+                                 content::ChildProcessImportance::MODERATE));
+  EXPECT_OK(RunUntilImportanceIs(guest_rph,
+                                 content::ChildProcessImportance::MODERATE));
+#endif
+
   // Finish/stop the task.
   ContinueJsTest();
   EXPECT_FALSE(instance->IsActuating());
 
-  // Now Glic is not actuating and it's closed, so the priority should drop.
+  // Now Glic is not actuating, so the priority should drop.
 #if !BUILDFLAG(IS_ANDROID)
   EXPECT_OK(
       RunUntilPriorityIs(webui_rph, base::Process::Priority::kBestEffort));

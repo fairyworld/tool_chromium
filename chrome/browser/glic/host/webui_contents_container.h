@@ -30,6 +30,7 @@ class WebUIContentsContainer {
   virtual void SetVisibility(content::Visibility visibility) = 0;
   virtual content::WebContents* web_contents() const = 0;
   virtual void OnActuatingChanged(bool actuating) = 0;
+  virtual void OnTaskTabsVisibilityChanged(bool has_visible_tab) = 0;
   base::TimeTicks creation_time() const { return creation_time_; }
 
  protected:
@@ -54,6 +55,7 @@ class WebUIContentsContainerImpl : public content::WebContentsObserver,
   void SetVisibility(content::Visibility visibility) override;
   content::WebContents* web_contents() const override;
   void OnActuatingChanged(bool actuating) override;
+  void OnTaskTabsVisibilityChanged(bool has_visible_tab) override;
 
  private:
   // content::WebContentsObserver:
@@ -63,6 +65,7 @@ class WebUIContentsContainerImpl : public content::WebContentsObserver,
       content::NavigationHandle* navigation_handle) override;
   void PrimaryMainDocumentElementAvailable() override;
   void DocumentOnLoadCompletedInPrimaryMainFrame() override;
+  void UpdateActuationTracker();
 
   base::TimeTicks navigation_commit_time_;
   ScopedProfileKeepAlive profile_keep_alive_;
@@ -75,6 +78,9 @@ class WebUIContentsContainerImpl : public content::WebContentsObserver,
 
   base::ScopedClosureRunner webui_capture_runner_;
   base::ScopedClosureRunner guest_capture_runner_;
+
+  bool is_actuating_ = false;
+  bool is_actuating_on_visible_tab_ = false;
 };
 
 }  // namespace glic

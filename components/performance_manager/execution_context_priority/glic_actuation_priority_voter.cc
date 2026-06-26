@@ -43,15 +43,15 @@ void GlicActuationPriorityVoter::TearDownOnGraph(Graph* graph) {
   voting_channel_.Reset();
 }
 
-void GlicActuationPriorityVoter::OnIsGlicActuatingChanged(
-    const PageNode* page_node) {
-  // This function is guaranteed to be called only when the actuation state
-  // changes, so we don't need to track whether the vote has already been cast.
-  const bool is_actuating =
-      PageLiveStateDecorator::Data::FromPageNode(page_node)->IsGlicActuating();
+void GlicActuationPriorityVoter::OnGlicActuationStateChanged(
+    const PageNode* page_node,
+    GlicActuationState previous_state) {
+  const GlicActuationState state =
+      PageLiveStateDecorator::Data::FromPageNode(page_node)
+          ->GetGlicActuationState();
 
   if (auto* main_frame_node = page_node->GetMainFrameNode()) {
-    UpdateFrameNodeVote(main_frame_node, is_actuating);
+    UpdateFrameNodeVote(main_frame_node, previous_state, state);
   }
 }
 
@@ -72,21 +72,21 @@ void GlicActuationPriorityVoter::OnBeforeFrameNodeAdded(
     const PageNode* pending_page_node,
     const ProcessNode* pending_process_node,
     const FrameNode* pending_parent_or_outer_document_or_embedder) {
-  const bool is_actuating =
+  const GlicActuationState state =
       PageLiveStateDecorator::Data::FromPageNode(pending_page_node)
-          ->IsGlicActuating();
-  if (is_actuating) {
-    UpdateFrameNodeVote(frame_node, is_actuating);
+          ->GetGlicActuationState();
+  if (state != GlicActuationState::kNone) {
+    UpdateFrameNodeVote(frame_node, GlicActuationState::kNone, state);
   }
 }
 
 void GlicActuationPriorityVoter::OnBeforeFrameNodeRemoved(
     const FrameNode* frame_node) {
-  const bool is_actuating =
+  const GlicActuationState state =
       PageLiveStateDecorator::Data::FromPageNode(frame_node->GetPageNode())
-          ->IsGlicActuating();
-  if (is_actuating) {
-    UpdateFrameNodeVote(frame_node, /*is_actuating=*/false);
+          ->GetGlicActuationState();
+  if (frame_node->IsMainFrame() && state != GlicActuationState::kNone) {
+    voting_channel_.InvalidateVote(GetExecutionContext(frame_node));
   }
 }
 
@@ -94,24 +94,38 @@ void GlicActuationPriorityVoter::OnCurrentFrameChanged(
     const FrameNode* previous_frame_node,
     const FrameNode* current_frame_node) {
   // An actuating glic instance should never have its current frame changed.
-  CHECK(!PageLiveStateDecorator::Data::FromPageNode(
-             current_frame_node->GetPageNode())
-             ->IsGlicActuating());
+  CHECK_EQ(PageLiveStateDecorator::Data::FromPageNode(
+               current_frame_node->GetPageNode())
+               ->GetGlicActuationState(),
+           GlicActuationState::kNone);
 }
 
 void GlicActuationPriorityVoter::UpdateFrameNodeVote(
     const FrameNode* frame_node,
-    bool is_actuating) {
+    GlicActuationState previous_state,
+    GlicActuationState new_state) {
+  DCHECK_NE(previous_state, new_state);
   // Only the main frame(s) participate in actuation.
   if (!frame_node->IsMainFrame()) {
     return;
   }
-  if (is_actuating) {
-    voting_channel_.SubmitVote(
-        GetExecutionContext(frame_node),
-        Vote(base::Process::Priority::kUserBlocking, kGlicActuationReason));
-  } else {
+
+  if (new_state == GlicActuationState::kNone) {
     voting_channel_.InvalidateVote(GetExecutionContext(frame_node));
+    return;
+  }
+
+  const base::Process::Priority priority =
+      (new_state == GlicActuationState::kActuatingOnVisibleTab)
+          ? base::Process::Priority::kUserBlocking
+          : base::Process::Priority::kUserVisible;
+
+  const Vote vote(priority, kGlicActuationReason);
+
+  if (previous_state != GlicActuationState::kNone) {
+    voting_channel_.ChangeVote(GetExecutionContext(frame_node), vote);
+  } else {
+    voting_channel_.SubmitVote(GetExecutionContext(frame_node), vote);
   }
 }
 

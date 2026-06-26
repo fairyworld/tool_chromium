@@ -76,9 +76,11 @@ TEST_F(GlicActuationPriorityVoterTest, VoteWhenActuatingWithChildFrame) {
   EXPECT_FALSE(
       observer_.HasVote(voter_id(), GetExecutionContext(child_frame_node)));
 
-  // Set to Glic actuating, expect a USER_BLOCKING vote ONLY on the main frame.
+  // Set to Glic actuating on visible tab, expect a USER_BLOCKING vote ONLY on
+  // the main frame.
   PageLiveStateDecorator::Data::GetOrCreateForPageNode(page_node)
-      ->SetIsGlicActuatingForTesting(true);
+      ->SetGlicActuationStateForTesting(
+          GlicActuationState::kActuatingOnVisibleTab);
   EXPECT_EQ(observer_.GetVoteCount(), 1u);
   EXPECT_TRUE(
       observer_.HasVote(voter_id(), GetExecutionContext(main_frame_node),
@@ -87,9 +89,19 @@ TEST_F(GlicActuationPriorityVoterTest, VoteWhenActuatingWithChildFrame) {
   EXPECT_FALSE(
       observer_.HasVote(voter_id(), GetExecutionContext(child_frame_node)));
 
-  // Set back to not actuating, expect the vote to be invalidated.
+  // Change to actuating on background tab, expect a USER_VISIBLE vote.
   PageLiveStateDecorator::Data::GetOrCreateForPageNode(page_node)
-      ->SetIsGlicActuatingForTesting(false);
+      ->SetGlicActuationStateForTesting(
+          GlicActuationState::kActuatingOnBackgroundTab);
+  EXPECT_EQ(observer_.GetVoteCount(), 1u);
+  EXPECT_TRUE(
+      observer_.HasVote(voter_id(), GetExecutionContext(main_frame_node),
+                        base::Process::Priority::kUserVisible,
+                        GlicActuationPriorityVoter::kGlicActuationReason));
+
+  // Set back to none, expect the vote to be invalidated.
+  PageLiveStateDecorator::Data::GetOrCreateForPageNode(page_node)
+      ->SetGlicActuationStateForTesting(GlicActuationState::kNone);
   EXPECT_EQ(observer_.GetVoteCount(), 0u);
   EXPECT_FALSE(
       observer_.HasVote(voter_id(), GetExecutionContext(main_frame_node)));
@@ -104,7 +116,8 @@ TEST_F(GlicActuationPriorityVoterTest,
 
   // Set to actuating, expect a USER_BLOCKING vote on the main frame.
   PageLiveStateDecorator::Data::GetOrCreateForPageNode(page_node)
-      ->SetIsGlicActuatingForTesting(true);
+      ->SetGlicActuationStateForTesting(
+          GlicActuationState::kActuatingOnVisibleTab);
   EXPECT_EQ(observer_.GetVoteCount(), 1u);
   EXPECT_TRUE(
       observer_.HasVote(voter_id(), GetExecutionContext(main_frame_node)));
@@ -118,7 +131,7 @@ TEST_F(GlicActuationPriorityVoterTest,
 
   // Set back to not actuating, expect all votes to be invalidated.
   PageLiveStateDecorator::Data::GetOrCreateForPageNode(page_node)
-      ->SetIsGlicActuatingForTesting(false);
+      ->SetGlicActuationStateForTesting(GlicActuationState::kNone);
   EXPECT_EQ(observer_.GetVoteCount(), 0u);
 }
 

@@ -5,6 +5,7 @@
 #include "chrome/browser/glic/public/glic_actuation_tracker.h"
 
 #include "base/no_destructor.h"
+#include "components/performance_manager/public/decorators/page_live_state_decorator.h"
 #include "content/public/browser/web_contents.h"
 
 namespace glic {
@@ -26,8 +27,8 @@ GlicActuationTracker::AddActuatingChangedCallback(Callback callback) {
 
 void GlicActuationTracker::NotifyActuatingChanged(
     content::WebContents* web_contents,
-    bool is_actuating) {
-  actuating_changed_callbacks_.Notify(web_contents, is_actuating);
+    GlicActuationState state) {
+  actuating_changed_callbacks_.Notify(web_contents, state);
 }
 
 }  // namespace glic

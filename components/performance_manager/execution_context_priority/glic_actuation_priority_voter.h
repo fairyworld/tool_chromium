@@ -12,7 +12,6 @@
 #include "components/performance_manager/public/graph/graph_registered.h"
 #include "components/performance_manager/public/graph/page_node.h"
 #include "components/performance_manager/public/voting/voting.h"
-#include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 
 namespace performance_manager::execution_context_priority {
 
@@ -39,7 +38,8 @@ class GlicActuationPriorityVoter
   void TearDownOnGraph(Graph* graph) override;
 
   // PageLiveStateObserver:
-  void OnIsGlicActuatingChanged(const PageNode* page_node) override;
+  void OnGlicActuationStateChanged(const PageNode* page_node,
+                                   GlicActuationState previous_state) override;
 
   // PageNodeObserver:
   void OnPageNodeAdded(const PageNode* page_node) override;
@@ -61,7 +61,9 @@ class GlicActuationPriorityVoter
  private:
   VotingChannel voting_channel_;
 
-  void UpdateFrameNodeVote(const FrameNode* frame_node, bool is_actuating);
+  void UpdateFrameNodeVote(const FrameNode* frame_node,
+                           GlicActuationState previous_state,
+                           GlicActuationState new_state);
 };
 
 }  // namespace performance_manager::execution_context_priority

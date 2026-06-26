@@ -622,6 +622,12 @@ void Host::OnActuatingChanged(bool actuating) {
   }
 }
 
+void Host::OnTaskTabsVisibilityChanged(bool has_visible_tab) {
+  if (contents_) {
+    contents_->OnTaskTabsVisibilityChanged(has_visible_tab);
+  }
+}
+
 void Host::NotifyAdditionalContext(mojom::AdditionalContextPtr context) {
   if (auto* client = GetPrimaryWebClient()) {
     client->NotifyAdditionalContext(std::move(context));

@@ -20,6 +20,7 @@
 #include "chrome/browser/profiles/keep_alive/profile_keep_alive_types.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/common/webui_url_constants.h"
+#include "components/performance_manager/public/decorators/page_live_state_decorator.h"
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_observer.h"
@@ -200,7 +201,8 @@ void WebUIContentsContainerImpl::OnActuatingChanged(bool actuating) {
   if (!guest) {
     return;
   }
-  if (actuating) {
+  is_actuating_ = actuating;
+  if (actuating && !webui_capture_runner_) {
     webui_capture_runner_ = web_contents_->IncrementCapturerCount(
         gfx::Size(), /*stay_hidden=*/true, /*stay_awake=*/true,
         /*is_activity=*/true);
@@ -209,10 +211,28 @@ void WebUIContentsContainerImpl::OnActuatingChanged(bool actuating) {
         /*is_activity=*/true);
   }
 
+  UpdateActuationTracker();
+}
+
+void WebUIContentsContainerImpl::OnTaskTabsVisibilityChanged(
+    bool has_visible_tab) {
+  is_actuating_on_visible_tab_ = has_visible_tab;
+  UpdateActuationTracker();
+}
+
+void WebUIContentsContainerImpl::UpdateActuationTracker() {
+  auto* guest = GetGlicGuestWebContents(web_contents_.get());
+  CHECK(guest);
+  GlicActuationState state = GlicActuationState::kNone;
+  if (is_actuating_) {
+    state = is_actuating_on_visible_tab_
+                ? GlicActuationState::kActuatingOnVisibleTab
+                : GlicActuationState::kActuatingOnBackgroundTab;
+  }
   glic::GlicActuationTracker::GetInstance()->NotifyActuatingChanged(
-      web_contents_.get(), actuating);
+      web_contents_.get(), state);
   glic::GlicActuationTracker::GetInstance()->NotifyActuatingChanged(guest,
-                                                                    actuating);
+                                                                    state);
 }
 
 }  // namespace glic
