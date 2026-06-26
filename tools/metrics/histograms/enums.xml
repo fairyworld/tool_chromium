@@ -3307,6 +3307,16 @@ shown properly on the user-facing crash UI.
   <int value="2" label="Coalesced"/>
 </enum>
 
+<enum name="DiscoverFeedBackgroundRefreshOutcome">
+  <int value="0" label="Success"/>
+  <int value="1" label="Failure"/>
+</enum>
+
+<enum name="DiscoverFeedServiceAvailability">
+  <int value="0" label="Available"/>
+  <int value="1" label="Unavailable"/>
+</enum>
+
 <enum name="DiskCacheError">
   <summary>Error codes defined in net/disk_cache/errors.h</summary>
   <int value="0" label="OK"/>
