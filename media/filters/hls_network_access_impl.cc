@@ -37,30 +37,23 @@ class HlsNetworkAccessImpl::ParallelFetchState
     if (init_segment) {
       init_pending_ = true;
       if (network_access_) {
-        HlsDataSourceProvider::SegmentQueue queue;
-        queue.push(*std::move(init_segment));
-
         auto cb = base::BindOnce(&ParallelFetchState::OnInitLoaded, this);
         cb = base::BindOnce(&HlsNetworkAccessImpl::ReadUntilExhaustedHelper,
                             network_access_, std::move(cb));
 
-        network_access_->ReadSegmentQueueInternal(std::move(queue),
-                                                  std::move(cb));
+        network_access_->ReadSegmentInternal(*std::move(init_segment),
+                                             std::move(cb));
       }
     }
 
     segment_pending_ = true;
     if (network_access_) {
-      HlsDataSourceProvider::SegmentQueue queue;
-      queue.push(std::move(media_segment));
-
       auto cb = base::BindOnce(&ParallelFetchState::OnSegmentLoaded, this);
       if (!read_chunked) {
         cb = base::BindOnce(&HlsNetworkAccessImpl::ReadUntilExhaustedHelper,
                             network_access_, std::move(cb));
       }
-      network_access_->ReadSegmentQueueInternal(std::move(queue),
-                                                std::move(cb));
+      network_access_->ReadSegmentInternal(media_segment, std::move(cb));
     }
   }
 
@@ -199,16 +192,15 @@ HlsNetworkAccessImpl::HlsNetworkAccessImpl(
   DETACH_FROM_SEQUENCE(media_sequence_checker_);
 }
 
-void HlsNetworkAccessImpl::ReadSegmentQueueInternal(
-    HlsDataSourceProvider::SegmentQueue media_segment_url_queue,
+void HlsNetworkAccessImpl::ReadSegmentInternal(
+    HlsDataSourceProvider::UrlDataSegment segment,
     HlsDataSourceProvider::ReadCb cb) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(media_sequence_checker_);
-  // Callers of `ReadSegmentQueueInternal` should enforce this.
+  // Callers of `ReadSegmentInternal` should enforce this.
   CHECK(data_source_provider_);
 
-  data_source_provider_
-      .AsyncCall(&HlsDataSourceProvider::ReadFromCombinedUrlQueue)
-      .WithArgs(std::move(media_segment_url_queue),
+  data_source_provider_.AsyncCall(&HlsDataSourceProvider::ReadFromUrl)
+      .WithArgs(std::move(segment),
                 base::BindPostTaskToCurrentDefault(std::move(cb)));
 }
 
@@ -220,11 +212,11 @@ void HlsNetworkAccessImpl::ReadAllInternal(
   DCHECK_CALLED_ON_VALID_SEQUENCE(media_sequence_checker_);
   // Callers of `ReadAllInternal` should enforce this.
   CHECK(data_source_provider_);
-  HlsDataSourceProvider::SegmentQueue queue;
-  queue.emplace(uri, std::nullopt, cache_mode, encoding_mode);
-  ReadSegmentQueueInternal(
-      std::move(queue),
-      base::BindOnce(&HlsNetworkAccessImpl::ReadUntilExhausted,
+  HlsDataSourceProvider::UrlDataSegment segment(uri, std::nullopt, cache_mode,
+                                                encoding_mode);
+  ReadSegmentInternal(
+      std::move(segment),
+      base::BindOnce(&HlsNetworkAccessImpl::ReadUntilExhaustedHelper,
                      weak_factory_.GetWeakPtr(), std::move(cb)));
 }
 

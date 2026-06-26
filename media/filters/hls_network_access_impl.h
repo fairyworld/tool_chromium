@@ -39,9 +39,8 @@ class MEDIA_EXPORT HlsNetworkAccessImpl final : public HlsNetworkAccess {
                                   HlsDataSourceProvider::ReadResult result);
   void ReadUntilExhausted(HlsDataSourceProvider::ReadCb cb,
                           HlsDataSourceProvider::ReadResult result);
-  void ReadSegmentQueueInternal(
-      HlsDataSourceProvider::SegmentQueue media_segment_url_queue,
-      HlsDataSourceProvider::ReadCb cb);
+  void ReadSegmentInternal(HlsDataSourceProvider::UrlDataSegment segment,
+                           HlsDataSourceProvider::ReadCb cb);
   void ReadAllInternal(
       const GURL& uri,
       HlsDataSourceProvider::ReadCb cb,
