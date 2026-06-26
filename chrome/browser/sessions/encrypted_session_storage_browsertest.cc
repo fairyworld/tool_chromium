@@ -36,6 +36,7 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
+#include "chrome/browser/ui/browser_window_state.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/tabs/tab_enums.h"
@@ -119,8 +120,7 @@ class EncryptedSessionStorageBrowserTestBase : public InProcessBrowserTest {
 
   void VerifyWindowBounds(gfx::Rect expected, gfx::Rect actual) {
 #if BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_WAYLAND)
-    // On Linux Wayland, client applications cannot set top-level window
-    // positions. So we can only verify the window size.
+    // On Linux Wayland, the client cannot set top-level window positions.
     EXPECT_EQ(expected.size(), actual.size());
 #else
     EXPECT_EQ(expected, actual);
@@ -586,6 +586,36 @@ IN_PROC_BROWSER_TEST_P(TabRestoreWithEncryptionTest, LargeSessionRestore) {
         GetUrl(i),
         restored_browser->tab_strip_model()->GetWebContentsAt(i)->GetURL());
   }
+}
+
+IN_PROC_BROWSER_TEST_P(SessionRestoreWithEncryptionTest,
+                       WindowBoundsAreRestored) {
+  gfx::Rect expected_bounds(50, 50, 550, 500);
+  browser()->GetWindow()->SetBounds(expected_bounds);
+
+  ASSERT_TRUE(base::test::RunUntil([&]() {
+    // Wait for window to be updated.  Only check window size because some
+    // Window Managers do not update position or adjust the position.
+    return browser()->GetWindow()->GetBounds().size() == expected_bounds.size();
+  }));
+  // Capture the actual OS-granted bounds so we verify against what session
+  // restore will save.
+  expected_bounds = browser()->GetWindow()->GetBounds();
+
+  // Navigate to trigger SessionService creation and record the new bounds.
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetUrl(1)));
+
+  AssertCommandStorageBackendFilesExist(SessionType::kSessionRestore);
+  BrowserWindowInterface* restored = QuitBrowserAndRestore(browser());
+
+  // Navigate to trigger SessionService creation and compare the bounds.
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(restored, GetUrl(1)));
+#if BUILDFLAG(IS_MAC)
+  // On MacOS, relaunch behavior differs from other platforms so evaluating
+  // window size restore is difficult. See https://crrev.com/c/8006276.
+#else
+  VerifyWindowBounds(expected_bounds, restored->GetWindow()->GetBounds());
+#endif
 }
 
 INSTANTIATE_TEST_SUITE_P(
