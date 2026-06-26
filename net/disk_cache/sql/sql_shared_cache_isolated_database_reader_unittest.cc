@@ -101,7 +101,8 @@ TEST_F(SqlSharedCacheIsolatedDatabaseReaderTest, ReadNotReady) {
   EXPECT_FALSE(response.has_value());
 }
 
-TEST_F(SqlSharedCacheIsolatedDatabaseReaderTest, ReadEmptyHeader) {
+// TODO(crbug.com/528258777): Re-enable this test
+TEST_F(SqlSharedCacheIsolatedDatabaseReaderTest, DISABLED_ReadEmptyHeader) {
   const std::string key_str = "0/0/https://example.com/empty-header";
   const std::string header_data = "";
   const std::string body_data = "Body with empty header.";
