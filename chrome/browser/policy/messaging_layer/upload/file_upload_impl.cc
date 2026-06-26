@@ -1058,6 +1058,10 @@ FileUploadDelegate::CreatePostLoader(
     std::unique_ptr<::network::ResourceRequest> resource_request) const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   resource_request->method = "POST";
+  // Traffic annotation declares cookies_allowed: NO. Enforce kOmit for every
+  // request issued by this delegate so SameSite=None cookies are never
+  // attached to the (potentially missived-supplied) resumable_upload_url_.
+  resource_request->credentials_mode = network::mojom::CredentialsMode::kOmit;
   if (resource_request->url.is_empty()) {
     resource_request->url = upload_url_;
   }
