@@ -1500,6 +1500,8 @@ public abstract class ChromeFeatureList {
             newMutableFlagWithSafeDefault(INLINE_PDF_V2, false);
     public static final MutableFlagWithSafeDefault sInlinePdfV2Download =
             newMutableFlagWithSafeDefault(INLINE_PDF_V2_DOWNLOAD, false);
+    public static final MutableFlagWithSafeDefault sLongScreenshotsNoMemoryCheck =
+            newMutableFlagWithSafeDefault(LONG_SCREENSHOTS_NO_MEMORY_CHECK, false);
     public static final MutableFlagWithSafeDefault sNoVisibleHintForDifferentTLD =
             newMutableFlagWithSafeDefault(ANDROID_NO_VISIBLE_HINT_FOR_DIFFERENT_TLD, true);
     public static final MutableFlagWithSafeDefault sOmniboxAutofocusOnIncognitoNtp =
