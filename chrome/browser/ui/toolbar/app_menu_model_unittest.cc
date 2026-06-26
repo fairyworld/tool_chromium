@@ -11,6 +11,7 @@
 #include "base/command_line.h"
 #include "base/functional/callback.h"
 #include "base/memory/ptr_util.h"
+#include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/with_feature_override.h"
 #include "build/branding_buildflags.h"
@@ -53,6 +54,7 @@
 #include "components/prefs/scoped_user_pref_update.h"
 #include "components/search/ntp_features.h"
 #include "components/signin/public/base/consent_level.h"
+#include "components/signin/public/base/signin_metrics.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/sync/base/features.h"
 #include "components/sync/test/test_sync_service.h"
@@ -640,6 +642,7 @@ class AppMenuModelSigninPromoTest : public base::test::WithFeatureOverride,
 };
 
 TEST_P(AppMenuModelSigninPromoTest, SignedIn) {
+  base::HistogramTester histogram_tester;
   signin::IdentityManager* identity_manager =
       IdentityManagerFactory::GetForProfile(browser()->profile());
   signin::MakePrimaryAccountAvailable(identity_manager, "user@example.com",
@@ -654,9 +657,12 @@ TEST_P(AppMenuModelSigninPromoTest, SignedIn) {
   EXPECT_EQ(!IsParamFeatureEnabled(),
             profile_menu->GetIndexOfCommandId(IDC_TURN_ON_SYNC).has_value());
   EXPECT_FALSE(profile_menu->GetIndexOfCommandId(IDC_SHOW_SIGNIN).has_value());
+
+  histogram_tester.ExpectTotalCount("Signin.SignIn.Offered", 0);
 }
 
 TEST_P(AppMenuModelSigninPromoTest, SignedOut) {
+  base::HistogramTester histogram_tester;
   AppMenuModel model(this, browser());
   model.Init();
   const size_t profile_menu_index =
@@ -668,6 +674,18 @@ TEST_P(AppMenuModelSigninPromoTest, SignedOut) {
             profile_menu->GetIndexOfCommandId(IDC_TURN_ON_SYNC).has_value());
   EXPECT_EQ(IsParamFeatureEnabled(),
             profile_menu->GetIndexOfCommandId(IDC_SHOW_SIGNIN).has_value());
+
+  if (IsParamFeatureEnabled()) {
+    histogram_tester.ExpectUniqueSample("Signin.SignIn.Offered",
+                                        signin_metrics::AccessPoint::kMenu, 1);
+    histogram_tester.ExpectUniqueSample(
+        "Signin.SignIn.Offered.NewAccountNoExistingAccount",
+        signin_metrics::AccessPoint::kMenu, 1);
+  } else {
+    histogram_tester.ExpectTotalCount("Signin.SignIn.Offered", 0);
+    histogram_tester.ExpectTotalCount(
+        "Signin.SignIn.Offered.NewAccountNoExistingAccount", 0);
+  }
 }
 
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(AppMenuModelSigninPromoTest);

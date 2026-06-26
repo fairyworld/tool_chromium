@@ -46,6 +46,7 @@
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/sharing_hub/sharing_hub_features.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
+#include "chrome/browser/signin/signin_ui_util.h"
 #include "chrome/browser/signin/signin_util.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/sync/sync_ui_util.h"
@@ -420,6 +421,7 @@ std::u16string GetOpenPWALabel(const Browser* browser) {
           gfx::CHARACTER_BREAK)));
 }
 
+#if !BUILDFLAG(IS_CHROMEOS)
 std::u16string GetSyncSectionTitle(Profile* profile,
                                    signin::IdentityManager* identity_manager) {
   const AccountInfo account = GetAccountInfoFromProfile(profile);
@@ -739,6 +741,13 @@ bool ProfileSubMenuModel::BuildSyncSection() {
             : features::IsRoundedIconsEnabled()
                 ? vector_icons::kAccountCircleIcon
                 : vector_icons::kAccountCircleOldIcon);
+        signin_metrics::LogSignInOffered(
+            signin_metrics::AccessPoint::kMenu,
+            signin_ui_util::GetSingleAccountForPromos(identity_manager)
+                    .IsEmpty()
+                ? signin_metrics::PromoAction::
+                      PROMO_ACTION_NEW_ACCOUNT_NO_EXISTING_ACCOUNT
+                : signin_metrics::PromoAction::PROMO_ACTION_WITH_DEFAULT);
       }
     } else {
       AddItemWithStringIdAndVectorIcon(
@@ -797,6 +806,7 @@ void ProfileSubMenuModel::BuildManageGoogleAccountRow(Profile* profile) {
                                      manage_account_icon);
   }
 }
+#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class PasswordsAndAutofillSubMenuModel : public ui::SimpleMenuModel {
  public:
