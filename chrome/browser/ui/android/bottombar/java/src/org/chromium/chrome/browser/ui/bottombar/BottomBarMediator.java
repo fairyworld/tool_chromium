@@ -17,6 +17,9 @@ import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.feature_engagement.TrackerFactory;
 import org.chromium.chrome.browser.glic.GlicKeyedService;
 import org.chromium.chrome.browser.glic.GlicKeyedServiceFactory;
+import org.chromium.chrome.browser.layouts.LayoutStateProvider;
+import org.chromium.chrome.browser.layouts.LayoutStateProvider.LayoutStateObserver;
+import org.chromium.chrome.browser.layouts.LayoutType;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
 import org.chromium.chrome.browser.tab.EmptyTabObserver;
@@ -43,6 +46,7 @@ public class BottomBarMediator
         implements ThemeColorProvider.TintObserver,
                 BottomBarButtonManager.Listener,
                 BottomBarPromoDialogCoordinator.BottomBarPromoDialogListener,
+                LayoutStateObserver,
                 Destroyable {
     /** Delegate for compositor-level visibility changes. */
     public interface VisibilityDelegate {
@@ -92,10 +96,12 @@ public class BottomBarMediator
     private @Nullable IphIntent mNewTabIphIntent;
     private @Nullable TemplateUrlService mTemplateUrlService;
     private @Nullable TemplateUrlServiceObserver mTemplateUrlServiceObserver;
+    private @Nullable LayoutStateProvider mLayoutStateProvider;
 
     // Mutable State (Primitive / Non-null)
     private boolean mGlicWasVisible;
     private boolean mGlicTimeToAppearRecorded;
+    private boolean mShouldHideForHub;
     private long mBottomBarShownTimeMs = -1;
     private long mGlicAppearedTimeMs = -1;
     private boolean mStartupPromoFlowFinished;
@@ -127,7 +133,8 @@ public class BottomBarMediator
             NullableObservableSupplier<Profile> profileSupplier,
             NonNullObservableSupplier<Boolean> omniboxFocusStateSupplier,
             BottomBarPromoDialogCoordinator promoDialogCoordinator,
-            ActionRegistry actionRegistry) {
+            ActionRegistry actionRegistry,
+            LayoutStateProvider layoutStateProvider) {
         mContext = context;
         mModel = model;
         mButtonManager = buttonManager;
@@ -142,6 +149,12 @@ public class BottomBarMediator
         mGlicActionSupplier = actionRegistry.get(ActionId.GLIC);
         mNewTabActionSupplier = actionRegistry.get(ActionId.NEW_TAB);
         mGlicTimeToAppearRecorded = false;
+
+        if (!BottomBarConfigUtils.shouldShowOnGts()) {
+            layoutStateProvider.addObserver(this);
+            mShouldHideForHub = layoutStateProvider.isLayoutVisible(LayoutType.HUB);
+            mLayoutStateProvider = layoutStateProvider;
+        }
 
         mTabObserver =
                 new EmptyTabObserver() {
@@ -180,6 +193,22 @@ public class BottomBarMediator
         updateVisibility();
     }
 
+    @Override
+    public void onFinishedShowing(@LayoutType int layoutType) {
+        if (layoutType == LayoutType.HUB) {
+            mShouldHideForHub = true;
+            updateVisibility();
+        }
+    }
+
+    @Override
+    public void onStartedHiding(@LayoutType int layoutType) {
+        if (layoutType == LayoutType.HUB) {
+            mShouldHideForHub = false;
+            updateVisibility();
+        }
+    }
+
     private void updateVisibility() {
         boolean currentTabIsRegularNtp =
                 mCurrentTab != null
@@ -188,7 +217,7 @@ public class BottomBarMediator
         boolean isOmniboxFocused = mOmniboxFocusStateSupplier.get();
         boolean shouldDisableOnNtp =
                 BottomBarConfigUtils.shouldDisableOnNtp() && currentTabIsRegularNtp;
-        boolean isVisible = !shouldDisableOnNtp && !isOmniboxFocused;
+        boolean isVisible = !shouldDisableOnNtp && !isOmniboxFocused && !mShouldHideForHub;
 
         if (mIsVisible != null && mIsVisible == isVisible) return;
 
@@ -463,6 +492,11 @@ public class BottomBarMediator
         }
 
         mOmniboxFocusStateSupplier.removeObserver(mOmniboxFocusObserver);
+
+        if (mLayoutStateProvider != null) {
+            mLayoutStateProvider.removeObserver(this);
+            mLayoutStateProvider = null;
+        }
 
         PropertyModel glicModel = mGlicActionSupplier.get();
         if (glicModel != null) {

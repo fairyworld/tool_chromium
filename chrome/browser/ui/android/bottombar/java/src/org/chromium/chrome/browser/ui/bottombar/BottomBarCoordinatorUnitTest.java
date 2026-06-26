@@ -44,6 +44,7 @@ import org.chromium.chrome.browser.feature_engagement.TrackerFactory;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.glic.GlicEnabling;
 import org.chromium.chrome.browser.glic.GlicEnablingJni;
+import org.chromium.chrome.browser.layouts.LayoutStateProvider;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
 import org.chromium.chrome.browser.tab.Tab;
@@ -80,6 +81,7 @@ public class BottomBarCoordinatorUnitTest {
     @Mock private ModalDialogManager mModalDialogManager;
     @Mock private Tracker mTracker;
     @Mock private Tab mTab;
+    @Mock private LayoutStateProvider mLayoutStateProvider;
 
     private final SettableNullableObservableSupplier<Tab> mTabSupplier =
             ObservableSuppliers.createNullable();
@@ -138,7 +140,8 @@ public class BottomBarCoordinatorUnitTest {
                         mVisibilityDelegate,
                         mProfileSupplier,
                         mOmniboxFocusStateSupplier,
-                        mModalDialogManagerSupplier);
+                        mModalDialogManagerSupplier,
+                        mLayoutStateProvider);
     }
 
     @After

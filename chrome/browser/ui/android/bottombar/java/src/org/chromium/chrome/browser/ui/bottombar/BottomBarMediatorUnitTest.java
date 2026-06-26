@@ -44,6 +44,8 @@ import org.chromium.chrome.browser.glic.GlicEnabling;
 import org.chromium.chrome.browser.glic.GlicEnablingJni;
 import org.chromium.chrome.browser.glic.GlicKeyedService;
 import org.chromium.chrome.browser.glic.GlicKeyedServiceFactory;
+import org.chromium.chrome.browser.layouts.LayoutStateProvider;
+import org.chromium.chrome.browser.layouts.LayoutType;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
 import org.chromium.chrome.browser.tab.Tab;
@@ -87,6 +89,7 @@ public class BottomBarMediatorUnitTest {
     @Mock private View mView;
     @Mock private Context mContext;
     @Mock private Resources mResources;
+    @Mock private LayoutStateProvider mLayoutStateProvider;
 
     @Captor private ArgumentCaptor<TabObserver> mTabObserverCaptor;
     @Captor private ArgumentCaptor<BottomBarButtonManager.Listener> mButtonManagerListenerCaptor;
@@ -481,7 +484,8 @@ public class BottomBarMediatorUnitTest {
                         mProfileSupplier,
                         mOmniboxFocusStateSupplier,
                         mPromoDialogCoordinator,
-                        mActionRegistry);
+                        mActionRegistry,
+                        mLayoutStateProvider);
 
         // Bottom bar is visible, but startup promo flow hasn't finished. IPH should NOT be shown.
         assertTrue(mModel.get(BottomBarProperties.IS_VISIBLE));
@@ -522,6 +526,38 @@ public class BottomBarMediatorUnitTest {
         verify(mButtonManager, times(2)).setButtonVisibility(ActionId.GLIC, false);
     }
 
+    @Test
+    public void testHubVisibility_DisableOnGts() {
+        ChromeFeatureList.sAndroidBottomBarShowBottomBarOnGts.setForTesting(false);
+        when(mLayoutStateProvider.isLayoutVisible(LayoutType.HUB)).thenReturn(false);
+
+        createMediator(/* shouldIncludeHomeButton= */ false);
+        assertNotNull(mMediator);
+
+        verify(mLayoutStateProvider).addObserver(mMediator);
+
+        // Initially visible
+        assertTrue(mModel.get(BottomBarProperties.IS_VISIBLE));
+
+        // Show Hub
+        mMediator.onFinishedShowing(LayoutType.HUB);
+        assertFalse(mModel.get(BottomBarProperties.IS_VISIBLE));
+
+        // Hide Hub
+        mMediator.onStartedHiding(LayoutType.HUB);
+        assertTrue(mModel.get(BottomBarProperties.IS_VISIBLE));
+    }
+
+    @Test
+    public void testHubVisibility_ShowOnGts() {
+        ChromeFeatureList.sAndroidBottomBarShowBottomBarOnGts.setForTesting(true);
+
+        createMediator(/* shouldIncludeHomeButton= */ false);
+
+        verify(mLayoutStateProvider, never()).addObserver(any());
+        assertTrue(mModel.get(BottomBarProperties.IS_VISIBLE));
+    }
+
     private void createMediator(boolean shouldIncludeHomeButton) {
         mMediator =
                 new BottomBarMediator(
@@ -536,7 +572,8 @@ public class BottomBarMediatorUnitTest {
                         mProfileSupplier,
                         mOmniboxFocusStateSupplier,
                         mPromoDialogCoordinator,
-                        mActionRegistry);
+                        mActionRegistry,
+                        mLayoutStateProvider);
         mMediator.onStartupPromoFlowFinished(false);
     }
 }

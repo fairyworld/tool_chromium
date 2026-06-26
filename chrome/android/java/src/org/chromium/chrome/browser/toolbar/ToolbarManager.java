@@ -2466,7 +2466,8 @@ public class ToolbarManager
                         mProfileSupplier,
                         mOmniboxFocusStateSupplier,
                         mModalDialogManagerSupplier,
-                        mAppMenuCoordinatorSupplier);
+                        mAppMenuCoordinatorSupplier,
+                        mLayoutManager);
         bottomBarContainerOneshotSupplier.set(bottomBarContainerCoordinator);
 
         if (mBottomBarHostManager != null) {
