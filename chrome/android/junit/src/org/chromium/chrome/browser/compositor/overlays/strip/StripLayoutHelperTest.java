@@ -1712,6 +1712,59 @@ public class StripLayoutHelperTest {
     }
 
     @Test
+    @EnableFeatures(ChromeFeatureList.TAB_SEARCH_FOR_AL)
+    public void testTabSearchButtonVisibility_FlagEnabled() {
+        initializeTest(false, false, 0, 1);
+        mStripLayoutHelper.onSizeChanged(
+                STRIP_WIDTH, STRIP_HEIGHT, false, TIMESTAMP, PADDING_LEFT, PADDING_RIGHT, 0f);
+        mStripLayoutHelper.updateLayout(TIMESTAMP);
+
+        TintedCompositorButton button = mStripLayoutHelper.getTabSearchButton();
+        assertNotNull("Tab Search button should be initialized", button);
+        assertTrue("Tab Search button should be visible", button.isVisible());
+        assertEquals(
+                "Tab Search button width should be 32dp",
+                32.f,
+                mStripLayoutHelper.getTabSearchButtonWidthForTesting(),
+                EPSILON);
+    }
+
+    @Test
+    @DisableFeatures(ChromeFeatureList.TAB_SEARCH_FOR_AL)
+    public void testTabSearchButtonVisibility_FlagDisabled() {
+        initializeTest(false, false, 0, 1);
+        mStripLayoutHelper.onSizeChanged(
+                STRIP_WIDTH, STRIP_HEIGHT, false, TIMESTAMP, PADDING_LEFT, PADDING_RIGHT, 0f);
+        mStripLayoutHelper.updateLayout(TIMESTAMP);
+
+        TintedCompositorButton button = mStripLayoutHelper.getTabSearchButton();
+        assertNotNull("Tab Search button should be initialized", button);
+        assertFalse("Tab Search button should be invisible", button.isVisible());
+        assertEquals(
+                "Tab Search button width should be 0dp",
+                0.f,
+                mStripLayoutHelper.getTabSearchButtonWidthForTesting(),
+                EPSILON);
+    }
+
+    @Test
+    @EnableFeatures(ChromeFeatureList.TAB_SEARCH_FOR_AL)
+    public void testTabSearchButtonHoverHighlightProperties() {
+        initializeTest(false, false, 0, 1);
+        mStripLayoutHelper.onSizeChanged(
+                STRIP_WIDTH, STRIP_HEIGHT, false, TIMESTAMP, PADDING_LEFT, PADDING_RIGHT, 0f);
+        mStripLayoutHelper.updateLayout(TIMESTAMP);
+
+        TintedCompositorButton button = mStripLayoutHelper.getTabSearchButton();
+        button.setHovered(true);
+        assertTrue("Tab Search button should be hovered", button.isHovered());
+
+        button.setHovered(false);
+        button.setPressed(true, true);
+        assertTrue("Tab Search button should be pressed", button.isPressed());
+    }
+
+    @Test
     public void testCloseButtonHoverHighlightProperties() {
         // Setup
         initializeTest(false, false, 2);

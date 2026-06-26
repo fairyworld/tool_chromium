@@ -248,6 +248,7 @@ chrome_java_resources = [
   "java/res/drawable/autofill_save_card_credit_card_surface.xml",
   "java/res/drawable/autorenew_24dp.xml",
   "java/res/drawable/bg_circle_tab_strip_button.xml",
+  "java/res/drawable/bg_square_rounded_tab_strip_button.xml",
   "java/res/drawable/bg_tabstrip_tab_divider.xml",
   "java/res/drawable/blue_google_shield.xml",
   "java/res/drawable/bolt_24dp.xml",
