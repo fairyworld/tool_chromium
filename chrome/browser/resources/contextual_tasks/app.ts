@@ -318,7 +318,8 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
   protected accessor isLensOverlayShowing_: boolean = false;
   protected accessor isOverlayOpenForAimVisualSearch_: boolean = false;
   // Indicates if in tab mode. Most start in a tab.
-  protected accessor isShownInTab_: boolean = true;
+  protected accessor isShownInTab_: boolean =
+      loadTimeData.getBoolean('isShownInTab');
   protected accessor darkMode_: boolean = loadTimeData.getBoolean('darkMode');
   protected accessor isErrorDialogVisible_: boolean = false;
   private pendingUrl_: string = '';
@@ -330,8 +331,8 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
   // Whether no queries have been submitted in the current AIM thread. This
   // can be undefined on initial load to prevent the composebox from flashing
   // briefly before the zero state is rendered.
-  protected accessor isZeroState_: boolean|undefined =
-      loadTimeData.getBoolean('isGhostLoaderVisible') ? false : undefined;
+  protected accessor isZeroState_: boolean =
+      loadTimeData.getBoolean('isZeroState');
   protected accessor enableNativeZeroStateSuggestions_: boolean =
       loadTimeData.getBoolean('enableNativeZeroStateSuggestions');
   protected accessor inNlm_: boolean = false;
@@ -629,7 +630,7 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
         this.isDomContentLoaded_ = true;
         // Play the zero state animations, unhide the composebox/header,
         // and focus the composebox.
-        if (this.isZeroState_) {
+        if (this.isZeroState_ && this.isShownInTab_) {
           this.playZeroStateAnimations_();
           this.forceComposeboxFocus();
         }
@@ -709,9 +710,11 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
 
     // Add this fallback: If the DOM already loaded while we were awaiting, play
     // it now!
-    if (this.isZeroState_ && this.isDomContentLoaded_) {
+    if (this.isZeroState_ && this.isDomContentLoaded_ && this.isShownInTab_) {
       this.playZeroStateAnimations_();
       this.forceComposeboxFocus();
+    } else if (this.isZeroState_ && !this.isShownInTab_) {
+      this.playZeroStateAnimations_();
     }
 
     // The thread URL is considered pending (not loaded immediately in the
@@ -1043,7 +1046,8 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
 
     if (isAiPage && isZeroState) {
       this.isZeroState_ = true;
-      if (!this.isInitialFrameLoad_ && this.isDomContentLoaded_) {
+      if (!this.isInitialFrameLoad_ && this.isDomContentLoaded_ &&
+          this.isShownInTab_) {
         this.playZeroStateAnimations_();
       }
     }
@@ -1112,7 +1116,7 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
       const currentHeight = composebox.offsetHeight;
       const currentUrl = this.$.threadFrame.src;
       if (currentUrl.includes(AIOH_URL_IDENTIFIER) &&
-          this.forcedComposeboxBounds_ === null) {
+          this.forcedComposeboxBounds_ === null && !this.isZeroState_) {
         this.playComposeboxAiohFadeInAnimation_();
       }
       if (currentHeight !== inputRect.height) {
@@ -1650,7 +1654,7 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
     await this.onThreadFrameLoadAbort(event);
   }
 
-  setIsZeroStateForTesting(isZeroState: boolean|undefined) {
+  setIsZeroStateForTesting(isZeroState: boolean) {
     this.isZeroState_ = isZeroState;
   }
 

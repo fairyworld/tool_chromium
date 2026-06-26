@@ -516,8 +516,11 @@ error-page {
 }
 
 :host([is-zero-state_]:not([in-nlm_])) #composebox {
-  animation: var(--composebox-zero-state-animation);
   opacity: 0;
+}
+
+:host(.play-zero-state[is-zero-state_]:not([in-nlm_])) #composebox {
+  animation: var(--composebox-zero-state-animation);
 }
 
 :host([is-zero-state_][is-shown-in-tab_]) {
@@ -789,6 +792,13 @@ error-page {
 
 :host([is-zero-state_]) #composeboxHeaderWrapper {
   display: flex;
+  opacity: 0;
+}
+
+:host([is-initial-frame-load_]:not([is-shown-in-tab_])) #composebox,
+:host([is-initial-frame-load_]:not([is-shown-in-tab_])) #composeboxHeaderWrapper {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 @keyframes zero-state-header-text {
@@ -925,10 +935,10 @@ error-page {
   }
 }
 
-:host([is-initial-frame-load_]:not([is-dom-content-loaded_])) #composebox,
-:host([is-initial-frame-load_]:not([is-dom-content-loaded_])) #composeboxHeaderWrapper,
-:host([is-zero-state_]:not([is-dom-content-loaded_])) #composebox,
-:host([is-zero-state_]:not([is-dom-content-loaded_])) #composeboxHeaderWrapper {
+:host([is-initial-frame-load_][is-shown-in-tab_]:not([is-dom-content-loaded_])) #composebox,
+:host([is-initial-frame-load_][is-shown-in-tab_]:not([is-dom-content-loaded_])) #composeboxHeaderWrapper,
+:host([is-zero-state_][is-shown-in-tab_]:not([is-dom-content-loaded_])) #composebox,
+:host([is-zero-state_][is-shown-in-tab_]:not([is-dom-content-loaded_])) #composeboxHeaderWrapper {
   visibility: hidden;
   pointer-events: none;
 }

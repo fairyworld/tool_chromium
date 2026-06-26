@@ -12,7 +12,7 @@ import {fakeMetricsPrivate} from 'chrome://webui-test/metrics_test_support.js';
 import { microtasksFinished } from 'chrome://webui-test/test_util.js';
 
 import {TestContextualTasksBrowserProxy} from './test_contextual_tasks_browser_proxy.js';
-import { createContextualTasksAppElement, fixtureUrl } from './contextual_tasks_test_utils.js';
+import {assertStyle, createContextualTasksAppElement, fixtureUrl} from './contextual_tasks_test_utils.js';
 
 // <if expr="not is_android or enable_webui_contextual_tasks_composebox">
 import { isVisible } from 'chrome://webui-test/test_util.js';
@@ -1174,16 +1174,16 @@ suite('ContextualTasksAppTest', function() {
     assertTrue(wrapper.hasAttribute('hidden'));
   });
 
-  test('composebox header wrapper hidden when isZeroState is undefined', async () => {
+  test('composebox header wrapper hidden when isZeroState is false', async () => {
     const {appElement} =
         await createContextualTasksAppElement(/*url=*/ fixtureUrl);
 
-    appElement.setIsZeroStateForTesting(undefined);
+    appElement.setIsZeroStateForTesting(false);
     await microtasksFinished();
     await appElement.updateComplete;
 
     const wrapper = appElement.shadowRoot.querySelector('#composeboxHeaderWrapper')!;
-    assertTrue(wrapper.hasAttribute('hidden'));
+    assertStyle(wrapper, 'display', 'none');
   });
 
   test('composebox header wrapper hidden when isInputHidden is true', async () => {
@@ -1223,5 +1223,45 @@ suite('ContextualTasksAppTest', function() {
         appElement.$.threadFrame.dispatchEvent(
             new CustomEvent('newwindow', {cancelable: true}));
         assertFalse(newWindowIntercepted);
+      });
+
+  test('side panel zero state plays animations immediately', async () => {
+    loadTimeData.overrideValues({isZeroState: true});
+    const {appElement} = await createContextualTasksAppElement(
+        /*url=*/ fixtureUrl,
+        (testProxy) => {
+          testProxy.handler.isShownInTab = () =>
+              Promise.resolve({isInTab: false});
+          testProxy.handler.setIsZeroState(true);
+        },
+        /*waitForInitialLoadStart=*/ false);
+
+    await appElement.updateComplete;
+    await microtasksFinished();
+
+    assertTrue(appElement.classList.contains('play-zero-state'));
+    assertTrue(appElement.$.composebox.classList.contains('play-zero-state'));
+  });
+
+  test(
+      'side panel zero state is visible before DOM content loads', async () => {
+        const {appElement, proxy} = await createContextualTasksAppElement(
+            /*url=*/ fixtureUrl,
+            (testProxy) => {
+              testProxy.handler.isShownInTab = () =>
+                  Promise.resolve({isInTab: false});
+            },
+            /*waitForInitialLoadStart=*/ false);
+
+        proxy.callbackRouterRemote.onZeroStateChange(true);
+        await proxy.callbackRouterRemote.$.flushForTesting();
+        await appElement.updateComplete;
+        await microtasksFinished();
+
+        assertFalse(appElement.$.composebox.hidden);
+
+        const wrapper =
+            appElement.shadowRoot.querySelector('#composeboxHeaderWrapper')!;
+        assertFalse(wrapper.hasAttribute('hidden'));
       });
 });

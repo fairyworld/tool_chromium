@@ -1277,6 +1277,10 @@ void ContextualTasksUI::AddInitialTaskStateToDataSource(
   source->AddBoolean("isAiPage",
                      ui_service_ && task_creation_url &&
                          ui_service_->IsAiUrl(task_creation_url.value()));
+  source->AddBoolean("isZeroState",
+                     ui_service_ && task_creation_url &&
+                         IsZeroState(task_creation_url.value(), ui_service_));
+  source->AddBoolean("isShownInTab", IsShownInTab());
 }
 
 void ContextualTasksUI::OnSidePanelStateChanged() {
