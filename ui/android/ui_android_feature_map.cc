@@ -22,7 +22,6 @@ const base::Feature* const kFeaturesExposedToJava[] = {
     &ui::kAndroidUseDisplayTopology,
     &ui::kAndroidWindowOcclusion,
     &ui::kBlockMouseEventsOnView,
-    &ui::kCachedGestureNavMetrics,
     &ui::kCheckIntentCallerPermission,
     &ui::kClipboardConfusedDeputyDefenseText,
     &ui::kClipboardConfusedDeputyDefenseImages,
