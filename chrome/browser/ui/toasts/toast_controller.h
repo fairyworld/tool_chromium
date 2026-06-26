@@ -46,6 +46,7 @@ class MenuModel;
 }
 
 namespace views {
+class View;
 class Widget;
 }
 
@@ -149,6 +150,16 @@ class ToastController : public views::WidgetObserver,
 
   // Called when the browser window's fullscreen state changes.
   void OnFullscreenStateChanged();
+
+  // Updates the anchor view and reparents the toast widget.
+  void UpdateToastAnchor();
+
+  // Gets the anchor view for a toast.
+  views::View* GetAnchorView(bool global_scope);
+
+  // Updates the focus traversable parent of the toast widget so that keyboard
+  // focus is properly handled.
+  void UpdateToastWidgetFocusTraversableParent(views::View* anchor_view);
 
   const raw_ptr<BrowserWindowInterface> browser_window_interface_;
   const raw_ptr<const ToastRegistry> toast_registry_;

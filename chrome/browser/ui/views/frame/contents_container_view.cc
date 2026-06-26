@@ -85,6 +85,8 @@ ContentsContainerView::ContentsContainerView(BrowserView* browser_view)
   devtools_scrim_view_ = AddChildView(std::make_unique<ScrimView>());
   devtools_scrim_view_->layer()->SetName("DevtoolsScrimView");
 
+  toast_anchor_view_ = AddChildView(std::make_unique<views::View>());
+
   contents_view_ = AddChildView(
       std::make_unique<ContentsWebView>(browser_view->GetProfile()));
   contents_view_->SetID(VIEW_ID_TAB_CONTAINER);
@@ -540,6 +542,10 @@ views::ProposedLayout ContentsContainerView::CalculateProposedLayout(
   const auto& contents_rect = GetMirroredRect(contents_view_bounds);
   layouts.child_layouts.emplace_back(
       contents_view_.get(), contents_view_->GetVisible(), contents_rect);
+
+  layouts.child_layouts.emplace_back(
+      toast_anchor_view_.get(), toast_anchor_view_->GetVisible(),
+      gfx::BoundingRect(contents_rect.origin(), contents_rect.top_right()));
 
   if (glic_border_) {
     // |glic_border_| should not be seen over devtools.

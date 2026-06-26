@@ -141,6 +141,8 @@ class ContentsContainerView : public views::View,
 
   void SetDefaultRoundedCorners(const gfx::RoundedCornersF& corner_overrides);
 
+  views::View* GetToastAnchorView() { return toast_anchor_view_; }
+
  private:
   void UpdateContentsClip();
 
@@ -168,6 +170,11 @@ class ContentsContainerView : public views::View,
   bool is_in_split_ = false;
 
   raw_ptr<BrowserView> browser_view_ = nullptr;
+
+  // An invisible view used to anchor tab toasts to the top of the contents
+  // view, while being before the contents view in the focus order.
+  raw_ptr<views::View> toast_anchor_view_ = nullptr;
+
   raw_ptr<ContentsWebView> contents_view_ = nullptr;
 
   TabModalDialogHost web_contents_modal_dialog_host_;
