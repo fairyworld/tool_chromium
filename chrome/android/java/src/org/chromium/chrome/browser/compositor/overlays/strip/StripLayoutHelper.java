@@ -124,6 +124,7 @@ import org.chromium.chrome.browser.tasks.tab_management.TabShareUtils;
 import org.chromium.chrome.browser.tasks.tab_management.TabUiThemeProvider;
 import org.chromium.chrome.browser.tasks.tab_management.TabUiUtils;
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
+import org.chromium.chrome.browser.ui.vertical_tabs.VerticalTabUtils;
 import org.chromium.chrome.browser.user_education.UserEducationHelper;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 import org.chromium.components.browser_ui.styles.ChromeColors;
@@ -1690,6 +1691,15 @@ public class StripLayoutHelper
             @IphType int iphType,
             boolean enableSnoozeMode) {
         if (mModel == null || mTabStripIphController == null) return false;
+
+        // If the target view is no longer in the layout (e.g. tab closed or group dissolved),
+        // discard the queued callback.
+        if ((tab != null && findTabById(tab.getTabId()) != tab)
+                || (groupTitle != null
+                        && findGroupTitle(groupTitle.getTabGroupId()) != groupTitle)) {
+            return true;
+        }
+
         // Remove the showTabStrip callback from the queue, as showing IPH is not applicable in
         // these cases.
         if (mModel.isIncognito()
@@ -1751,6 +1761,28 @@ public class StripLayoutHelper
                 && mTabStripIphController.wouldTriggerIph(IphType.GLIC_PROMO)
                 && GlicUtils.isTabEligibleForGlicIph(tab)) {
             mQueuedIphList.add(() -> attemptToShowGlicIph());
+        }
+    }
+
+    /** Attempts to queue the Vertical Tabs promo IPH if eligible. */
+    public void attemptToQueueVerticalTabsPromoIph(@Nullable Tab tab) {
+        if (mModel != null
+                && mTabStripIphController != null
+                && VerticalTabUtils.isVerticalTabsEligible(mContext)
+                && mTabStripIphController.wouldTriggerIph(IphType.VERTICAL_TABS_PROMO)) {
+            if (tab == null) {
+                return;
+            }
+            final StripLayoutTab stripTab = findTabById(tab.getId());
+            if (stripTab != null) {
+                mQueuedIphList.add(
+                        () ->
+                                attemptToShowTabStripIph(
+                                        /* groupTitle= */ null,
+                                        stripTab,
+                                        IphType.VERTICAL_TABS_PROMO,
+                                        /* enableSnoozeMode= */ false));
+            }
         }
     }
 
@@ -1837,6 +1869,7 @@ public class StripLayoutHelper
         }
 
         attemptToQueueGlicIph(tab);
+        attemptToQueueVerticalTabsPromoIph(tab);
     }
 
     /**

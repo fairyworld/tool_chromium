@@ -5932,6 +5932,35 @@ public class StripLayoutHelperTest {
     }
 
     @Test
+    @EnableFeatures(ChromeFeatureList.ANDROID_VERTICAL_TABS)
+    public void testVerticalTabsPromoIph() {
+        initializeTest(false, false, 1, 2);
+        mStripLayoutHelper.onSizeChanged(
+                STRIP_WIDTH, STRIP_HEIGHT, false, TIMESTAMP, PADDING_LEFT, PADDING_RIGHT, 0f);
+
+        // Mock tracker wouldTriggerIph to return true.
+        when(mController.wouldTriggerIph(eq(IphType.VERTICAL_TABS_PROMO))).thenReturn(true);
+
+        // Select tab to queue Vertical Tabs IPH.
+        mStripLayoutHelper.tabSelected(TIMESTAMP, 1, 0);
+
+        // Run layout pass (completes animations/scroll and runs queue).
+        mStripLayoutHelper.finishAnimations();
+        mStripLayoutHelper.finishScrollForTesting();
+        mStripLayoutHelper.updateLayout(TIMESTAMP);
+
+        // Verify the Vertical Tabs IPH was requested.
+        verify(mController)
+                .showIphOnTabStrip(
+                        eq(null),
+                        notNull(),
+                        any(),
+                        eq(IphType.VERTICAL_TABS_PROMO),
+                        anyFloat(),
+                        eq(false));
+    }
+
+    @Test
     public void testUpdateLastHoveredTab() {
         // Assume tab0 is selected, tab1 is hovered on.
         initializeTabHoverTest();
