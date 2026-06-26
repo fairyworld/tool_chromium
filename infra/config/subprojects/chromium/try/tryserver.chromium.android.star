@@ -396,6 +396,9 @@ try_.builder(
     mirrors = [
         "ci/android-16-x64-leakcanary-rel",
     ],
+    builder_config_settings = builder_config.try_settings(
+        retry_failed_shards = False,
+    ),
     gn_args = gn_args.config(
         configs = [
             "ci/android-16-x64-leakcanary-rel",
