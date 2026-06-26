@@ -249,15 +249,6 @@ bool AvatarToolbarButtonTestAccessor::WaitForTextNotEqual(
   return base::test::RunUntil([this, text]() { return GetText() != text; });
 }
 
-bool AvatarToolbarButtonTestAccessor::WaitForVisible(bool visible) {
-  return base::test::RunUntil(
-      [this, visible]() { return GetVisible() == visible; });
-}
-
-bool AvatarToolbarButtonTestAccessor::WaitForEnabled(bool enabled) {
-  return base::test::RunUntil(
-      [this, enabled]() { return GetEnabled() == enabled; });
-}
 
 bool AvatarToolbarButtonTestAccessor::WaitForState(
     AvatarToolbarButtonState state) {
@@ -310,11 +301,6 @@ AvatarToolbarButtonState AvatarToolbarButtonTestAccessor::GetState() {
       GetButton());
 }
 
-bool AvatarToolbarButtonTestAccessor::WaitForImageUrl(
-    const std::string& image_url) {
-  return base::test::RunUntil(
-      [this, image_url]() { return GetImageUrl() == image_url; });
-}
 
 bool AvatarToolbarButtonTestAccessor::WaitForRenderedTooltipText(
     const std::u16string& text) {
@@ -553,9 +539,17 @@ std::string AvatarToolbarButtonTestAccessor::GetImageUrl() {
               return std::string();
             }
             if (ShouldUseCppFallback(button)) {
-              StateProvider* active_provider =
-                  button->state_manager_->GetActiveStateProvider();
-              return active_provider->GetAvatarIconUrl();
+              if (button->avatar_icon_handle_.is_null()) {
+                return std::string();
+              }
+              auto updates = button->delegate_->GetIconTable().GetFullState();
+              for (const auto& update : updates) {
+                if (update->handle_id ==
+                    button->avatar_icon_handle_.HandleId().value()) {
+                  return update->icon_url_or_name.value_or(std::string());
+                }
+              }
+              return std::string();
             }
             content::WebContents* contents = GetWebContents();
             if (!contents) {
@@ -571,9 +565,13 @@ std::string AvatarToolbarButtonTestAccessor::GetImageUrl() {
                        "app.shadowRoot?.querySelector('avatar-button');"
                        "  if (!btn) return '';"
                        "  await btn.updateComplete;"
-                       "  const img = "
+                       "  const iconEl = "
                        "btn.shadowRoot?.querySelector('#icon');"
-                       "  return img?.src || '';"
+                       "  if (!iconEl) return '';"
+                       "  if (iconEl.tagName === 'ICON-FROM-TABLE') {"
+                       "    return iconEl.iconInfo_?.urlOrName || '';"
+                       "  }"
+                       "  return iconEl.getAttribute('icon') || '';"
                        "})()")
                 .ExtractString();
           },

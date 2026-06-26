@@ -113,6 +113,7 @@
 #include "third_party/skia/include/core/SkColor.h"
 #include "ui/base/mojom/themes.mojom.h"
 #include "ui/base/ui_base_features.h"
+#include "ui/base/webui/web_ui_util.h"
 #include "ui/events/base_event_utils.h"
 #include "ui/gfx/image/image.h"
 #include "ui/gfx/image/image_skia.h"
@@ -499,7 +500,12 @@ class AvatarToolbarButtonInterfaceBaseBrowserTest {
     if (features::IsWebUIAvatarButtonEnabled()) {
       std::string actual =
           AvatarToolbarButtonTestAccessor(GetBrowser()).GetImageUrl();
-      return actual.find(expected_url) == 0;
+      int icon_size = GetLayoutConstant(LayoutConstant::kToolbarButtonIconSize);
+      gfx::Image expected_image = profiles::GetSizedAvatarIcon(
+          account_image, icon_size, icon_size, profiles::SHAPE_CIRCLE);
+      std::string expected_data_url =
+          webui::GetBitmapDataUrl(expected_image.AsBitmap());
+      return actual == expected_data_url;
     }
     gfx::Image current_avatar_icon =
         gfx::Image(AvatarToolbarButtonTestAccessor(GetBrowser())

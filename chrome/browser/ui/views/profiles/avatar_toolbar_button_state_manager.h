@@ -121,8 +121,6 @@ class StateProvider {
       SkColor /*icon_color*/,
       const ui::ColorProvider& color_provider) const;
 
-  // Returns the avatar icon URL of the avatar button.
-  virtual std::string GetAvatarIconUrl() const;
 
   // Returns the tooltip text of the avatar button.
   virtual std::u16string GetAvatarTooltipText() const;

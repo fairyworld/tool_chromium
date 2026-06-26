@@ -159,7 +159,7 @@ function createMockNavigationState() {
       },
     },
     avatarControlState: {
-      iconUrl: '',
+      icon: {handleId: 0n},
       text: '',
       tooltip: '',
       accessibilityName: '',

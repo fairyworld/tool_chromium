@@ -369,6 +369,7 @@ if (!is_android) {
       deps += [
         "//chrome/browser/ui/views/performance_controls",
         "//chrome/browser/ui/webui:webui_util",
+        "//chrome/browser/ui/webui/webui_toolbar:test_support",
       ]
     }
   }

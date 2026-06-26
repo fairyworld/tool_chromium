@@ -12,6 +12,7 @@
 #include "base/strings/strcat.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
+#include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
 #include "base/strings/to_string.h"
 #include "base/task/sequenced_task_runner.h"
@@ -25,6 +26,7 @@
 #include "base/time/time.h"
 #include "base/values.h"
 #include "build/build_config.h"
+#include "chrome/browser/ui/webui/webui_toolbar/webui_toolbar_test_utils.h"
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/constants/ash_features.h"
 #include "ash/constants/ash_pref_names.h"
@@ -2529,6 +2531,80 @@ INSTANTIATE_TEST_SUITE_P(
       return info.param.test_name;
     });
 #endif  // !BUILDFLAG(IS_CHROMEOS)
+
+class WebUIAvatarButtonBrowserTest : public WebUIToolbarWebViewBrowserTest {
+ public:
+  WebUIAvatarButtonBrowserTest()
+      : WebUIToolbarWebViewBrowserTest(
+            {features::kInitialWebUI, features::kWebUIAvatarButton},
+            {}) {}
+};
+
+IN_PROC_BROWSER_TEST_F(WebUIAvatarButtonBrowserTest, AvatarButtonState) {
+  WebUIToolbarWebView* webui_toolbar_view = GetWebUIToolbarWebView(browser());
+  ASSERT_TRUE(webui_toolbar_view);
+
+  auto* avatar_button = static_cast<WebUIAvatarToolbarButton*>(
+      webui_toolbar_view->GetAvatarToolbarButtonInterface());
+  ASSERT_TRUE(avatar_button);
+
+  ASSERT_TRUE(
+      base::test::RunUntil([&]() { return avatar_button->is_initialized(); }));
+
+  WebUIToolbarControlDelegate* delegate = webui_toolbar_view;
+  const auto& state = delegate->GetState().avatar_control_state;
+  ASSERT_TRUE(state);
+
+  EXPECT_EQ(state->state,
+            toolbar_ui_api::mojom::AvatarToolbarButtonState::kNormal);
+  EXPECT_TRUE(state->text.empty());
+
+  EXPECT_FALSE(state->icon.is_null());
+
+  auto icon_updates = delegate->GetIconTable().GetFullState();
+  EXPECT_THAT(icon_updates, testing::Contains(MatchesBitmapIconUpdate(
+                                state->icon.HandleId().value())));
+}
+
+IN_PROC_BROWSER_TEST_F(WebUIAvatarButtonBrowserTest, AvatarButtonIPHPromo) {
+  WebUIToolbarWebView* webui_toolbar_view = GetWebUIToolbarWebView(browser());
+  ASSERT_TRUE(webui_toolbar_view);
+
+  auto* avatar_button = static_cast<WebUIAvatarToolbarButton*>(
+      webui_toolbar_view->GetAvatarToolbarButtonInterface());
+  ASSERT_TRUE(avatar_button);
+
+  ASSERT_TRUE(
+      base::test::RunUntil([&]() { return avatar_button->is_initialized(); }));
+
+  WebUIToolbarControlDelegate* delegate = webui_toolbar_view;
+
+  EXPECT_EQ(delegate->GetState().avatar_control_state->state,
+            toolbar_ui_api::mojom::AvatarToolbarButtonState::kNormal);
+  EXPECT_TRUE(delegate->GetState().avatar_control_state->text.empty());
+
+  // Trigger IPH promo.
+  avatar_button->NotifyIPHPromoChanged(true);
+
+  // Wait until the state updates to kShowIdentityName and text is populated.
+  ASSERT_TRUE(base::test::RunUntil([&]() {
+    return delegate->GetState().avatar_control_state->state ==
+               toolbar_ui_api::mojom::AvatarToolbarButtonState::
+                   kShowIdentityName &&
+           !delegate->GetState().avatar_control_state->text.empty();
+  }));
+
+  // Trigger IPH promo hide.
+  avatar_button->NotifyIPHPromoChanged(false);
+  avatar_button->ClearActiveStateForTesting();
+
+  // Wait until it goes back to kNormal and text is empty.
+  ASSERT_TRUE(base::test::RunUntil([&]() {
+    return delegate->GetState().avatar_control_state->state ==
+               toolbar_ui_api::mojom::AvatarToolbarButtonState::kNormal &&
+           delegate->GetState().avatar_control_state->text.empty();
+  }));
+}
 
 struct ButtonVisibilityToggleTestParam {
   const char* test_name;

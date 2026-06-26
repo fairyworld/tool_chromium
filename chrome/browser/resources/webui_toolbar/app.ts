@@ -261,7 +261,7 @@ export class ToolbarAppElement extends AppElementBase {
     },
     avatarControlState: {
       state: AvatarToolbarButtonState.kNormal,
-      iconUrl: '',
+      icon: {handleId: 0n},
       text: '',
       tooltip: '',
       accessibilityName: '',

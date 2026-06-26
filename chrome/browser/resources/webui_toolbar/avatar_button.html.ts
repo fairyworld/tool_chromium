@@ -22,8 +22,9 @@ export function getHtml(this: AvatarButtonElement) {
     @mouseleave="${this.onMouseleave_}"
     @focus="${this.onFocus_}"
     @blur="${this.onBlur_}">
-  ${this.state.iconUrl ? html`
-    <img id="icon" src="${this.state.iconUrl}" alt="">
+  ${(this.state.icon?.handleId ?? 0n) !== 0n ? html`
+    <icon-from-table id="icon" .iconHandle="${this.state.icon}">
+    </icon-from-table>
   ` : html`
     <cr-icon id="icon" icon="cr:person"></cr-icon>
   `}

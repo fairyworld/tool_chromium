@@ -222,7 +222,7 @@ enum AvatarToolbarButtonState {
 
 struct AvatarControlState {
   AvatarToolbarButtonState state;
-  string icon_url;
+  IconHandle icon;
   mojo_base.mojom.String16 text;
   mojo_base.mojom.String16 tooltip;
   mojo_base.mojom.String16 accessibility_name;

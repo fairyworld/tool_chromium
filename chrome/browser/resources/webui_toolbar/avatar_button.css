@@ -41,9 +41,10 @@
 }
 
 #icon {
+  --icon-size: var(--toolbar-button-icon-size);
   border-radius: 50%;
+  display: inline-block;
   height: var(--toolbar-button-icon-size);
-  object-fit: contain;
   width: var(--toolbar-button-icon-size);
 }
 
