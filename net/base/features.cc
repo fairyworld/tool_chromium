@@ -45,6 +45,8 @@ BASE_FEATURE(kAsyncDns,
 );
 
 BASE_FEATURE(kOptimisticDnsForTcp, base::FEATURE_DISABLED_BY_DEFAULT);
+const base::FeatureParam<bool> kUseStaleConnectorsForOptimisticDns{
+    &kOptimisticDnsForTcp, "use_stale_connectors", false};
 
 BASE_FEATURE(kAddressSorterConnectCache, base::FEATURE_DISABLED_BY_DEFAULT);
 
