@@ -3734,7 +3734,9 @@ if (!is_android) {
     }
 
     if (is_win || is_mac || is_linux) {
-      sources += [ "../browser/ui/views/media_preview/mic_preview/audio_stream_coordinator_browsertest.cc" ]
+      deps += [
+        "//chrome/browser/ui/views/media_preview/mic_preview:browser_tests",
+      ]
     }
 
     if (is_chrome_for_testing) {
@@ -8931,24 +8933,13 @@ test("unit_tests") {
     ]
 
     if (is_linux || is_win || is_mac) {
-      sources += [
-        "../browser/ui/views/media_preview/active_devices_media_coordinator_unittest.cc",
-        "../browser/ui/views/media_preview/camera_preview/camera_coordinator_unittest.cc",
-        "../browser/ui/views/media_preview/camera_preview/video_format_comparison_unittest.cc",
-        "../browser/ui/views/media_preview/camera_preview/video_stream_coordinator_unittest.cc",
-        "../browser/ui/views/media_preview/media_coordinator_unittest.cc",
-        "../browser/ui/views/media_preview/media_preview_metrics_unittest.cc",
-        "../browser/ui/views/media_preview/media_view_controller_base_unittest.cc",
-        "../browser/ui/views/media_preview/mic_preview/mic_coordinator_unittest.cc",
-        "../browser/ui/views/media_preview/page_info_previews_coordinator_unittest.cc",
-        "../browser/ui/views/media_preview/permission_prompt_previews_coordinator_unittest.cc",
-        "../browser/ui/views/policy/enterprise_startup_dialog_unittest.cc",
-      ]
+      sources +=
+          [ "../browser/ui/views/policy/enterprise_startup_dialog_unittest.cc" ]
 
       deps += [
-        "//components/media_effects/test:test_support",
-        "//services/audio/public/cpp:test_support",
-        "//services/video_capture/public/cpp:mocks",
+        "//chrome/browser/ui/views/media_preview:unit_tests",
+        "//chrome/browser/ui/views/media_preview/camera_preview:unit_tests",
+        "//chrome/browser/ui/views/media_preview/mic_preview:unit_tests",
       ]
     }
 
@@ -9859,10 +9850,8 @@ if (!is_android && !is_chromeos_device) {
     ]
 
     if (is_mac || is_linux || is_win) {
-      sources += [
-        "../browser/ui/views/default_link_capturing_interactive_uitest.cc",
-        "../browser/ui/views/media_preview/permission_prompt_preview_browsertest.cc",
-      ]
+      sources +=
+          [ "../browser/ui/views/default_link_capturing_interactive_uitest.cc" ]
 
       if (enable_dice_support) {
         sources += [
@@ -10270,7 +10259,10 @@ if (!is_android && !is_chromeos_device) {
     }
 
     if (is_win || is_mac || is_linux) {
-      deps += [ "//chrome/browser/ui/startup/default_browser_prompt:interactive_ui_tests" ]
+      deps += [
+        "//chrome/browser/ui/startup/default_browser_prompt:interactive_ui_tests",
+        "//chrome/browser/ui/views/media_preview:interactive_ui_tests",
+      ]
     }
 
     if (is_chromeos) {
