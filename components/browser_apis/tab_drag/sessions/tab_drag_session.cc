@@ -137,17 +137,33 @@ void TabDragSession::HandleMoveWhileAttached(const gfx::Point& screen_point) {
 }
 
 void TabDragSession::HandleMoveWhileDetached(const gfx::Point& screen_point) {
-  DropTargetRegistry& registry = injector_->GetDropTargetRegistry();
-  DropTargetId exclude_target = registry.FindTargetForWindow(dragged_window_);
+  DropTargetRegistry& drop_target_registry = injector_->GetDropTargetRegistry();
+  DropTargetId exclude_target =
+      drop_target_registry.FindTargetForWindow(dragged_window_);
   DropTargetId new_target_id =
-      registry.FindTargetAtPoint(screen_point, exclude_target);
+      drop_target_registry.FindTargetAtPoint(screen_point, exclude_target);
 
   if (new_target_id) {
-    if (DropTarget* target = registry.GetDropTarget(new_target_id)) {
-      drag_mode_ = DragMode::kAttachedToWindow;
+    if (DropTarget* target =
+            drop_target_registry.GetDropTarget(new_target_id)) {
       TabDragWindowId target_window_id = target->window_id();
       CHECK(target_window_id);
-      dragged_window_ = target_window_id;
+
+      TabDragWindowAdapter* detached_window = registry()->Get(dragged_window_);
+      CHECK(detached_window);
+
+      detached_window->EndWindowMoveLoop();
+
+      auto migrate_result =
+          detached_window->MigrateTabs(target_window_id, dragged_tabs_);
+      if (!migrate_result.has_value()) {
+        injector_->GetSessionListener().OnSessionCancelled();
+        EndSession();
+        return;
+      }
+
+      UpdateDraggedWindow(target_window_id);
+      drag_mode_ = DragMode::kAttachedToWindow;
       injector_->GetSessionListener().OnTargetChanged(new_target_id,
                                                       screen_point);
       return;

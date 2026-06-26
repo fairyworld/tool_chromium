@@ -65,6 +65,14 @@ class ToyTabDragWindowAdapter : public TabDragWindowAdapter {
     return run_window_move_loop_result_;
   }
 
+  void EndWindowMoveLoop() override {}
+
+  base::expected<void, mojo_base::mojom::ErrorPtr> MigrateTabs(
+      TabDragWindowId target_window_id,
+      const std::vector<tabs_api::NodeId>& tab_ids) override {
+    return base::ok();
+  }
+
   // Toy controls:
   void set_tab_count(size_t count) { tab_count_ = count; }
   void set_detach_to_new_window_result(
