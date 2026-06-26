@@ -55,6 +55,7 @@ import org.chromium.build.annotations.CheckDiscard;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
+import org.chromium.chrome.browser.omnibox.UrlBarFocusChangeInfo.FocusDirection;
 import org.chromium.chrome.browser.toolbar.ToolbarVariationUtils;
 import org.chromium.components.browser_ui.share.ShareHelper;
 import org.chromium.components.browser_ui.util.FirstDrawDetector;
@@ -109,6 +110,7 @@ public class UrlBar extends AutocompleteEditText {
     private @Nullable Callback<String> mTextChangeListener;
     // Listens for each raw text change to drive site-search triggering.
     private @Nullable Callback<UrlBarTextChangeInfo> mRichTextChangeListener;
+    private @Nullable Callback<UrlBarFocusChangeInfo> mFocusChangeCallback;
     private @Nullable OnKeyListener mKeyDownListener;
     private @Nullable UrlBarTextContextMenuDelegate mTextContextMenuDelegate;
     private @Nullable Callback<Integer> mUrlDirectionListener;
@@ -403,7 +405,8 @@ public class UrlBar extends AutocompleteEditText {
 
     @Override
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    public void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
+    public void onFocusChanged(
+            boolean focused, @FocusDirection int direction, Rect previouslyFocusedRect) {
         mFocused = focused;
 
         if (!mFocused) {
@@ -411,6 +414,13 @@ public class UrlBar extends AutocompleteEditText {
             mFocusEventEmitted = false;
         }
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
+
+        // Ensure the URL bar is ready to generate autocomplete suggestions on user input.
+        if (focused) setIgnoreTextChangesForAutocomplete(false);
+        if (mFocusChangeCallback != null) {
+            mFocusChangeCallback.onResult(new UrlBarFocusChangeInfo(focused, direction));
+        }
+
         updateCursorVisibility();
 
         updateUrlBarForMultilineInput();
@@ -755,6 +765,11 @@ public class UrlBar extends AutocompleteEditText {
      */
     public void setRichTextChangeListener(Callback<UrlBarTextChangeInfo> listener) {
         mRichTextChangeListener = listener;
+    }
+
+    /** Set the callback notified on focus changes, carrying the focus direction. */
+    public void setFocusChangeCallback(@Nullable Callback<UrlBarFocusChangeInfo> callback) {
+        mFocusChangeCallback = callback;
     }
 
     /**

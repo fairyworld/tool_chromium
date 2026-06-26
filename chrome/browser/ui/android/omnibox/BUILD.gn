@@ -71,6 +71,7 @@ android_library("java") {
     "java/src/org/chromium/chrome/browser/omnibox/UrlBarCoordinator.java",
     "java/src/org/chromium/chrome/browser/omnibox/UrlBarData.java",
     "java/src/org/chromium/chrome/browser/omnibox/UrlBarEditingTextStateProvider.java",
+    "java/src/org/chromium/chrome/browser/omnibox/UrlBarFocusChangeInfo.java",
     "java/src/org/chromium/chrome/browser/omnibox/UrlBarMediator.java",
     "java/src/org/chromium/chrome/browser/omnibox/UrlBarProperties.java",
     "java/src/org/chromium/chrome/browser/omnibox/UrlBarTextChangeInfo.java",

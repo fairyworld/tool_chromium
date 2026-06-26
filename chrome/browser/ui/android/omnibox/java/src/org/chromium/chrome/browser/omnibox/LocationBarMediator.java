@@ -490,7 +490,8 @@ class LocationBarMediator
         return mExactMatchUrlSupplier;
     }
 
-    /*package */ void onUrlFocusChange(boolean hasFocus) {
+    /*package */ void onUrlFocusChange(UrlBarFocusChangeInfo info) {
+        boolean hasFocus = info.hasFocus;
         if (mAccessibilityFocusWorkaroundInProgress) {
             return;
         }
@@ -509,6 +510,13 @@ class LocationBarMediator
         if (hasFocus) {
             mDeferredFocusCurrentTab = false;
             if (mNativeInitialized) RecordUserAction.record("FocusLocation");
+            if (shouldEnterStandbyForKeyboardFocus(info)) {
+                mUrlFocusedWithoutAnimations = true;
+                beginInput(
+                        new AutocompleteInput(OmniboxFocusReason.KEYBOARD_NAVIGATION_FOCUS)
+                                .setAutocompleteState(AutocompleteState.STANDBY)
+                                .setSelection(TextSelection.SELECT_ALL));
+            }
         } else {
             mUrlFocusedWithoutAnimations = false;
         }
@@ -534,6 +542,11 @@ class LocationBarMediator
         if (!hasFocus && mLocationBarDataProvider.hasTab()) {
             updateUrl();
         }
+    }
+
+    @VisibleForTesting
+    /*package */ void onUrlFocusChange(boolean hasFocus) {
+        onUrlFocusChange(new UrlBarFocusChangeInfo(hasFocus, View.FOCUS_DOWN));
     }
 
     /*package */ void onFinishNativeInitialization() {
@@ -2472,6 +2485,12 @@ class LocationBarMediator
     @Override
     public void onTemplateURLServiceChanged() {
         mIsLensOnOmniboxEnabled = Boolean.valueOf(isLensEnabled(LensEntryPoint.OMNIBOX));
+    }
+
+    private boolean shouldEnterStandbyForKeyboardFocus(UrlBarFocusChangeInfo info) {
+        return mCurrentInput == null
+                && OmniboxCapabilities.isDesktopPlatform()
+                && (info.direction == View.FOCUS_FORWARD || info.direction == View.FOCUS_BACKWARD);
     }
 
     // OmniboxStub implementation.

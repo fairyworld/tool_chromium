@@ -3346,4 +3346,20 @@ public class LocationBarMediatorTest {
 
         verify(mLocationBarLayout).setIsInStandby(false);
     }
+
+    @Test
+    public void onUrlFocusChange_keyboardForward_entersStandbyNoPopover() {
+        OmniboxCapabilities.setIsDesktopPlatformForTesting(true);
+        mMediator.onUrlFocusChange(new UrlBarFocusChangeInfo(true, View.FOCUS_FORWARD));
+
+        verify(mLocationBarLayout, atLeastOnce()).setIsInStandby(true);
+        verify(mUrlCoordinator, never()).startReparenting();
+    }
+
+    @Test
+    public void onUrlFocusChange_programmaticFocus_keepsExistingPath() {
+        mMediator.onUrlFocusChange(new UrlBarFocusChangeInfo(true, View.FOCUS_DOWN));
+
+        verify(mLocationBarLayout, never()).setIsInStandby(true);
+    }
 }
