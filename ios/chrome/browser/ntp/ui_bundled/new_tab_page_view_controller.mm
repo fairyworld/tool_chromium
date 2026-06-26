@@ -1773,19 +1773,9 @@ const CGFloat kBackgroundImageAnimationDuration = 0.2;
                   completion:nil];
 }
 
-// Returns if the given size represents a landscape orientation on an iPhone or
-// iPad.
+// Returns if the given size represents a landscape orientation.
 - (BOOL)isOrientationLandscapeForSize:(CGSize)size {
-  BOOL isLandscape = size.width > size.height;
-  if (isLandscape) {
-    UIUserInterfaceIdiom deviceIdiom =
-        [[UIDevice currentDevice] userInterfaceIdiom];
-    if (deviceIdiom == UIUserInterfaceIdiomPad ||
-        deviceIdiom == UIUserInterfaceIdiomPhone) {
-      return YES;
-    }
-  }
-  return NO;
+  return size.width > size.height;
 }
 
 // Lays out content above feed and adjusts content suggestions for the given
