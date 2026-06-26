@@ -409,7 +409,9 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
                     mIsSafeModeEnabled
                             ? controller.queryActions(ctx, webViewPackageName)
                             : new HashSet<>();
-
+            for (String actionId : safeModeActions) {
+                SafeModeController.getInstance().enableAction(actionId);
+            }
             long startCachedFlagInit = SystemClock.uptimeMillis();
             try (StrictModeContext ignored = StrictModeContext.allowDiskWrites()) {
                 // Since N, getSharedPreferences creates the preference dir if it doesn't exist,
