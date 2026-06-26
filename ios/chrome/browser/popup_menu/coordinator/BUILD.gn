@@ -33,6 +33,7 @@ source_set("coordinator") {
     "//ios/chrome/browser/policy/model",
     "//ios/chrome/browser/popup_menu/overflow_menu/coordinator",
     "//ios/chrome/browser/popup_menu/overflow_menu/public",
+    "//ios/chrome/browser/popup_menu/overflow_menu/public:features",
     "//ios/chrome/browser/popup_menu/overflow_menu/public:overflow_menu_constants",
     "//ios/chrome/browser/popup_menu/overflow_menu/ui:overflow_menu_metrics",
     "//ios/chrome/browser/popup_menu/overflow_menu/ui:ui_swift",

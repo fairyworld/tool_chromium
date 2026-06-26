@@ -86,6 +86,7 @@
 #import "ios/chrome/browser/shared/public/commands/help_commands.h"
 #import "ios/chrome/browser/shared/public/commands/lens_overlay_commands.h"
 #import "ios/chrome/browser/shared/public/commands/level_up_commands.h"
+#import "ios/chrome/browser/shared/public/commands/new_tab_page_commands.h"
 #import "ios/chrome/browser/shared/public/commands/open_new_tab_command.h"
 #import "ios/chrome/browser/shared/public/commands/overflow_menu_customization_commands.h"
 #import "ios/chrome/browser/shared/public/commands/page_action_menu_commands.h"
@@ -381,6 +382,7 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
     return nil;
   }
 
+  __weak __typeof(self) weakSelf = self;
   if (!_customizeHomepageAction) {
     // TODO(crbug.com/527016576): Add a preview image for the current NTP
     // background to the left of the symbol.
@@ -395,9 +397,7 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
                                  accessibilityID:kToolsMenuCustomizeHomePageId
                                     hideItemText:nil
                                          handler:^{
-                                           // TODO(crbug.com/527016576): Present
-                                           // the customization menu.
-                                           NOTIMPLEMENTED();
+                                           [weakSelf openHomeCustomization];
                                          }];
     _customizeHomepageAction.symbolTintColor =
         [UIColor colorNamed:kTextQuaternaryColor];
@@ -3020,6 +3020,13 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
       showSettingsFromViewController:self.baseViewController
             hasDefaultBrowserBlueDot:(self.settingsDestination.badge ==
                                       BadgeTypePromo)];
+}
+
+// Presents the home customization menu.
+- (void)openHomeCustomization {
+  CHECK(IsOverflowMenuHomeCustomizationEntrypointEnabled());
+  [self dismissMenu];
+  [self.NTPCommandHandler customizationMenuWasTapped];
 }
 
 - (void)enterpriseLearnMore {

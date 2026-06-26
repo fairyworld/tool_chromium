@@ -181,6 +181,7 @@ source_set("coordinator") {
     "//ios/chrome/browser/omnibox/model/placeholder_service",
     "//ios/chrome/browser/overscroll_actions/ui_bundled",
     "//ios/chrome/browser/policy/model:policy_util",
+    "//ios/chrome/browser/popup_menu/overflow_menu/public:features",
     "//ios/chrome/browser/safari_data_import/coordinator:coordinator_delegate",
     "//ios/chrome/browser/safari_data_import/coordinator:export_coordinator",
     "//ios/chrome/browser/search_engines/model:template_url_service_factory",

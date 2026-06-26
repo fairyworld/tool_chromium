@@ -50,6 +50,7 @@ class PrefService;
 @protocol PriceTrackedItemsCommands;
 class PromosManager;
 @protocol QuickDeleteCommands;
+@protocol NewTabPageCommands;
 @protocol ReaderModeCommands;
 class ReadingListBrowserAgent;
 class ReadingListModel;
@@ -100,6 +101,7 @@ class WebStateList;
 @property(nonatomic, weak) id<ReaderModeCommands> readerModeHandler;
 @property(nonatomic, weak) id<GeminiCommands> geminiHandler;
 @property(nonatomic, weak) id<CobaltCommands> cobaltHandler;
+@property(nonatomic, weak) id<NewTabPageCommands> NTPCommandHandler;
 
 // Navigation agent for reloading pages.
 @property(nonatomic, assign) WebNavigationBrowserAgent* navigationAgent;
