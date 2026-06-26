@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/enterprise/browser_management/platform_management_status_provider_android.h"
+#include "components/policy/core/common/management/platform_management_status_provider_android.h"
 
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
@@ -25,20 +25,18 @@ EnterpriseManagementAuthority AndroidManagementStatusProvider::FetchAuthority() 
 }
 
 void AndroidManagementStatusProvider::FetchAuthorityAsync(
-    base::OnceCallback<void(std::pair<ManagementStatusProvider*,
-                                      EnterpriseManagementAuthority>)>
+    base::OnceCallback<void(
+        std::pair<ManagementStatusProvider*, EnterpriseManagementAuthority>)>
         callback) {
-  policy::AndroidEnterpriseInfo::GetInstance()
-      ->GetAndroidEnterpriseInfoState(
-          base::BindOnce(&AndroidManagementStatusProvider::
-                             OnAndroidOwnedStateCheckComplete,
-                         weak_factory_.GetWeakPtr(), std::move(callback)));
+  AndroidEnterpriseInfo::GetInstance()->GetAndroidEnterpriseInfoState(
+      base::BindOnce(
+          &AndroidManagementStatusProvider::OnAndroidOwnedStateCheckComplete,
+          weak_factory_.GetWeakPtr(), std::move(callback)));
 }
 
 void AndroidManagementStatusProvider::OnAndroidOwnedStateCheckComplete(
     base::OnceCallback<void(std::pair<ManagementStatusProvider*,
-                                      EnterpriseManagementAuthority>)>
-        callback,
+                                      EnterpriseManagementAuthority>)> callback,
     bool has_device_owner,
     bool has_profile_owner) {
   EnterpriseManagementAuthority authority = EnterpriseManagementAuthority::NONE;

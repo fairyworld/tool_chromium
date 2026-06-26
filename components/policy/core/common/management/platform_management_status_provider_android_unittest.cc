@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/enterprise/browser_management/platform_management_status_provider_android.h"
+#include "components/policy/core/common/management/platform_management_status_provider_android.h"
 
 #include "base/functional/bind.h"
 #include "base/memory/raw_ptr.h"
@@ -19,11 +19,12 @@ class AndroidManagementStatusProviderParameterizedTest
           std::tuple<bool, bool, EnterpriseManagementAuthority>> {
  protected:
   AndroidManagementStatusProviderParameterizedTest() {
-    instance_ = policy::AndroidEnterpriseInfo::GetInstance();
+    instance_ = AndroidEnterpriseInfo::GetInstance();
+    // Java side isn't running, so we need to skip the call to it.
     instance_->set_skip_jni_call_for_testing(true);
   }
 
-  raw_ptr<policy::AndroidEnterpriseInfo> instance_;
+  raw_ptr<AndroidEnterpriseInfo> instance_;
   base::test::TaskEnvironment task_environment_;
 };
 
@@ -31,8 +32,8 @@ TEST_P(AndroidManagementStatusProviderParameterizedTest, CheckAuthority) {
   const auto& [device_owned, profile_owned, expected_authority] = GetParam();
 
   AndroidManagementStatusProvider provider;
-  base::test::TestFuture<std::pair<ManagementStatusProvider*,
-                                   EnterpriseManagementAuthority>>
+  base::test::TestFuture<
+      std::pair<ManagementStatusProvider*, EnterpriseManagementAuthority>>
       test_future;
 
   provider.FetchAuthorityAsync(test_future.GetCallback());
