@@ -498,6 +498,7 @@ try_.orchestrator_builder(
         experiment_percentage = 10,
         on_default_cq = True,
     ),
+    siso_configs = ["builder", "default-remote"],
     use_clang_coverage = True,
 )
 

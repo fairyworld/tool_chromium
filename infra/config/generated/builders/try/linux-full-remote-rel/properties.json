@@ -166,6 +166,7 @@
   "$build/siso": {
     "configs": [
       "builder",
+      "default-remote",
       "remote-link"
     ],
     "enable_cloud_monitoring": true,
