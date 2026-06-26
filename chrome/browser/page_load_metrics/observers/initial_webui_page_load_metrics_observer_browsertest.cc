@@ -140,17 +140,11 @@ class WebUIToolbarInitializer : public WebUIControllerInitalizer {
 class InitialWebUIPageLoadMetricsObserverBrowserTest
     : public InProcessBrowserTest {
  public:
-  InitialWebUIPageLoadMetricsObserverBrowserTest()
-      : InitialWebUIPageLoadMetricsObserverBrowserTest(
-            {features::kInitialWebUI, features::kWebUIReloadButton,
-             features::kInitialWebUIMetrics,
-             features::kInitialWebUISyncNavStartToCommit},
-            {}) {}
-
-  InitialWebUIPageLoadMetricsObserverBrowserTest(
-      std::vector<base::test::FeatureRef> enabled_features,
-      std::vector<base::test::FeatureRef> disabled_features) {
-    feature_list_.InitWithFeatures(enabled_features, disabled_features);
+  InitialWebUIPageLoadMetricsObserverBrowserTest() {
+    feature_list_.InitWithFeatures(
+        {features::kInitialWebUI, features::kWebUIReloadButton,
+         features::kInitialWebUIMetrics},
+        {});
   }
 
   InitialWebUIPageLoadMetricsObserverBrowserTest(
@@ -271,16 +265,6 @@ class InitialWebUIPageLoadMetricsObserverBrowserTest
   base::test::ScopedFeatureList feature_list_;
 };
 
-class InitialWebUIPageLoadMetricsObserverBrowserTestWithoutSyncNav
-    : public InitialWebUIPageLoadMetricsObserverBrowserTest {
- public:
-  InitialWebUIPageLoadMetricsObserverBrowserTestWithoutSyncNav()
-      : InitialWebUIPageLoadMetricsObserverBrowserTest(
-            {features::kInitialWebUI, features::kWebUIReloadButton,
-             features::kInitialWebUIMetrics},
-            {features::kInitialWebUISyncNavStartToCommit}) {}
-};
-
 // Verify PageLoad event is recorded with valid Paint Milestones in the expected
 // sequence of lifecycle events.
 // Verify that the InitialWebUIPageLoad UKM event is recorded with all expected
@@ -372,34 +356,6 @@ IN_PROC_BROWSER_TEST_F(InitialWebUIPageLoadMetricsObserverBrowserTest,
   EXPECT_THAT(GetEntriesForUrl("InitialWebUINavigationTiming", url), IsEmpty());
 
   EXPECT_THAT(GetEntriesForUrl("InitialWebUIPageLoad", url), IsEmpty());
-}
-
-// Verify page end reason and failed load details are logged for failed
-// provisional loads.
-IN_PROC_BROWSER_TEST_F(
-    InitialWebUIPageLoadMetricsObserverBrowserTestWithoutSyncNav,
-    VerifyFailedProvisionalLoad) {
-  GURL failed_url(chrome::kChromeUIWebUIToolbarURL);
-  WebUIToolbarInitializer initializer(browser());
-  content::WebContents* active_contents =
-      CreateNewContents(failed_url, initializer);
-  browser()->tab_strip_model()->ActivateTabAt(1);
-
-  content::TestNavigationManager navigation_manager(active_contents,
-                                                    failed_url);
-  active_contents->GetController().LoadURL(
-      failed_url, content::Referrer(), ui::PAGE_TRANSITION_LINK, std::string());
-
-  ASSERT_TRUE(navigation_manager.WaitForRequestStart());
-  active_contents->Stop();
-  ASSERT_TRUE(navigation_manager.WaitForNavigationFinished());
-
-  browser()->tab_strip_model()->CloseWebContentsAt(1, 0);
-
-  EXPECT_THAT(GetEntriesForUrl("InitialWebUIPageLoad", failed_url),
-              Contains(AllOf(
-                  HasMetric("Net.ErrorCode.OnFailedProvisionalLoad"),
-                  HasMetric("PageTiming.NavigationToFailedProvisionalLoad"))));
 }
 
 // Verify background timing logic for pages loaded in the background.
@@ -528,32 +484,6 @@ IN_PROC_BROWSER_TEST_F(InitialWebUIPageLoadMetricsObserverBrowserTest,
 
   EXPECT_THAT(GetEntriesForUrl("InitialWebUIPageLoad", url),
               Contains(HasMetric("PageTiming.ForegroundDurationMs")));
-}
-
-// Verify cache status and failure metrics for cached page load with
-// provisional load failure.
-IN_PROC_BROWSER_TEST_F(
-    InitialWebUIPageLoadMetricsObserverBrowserTestWithoutSyncNav,
-    VerifyCachedFailedLoad) {
-  GURL failed_url(chrome::kChromeUIWebUIToolbarURL);
-  WebUIToolbarInitializer initializer(browser());
-  content::WebContents* active_contents =
-      CreateNewContents(failed_url, initializer);
-  browser()->tab_strip_model()->ActivateTabAt(1);
-
-  content::TestNavigationManager navigation_manager(active_contents,
-                                                    failed_url);
-  active_contents->GetController().LoadURL(
-      failed_url, content::Referrer(), ui::PAGE_TRANSITION_LINK, std::string());
-
-  ASSERT_TRUE(navigation_manager.WaitForRequestStart());
-  active_contents->Stop();
-  ASSERT_TRUE(navigation_manager.WaitForNavigationFinished());
-
-  browser()->tab_strip_model()->CloseWebContentsAt(1, 0);
-
-  EXPECT_THAT(GetEntriesForUrl("InitialWebUIPageLoad", failed_url),
-              Contains(HasMetric("Net.ErrorCode.OnFailedProvisionalLoad")));
 }
 
 // Verify NavigationTiming for navigations with redirects.

@@ -172,8 +172,7 @@ class WebUIToolbarPixelInteractiveUiTest : public InteractiveBrowserTest {
          features::kWebUIHomeButton, features::kWebUIPinnedToolbarActions,
          features::kWebUILocationBar,
          features::kSkipIPCChannelPausingForNonGuests,
-         features::kWebUIInProcessResourceLoadingV2,
-         features::kInitialWebUISyncNavStartToCommit},
+         features::kWebUIInProcessResourceLoadingV2},
         {});
   }
 
@@ -264,16 +263,14 @@ class WebUIToolbarViewsInteractiveUiTest
            features::kWebUIBackForwardButton,
 #endif  // BUILDFLAG(IS_MAC)
            features::kSkipIPCChannelPausingForNonGuests,
-           features::kWebUIInProcessResourceLoadingV2,
-           features::kInitialWebUISyncNavStartToCommit},
+           features::kWebUIInProcessResourceLoadingV2},
           {});
     } else {
       feature_list_.InitWithFeatures(
           {}, {features::kInitialWebUI, features::kWebUIReloadButton,
                features::kWebUIBackForwardButton,
                features::kSkipIPCChannelPausingForNonGuests,
-               features::kWebUIInProcessResourceLoadingV2,
-               features::kInitialWebUISyncNavStartToCommit});
+               features::kWebUIInProcessResourceLoadingV2});
     }
   }
 
@@ -1282,8 +1279,7 @@ class WebUIToolbarFocusMinimalInteractiveUiTest
          features::kWebUIReloadButton, features::kWebUIHomeButton,
          features::kWebUISplitTabsButton,
          features::kSkipIPCChannelPausingForNonGuests,
-         features::kWebUIInProcessResourceLoadingV2,
-         features::kInitialWebUISyncNavStartToCommit},
+         features::kWebUIInProcessResourceLoadingV2},
         {features::kWebUILocationBar, features::kWebUIPinnedToolbarActions});
   }
   ~WebUIToolbarFocusMinimalInteractiveUiTest() override = default;
@@ -1443,8 +1439,7 @@ class WebUIToolbarFocusFullInteractiveUiTest
          features::kWebUISplitTabsButton, features::kWebUILocationBar,
          features::kWebUIPinnedToolbarActions,
          features::kSkipIPCChannelPausingForNonGuests,
-         features::kWebUIInProcessResourceLoadingV2,
-         features::kInitialWebUISyncNavStartToCommit},
+         features::kWebUIInProcessResourceLoadingV2},
         {});
   }
   ~WebUIToolbarFocusFullInteractiveUiTest() override = default;

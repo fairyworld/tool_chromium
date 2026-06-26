@@ -1168,7 +1168,7 @@ bool IsDocumentLoadedWithoutUrlLoaderClient(
          // Initial WebUI navigations loads the body internally within the
          // renderer process, so there is no need to create and send
          // URLLoaderClient from the browser process.
-         navigation_request->IsInitialWebUISyncNavigation();
+         navigation_request->IsInitialWebUINavigation();
 }
 
 std::vector<GURL> GetTargetUrlsOfBoostRenderProcessForLoading() {

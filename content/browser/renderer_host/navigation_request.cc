@@ -3504,7 +3504,7 @@ void NavigationRequest::StartNavigation() {
   // For initial WebUI navigations, CommitDeferringConditions and
   // ProcessSelectionDeferringConditions are not run, so that the navigation can
   // run synchronously from start to commit.
-  if (!IsPrerenderedPageActivation() && !IsInitialWebUISyncNavigation()) {
+  if (!IsPrerenderedPageActivation() && !IsInitialWebUINavigation()) {
     commit_deferrer_ = CommitDeferringConditionRunner::Create(
         *this, CommitDeferringCondition::NavigationType::kOther,
         /*candidate_prerender_frame_tree_node_id=*/std::nullopt);
@@ -5987,7 +5987,7 @@ void NavigationRequest::OnStartChecksComplete(
     // confident it won't be triggered.
     DCHECK(last_response_head);
     cached_response_head = last_response_head->Clone();
-  } else if (IsInitialWebUISyncNavigation()) {
+  } else if (IsInitialWebUINavigation()) {
     loader_type = NavigationURLLoader::LoaderType::kNoopForInitialWebUI;
   }
 
@@ -6672,7 +6672,7 @@ void NavigationRequest::OnWillProcessResponseChecksComplete(
   // When this request is for prerender activation, `commit_deferrer_` has
   // already been processed. If it's an initial WebUI navigation, commit
   // deferring conditions are skipped.
-  if (IsPrerenderedPageActivation() || IsInitialWebUISyncNavigation()) {
+  if (IsPrerenderedPageActivation() || IsInitialWebUINavigation()) {
     CHECK(!commit_deferrer_);
     CommitNavigation();
     // DO NOT ADD CODE after this. The previous call to CommitNavigation
@@ -13012,12 +13012,6 @@ void NavigationRequest::MaybeResumeAsyncBeforeUnloadCommit(
 
 bool NavigationRequest::IsWaitingForAsyncBeforeUnload() const {
   return !async_before_unload_pending_replies_.empty();
-}
-
-bool NavigationRequest::IsInitialWebUISyncNavigation() {
-  return IsInitialWebUINavigation() &&
-         base::FeatureList::IsEnabled(
-             features::kInitialWebUISyncNavStartToCommit);
 }
 
 bool NavigationRequest::IsInitialWebUINavigation() {

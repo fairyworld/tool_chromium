@@ -195,7 +195,6 @@ class ProfileKeyedServiceBrowserTest : public InProcessBrowserTest {
 #if !BUILDFLAG(IS_ANDROID)
           features::kInitialWebUI,
           features::kWebUIReloadButton,
-          features::kInitialWebUISyncNavStartToCommit,
 #endif  // !BUILDFLAG(IS_ANDROID)
           features::kTrustSafetySentimentSurvey,
 #if BUILDFLAG(IS_WIN)

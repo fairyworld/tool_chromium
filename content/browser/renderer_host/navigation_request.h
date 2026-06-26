@@ -526,7 +526,6 @@ class CONTENT_EXPORT NavigationRequest
   // NOTE: Read function comments in NavigationHandle before use!
   std::optional<url::Origin> GetOriginToCommit() override;
   bool NeedsUrlLoader() override;
-  bool IsInitialWebUISyncNavigation() override;
   bool IsInitialWebUINavigation() override;
   bool IsPageActivation() const override;
   bool IsNavigatingFromInitialEmptyDocument() const override;

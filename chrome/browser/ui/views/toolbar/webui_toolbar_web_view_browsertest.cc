@@ -105,6 +105,7 @@
 #include "components/viz/common/frame_sinks/copy_output_result.h"
 #include "components/zoom/zoom_controller.h"
 #include "content/public/browser/ax_inspect_factory.h"
+#include "content/public/browser/global_routing_id.h"
 #include "content/public/browser/javascript_dialog_manager.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/navigation_handle.h"
@@ -218,7 +219,6 @@ bool WaitForButtonVisible(content::WebContents* web_contents,
         .ExtractBool();
   });
 }
-
 
 void PinButton(Browser* browser, views::WebView* web_view, const char* pref) {
   browser->profile()->GetPrefs()->SetBoolean(pref, true);
@@ -461,7 +461,6 @@ WebUIToolbarWebView* SetUpAndPinHomeButton(Browser* browser) {
   return webui_toolbar_view;
 }
 
-
 }  // namespace
 
 class WebUIToolbarWebViewPixelBrowserTest : public InProcessBrowserTest {
@@ -475,7 +474,6 @@ class WebUIToolbarWebViewPixelBrowserTest : public InProcessBrowserTest {
          features::kWebUILocationBar, features::kWebUIExtensionsContainer,
          features::kSkipIPCChannelPausingForNonGuests,
          features::kWebUIInProcessResourceLoadingV2,
-         features::kInitialWebUISyncNavStartToCommit,
 #if BUILDFLAG(IS_CHROMEOS)
          ash::features::kBatterySaver,
 #endif
@@ -1414,8 +1412,7 @@ class WebUIToolbarWebViewStabilityTest : public InProcessBrowserTest {
                base::NumberToString(kRecoveryRetryInterval.InSeconds()) + "s"},
           }},
          {features::kSkipIPCChannelPausingForNonGuests, {}},
-         {features::kWebUIInProcessResourceLoadingV2, {}},
-         {features::kInitialWebUISyncNavStartToCommit, {}}},
+         {features::kWebUIInProcessResourceLoadingV2, {}}},
         {});
   }
 
@@ -1534,6 +1531,35 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewStabilityTest,
   ASSERT_TRUE(observer.last_navigation_succeeded());
 }
 
+class SyncNavigationObserver : public content::WebContentsObserver {
+ public:
+  SyncNavigationObserver(content::WebContents* web_contents, const GURL& url)
+      : content::WebContentsObserver(web_contents), url_(url) {}
+
+  void ReadyToCommitNavigation(
+      content::NavigationHandle* navigation_handle) override {
+    if (navigation_handle->GetURL() == url_) {
+      waiter_helper_.OnEvent();
+      rfh_ = navigation_handle->GetRenderFrameHost();
+    }
+  }
+
+  content::RenderFrameHost* WaitForReadyToCommit() {
+    if (waiter_helper_.Wait()) {
+      content::RenderFrameHost* rfh = rfh_;
+      rfh_ = nullptr;
+      return rfh;
+    } else {
+      return nullptr;
+    }
+  }
+
+ private:
+  GURL url_;
+  content::WaiterHelper waiter_helper_;
+  raw_ptr<content::RenderFrameHost> rfh_;
+};
+
 class WebUIToolbarWebViewRaceTest : public InProcessBrowserTest {
  public:
   WebUIToolbarWebViewRaceTest() {
@@ -1541,14 +1567,16 @@ class WebUIToolbarWebViewRaceTest : public InProcessBrowserTest {
         {features::kInitialWebUI, features::kWebUIReloadButton,
          features::kWebUIInProcessResourceLoadingV2,
          features::kSkipIPCChannelPausingForNonGuests},
-        {features::kInitialWebUISyncNavStartToCommit});
+        {});
   }
 
  private:
   base::test::ScopedFeatureList feature_list_;
 };
 
-// Regression test for crbug.com/478033216.
+// Regression test for crbug.com/478033216. Tests that an attempt to bind to
+// `TrackedElementHandler` while the window is being closed does not cause a
+// crash.
 IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewRaceTest,
                        BindInterfaceAfterCloseRace) {
   // 1. Setup: Create a new browser window.
@@ -1561,50 +1589,43 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewRaceTest,
       toolbar_view->GetWebViewForTesting()->GetWebContents();
   ASSERT_TRUE(webui_contents);
 
-  // 2. Prepare Navigation Manager to hang the navigation.
   GURL toolbar_url(chrome::kChromeUIWebUIToolbarURL);
 
-  // Trigger a reload to start a new navigation that we can control.
-  content::TestNavigationManager nav_manager(webui_contents, toolbar_url);
+  // Use our custom observer which captures the RFH of the pending navigation.
+  SyncNavigationObserver observer(webui_contents, toolbar_url);
+
+  // This will leave us post-commit and waiting for the renderer to ack.
   webui_contents->GetController().Reload(content::ReloadType::NORMAL,
                                          /*check_for_repost=*/false);
-  EXPECT_TRUE(nav_manager.WaitForResponse());
 
-  // 3. Resume navigation (this queues the commit task on the UI thread).
-  nav_manager.ResumeNavigation();
+  // Because this is a synchronous navigation, it will already have reached
+  // ReadyToCommit which gives us access to the pending RFH. There is no real
+  // wait here and the `RunLoop` never runs again, ensuring that the real bind
+  // coming from the renderer does not arrive before our bind below.
+  content::RenderFrameHostWrapper rfh(observer.WaitForReadyToCommit());
+  ASSERT_TRUE(rfh);
 
-  // 4. Initiate browser closure.
-  // This synchronously calls Browser::OnWindowClosing() which nulls the
-  // BrowserWindowInterface reference and posts SynchronouslyDestroyBrowser.
+  // Initiate browser closure. This synchronously calls
+  // Browser::OnWindowClosing() which nulls the BrowserWindowInterface reference
+  // and posts SynchronouslyDestroyBrowser.
+  ui_test_utils::BrowserDestroyedObserver destroyed_observer(new_browser);
   new_browser->GetWindow()->Close();
 
-  // 5. Queue BindInterface manually.
-  // This mimics the Mojo request from the renderer arriving after the BWI is
-  // nulled but BEFORE the browser is destroyed.
-  base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
-      FROM_HERE,
-      base::BindOnce(
-          [](base::WeakPtr<content::WebContents> weak_wc) {
-            if (!weak_wc) {
-              return;
-            }
-            auto* rfh = weak_wc->GetPrimaryMainFrame();
-            if (rfh) {
-              mojo::PendingRemote<tracked_element::mojom::TrackedElementHandler>
-                  remote;
-              auto handler =
-                  ui::TrackedElementHandlerDocumentSingleton::GetOrCreate(rfh);
-              if (handler) {
-                handler->BindInterface(remote.InitWithNewPipeAndPassReceiver());
-              }
-            }
-          },
-          webui_contents->GetWeakPtr()));
+  // Ensure that the reference has become null already.
+  ASSERT_FALSE(webui::GetBrowserWindowInterface(webui_contents));
 
-  // 6. Return to the message loop.
-  // This will process: [Commit Task] -> [BindInterface Task] -> [Destruction
-  // Task]. Without the fix, both Commit and BindInterface tasks would crash.
-  std::ignore = nav_manager.WaitForNavigationFinished();
+  // Bind the interface manually. This will happen before the renderer has a
+  // chance to do so. This mimics the Mojo request from the renderer arriving
+  // after the BWI is nulled but BEFORE the browser is destroyed.
+  mojo::PendingRemote<tracked_element::mojom::TrackedElementHandler> remote;
+  auto handler =
+      ui::TrackedElementHandlerDocumentSingleton::GetOrCreate(rfh.get());
+  ASSERT_TRUE(handler);
+  handler->BindInterface(remote.InitWithNewPipeAndPassReceiver());
+
+  // 4. Wait for the browser to close. This will run the message loop,
+  // processing the destruction task.
+  destroyed_observer.Wait();
 }
 
 class WebUIToolbarLifecycleBrowserTest : public InProcessBrowserTest {
@@ -2192,8 +2213,7 @@ class WebUIToolbarWebViewBrowserTest : public InProcessBrowserTest {
              features::kWebUISplitTabsButton, features::kWebUIHomeButton,
              features::kWebUIExtensionsContainer,
              features::kSkipIPCChannelPausingForNonGuests,
-             features::kWebUIInProcessResourceLoadingV2,
-             features::kInitialWebUISyncNavStartToCommit},
+             features::kWebUIInProcessResourceLoadingV2},
             {}) {}
 
   void SetUpOnMainThread() override {
@@ -2254,7 +2274,6 @@ class WebUIAppMenuBrowserTest : public WebUIToolbarWebViewBrowserTest {
              features::kWebUIExtensionsContainer,
              features::kSkipIPCChannelPausingForNonGuests,
              features::kWebUIInProcessResourceLoadingV2,
-             features::kInitialWebUISyncNavStartToCommit,
              features::kWebUIAppMenuButton},
             {}) {}
 };
@@ -2826,8 +2845,7 @@ class WebUIToolbarWebViewSplitTabsBrowserTest : public InProcessBrowserTest {
     feature_list_.InitWithFeatures(
         {features::kInitialWebUI, features::kWebUISplitTabsButton,
          features::kSkipIPCChannelPausingForNonGuests,
-         features::kWebUIInProcessResourceLoadingV2,
-         features::kInitialWebUISyncNavStartToCommit, features::kRoundedIcons},
+         features::kWebUIInProcessResourceLoadingV2, features::kRoundedIcons},
         {});
   }
 
@@ -3555,8 +3573,7 @@ class WebUIToolbarWebViewHomeButtonBrowserTest : public InProcessBrowserTest {
     feature_list_.InitWithFeatures(
         {features::kInitialWebUI, features::kWebUIHomeButton,
          features::kSkipIPCChannelPausingForNonGuests,
-         features::kWebUIInProcessResourceLoadingV2,
-         features::kInitialWebUISyncNavStartToCommit},
+         features::kWebUIInProcessResourceLoadingV2},
         {});
   }
 
@@ -4048,7 +4065,6 @@ class WebUIPinnedToolbarActionsBrowserTest
             {features::kInitialWebUI, features::kWebUIPinnedToolbarActions,
              features::kSkipIPCChannelPausingForNonGuests,
              features::kWebUIInProcessResourceLoadingV2,
-             features::kInitialWebUISyncNavStartToCommit,
              // `WebUIPinnedToolbarActionsBrowserTest.LensOverlayResultsIcon`
              // depends on `kRoundedIcons`.
              features::kRoundedIcons,
@@ -5069,8 +5085,7 @@ class WebUIToolbarButtonPressAndDragTest
              features::kWebUISplitTabsButton, features::kWebUIHomeButton,
              features::kWebUIBackForwardButton,
              features::kSkipIPCChannelPausingForNonGuests,
-             features::kWebUIInProcessResourceLoadingV2,
-             features::kInitialWebUISyncNavStartToCommit},
+             features::kWebUIInProcessResourceLoadingV2},
             {}) {}
 };
 
@@ -5226,8 +5241,7 @@ class WebUIToolbarAlreadyExistsForTheSameProfileOnInitTest
             {features::kWebUIReloadButton, features::kWebUISplitTabsButton,
              features::kWebUIHomeButton, features::kWebUIExtensionsContainer,
              features::kSkipIPCChannelPausingForNonGuests,
-             features::kWebUIInProcessResourceLoadingV2,
-             features::kInitialWebUISyncNavStartToCommit},
+             features::kWebUIInProcessResourceLoadingV2},
             {}) {
     scoped_feature_list_.InitAndEnableFeatureWithParameters(
         features::kInitialWebUI,
@@ -5302,8 +5316,7 @@ class WebUIToolbarWebViewContentSettingsBrowserTest
             {features::kInitialWebUI, features::kWebUIReloadButton,
              features::kWebUILocationBar,
              features::kSkipIPCChannelPausingForNonGuests,
-             features::kWebUIInProcessResourceLoadingV2,
-             features::kInitialWebUISyncNavStartToCommit},
+             features::kWebUIInProcessResourceLoadingV2},
             {}) {}
 
   void SetUpOnMainThread() override {
@@ -5456,7 +5469,6 @@ class WebUIToolbarSurfaceSyncBrowserTest
              features::kWebUISplitTabsButton, features::kWebUIHomeButton,
              features::kSkipIPCChannelPausingForNonGuests,
              features::kWebUIInProcessResourceLoadingV2,
-             features::kInitialWebUISyncNavStartToCommit,
              blink::features::kInitialWebUISurfaceSync},
             {}) {}
 };

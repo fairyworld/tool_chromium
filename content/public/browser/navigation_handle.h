@@ -934,11 +934,6 @@ class CONTENT_EXPORT NavigationHandle : public base::SupportsUserData {
   // Note: This is exposed in NavigationHandle because it needs to be present on
   // both NavigationRequest and MockNavigationHandle. It's not actually needed
   // outside of //content.
-  virtual bool IsInitialWebUISyncNavigation() = 0;
-
-  // Different from `IsInitialWebUISyncNavigation()`, this also returns true if
-  // the navigation doesn't go from start -> commit synchronously (i.e. when the
-  // kInitialWebUISyncNavStartToCommit flag is disabled).
   virtual bool IsInitialWebUINavigation() = 0;
 };
 

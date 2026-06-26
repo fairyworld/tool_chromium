@@ -26637,7 +26637,6 @@
                         "BypassOutdatedSurfaceActivation",
                         "InitialWebUI",
                         "InitialWebUISurfaceSync",
-                        "InitialWebUISyncNavStartToCommit",
                         "InitialWebUIWithoutExtensions",
                         "SendGPUChannelEarly",
                         "SkipIPCChannelPausingForNonGuests",
