@@ -1,0 +1,13 @@
+# The files in this directory are a verbatim copy of //mojo and still
+# include //mojo (and, until the ipcz code paths are stripped,
+# //third_party/ipcz) headers. The next CLs in the series mechanically
+# rewrite all include paths to point inside this directory and remove the
+# ipcz code paths, replacing the "+mojo" / "+third_party/ipcz" rules with
+# "-mojo": this directory must not depend on //mojo (see README.md).
+include_rules = [
+  "+mojo",
+  "+third_party/ipcz/include",
+
+  # Mirrors //mojo/public/DEPS: simple_watcher.cc emits a typed tracing event.
+  "+third_party/perfetto/protos/perfetto/trace/track_event",
+]
