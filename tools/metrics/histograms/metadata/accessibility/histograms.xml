@@ -803,6 +803,21 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Accessibility.AXEmptyGroupSubrolePredicate.Latency"
+    units="microseconds" expires_after="2027-06-01">
+  <owner>dtseng@chromium.org</owner>
+  <owner>chrome-a11y-core@google.com</owner>
+  <summary>
+    Time spent evaluating the AXEmptyGroup mac subrole predicate (-subrole on
+    NSAccessibilityGroupRole) per top-level call on macOS. Escalate to eager
+    build-time compute if p99 exceeds 100 microseconds on representative pages
+    during normal VoiceOver linear navigation.
+
+    This histogram is recorded via base::UmaHistogramMicrosecondsTimes, so it is
+    only reported for clients with high-resolution clocks.
+  </summary>
+</histogram>
+
 <histogram
     name="Accessibility.AXTreeFixing.ScreenAI.Disconnect.{DisconnectCount}"
     enum="BooleanOccurred" expires_after="2027-06-01">

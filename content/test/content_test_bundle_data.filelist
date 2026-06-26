@@ -6342,6 +6342,8 @@ data/accessibility/mac/attributes/ax-selected-rows.html
 data/accessibility/mac/attributes/ax-selected.html
 data/accessibility/mac/attributes/ax-size-expected.txt
 data/accessibility/mac/attributes/ax-size.html
+data/accessibility/mac/attributes/ax-subrole-expected.txt
+data/accessibility/mac/attributes/ax-subrole.html
 data/accessibility/mac/attributes/ax-title-expected.txt
 data/accessibility/mac/attributes/ax-title-ui-element-expected.txt
 data/accessibility/mac/attributes/ax-title-ui-element.html
