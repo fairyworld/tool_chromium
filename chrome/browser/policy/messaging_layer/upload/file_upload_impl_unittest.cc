@@ -1144,4 +1144,44 @@ TEST_F(FileUploadDelegateTest, DeleteFileRejectsUnsafePaths) {
   // allowed directory!
   EXPECT_TRUE(base::PathExists(unsafe_file));
 }
+
+TEST_F(FileUploadDelegateTest, RejectNonGoogleResumableUploadUrlOnNextStep) {
+  // Prepare the delegate.
+  std::unique_ptr<FileUploadJob::Delegate> delegate =
+      PrepareFileUploadDelegate();
+
+  test::TestEvent<
+      StatusOr<std::pair<int64_t /*uploaded*/, std::string /*session_token*/>>>
+      step_done;
+  delegate->DoNextStep(kTestDataSize, kMaxUploadBufferSize,
+                       /*session_token=*/
+                       base::StrCat({origin_path(), "\n",
+                                     "http://malicious-attacker.com/upload"}),
+                       ScopedReservation(0uL, memory_resource_),
+                       step_done.cb());
+  const auto& result = step_done.result();
+  ASSERT_FALSE(result.has_value());
+  EXPECT_THAT(result.error(),
+              AllOf(Property(&Status::error_code, Eq(error::DATA_LOSS)),
+                    Property(&Status::error_message,
+                             StartsWith("Corrupt resumable upload URL="))));
+}
+
+TEST_F(FileUploadDelegateTest, RejectNonGoogleResumableUploadUrlOnFinalize) {
+  // Prepare the delegate.
+  std::unique_ptr<FileUploadJob::Delegate> delegate =
+      PrepareFileUploadDelegate();
+
+  test::TestEvent<StatusOr<std::string /*access_parameters*/>> finish_done;
+  delegate->DoFinalize(
+      /*session_token=*/base::StrCat(
+          {origin_path(), "\n", "http://malicious-attacker.com/upload"}),
+      finish_done.cb());
+  const auto& result = finish_done.result();
+  ASSERT_FALSE(result.has_value());
+  EXPECT_THAT(result.error(),
+              AllOf(Property(&Status::error_code, Eq(error::DATA_LOSS)),
+                    Property(&Status::error_message,
+                             StartsWith("Corrupt resumable upload URL="))));
+}
 }  // namespace reporting
