@@ -8409,6 +8409,12 @@ inline constexpr char kEnableChromeRefreshTokenBindingUpgradeDescription[] =
     "and session cookies to cryptographic keys. Requires Chrome Refresh Token "
     "Binding to be enabled.";
 
+inline constexpr char kEnableCookieBindingCookieUpgradeName[] =
+    "Cookie Binding Cookie Upgrade";
+inline constexpr char kEnableCookieBindingCookieUpgradeDescription[] =
+    "Enables upgrading unbound session cookies to be hardware-bound on "
+    "supported device platforms.";
+
 inline constexpr char kEnableOAuthMultiloginCookiesBindingName[] =
     "Enable OAuthMultilogin Cookies Binding";
 inline constexpr char kEnableOAuthMultiloginCookiesBindingDescription[] =

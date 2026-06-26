@@ -10869,6 +10869,12 @@ const FeatureEntry kFeatureEntries[] = {
          switches::kEnableChromeRefreshTokenBindingUpgrade,
          kRefreshTokenBindingUpgradeVariations,
          "RefreshTokenBindingUpgrade")},
+
+    {"enable-cookie-binding-cookie-upgrade",
+     flag_descriptions::kEnableCookieBindingCookieUpgradeName,
+     flag_descriptions::kEnableCookieBindingCookieUpgradeDescription,
+     kOsMac | kOsWin | kOsLinux,
+     FEATURE_VALUE_TYPE(switches::kEnableCookieBindingCookieUpgrade)},
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 #if !BUILDFLAG(IS_ANDROID)

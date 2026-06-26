@@ -16968,6 +16968,7 @@ from previous Chrome versions.
   <int value="798456441" label="ConchGenAi:disabled"/>
   <int value="798696013" label="ImeInputLogicMozc:enabled"/>
   <int value="798803191" label="ShareToGoogleCollections:disabled"/>
+  <int value="799108893" label="EnableCookieBindingCookieUpgrade:disabled"/>
   <int value="799680074" label="ContextualSearchTranslationModel:enabled"/>
   <int value="800633951" label="AIPromptAPIForWebPlatform:enabled"/>
   <int value="801838630"
@@ -19004,6 +19005,7 @@ from previous Chrome versions.
   <int value="1455970119" label="MacCoreLocationBackend:disabled"/>
   <int value="1456045101" label="FullscreenAnimateTabs:enabled"/>
   <int value="1456108837" label="RealboxSecondaryZeroSuggest:disabled"/>
+  <int value="1456376475" label="EnableCookieBindingCookieUpgrade:enabled"/>
   <int value="1456483593" label="UseStructuredDnsErrors:enabled"/>
   <int value="1457383851" label="NtpHistoryClustersModule:disabled"/>
   <int value="1457465866" label="TouchToFillPasswordSubmission:disabled"/>

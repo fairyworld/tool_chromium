@@ -3242,6 +3242,11 @@
     "expiry_milestone": 140
   },
   {
+    "name": "enable-cookie-binding-cookie-upgrade",
+    "owners": [ "ahijazi@chromium.org", "chrome-signin-team@google.com" ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "enable-cros-autocorrect-by-default",
     "owners": [ "curtismcmullan@chromium.org", "essential-inputs-team@google.com" ],
     "expiry_milestone": 130
