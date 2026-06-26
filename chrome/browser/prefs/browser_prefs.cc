@@ -1800,6 +1800,8 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   registry->RegisterBooleanPref(prefs::kRestrictYouTubeCookiesDeletion, false);
   RegisterGeminiSettingsPrefs(registry);
   registry->RegisterIntegerPref(prefs::kVoiceTypingSettings, 0);
+  registry->RegisterBooleanPref(prefs::kPrefDictationOnboardingCompleted,
+                                false);
   RegisterPrefersDefaultScrollbarStylesPrefs(registry);
   RegisterSafetyHubProfilePrefs(registry);
 #if BUILDFLAG(IS_CHROMEOS)

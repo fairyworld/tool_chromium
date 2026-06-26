@@ -8,7 +8,9 @@
 #include "chrome/browser/dictation/target.h"
 #include "chrome/browser/dictation/test_util.h"
 #include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
+#include "chrome/common/pref_names.h"
 #include "chrome/test/base/testing_profile.h"
+#include "components/prefs/pref_service.h"
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -18,7 +20,10 @@ class DictationKeyedServiceTest : public testing::Test {
  public:
   DictationKeyedServiceTest()
       : scoped_feature_list_(CreateEnablingFeatureList()),
-        service_(std::make_unique<DictationKeyedService>(&profile_)) {}
+        service_(std::make_unique<DictationKeyedService>(&profile_)) {
+    profile_.GetPrefs()->SetBoolean(prefs::kPrefDictationOnboardingCompleted,
+                                    true);
+  }
   ~DictationKeyedServiceTest() override = default;
 
  protected:

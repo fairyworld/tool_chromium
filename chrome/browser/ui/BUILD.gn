@@ -3926,6 +3926,8 @@ static_library("ui") {
       "views/device_chooser_content_view.h",
       "views/dictation/dictation_bubble_ui.cc",
       "views/dictation/dictation_bubble_ui.h",
+      "views/dictation/onboarding_dialog_controller.cc",
+      "views/dictation/onboarding_dialog_controller.h",
       "views/dotted_icon.cc",
       "views/dotted_icon.h",
       "views/elevation_icon_setter.cc",

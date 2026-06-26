@@ -662,6 +662,10 @@ inline constexpr char kGeminiSettings[] = "browser.gemini_settings";
 // enterprise policy.
 inline constexpr char kVoiceTypingSettings[] = "browser.voice_typing_settings";
 
+// Boolean indicating completion of the Dictation onboarding.
+inline constexpr char kPrefDictationOnboardingCompleted[] =
+    "browser.dictation_onboarding_completed";
+
 // Comma separated list of domain names (e.g. "google.com,school.edu").
 // When this pref is set, the user will be able to access Google Apps
 // only using an account that belongs to one of the domains from this pref.

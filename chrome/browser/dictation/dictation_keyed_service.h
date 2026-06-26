@@ -12,6 +12,7 @@
 #include "base/memory/weak_ptr.h"
 #include "chrome/browser/dictation/connector_component_extension.h"
 #include "chrome/browser/dictation/dictation_multiplexer.h"
+#include "chrome/browser/dictation/onboarding_manager.h"
 #include "chrome/browser/dictation/session_controller.h"
 #include "chrome/browser/dictation/session_controller_delegate.h"
 #include "components/keyed_service/core/keyed_service.h"
@@ -96,6 +97,8 @@ class DictationKeyedService : public KeyedService,
   ConnectorComponentExtension connector_extension_;
 
   DictationMultiplexer multiplexer_;
+
+  OnboardingManager onboarding_manager_;
 
   struct SessionState {
     SessionState(SessionControllerDelegate& delegate,

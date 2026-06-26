@@ -11,6 +11,7 @@
 #include "chrome/browser/dictation/dictation_keyed_service_factory.h"
 #include "chrome/browser/dictation/features.h"
 #include "chrome/browser/dictation/listener_stream_provider.h"
+#include "chrome/browser/dictation/onboarding_manager.h"
 #include "chrome/browser/dictation/session_controller.h"
 #include "chrome/browser/dictation/session_ui_impl.h"
 #include "chrome/browser/dictation/target.h"
@@ -39,7 +40,9 @@ DictationKeyedService::SessionState::SessionState(
 DictationKeyedService::SessionState::~SessionState() = default;
 
 DictationKeyedService::DictationKeyedService(Profile* profile)
-    : profile_(profile), connector_extension_(profile) {
+    : profile_(profile),
+      connector_extension_(profile),
+      onboarding_manager_(*this, *profile->GetPrefs()) {
   CHECK(base::FeatureList::IsEnabled(kDictation));
   pref_change_registrar_.Init(profile_->GetPrefs());
   pref_change_registrar_.Add(
@@ -73,6 +76,13 @@ void DictationKeyedService::StartSession(BrowserWindowInterface& window,
                                          std::unique_ptr<Target> target) {
   CHECK(IsEnabled());
   CHECK(!session_);
+
+  // ShowOnboardingIfNeeded conditionally moves the target unique_ptr if it
+  // returns true.
+  if (onboarding_manager_.ShowOnboardingIfNeeded(window, target)) {
+    // If onboarding is shown, it will call StartSession again if needed.
+    return;
+  }
 
   session_.emplace(*this, window.GetWeakPtr());
 

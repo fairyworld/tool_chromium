@@ -18,7 +18,6 @@
 #include "content/public/test/browser_test_utils.h"
 #include "extensions/browser/browsertest_util.h"
 #include "extensions/browser/extension_registry_test_helper.h"
-#include "testing/gtest/include/gtest/gtest.h"
 
 namespace dictation {
 

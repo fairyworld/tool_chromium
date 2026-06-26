@@ -13,9 +13,11 @@
 #include "chrome/browser/policy/policy_test_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/renderer_context_menu/render_view_context_menu_test_util.h"
+#include "chrome/common/pref_names.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "components/policy/core/common/policy_map.h"
 #include "components/policy/policy_constants.h"
+#include "components/prefs/pref_service.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 
@@ -40,6 +42,12 @@ class DictationKeyedServicePolicyTest : public policy::PolicyTest {
   ~DictationKeyedServicePolicyTest() override = default;
 
   Profile* profile() { return chrome_test_utils::GetProfile(this); }
+
+  void SetUpOnMainThread() override {
+    policy::PolicyTest::SetUpOnMainThread();
+    profile()->GetPrefs()->SetBoolean(prefs::kPrefDictationOnboardingCompleted,
+                                      true);
+  }
 
   void SetPolicyCombination(std::optional<int> voice_typing_policy,
                             std::optional<int> gen_ai_policy) {

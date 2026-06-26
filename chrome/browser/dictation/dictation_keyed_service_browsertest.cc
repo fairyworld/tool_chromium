@@ -9,6 +9,7 @@
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
 #include "chrome/app/chrome_command_ids.h"
+#include "chrome/browser/dictation/dictation_browser_test_base.h"
 #include "chrome/browser/dictation/dictation_keyed_service_factory.h"
 #include "chrome/browser/dictation/features.h"
 #include "chrome/browser/dictation/listener_stream_provider.h"
@@ -18,6 +19,7 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/renderer_context_menu/render_view_context_menu_test_util.h"
 #include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/views/dictation/onboarding_dialog_controller.h"
 #include "chrome/common/extensions/api/dictation_private.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/base/platform_browser_test.h"
@@ -27,6 +29,9 @@
 #include "content/public/test/browser_test_utils.h"
 #include "extensions/common/switches.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
+#include "ui/views/widget/widget.h"
+#include "ui/views/widget/widget_delegate.h"
+#include "ui/views/window/dialog_delegate.h"
 
 namespace dictation {
 
@@ -56,30 +61,10 @@ class FocusLossObserver : public content::WebContentsObserver {
   bool lost_focus_called_ = false;
 };
 
-class DictationKeyedServiceBrowserTest : public PlatformBrowserTest {
+class DictationKeyedServiceBrowserTest : public DictationBrowserTestBase {
  public:
-  DictationKeyedServiceBrowserTest()
-      : scoped_feature_list_(CreateEnablingFeatureList()) {}
+  DictationKeyedServiceBrowserTest() = default;
   ~DictationKeyedServiceBrowserTest() override = default;
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    PlatformBrowserTest::SetUpCommandLine(command_line);
-    command_line->AppendSwitchASCII(
-        extensions::switches::kAllowlistedExtensionID,
-        kDictationTestExtensionId);
-  }
-
-  Profile* profile() { return chrome_test_utils::GetProfile(this); }
-
-  content::WebContents* web_contents() {
-    return chrome_test_utils::GetActiveWebContents(this);
-  }
-
-  DictationKeyedService& dictation_service() {
-    auto* service = DictationKeyedService::Get(profile());
-    CHECK(service);
-    return *service;
-  }
 
   void SimulateSpeechRecognition(ListenerStreamProvider* provider,
                                  ExtensionTranscriptionType type,
@@ -87,9 +72,6 @@ class DictationKeyedServiceBrowserTest : public PlatformBrowserTest {
     ExtensionSendTranscriptUpdate(profile(), provider->stream_id_for_testing(),
                                   type, text);
   }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
 };
 
 IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
@@ -182,7 +164,6 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
                        StartSessionAndReceiveTranscription) {
-  LoadTestExtensionInManualMode(profile());
 
   dictation_service().StartSession(
       *GetBrowserWindowInterface(),
@@ -222,7 +203,6 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
                        EndActiveStreamEntersFinalizingState) {
-  LoadTestExtensionInManualMode(profile());
 
   dictation_service().StartSession(
       *GetBrowserWindowInterface(),
@@ -266,7 +246,6 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
                        StartNewStreamWhileFinalizing) {
-  LoadTestExtensionInManualMode(profile());
 
   dictation_service().StartSession(
       *GetBrowserWindowInterface(),
@@ -316,7 +295,6 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
                        ProviderDestroyedAfterComplete) {
-  LoadTestExtensionInManualMode(profile());
 
   dictation_service().StartSession(
       *GetBrowserWindowInterface(),
@@ -347,7 +325,6 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
                        ProviderDestroyedAfterFailed) {
-  LoadTestExtensionInManualMode(profile());
 
   dictation_service().StartSession(
       *GetBrowserWindowInterface(),
