@@ -41,6 +41,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       selection: {start: 0, end: 0},
       userInputInProgress: false,
       fullUrl: '',
+      isFocused: false,
     });
     await microtasksFinished();
 
@@ -69,6 +70,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       selection: {start: 0, end: 0},
       userInputInProgress: true,
       fullUrl: '',
+      isFocused: true,
     });
     await microtasksFinished();
 
@@ -118,6 +120,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       selection: {start: 1, end: 4},
       userInputInProgress: false,
       fullUrl: '',
+      isFocused: false,
     });
     await microtasksFinished();
 
@@ -133,6 +136,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       selection: {start: 0, end: 0},
       userInputInProgress: true,
       fullUrl: '',
+      isFocused: true,
     });
     await microtasksFinished();
 
@@ -147,6 +151,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       selection: {start: 0, end: 0},
       userInputInProgress: false,
       fullUrl: '',
+      isFocused: true,
     });
     await microtasksFinished();
 
@@ -163,6 +168,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       selection: {start: 12, end: 12},
       userInputInProgress: true,
       fullUrl: '',
+      isFocused: true,
     });
     await microtasksFinished();
 
@@ -196,6 +202,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       selection: {start: 0, end: 0},
       userInputInProgress: true,
       fullUrl: '',
+      isFocused: true,
     });
     await microtasksFinished();
     handler.reset();
@@ -238,11 +245,129 @@ suite('OmniboxPopupSearchboxTest', function() {
       selection: {start: 0, end: 4},
       userInputInProgress: true,
       fullUrl: full_url,
+      isFocused: true,
     });
     await microtasksFinished();
     handler.reset();
 
     // Verify the full URL is displayed.
     assertEquals(full_url, input.value);
+  });
+
+  test('HandlesSetInputStateFocus', async () => {
+    // Set isFocused = true.
+    callbackRouter.setInputState({
+      sequenceNumber: 1,
+      text: 'test text',
+      selection: {start: 0, end: 0},
+      userInputInProgress: false,
+      fullUrl: '',
+      isFocused: true,
+    });
+    await microtasksFinished();
+
+    // Verify input element is focused.
+    assertEquals(searchbox.$.input, searchbox.shadowRoot.activeElement);
+
+    // Set isFocused = false.
+    callbackRouter.setInputState({
+      sequenceNumber: 2,
+      text: 'test text',
+      selection: {start: 0, end: 0},
+      userInputInProgress: false,
+      fullUrl: '',
+      isFocused: false,
+    });
+    await microtasksFinished();
+
+    // Verify input element is blurred.
+    assertFalse(searchbox.$.input === searchbox.shadowRoot.activeElement);
+  });
+
+  test('HandlesManualBlur', async () => {
+    // Test default sequence number (0) when no state is set.
+    const input = searchbox.$.input.inputElement;
+    input.focus();
+    await microtasksFinished();
+
+    assertEquals(searchbox.$.input, searchbox.shadowRoot.activeElement);
+    input.blur();
+    await microtasksFinished();
+
+    assertEquals(1, handler.getCallCount('onManualBlur'));
+    assertEquals(0, handler.getArgs('onManualBlur')[0]);
+    assertFalse(searchbox.$.input === searchbox.shadowRoot.activeElement);
+
+    // Test active sequence number (42) after receiving state.
+    handler.reset();
+    callbackRouter.setInputState({
+      sequenceNumber: 42,
+      text: 'hello',
+      selection: {start: 5, end: 5},
+      userInputInProgress: true,
+      fullUrl: '',
+      isFocused: true,
+    });
+    await microtasksFinished();
+
+    input.blur();
+    await microtasksFinished();
+
+    assertEquals(1, handler.getCallCount('onManualBlur'));
+    assertEquals(42, handler.getArgs('onManualBlur')[0]);
+  });
+
+  test('HandlesRevert', async () => {
+    // Test revert is called with default sequence number (0).
+    searchbox.clearAutocompleteMatches();
+    await microtasksFinished();
+
+    assertEquals(1, handler.getCallCount('revert'));
+    assertEquals(0, handler.getArgs('revert')[0]);
+
+    // Test revert is called with active sequence number (42) after receiving
+    // state.
+    handler.reset();
+    callbackRouter.setInputState({
+      sequenceNumber: 42,
+      text: 'hello',
+      selection: {start: 5, end: 5},
+      userInputInProgress: true,
+      fullUrl: '',
+      isFocused: true,
+    });
+    await microtasksFinished();
+
+    searchbox.clearAutocompleteMatches();
+    await microtasksFinished();
+
+    assertEquals(1, handler.getCallCount('revert'));
+    assertEquals(42, handler.getArgs('revert')[0]);
+  });
+
+  test('IgnoresManualBlurWhenWindowInactive', async () => {
+    // Override `document.visibilityState` to 'hidden'.
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'hidden',
+      configurable: true,
+    });
+
+    const input = searchbox.$.input.inputElement;
+    input.focus();
+    await microtasksFinished();
+
+    assertEquals(searchbox.$.input, searchbox.shadowRoot.activeElement);
+    input.blur();
+    await microtasksFinished();
+
+    // Verify `onManualBlur` is NOT called because `document.visibilityState` is
+    // hidden.
+    assertEquals(0, handler.getCallCount('onManualBlur'));
+
+    // Restore `document.visibilityState` to 'visible'.
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
   });
 });

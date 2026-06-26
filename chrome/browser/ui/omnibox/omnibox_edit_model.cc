@@ -390,6 +390,14 @@ bool OmniboxEditModel::ResetDisplayTexts() {
   url_for_editing_ = controller_->client()->GetFormattedFullURL();
   display_text_ = controller_->client()->GetURLForDisplay();
 
+  // Under V2, if there is an active user draft (user_input_in_progress_), we
+  // treat the user as active/interacting to prevent background page loads or
+  // async tab updates from wiping out the restored draft.
+  const bool user_interacting =
+      has_focus() ||
+      (base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup) &&
+       user_input_in_progress_);
+
   // When there's new permanent text, and the user isn't interacting with the
   // omnibox, we want to revert the edit to show the new text.  We could simply
   // define "interacting" as "the omnibox has focus", but we still allow updates
@@ -401,7 +409,7 @@ bool OmniboxEditModel::ResetDisplayTexts() {
   // URL" (which sounds as if it might be persistent) from seeing just that URL
   // forever afterwards.
   return (GetPermanentDisplayText() != old_display_text) &&
-         (!has_focus() ||
+         (!user_interacting ||
           (!user_input_in_progress_ && !controller_->IsPopupOpen()));
 }
 

@@ -126,7 +126,6 @@ export class OmniboxPopupSearchboxElement extends
   private fullUrl_: string = '';
   private pendingFocusSelection_: {start: number, end: number}|null = null;
 
-
   constructor() {
     super();
     const searchboxBrowserProxy = SearchboxBrowserProxy.getInstance();
@@ -211,6 +210,12 @@ export class OmniboxPopupSearchboxElement extends
     return this.searchboxPageHandler_;
   }
 
+  override clearAutocompleteMatches() {
+    super.clearAutocompleteMatches();
+    // Revert the `OmniboxEditModel` to the permanent URL (with sequence guard).
+    this.popupPageHandler_.revert(this.currentSequenceNum_);
+  }
+
   isInputEmpty(): boolean {
     // If this is called before first render, the input element will not exist.
     if (!this.shadowRoot?.querySelector('#input') || !this.$.input ||
@@ -250,12 +255,6 @@ export class OmniboxPopupSearchboxElement extends
     super.onInputFocusChanged(e);
   }
 
-  override onInputWrapperFocusout(e: FocusEvent) {
-    // Clear selection when input loses focus.
-    this.getInputElement().blur();
-    super.onInputWrapperFocusout(e);
-  }
-
   private isChromeScheme_(): boolean {
     try {
       const url = new URL(this.fullUrl_);
@@ -291,16 +290,22 @@ export class OmniboxPopupSearchboxElement extends
     this.userInputInProgress_ = state.userInputInProgress;
     this.currentSequenceNum_ = state.sequenceNumber;
     this.fullUrl_ = state.fullUrl;
-    // Input gets focused on init which triggers blink UpdateSelectionOnFocus.
-    // Set pendingFocusSelection_ so that this update does not trigger
-    // onSelectionChanged(). See line 348 of
+    this.lastQueriedInput = state.text;
+
+    if (state.isFocused) {
+      this.$.input.focus();
+    } else {
+      this.$.input.blur();
+    }
+
+    // Input gets focused on init which triggers Blink's
+    // `UpdateSelectionOnFocus`. Set `pendingFocusSelection_` so that this
+    // update does not trigger `onSelectionChanged()`. See line 348 of
     // third_party/blink/renderer/core/html/forms/html_input_element.cc.
     this.pendingFocusSelection_ = state.selection;
     this.selectRange(state.selection);
-
     this.getDropdownElement().unselect();
     this.pageHandler().stopAutocomplete(/*clearResult=*/ false);
-    this.lastQueriedInput = state.text;
   }
 
   private selectRange(selection: {start: number, end: number}) {
@@ -337,6 +342,26 @@ export class OmniboxPopupSearchboxElement extends
       e: CustomEvent<{value: string, isComposing: boolean}>) {
     this.userInputInProgress_ = true;
     this.onSearchboxInputTextUpdated(e, /*forceAutocomplete=*/ false);
+  }
+
+  override onInputWrapperFocusout(e: FocusEvent) {
+    super.onInputWrapperFocusout(e);
+
+    const newlyFocusedEl = e.relatedTarget as Element;
+    // Check if the focus has completely left the searchbox wrapper, and not
+    // just moved to another internal child element (e.g., the clear button).
+    const isOutside = !this.getWrapperElement().contains(newlyFocusedEl);
+
+    // Only trigger a manual blur if the user clicked outside the searchbox
+    // within the active window. Avoid blurring if the entire browser window
+    // lost focus, which should preserve the Omnibox focus state.
+    if (isOutside && document.visibilityState === 'visible') {
+      // Pass `currentSequenceNum_` to the C++ handler to prevent stale
+      // blur events from previous tabs from incorrectly blurring
+      // a newly focused tab during rapid tab switching.
+      this.popupPageHandler_.onManualBlur(this.currentSequenceNum_);
+      this.$.input.blur();
+    }
   }
 
   protected onVoiceSearchClick_() {

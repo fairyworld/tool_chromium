@@ -87,6 +87,9 @@ class OmniboxPopupView {
   // Called when the omnibox gains focus.
   virtual void OnFocus() {}
 
+  // Called when the WebUI omnibox reports a manual blur.
+  virtual void OnManualBlur() {}
+
   // Returns true if the popup controls its own selection state.
   virtual bool IsSelectionPopupControlled() const = 0;
 

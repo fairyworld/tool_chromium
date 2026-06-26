@@ -22,6 +22,8 @@ struct OmniboxInputState {
   bool user_input_in_progress;
   // The full url to show on unelision.
   string full_url;
+  // Whether the Omnibox input should have active focus.
+  bool is_focused;
 };
 
 // Browser-side handler for the Omnibox Popup.
@@ -39,8 +41,15 @@ interface PageHandler {
   // Closes the Omnibox Popup.
   CloseUI();
 
+  // Called when the WebUI input is manually blurred (e.g. webpage click).
+  OnManualBlur(uint32 sequence_number);
+
   // Called when the selection changes in the WebUI.
   OnSelectionChanged(gfx.mojom.Range selection, uint32 sequence_number);
+
+  // Reverts the omnibox edit model.
+  // Discards the call if `sequence_number` is stale.
+  Revert(uint32 sequence_number);
 };
 
 // The WebUI page for the Omnibox Popup.

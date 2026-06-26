@@ -19,12 +19,15 @@ namespace content {
 class WebContents;
 }
 
+class OmniboxController;
+
 class OmniboxPopupHandler : public omnibox_popup::mojom::PageHandler {
  public:
   OmniboxPopupHandler(
       mojo::PendingReceiver<omnibox_popup::mojom::PageHandler> receiver,
       mojo::PendingRemote<omnibox_popup::mojom::Page> page,
-      content::WebContents* web_contents);
+      content::WebContents* web_contents,
+      OmniboxController* controller);
 
   OmniboxPopupHandler(const OmniboxPopupHandler&) = delete;
   OmniboxPopupHandler& operator=(const OmniboxPopupHandler&) = delete;
@@ -39,8 +42,10 @@ class OmniboxPopupHandler : public omnibox_popup::mojom::PageHandler {
   // omnibox_popup::mojom::PageHandler:
   void ShowContextMenu(const gfx::Point& point) override;
   void CloseUI() override;
+  void OnManualBlur(uint32_t sequence_number) override;
   void OnSelectionChanged(const gfx::Range& selection,
                           uint32_t sequence_number) override;
+  void Revert(uint32_t sequence_number) override;
 
   // omnibox_popup::mojom::Page:
   void OnShow();
@@ -48,7 +53,8 @@ class OmniboxPopupHandler : public omnibox_popup::mojom::PageHandler {
   void SetInputState(const std::string& text,
                      const gfx::Range& selection,
                      bool user_input_in_progress,
-                     const std::string& full_url);
+                     const std::string& full_url,
+                     bool is_focused);
 
   const gfx::Range& latest_selection() const { return latest_selection_; }
 
@@ -57,6 +63,7 @@ class OmniboxPopupHandler : public omnibox_popup::mojom::PageHandler {
   mojo::Remote<omnibox_popup::mojom::Page> page_;
   base::WeakPtr<TopChromeWebUIController::Embedder> embedder_;
   raw_ptr<content::WebContents> web_contents_;
+  raw_ptr<OmniboxController> controller_;
   // Caches the latest selection range reported by the WebUI to allow
   // synchronous access on tab switches.
   gfx::Range latest_selection_;

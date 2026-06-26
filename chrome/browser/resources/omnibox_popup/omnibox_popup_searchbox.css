@@ -101,7 +101,12 @@
 
 :host([omnibox-popup-debug-enabled_]) cr-searchbox-input::part(searchbox-input) {
   background-color: lightgreen;
-  color: white;
+  color: black;
+}
+
+:host([omnibox-popup-debug-enabled_]) #inputWrapper {
+  --color-location-bar-border-on-mismatch: blue;
+  --cr-focus-outline-color: red;
 }
 
 :host([searchbox-voice-search-enabled_]) {
