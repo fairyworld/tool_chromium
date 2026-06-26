@@ -66,6 +66,22 @@ export class AvatarButtonElement extends AvatarButtonElementBase {
         this.state.state === AvatarToolbarButtonState.kGuestSession;
   }
 
+  protected getButtonClass_(): string {
+    if (!this.state.text) {
+      return '';
+    }
+    switch (this.state.state) {
+      case AvatarToolbarButtonState.kSyncError:
+        return 'highlight-sync-error';
+      case AvatarToolbarButtonState.kGuestSession:
+        return 'highlight-guest';
+      case AvatarToolbarButtonState.kIncognitoProfile:
+        return 'highlight-incognito';
+      default:
+        return 'highlight-default';
+    }
+  }
+
   protected onClick_(_: Event) {
     // TODO(behamilton): Log an error if this fails.
     BrowserProxyImpl.getInstance().toolbarUIHandler.showAvatarMenu();
