@@ -1077,8 +1077,6 @@ static_library("test_support") {
     sources += [
       "../browser/ui/chooser_bubble_testapi.h",
       "../browser/ui/views/chooser_bubble_testapi_views.cc",
-      "../browser/ui/views/desktop_capture/desktop_media_picker_views_test_api.cc",
-      "../browser/ui/views/desktop_capture/desktop_media_picker_views_test_api.h",
       "../browser/ui/views/frame/test_with_browser_view.cc",
       "../browser/ui/views/frame/test_with_browser_view.h",
       "../browser/ui/views/media_router/app_menu_test_api.h",
@@ -4330,7 +4328,6 @@ if (!is_android) {
         "../browser/ui/views/bubble/bubble_frame_view_browsertest.cc",
         "../browser/ui/views/bubble/webui_bubble_manager_browsertest.cc",
         "../browser/ui/views/certificate_selector_dialog_browsertest.cc",
-        "../browser/ui/views/desktop_capture/desktop_media_picker_views_browsertest.cc",
         "../browser/ui/views/extensions/device_chooser_extension_browsertest.cc",
         "../browser/ui/views/extensions/extension_install_dialog_view_browsertest.cc",
         "../browser/ui/views/extensions/extension_post_install_dialog_view_utils_browsertest.cc",
@@ -4541,6 +4538,7 @@ if (!is_android) {
         "//chrome/browser/ui/views/animations",
         "//chrome/browser/ui/views/commerce",
         "//chrome/browser/ui/views/commerce:browser_tests",
+        "//chrome/browser/ui/views/desktop_capture:browser_tests",
         "//chrome/browser/ui/views/global_media_controls:browser_tests",
         "//chrome/browser/ui/views/infobars",
         "//chrome/browser/ui/views/performance_controls:browser_tests",
@@ -9047,6 +9045,7 @@ test("unit_tests") {
       "//chrome/browser/ui/views/apps/app_info_dialog:unit_tests",
       "//chrome/browser/ui/views/commerce:unit_tests",
       "//chrome/browser/ui/views/controls",
+      "//chrome/browser/ui/views/desktop_capture:unit_tests",
       "//chrome/browser/ui/views/frame",
       "//chrome/browser/ui/views/frame:test_support",
       "//chrome/browser/ui/views/global_media_controls:unit_tests",
@@ -9134,9 +9133,6 @@ test("unit_tests") {
       "../browser/ui/views/confirm_bubble_views_unittest.cc",
       "../browser/ui/views/content_setting_bubble_contents_unittest.cc",
       "../browser/ui/views/content_setting_site_row_view_unittest.cc",
-      "../browser/ui/views/desktop_capture/desktop_media_pane_view_unittest.cc",
-      "../browser/ui/views/desktop_capture/desktop_media_picker_views_unittest.cc",
-      "../browser/ui/views/desktop_capture/desktop_media_tab_list_unittest.cc",
       "../browser/ui/views/device_chooser_content_view_unittest.cc",
       "../browser/ui/views/download/download_in_progress_dialog_view_unittest.cc",
       "../browser/ui/views/extensions/chooser_dialog_view_unittest.cc",
@@ -9246,11 +9242,6 @@ test("unit_tests") {
       deps += [ "//chrome/browser/ui/views/status_icons:unit_tests" ]
     }
     if (is_mac) {
-      sources += [
-        "../browser/ui/views/desktop_capture/audio_capture_permission_checker_mac_unittest.mm",
-        "../browser/ui/views/desktop_capture/desktop_media_permission_pane_view_mac_unittest.mm",
-        "../browser/ui/views/desktop_capture/screen_capture_permission_checker_mac_unittest.mm",
-      ]
       deps += [
         "//chrome/browser/ui/webui/unexportable_keys_internals:unit_tests",
         "//services/audio/public/cpp:test_support",

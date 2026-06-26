@@ -3920,32 +3920,6 @@ static_library("ui") {
       "views/data_sharing/data_sharing_bubble_controller.h",
       "views/data_sharing/data_sharing_utils.cc",
       "views/data_sharing/data_sharing_utils.h",
-      "views/desktop_capture/audio_capture_permission_checker.cc",
-      "views/desktop_capture/audio_capture_permission_checker.h",
-      "views/desktop_capture/desktop_media_content_pane_view.cc",
-      "views/desktop_capture/desktop_media_content_pane_view.h",
-      "views/desktop_capture/desktop_media_delegated_source_list_view.cc",
-      "views/desktop_capture/desktop_media_delegated_source_list_view.h",
-      "views/desktop_capture/desktop_media_list_controller.cc",
-      "views/desktop_capture/desktop_media_list_controller.h",
-      "views/desktop_capture/desktop_media_list_view.cc",
-      "views/desktop_capture/desktop_media_list_view.h",
-      "views/desktop_capture/desktop_media_pane_view.cc",
-      "views/desktop_capture/desktop_media_pane_view.h",
-      "views/desktop_capture/desktop_media_picker_views.cc",
-      "views/desktop_capture/desktop_media_picker_views.h",
-      "views/desktop_capture/desktop_media_source_view.cc",
-      "views/desktop_capture/desktop_media_source_view.h",
-      "views/desktop_capture/desktop_media_tab_list.cc",
-      "views/desktop_capture/desktop_media_tab_list.h",
-      "views/desktop_capture/screen_capture_permission_checker.cc",
-      "views/desktop_capture/screen_capture_permission_checker.h",
-      "views/desktop_capture/share_audio_view.cc",
-      "views/desktop_capture/share_audio_view.h",
-      "views/desktop_capture/share_this_tab_dialog_views.cc",
-      "views/desktop_capture/share_this_tab_dialog_views.h",
-      "views/desktop_capture/share_this_tab_source_view.cc",
-      "views/desktop_capture/share_this_tab_source_view.h",
       "views/device_chooser_content_view.cc",
       "views/device_chooser_content_view.h",
       "views/dictation/dictation_bubble_ui.cc",
@@ -4856,6 +4830,8 @@ static_library("ui") {
       "//chrome/browser/ui/views/commerce",
       "//chrome/browser/ui/views/commerce:impl",
       "//chrome/browser/ui/views/controls",
+      "//chrome/browser/ui/views/desktop_capture",
+      "//chrome/browser/ui/views/desktop_capture:impl",
       "//chrome/browser/ui/views/digital_credentials",
       "//chrome/browser/ui/views/digital_credentials:impl",
       "//chrome/browser/ui/views/download",
@@ -5061,6 +5037,15 @@ static_library("ui") {
       # c/b/ui/views/media_router/cast_dialog_helper.h
       "//chrome/browser/ui/views/global_media_controls:impl",
 
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following headers get componentized:
+      # c/b/ui/browser_window.h, view_ids.h
+      # c/b/ui/views/extensions/security_dialog_tracker.h
+      # c/b/ui/views/frame/browser_view.h
+      # c/b/ui/views/media_picker_utils.h
+      # c/b/ui/views/title_origin_label.h
+      "//chrome/browser/ui/views/desktop_capture:impl",
+
       # TODO(crbug.com/408801109): Remove this circular dependency when the
       # following headers get componentized:
       # c/b/ui/browser.h, browser_window.h
@@ -5259,14 +5244,6 @@ static_library("ui") {
         "views/apps/chrome_native_app_window_views_mac.h",
         "views/apps/chrome_native_app_window_views_mac.mm",
         "views/chrome_views_delegate_mac.cc",
-        "views/desktop_capture/audio_capture_permission_checker_mac.h",
-        "views/desktop_capture/audio_capture_permission_checker_mac.mm",
-        "views/desktop_capture/audio_permission_warning_view.h",
-        "views/desktop_capture/audio_permission_warning_view.mm",
-        "views/desktop_capture/desktop_media_permission_pane_view_mac.h",
-        "views/desktop_capture/desktop_media_permission_pane_view_mac.mm",
-        "views/desktop_capture/screen_capture_permission_checker_mac.h",
-        "views/desktop_capture/screen_capture_permission_checker_mac.mm",
         "views/overlay/video_overlay_window_native_widget_mac.h",
         "views/overlay/video_overlay_window_native_widget_mac.mm",
         "views/permissions/permission_prompt_notifications_mac.cc",
