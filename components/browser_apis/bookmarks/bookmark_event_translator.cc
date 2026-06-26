@@ -91,7 +91,7 @@ void BookmarkEventTranslator::BookmarkNodeMoved(
 
   RefreshFoldersSnapshot();
 
-  Notify(events);
+  Notify(std::move(events));
 }
 
 void BookmarkEventTranslator::BookmarkNodeAdded(
@@ -108,7 +108,7 @@ void BookmarkEventTranslator::BookmarkNodeAdded(
 
   RefreshFoldersSnapshot();
 
-  Notify(events);
+  Notify(std::move(events));
 }
 
 void BookmarkEventTranslator::BookmarkNodeRemoved(
@@ -124,7 +124,7 @@ void BookmarkEventTranslator::BookmarkNodeRemoved(
 
   RefreshFoldersSnapshot();
 
-  Notify(events);
+  Notify(std::move(events));
 }
 
 void BookmarkEventTranslator::BookmarkNodeChanged(
@@ -134,7 +134,7 @@ void BookmarkEventTranslator::BookmarkNodeChanged(
 
   std::vector<mojom::BookmarksEventPtr> events;
   events.push_back(mojom::BookmarksEvent::NewChanged(std::move(changed_event)));
-  Notify(events);
+  Notify(std::move(events));
 }
 
 void BookmarkEventTranslator::BookmarkNodeChildrenReordered(
@@ -172,7 +172,7 @@ void BookmarkEventTranslator::BookmarkNodeChildrenReordered(
 
   RefreshFoldersSnapshot();
 
-  Notify(events);
+  Notify(std::move(events));
 }
 
 void BookmarkEventTranslator::BookmarkAllUserNodesRemoved(
@@ -200,7 +200,7 @@ void BookmarkEventTranslator::BookmarkAllUserNodesRemoved(
   // Reset snapshot.
   RefreshFoldersSnapshot();
 
-  Notify(events);
+  Notify(std::move(events));
 }
 
 void BookmarkEventTranslator::RefreshFoldersSnapshot() {
@@ -220,9 +220,22 @@ void BookmarkEventTranslator::PopulateFoldersSnapshot(
   }
 }
 
+void BookmarkEventTranslator::ExtensiveBookmarkChangesBeginning() {}
+
+void BookmarkEventTranslator::ExtensiveBookmarkChangesEnded() {
+  if (!queued_events_.empty()) {
+    subscriber_->OnBookmarkEvents(queued_events_);
+    queued_events_.clear();
+  }
+}
+
 void BookmarkEventTranslator::Notify(
-    const std::vector<mojom::BookmarksEventPtr>& events) {
+    std::vector<mojom::BookmarksEventPtr> events) {
   if (events.empty()) {
+    return;
+  }
+  if (model_->IsDoingExtensiveChanges()) {
+    std::move(events.begin(), events.end(), std::back_inserter(queued_events_));
     return;
   }
   subscriber_->OnBookmarkEvents(events);

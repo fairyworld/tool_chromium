@@ -525,6 +525,7 @@ class TestBookmarksObserver : public mojom::BookmarksObserver {
 
   void OnBookmarksEvents(
       std::vector<mojom::BookmarksEventPtr> events) override {
+    call_count_++;
     for (auto& event : events) {
       events_.push_back(std::move(event));
     }
@@ -546,12 +547,17 @@ class TestBookmarksObserver : public mojom::BookmarksObserver {
   const std::vector<mojom::BookmarksEventPtr>& events() const {
     return events_;
   }
-  void ClearEvents() { events_.clear(); }
+  int call_count() const { return call_count_; }
+  void ClearEvents() {
+    events_.clear();
+    call_count_ = 0;
+  }
 
  private:
   mojo::AssociatedReceiver<mojom::BookmarksObserver> receiver_;
   std::vector<mojom::BookmarksEventPtr> events_;
   raw_ptr<base::RunLoop> run_loop_ = nullptr;
+  int call_count_ = 0;
 };
 
 TEST_F(BookmarksServiceImplTest, Observation) {
@@ -670,6 +676,61 @@ TEST_F(BookmarksServiceImplTest, Observation) {
   EXPECT_EQ(observer.events()[0]->get_removed()->id, node3_uuid);
   EXPECT_TRUE(observer.events()[1]->is_removed());
   EXPECT_EQ(observer.events()[1]->get_removed()->id, node2_uuid);
+}
+
+TEST_F(BookmarksServiceImplTest, Observation_ExtensiveChanges) {
+  mojom::BookmarksSnapshotPtr snapshot;
+  {
+    base::RunLoop run_loop;
+    remote_service_->GetBookmarks(base::BindOnce(
+        [](mojom::BookmarksSnapshotPtr* out_snapshot,
+           base::OnceClosure quit_closure,
+           mojom::BookmarksService::GetBookmarksResult result) {
+          ASSERT_TRUE(result.has_value());
+          *out_snapshot = std::move(result.value());
+          std::move(quit_closure).Run();
+        },
+        &snapshot, run_loop.QuitClosure()));
+    run_loop.Run();
+  }
+
+  ASSERT_TRUE(snapshot);
+  TestBookmarksObserver observer(std::move(snapshot->stream));
+
+  const bookmarks::BookmarkNode* parent = model_->bookmark_bar_node();
+  ASSERT_TRUE(parent);
+
+  // Start extensive changes (e.g. import).
+  model_->BeginExtensiveChanges();
+
+  // Perform multiple changes.
+  const bookmarks::BookmarkNode* node1 =
+      model_->AddURL(parent, 0, u"Title 1", GURL("http://example1.com"));
+  model_->AddURL(parent, 1, u"Title 2", GURL("http://example2.com"));
+  base::Uuid node1_uuid = node1->uuid();
+  model_->Remove(node1, bookmarks::metrics::BookmarkEditSource::kUser,
+                 FROM_HERE);
+
+  // End extensive changes. This should flush the queued events.
+  model_->EndExtensiveChanges();
+
+  // Wait for the events to arrive.
+  observer.WaitForEvent();
+
+  // We expect 3 events: Add(node1), Add(node2), Remove(node1).
+  ASSERT_EQ(observer.events().size(), 3u);
+  EXPECT_EQ(observer.call_count(), 1);
+
+  EXPECT_TRUE(observer.events()[0]->is_added());
+  EXPECT_EQ(observer.events()[0]->get_added()->node->get_url()->title,
+            "Title 1");
+
+  EXPECT_TRUE(observer.events()[1]->is_added());
+  EXPECT_EQ(observer.events()[1]->get_added()->node->get_url()->title,
+            "Title 2");
+
+  EXPECT_TRUE(observer.events()[2]->is_removed());
+  EXPECT_EQ(observer.events()[2]->get_removed()->id, node1_uuid);
 }
 
 }  // namespace bookmarks_api
