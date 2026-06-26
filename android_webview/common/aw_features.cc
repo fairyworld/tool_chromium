@@ -54,7 +54,7 @@ BASE_FEATURE(kWebViewForceWebAuthn, base::FEATURE_DISABLED_BY_DEFAULT);
 // Gate text-size-adjust on whether the app called
 // setLayoutAlgorithm(TEXT_AUTOSIZING).
 BASE_FEATURE(kWebViewGateTextSizeAdjustOnTextAutosizing,
-             base::FEATURE_ENABLED_BY_DEFAULT);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Install the profiling client with memory_system::Initializer. If this is
 // enabled the profiler MAY be started by

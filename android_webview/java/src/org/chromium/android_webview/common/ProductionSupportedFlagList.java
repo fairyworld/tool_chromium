@@ -1398,6 +1398,10 @@ public final class ProductionSupportedFlagList {
         Flag.baseFeature(
                 BlinkFeatures.ANDROID_SYSTEM_FONT_PREWARMING,
                 "Prewarms system fonts on Android to improve initial rendering latency."),
+        Flag.baseFeature(
+                AwFeatures.WEBVIEW_GATE_TEXT_SIZE_ADJUST_ON_TEXT_AUTOSIZING,
+                "When enabled, text-size-adjust CSS property only affects WebViews with"
+                        + " TEXT_AUTOSIZING layout algorithm."),
         // Add new commandline switches and features above. The final entry should have a
         // trailing comma for cleaner diffs.
     };
