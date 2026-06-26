@@ -19859,6 +19859,33 @@
             ]
         }
     ],
+    "PrefetchTimeoutForWebViewPrefetch": [
+        {
+            "platforms": [
+                "android_webview"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_2000ms",
+                    "params": {
+                        "prefetch_timeout_ms": "2000"
+                    },
+                    "enable_features": [
+                        "PrefetchUseContentRefactor"
+                    ]
+                },
+                {
+                    "name": "Enabled_5000ms",
+                    "params": {
+                        "prefetch_timeout_ms": "5000"
+                    },
+                    "enable_features": [
+                        "PrefetchUseContentRefactor"
+                    ]
+                }
+            ]
+        }
+    ],
     "PreloadMediaEngagementData": [
         {
             "platforms": [
