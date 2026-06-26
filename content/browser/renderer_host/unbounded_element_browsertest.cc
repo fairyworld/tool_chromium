@@ -287,6 +287,28 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, CompositorPopupAllocation) {
   EXPECT_EQ(100, bounds.height());
 }
 
+IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, VisualOverflowBounds) {
+  GURL url(embedded_test_server()->GetURL("/title1.html"));
+  EXPECT_TRUE(NavigateToURL(shell(), url));
+
+  std::string script = R"(
+    document.body.innerHTML = `
+      <div id="target" style="width:100px; height:100px;
+           filter:drop-shadow(50px 50px 0px green);" unbounded></div>
+    `;
+    document.getElementById('target').showUnboundedElement();
+  )";
+  EXPECT_TRUE(ExecJs(primary_main_frame_host(), script));
+  WaitForFrameReady();
+
+  UnboundedSurfaceWindow* window =
+      primary_main_frame_host()->GetUnboundedSurfaceWindow();
+  ASSERT_TRUE(window);
+  gfx::Rect bounds = window->GetBounds();
+  EXPECT_EQ(150, bounds.width());
+  EXPECT_EQ(150, bounds.height());
+}
+
 IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
                        RequestWithEmptyBoundsThrowsException) {
   GURL url(embedded_test_server()->GetURL("/title1.html"));
