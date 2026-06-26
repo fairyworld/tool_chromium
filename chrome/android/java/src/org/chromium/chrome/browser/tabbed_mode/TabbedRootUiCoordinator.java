@@ -2318,8 +2318,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
     public void toggleTabStrip() {
         boolean shouldShowVerticalTabs =
                 !ChromeSharedPreferences.getInstance()
-                        .readBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, true);
-
+                        .readBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, false);
         ChromeSharedPreferences.getInstance()
                 .writeBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, shouldShowVerticalTabs);
 
