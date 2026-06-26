@@ -829,11 +829,11 @@
   <message name="IDS_AUTOFILL_AT_MEMORY_SEARCH_AFFORDANCE_SUBTITLE" desc="Subtitle of the AtMemory search trigger affordance." translateable="false">
     Find and fill info with Gemini
   </message>
-  <message name="IDS_AUTOFILL_AT_MEMORY_UNSUPPORTED_QUERY_TITLE" desc="Title for the suggestion shown when the query is unsupported by @memory." translateable="false">
+  <message name="IDS_AUTOFILL_AT_MEMORY_UNSUPPORTED_QUERY_TITLE" desc="This error message is to help users understand that enhanced autofill wasn't able to find and fill relevant info. The technical reason is that the query is not supported by enhanced autofill. It appears on the query results empty state.">
     Couldn't find this info
   </message>
-  <message name="IDS_AUTOFILL_AT_MEMORY_UNSUPPORTED_QUERY_DESCRIPTION" desc="Description for the suggestion shown when the query is unsupported by @memory." translateable="false">
-    Try asking Gemini
+  <message name="IDS_AUTOFILL_AT_MEMORY_UNSUPPORTED_QUERY_DESCRIPTION" desc="A linkout that suggests using Gemini for a broader search or query, as the current recall feature could not handle the request. This text is a verb phrase short for the longer phrase: 'Try submitting your query to the Gemini in Chrome side panel'.">
+    Ask Gemini in Chrome instead
   </message>
   <if expr="is_android">
     <message name="IDS_AT_MEMORY_SEARCH_HINT" desc="Hint text for the search bar in the @memory bottom sheet." formatter_data="android_java" translateable="false">
