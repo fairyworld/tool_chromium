@@ -424,6 +424,9 @@ void GlicInstanceImpl::Show(const ShowOptions& options) {
     instance_metrics().OnOpen(options.invocation_source, options);
     service_->metrics()->OnGlicWindowStartedOpening(/*attached=*/false,
                                                     options.invocation_source);
+    if (coordinator_delegate_) {
+      coordinator_delegate_->OnInvoked();
+    }
   }
 
   embedder_to_show->Show(options);
@@ -713,6 +716,9 @@ void GlicInstanceImpl::OnUserInputSubmitted(mojom::WebClientMode mode) {
     entry.user_input_submitted_while_bound = true;
   }
   last_prompt_submission_time_ = base::TimeTicks::Now();
+  if (coordinator_delegate_) {
+    coordinator_delegate_->OnUserInputSubmitted();
+  }
   // TODO(harringtond): The only subscriber to this event is the tab underline
   // controller and I think it makes more sense for it to get that signal from
   // sharing manager instead of going through the keyed service.

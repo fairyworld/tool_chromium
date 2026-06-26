@@ -102,6 +102,9 @@ class GlicInstanceImpl : public GlicInstance,
         GlicInstanceImpl& source_instance,
         bool enabled) = 0;
 
+    virtual void OnInvoked() = 0;
+    virtual void OnUserInputSubmitted() = 0;
+
     // Called to create a new web contents for the glic instance.
     virtual std::unique_ptr<WebUIContentsContainer>
     CreateWebUIContentsContainer() = 0;
