@@ -503,6 +503,11 @@ void UserCloudPolicyManagerAsh::OnStoreLoaded(
     CloudPolicyStore* cloud_policy_store) {
   CloudPolicyManager::OnStoreLoaded(cloud_policy_store);
 
+  if (cloud_policy_store == extension_install_store()) {
+    // Extension Install policies do not affect affiliation.
+    return;
+  }
+
   em::PolicyData const* const policy_data = cloud_policy_store->policy();
 
   bool is_managed = cloud_policy_store->is_managed();
