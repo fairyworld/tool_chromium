@@ -308,7 +308,6 @@ class AutocompleteInput {
 
   // Whether the user entered keyword mode.
   bool in_keyword_mode() const { return in_keyword_mode_; }
-  bool prefer_keyword() const { return in_keyword_mode_; }
 
   // Set by the edit model or driver of autocompletion to inform autocomplete
   // providers & controller.

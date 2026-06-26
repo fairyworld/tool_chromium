@@ -1366,10 +1366,10 @@ TEST_F(HistoryURLProviderTest, DoTrimHttpsScheme) {
 // the keyword, i.e. "@history google" should only match "google".
 TEST_F(HistoryURLProviderTest, KeywordModeExtractUserInput) {
   const auto test = [&](std::u16string input_text,
-                        bool input_prefer_keyword_mode = false) {
+                        bool input_in_keyword_mode = false) {
     AutocompleteInput input(input_text, metrics::OmniboxEventProto::OTHER,
                             TestSchemeClassifier());
-    if (input_prefer_keyword_mode) {
+    if (input_in_keyword_mode) {
       input.set_in_keyword_mode(true);
     }
 

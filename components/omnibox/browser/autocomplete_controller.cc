@@ -311,7 +311,7 @@ bool ShouldPreserveLastDefaultMatch(
   // Don't preserve default in keyword mode to avoid e.g. the 'google.com'
   // suggestion being preserved and kicking the user out of keyword mode when
   // they type 'google.com  '.
-  if (input.prefer_keyword()) {
+  if (input.in_keyword_mode()) {
     return false;
   }
 

@@ -142,7 +142,7 @@ int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
 
 void AutocompleteClassifier::Classify(
     const std::u16string& text,
-    bool prefer_keyword,
+    bool in_keyword_mode,
     bool allow_exact_keyword_match,
     metrics::OmniboxEventProto::PageClassification page_classification,
     AutocompleteMatch* match,
@@ -153,7 +153,7 @@ void AutocompleteClassifier::Classify(
   base::AutoReset<bool> reset(&inside_classify_, true);
   AutocompleteInput input(text, page_classification, *scheme_classifier_);
   input.set_prevent_inline_autocomplete(true);
-  input.set_in_keyword_mode(prefer_keyword);
+  input.set_in_keyword_mode(in_keyword_mode);
   input.set_allow_exact_keyword_match(allow_exact_keyword_match);
   input.set_omit_asynchronous_matches(true);
   controller_->Start(input);
