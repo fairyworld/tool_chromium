@@ -188,6 +188,9 @@ SessionAccessor::Ptr SessionAccessor::Create(
 
 SessionAccessor::~SessionAccessor() {
   DCHECK(task_runner_->RunsTasksInCurrentSequence());
+  if (asr_stream_ != 0) {
+    chrome_ml_->ASRDestroyStream(asr_stream_);
+  }
   chrome_ml_->DestroySession(session_);
 }
 
