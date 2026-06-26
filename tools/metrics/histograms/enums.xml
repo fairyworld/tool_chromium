@@ -116,13 +116,6 @@ uploading your change for review.  These are checked by presubmit scripts.
       label="Incompatible Mojo versions between remote and receiver"/>
 </enum>
 
-<enum name="AccountManagerFacadeMojoStatus">
-  <int value="0" label="Ok"/>
-  <int value="1" label="Uninitialized"/>
-  <int value="2" label="No remote"/>
-  <int value="3" label="Version mismatch"/>
-</enum>
-
 <enum name="AccountManagerTokenLoadStatus">
   <int value="0" label="Success"/>
   <int value="1" label="File Read Error"/>
