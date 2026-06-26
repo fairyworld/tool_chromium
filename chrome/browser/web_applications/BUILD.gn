@@ -269,6 +269,8 @@ source_set("web_applications") {
     "model/migration_source.h",
     "model/pending_migration_info.cc",
     "model/pending_migration_info.h",
+    "model/safe_url_pattern_to_value.cc",
+    "model/safe_url_pattern_to_value.h",
     "model/web_app_comparison.cc",
     "model/web_app_comparison.h",
     "model/web_app_icon_types.cc",
