@@ -401,6 +401,8 @@ static_library("browser_launch_reporting") {
       "reporting/browser_launch/browser_launch_event_controller_factory_desktop.h",
       "reporting/browser_launch/browser_launch_event_uploader_desktop.cc",
       "reporting/browser_launch/browser_launch_event_uploader_desktop.h",
+      "reporting/browser_launch/scoped_initial_command_line.cc",
+      "reporting/browser_launch/scoped_initial_command_line.h",
     ]
     deps += [
       ":enterprise",

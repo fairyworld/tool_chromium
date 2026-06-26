@@ -8,29 +8,9 @@
 
 #include "base/command_line.h"
 #include "base/process/process.h"
-#include "chrome/app/chrome_main.h"  // nogncheck
+#include "chrome/browser/enterprise/reporting/browser_launch/scoped_initial_command_line.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-
-namespace enterprise_reporting {
-
-namespace {
-
-base::CommandLine* g_stubbed_initial_cli = nullptr;
-
-const base::CommandLine& GetInitialBrowserCommandLineStub() {
-  CHECK(g_stubbed_initial_cli);
-  return *g_stubbed_initial_cli;
-}
-
-}  // namespace
-
-}  // namespace enterprise_reporting
-
-// Fulfill the global Linker promise using our local stub.
-const base::CommandLine& GetInitialBrowserCommandLine() {
-  return enterprise_reporting::GetInitialBrowserCommandLineStub();
-}
 
 namespace enterprise_reporting {
 
@@ -40,22 +20,16 @@ class BrowserLaunchDataCollectorDesktopTest : public testing::Test {
   ~BrowserLaunchDataCollectorDesktopTest() override = default;
 
  protected:
-  void SetUp() override {
-    g_stubbed_initial_cli = &local_cli_;
-  }
-
-  void TearDown() override {
-    g_stubbed_initial_cli = nullptr;
-  }
-
-  base::CommandLine local_cli_{base::CommandLine::NO_PROGRAM};
+  base::CommandLine stubbed_cli_{base::CommandLine::NO_PROGRAM};
 };
 
 TEST_F(BrowserLaunchDataCollectorDesktopTest, GetEvent) {
   // Configure the command line for this specific test case.
-  local_cli_.AppendSwitch("switch-1");
-  local_cli_.AppendSwitchASCII("switch-2", "value-2");
-  local_cli_.AppendSwitchASCII("switch-3", "value-3");
+  stubbed_cli_.AppendSwitch("switch-1");
+  stubbed_cli_.AppendSwitchASCII("switch-2", "value-2");
+  stubbed_cli_.AppendSwitchASCII("switch-3", "value-3");
+
+  ScopedInitialCommandLine scoped_cli(&stubbed_cli_);
 
   BrowserLaunchDataCollectorDesktop collector;
   auto&& event = collector.GetEvent();

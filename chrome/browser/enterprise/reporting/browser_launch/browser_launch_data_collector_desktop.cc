@@ -8,8 +8,7 @@
 
 #include "base/command_line.h"
 #include "base/process/process.h"
-#include "chrome/app/chrome_main.h"  // nogncheck
-
+#include "chrome/browser/enterprise/reporting/browser_launch/scoped_initial_command_line.h"
 #include "components/enterprise/common/proto/synced/browser_events.pb.h"
 
 namespace enterprise_reporting {
