@@ -266,16 +266,10 @@ class KeyboardAccessoryViewBinder {
                         });
             }
 
-            boolean isLoading = item.getViewState() == ActionBarItem.ViewState.LOADING;
-            boolean isVisuallyDeactivated =
+            final boolean isLoading = item.getViewState() == ActionBarItem.ViewState.LOADING;
+            final boolean isVisuallyDeactivated =
                     item.getViewState() == ActionBarItem.ViewState.DEACTIVATED
                             || item.getSuggestion().applyDeactivatedStyle();
-
-            if (isLoading) {
-                chipView.showLoadingView(/* loadingViewObserver= */ null);
-            } else {
-                chipView.hideLoadingView(/* loadingViewObserver= */ null, /* skipDelay= */ true);
-            }
 
             float iconAlpha;
             if (isVisuallyDeactivated) {
@@ -301,6 +295,14 @@ class KeyboardAccessoryViewBinder {
                 iconDrawable.setAlpha((int) (255 * iconAlpha));
             }
             chipView.setIconWithTint(iconDrawable, /* tintWithTextColor= */ false);
+
+            if (isLoading) {
+                // The `showLoadingView` must be called after `setIconWithTint` because
+                // `setIconWithTint` updates the icon visibility.
+                chipView.showLoadingView(/* loadingViewObserver= */ null);
+            } else {
+                chipView.hideLoadingView(/* loadingViewObserver= */ null, /* skipDelay= */ true);
+            }
 
             @Nullable String voiceOver = item.getSuggestion().getVoiceOver();
             if (!TextUtils.isEmpty(voiceOver)) {
