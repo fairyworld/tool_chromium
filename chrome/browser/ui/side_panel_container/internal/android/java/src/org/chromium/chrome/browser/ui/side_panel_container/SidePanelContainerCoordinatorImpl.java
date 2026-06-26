@@ -222,7 +222,16 @@ final class SidePanelContainerCoordinatorImpl
 
         int availableWidthDp = ViewUtils.pxToDp(mParentActivity, availableWidth);
         int windowWidthDp = ViewUtils.pxToDp(mParentActivity, windowWidth);
-        int showableWidthDp = determineShowableWidthDp(availableWidthDp, windowWidthDp);
+
+        int horizontalPaddingDp =
+                ViewUtils.pxToDp(
+                        mParentActivity,
+                        mContainerView.getPaddingLeft() + mContainerView.getPaddingRight());
+        int minSidePanelContainerWidthDp = horizontalPaddingDp + MIN_SIDE_PANEL_CONTENT_WIDTH_DP;
+
+        int showableWidthDp =
+                determineShowableWidthDp(
+                        availableWidthDp, windowWidthDp, minSidePanelContainerWidthDp);
         return ViewUtils.dpToPx(mParentActivity, showableWidthDp);
     }
 
@@ -310,10 +319,12 @@ final class SidePanelContainerCoordinatorImpl
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Returns the final width (in dp) of the side panel given the available width in the window.
+     * Returns the final width (in dp) of the side panel container given the available width in the
+     * window, the window width, and the minimum side panel container width.
      */
     @VisibleForTesting
-    static int determineShowableWidthDp(int availableWidthDp, int windowWidthDp) {
+    static int determineShowableWidthDp(
+            int availableWidthDp, int windowWidthDp, int minSidePanelContainerWidthDp) {
         // 1. Check if we can use the fixed, larger width.
         if (windowWidthDp >= MIN_WINDOW_WIDTH_DP_FOR_WIDE_SIDE_PANEL) {
             assert availableWidthDp >= WIDE_SIDE_PANEL_WIDTH_DP;
@@ -326,8 +337,8 @@ final class SidePanelContainerCoordinatorImpl
         }
 
         // 3. If we can't use the fixed, smaller width, but the available space is more than the
-        // minimum width, we'll fill the available space.
-        if (availableWidthDp >= MIN_SIDE_PANEL_WIDTH_DP) {
+        // minimum container width, we'll fill the available space.
+        if (availableWidthDp >= minSidePanelContainerWidthDp) {
             return availableWidthDp;
         }
 
