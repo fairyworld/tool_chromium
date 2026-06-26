@@ -150,6 +150,14 @@ export class SettingsSyncAccountControlElement extends
             'syncStatus.signedInState)',
         observer: 'maybeRecordSigninPendingOffered_',
       },
+
+      shouldShowSignInPromo_: {
+        type: Boolean,
+        value: false,
+        computed: 'computeShouldShowSignInPromo_(syncStatus,' +
+            'syncStatus.signedInState, promoType_)',
+        observer: 'maybeRecordSignInOffered_',
+      },
       // </if>
 
       subLabel_: {
@@ -200,6 +208,8 @@ export class SettingsSyncAccountControlElement extends
   // <if expr="not is_chromeos">
   declare private shouldShowSigninPausedButtons_: boolean;
   private signinPausedImpressionRecorded_: boolean = false;
+  declare private shouldShowSignInPromo_: boolean;
+  private signinOfferedImpressionRecorded_: boolean = false;
   // </if>
   private syncBrowserProxy_: SyncBrowserProxy =
       SyncBrowserProxyImpl.getInstance();
@@ -228,6 +238,7 @@ export class SettingsSyncAccountControlElement extends
   override currentRouteChanged(_newRoute: Route, _oldRoute?: Route): void {
     // <if expr="not is_chromeos">
     this.maybeRecordSigninPendingOffered_();
+    this.maybeRecordSignInOffered_();
     // </if>
   }
 
@@ -804,6 +815,42 @@ export class SettingsSyncAccountControlElement extends
   private computeShouldShowSigninPausedButtons_() {
     return !this.hideButtons && !!this.syncStatus &&
         this.syncStatus.signedInState === SignedInState.SIGNED_IN_PAUSED;
+  }
+
+  private computeShouldShowSignInPromo_() {
+    if (this.hideButtons || !this.syncStatus) {
+      return false;
+    }
+    const state = this.syncStatus.signedInState;
+    return state === SignedInState.SIGNED_OUT ||
+        state === SignedInState.WEB_ONLY_SIGNED_IN;
+  }
+
+  private maybeRecordSignInOffered_() {
+    if (!this.shouldShowSignInPromo_) {
+      return;
+    }
+
+    // Only record if we are currently on a page that could have an account
+    // control in promo state.
+    const currentRoute = Router.getInstance().getCurrentRoute();
+    if (![routes.BASIC, routes.PEOPLE, routes.YOUR_SAVED_INFO].includes(
+            currentRoute)) {
+      return;
+    }
+
+    // Only record for account controls that are visible.
+    if (this.embeddedInSubpage) {
+      return;
+    }
+
+    // Don't record twice.
+    if (this.signinOfferedImpressionRecorded_) {
+      return;
+    }
+
+    this.syncBrowserProxy_.recordSigninOffered(this.accessPoint);
+    this.signinOfferedImpressionRecorded_ = true;
   }
 
   private maybeRecordSigninPendingOffered_() {
