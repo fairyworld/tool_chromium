@@ -376,6 +376,15 @@ BASE_FEATURE(kSkiaGraphite,
 #endif
 );
 
+// Controls Skia Graphite specifically for Intel GPUs on Windows.
+// On Windows, the status of Graphite on Intel GPUs won't be controlled
+// by the standard SkiaGraphite feature, but by this feature flag
+// instead. This feature only works if `kLateGraphiteFeatureCheck` is
+// also enabled.
+BASE_FEATURE(kSkiaGraphiteWinIntel,
+             "SkiaGraphiteWinIntel",
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 // Allows CompoundImageBacking to allocate backings during runtime if a
 // compatible backing to serve clients requested usage is not already present.
 BASE_FEATURE(kUseDynamicBackingAllocations, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -630,6 +639,14 @@ bool IsSkiaGraphiteEnabled(const base::CommandLine* command_line) {
 
   if (base::FeatureList::IsEnabled(kSkiaGraphite)) {
     InitSkiaGraphiteFeatureParams(kSkiaGraphite);
+    return true;
+  }
+  return false;
+}
+
+bool IsSkiaGraphiteWinIntelEnabled() {
+  if (base::FeatureList::IsEnabled(kSkiaGraphiteWinIntel)) {
+    InitSkiaGraphiteFeatureParams(kSkiaGraphiteWinIntel);
     return true;
   }
   return false;

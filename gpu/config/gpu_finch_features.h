@@ -64,6 +64,7 @@ GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kVulkan);
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kForceEnableWebGpuInterop);
 
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kSkiaGraphite);
+GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kSkiaGraphiteWinIntel);
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kSkiaGraphitePrecompilation);
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kSkiaGraphiteUsePersistentCache);
 GPU_CONFIG_EXPORT bool SkiaGraphiteUsesPersistentCache();
@@ -109,8 +110,8 @@ struct GPU_CONFIG_EXPORT SkiaGraphiteFeatureParams {
 static_assert(std::is_trivially_destructible_v<SkiaGraphiteFeatureParams>);
 
 // Gets the initialized Skia Graphite feature parameters.
-// IsSkiaGraphiteEnabled() must be called to populate the parameters before
-// calling this function (or
+// Either IsSkiaGraphiteEnabled() or IsSkiaGraphiteWinIntelEnabled() must be
+// called to populate the parameters before calling this function (or
 // InitSkiaGraphiteDefaultParamsForTesting() in tests).
 GPU_CONFIG_EXPORT const SkiaGraphiteFeatureParams&
 GetSkiaGraphiteFeatureParams();
@@ -228,6 +229,7 @@ GPU_CONFIG_EXPORT bool ShouldEnableDrDc();
 GPU_CONFIG_EXPORT bool NeedThreadSafeAndroidMedia();
 GPU_CONFIG_EXPORT bool IsSkiaGraphiteEnabled(
     const base::CommandLine* command_line);
+GPU_CONFIG_EXPORT bool IsSkiaGraphiteWinIntelEnabled();
 GPU_CONFIG_EXPORT bool IsSkiaGraphitePrecompilationEnabled(
     const base::CommandLine* command_line);
 GPU_CONFIG_EXPORT bool EnablePruneOldTransferCacheEntries();

@@ -22912,6 +22912,25 @@
             ]
         }
     ],
+    "SkiaGraphiteWinIntel": [
+        {
+            "platforms": [
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "params": {
+                        "dawn_backend_validation": "false",
+                        "dawn_skip_validation": "true"
+                    },
+                    "enable_features": [
+                        "SkiaGraphiteWinIntel"
+                    ]
+                }
+            ]
+        }
+    ],
     "Skills": [
         {
             "platforms": [
