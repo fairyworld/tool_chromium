@@ -138,9 +138,4 @@ public final class TestSideUiContainer implements SideUiContainer {
     public void onWillAutoRestore() {
         mNumOnWillAutoRestoreReceived++;
     }
-
-    @Override
-    public void onWindowResized(boolean canShowSideUi) {
-        mSideUiCoordinator.updateUi(new UiUpdateRequest(mSideUiId, /* suppressAnimations= */ true));
-    }
 }

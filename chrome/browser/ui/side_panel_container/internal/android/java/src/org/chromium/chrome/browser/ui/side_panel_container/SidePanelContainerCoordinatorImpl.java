@@ -53,6 +53,33 @@ final class SidePanelContainerCoordinatorImpl
     private @Nullable SidePanelContent mCurrentContent;
 
     /**
+     * Whether {@link #onWillAutoClose} is running.
+     *
+     * <p>This flag prevents {@link #onWillAutoClose} from triggering another UI update, which isn't
+     * allowed.
+     *
+     * <p>The C++ {@code SidePanelCoordinatorAndroid} calls {@link #startRemovingContent} during
+     * {@link #onWillAutoClose}. {@link #startRemovingContent} is also for non-auto-closing cases
+     * where a call to {@link SideUiCoordinator#updateUi} is required, so we need this flag to avoid
+     * calling {@link SideUiCoordinator#updateUi} for the auto-close case.
+     *
+     * <p>TODO(crbug.com/527985639): Refactor the C++ side and remove this flag.
+     */
+    private boolean mIsPreparingForAutoClose;
+
+    /**
+     * Whether {@link #onWillAutoRestore} is running.
+     *
+     * <p>This flag prevents {@link #onWillAutoRestore} from triggering another UI update, which
+     * isn't allowed.
+     *
+     * <p>TODO(crbug.com/527985639): Refactor the C++ side and remove this flag.
+     *
+     * @see #mIsPreparingForAutoClose
+     */
+    private boolean mIsPreparingForAutoRestore;
+
+    /**
      * Constructs a concrete implementation of the SidePanelContainerCoordinator interface.
      *
      * @param parentActivity Parent Activity that will own this instance.
@@ -105,7 +132,12 @@ final class SidePanelContainerCoordinatorImpl
         mContainerView.removeAllViews();
         mContainerView.addView(content.mView);
 
-        mSideUiCoordinator.updateUi(new UiUpdateRequest(SideUiId.SIDE_PANEL, suppressAnimations));
+        assert !mIsPreparingForAutoClose;
+        if (!mIsPreparingForAutoRestore) {
+            mSideUiCoordinator.updateUi(
+                    new UiUpdateRequest(SideUiId.SIDE_PANEL, suppressAnimations));
+        }
+
         // TODO(crbug.com/496407828): Move this around so it actually runs after the animation is
         //  finished.
         onContentPopulated.run();
@@ -116,7 +148,12 @@ final class SidePanelContainerCoordinatorImpl
         log(TAG, "startRemovingContent", suppressAnimations);
         ThreadUtils.assertOnUiThread();
 
-        mSideUiCoordinator.updateUi(new UiUpdateRequest(SideUiId.SIDE_PANEL, suppressAnimations));
+        assert !mIsPreparingForAutoRestore;
+        if (!mIsPreparingForAutoClose) {
+            mSideUiCoordinator.updateUi(
+                    new UiUpdateRequest(SideUiId.SIDE_PANEL, suppressAnimations));
+        }
+
         // TODO(crbug.com/496407828): Move this around so it actually runs after the animation is
         //  finished.
         onContentRemoved.run();
@@ -238,9 +275,33 @@ final class SidePanelContainerCoordinatorImpl
     public void onContainerResized(@Px int containerWidth) {}
 
     @Override
-    public void onWindowResized(boolean canShowSideUi) {
+    public void onWillAutoClose() {
+        // The pure-Java dev feature doesn't need onWillAutoClose() or SidePanelCoordinatorAndroid.
+        // SidePanelCoordinatorAndroid is a bridge to the C++ side panel state management.
+        if (mSidePanelPureJavaDevFeature != null) {
+            return;
+        }
+
         if (mSidePanelCoordinatorAndroid != null) {
-            mSidePanelCoordinatorAndroid.onWindowResized(canShowSideUi);
+            mIsPreparingForAutoClose = true;
+            mSidePanelCoordinatorAndroid.onWillAutoClose();
+            mIsPreparingForAutoClose = false;
+        }
+    }
+
+    @Override
+    public void onWillAutoRestore() {
+        // The pure-Java dev feature doesn't need onWillAutoRestore() or
+        // SidePanelCoordinatorAndroid.
+        // SidePanelCoordinatorAndroid is a bridge to the C++ side panel state management.
+        if (mSidePanelPureJavaDevFeature != null) {
+            return;
+        }
+
+        if (mSidePanelCoordinatorAndroid != null) {
+            mIsPreparingForAutoRestore = true;
+            mSidePanelCoordinatorAndroid.onWillAutoRestore();
+            mIsPreparingForAutoRestore = false;
         }
     }
 
