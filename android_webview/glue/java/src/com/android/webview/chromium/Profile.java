@@ -186,7 +186,8 @@ public class Profile {
     private void validatePreconnectUrl(@NonNull String url) {
         GURL gurl = new GURL(url);
         if (!gurl.isValid()
-                || (!gurl.getScheme().equals("http") && !gurl.getScheme().equals("https"))) {
+                || (!gurl.getOrigin().getScheme().equals("http")
+                        && !gurl.getOrigin().getScheme().equals("https"))) {
             throw new IllegalArgumentException("Invalid URL: " + gurl.getPossiblyInvalidSpec());
         }
     }
