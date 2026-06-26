@@ -2409,6 +2409,13 @@ void URLLoader::OnBeforeSendHeadersComplete(
             .value_or(std::string());
     net::cookie_util::ParseRequestCookieLine(cookie_header, &request_cookies_);
   }
+  if (extended_net_log_events) {
+    url_request_->net_log().AddEvent(
+        net::NetLogEventType::ON_BEFORE_SEND_HEADERS_RESULT,
+        [&](net::NetLogCaptureMode capture_mode) {
+          return extended_net_log_events->Clone();
+        });
+  }
   std::move(callback).Run(result, headers);
 }
 
