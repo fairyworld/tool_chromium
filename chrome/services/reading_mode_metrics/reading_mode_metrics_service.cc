@@ -202,6 +202,13 @@ void ReadingModeMetricsService::Evaluate(
   auto rust_metrics =
       evaluate(original_text.c_str(), distilled_html.c_str(), structure);
 
+  if (!rust_metrics.well_formed) {
+    LOG(WARNING) << "Distilled HTML is malformed (unclosed tags).";
+    std::move(callback).Run(
+        base::unexpected(mojom::EvaluationStatus::kMalformedDistilledHtml));
+    return;
+  }
+
   mojom::DistillationMetricsPtr metrics = mojom::DistillationMetrics::New();
   metrics->rouge_l_precision = rust_metrics.rouge_l_precision;
   metrics->rouge_l_recall = rust_metrics.rouge_l_recall;
