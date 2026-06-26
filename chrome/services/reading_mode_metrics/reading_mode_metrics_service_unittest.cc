@@ -22,6 +22,17 @@ namespace reading_mode {
 class ReadingModeMetricsServiceTest : public testing::Test {
  protected:
   ui::AXTreeUpdate CreateMockAXTreeUpdate() {
+    // AXTree Representation:
+    // kRootWebArea (id: 1)
+    //   ├── kHeading (id: 2)
+    //   │     └── kStaticText (id: 8): "My Article Title"
+    //   ├── kList (id: 3)
+    //   │     └── kListItem (id: 4)
+    //   │           └── kStaticText (id: 9): "Shopping item"
+    //   └── kParagraph (id: 5)
+    //         ├── kStaticText (id: 6): "This is bold content" [Bold]
+    //         └── kStaticText (id: 7): "This is italic content" [Italic]
+
     ui::AXTreeUpdate update;
 
     // 1. Root Web Area
@@ -88,6 +99,27 @@ class ReadingModeMetricsServiceTest : public testing::Test {
   }
 
   ui::AXTreeUpdate CreateComplexMockAXTreeUpdate() {
+    // AXTree Representation:
+    // kRootWebArea (id: 1)
+    //   ├── kHeading (id: 2)
+    //   │     └── kStaticText (id: 11): "Rust Programming Language "
+    //   ├── kParagraph (id: 3)
+    //   │     ├── kStaticText (id: 12): "By "
+    //   │     └── kStaticText (id: 13): "Graydon Hoare " [Bold]
+    //   ├── kHeading (id: 5)
+    //   │     └── kStaticText (id: 14): "Core Architecture "
+    //   ├── kParagraph (id: 6)
+    //   │     ├── kStaticText (id: 15): "Some code: "
+    //   │     ├── kCode (id: 19)
+    //   │     │     └── kStaticText (id: 16): "fn main() "
+    //   │     └── kStaticText (id: 17): ". Rust achieves memory safety without
+    //   a GC. " ├── kList (id: 8) │     ├── kListItem (id: 20) │     │     └──
+    //   kStaticText (id: 22): "Memory safety via ownership " │     └──
+    //   kListItem (id: 21) │           └── kStaticText (id: 23): "Concurrency
+    //   without data races " ├── kBlockquote (id: 9) │     └── kStaticText (id:
+    //   24): "Safety is not just about preventing crashes. " └── kLink (id: 10)
+    //         └── kStaticText (id: 25): "Read the official guide "
+
     ui::AXTreeUpdate update;
 
     // 1. Root Web Area
@@ -222,6 +254,33 @@ class ReadingModeMetricsServiceTest : public testing::Test {
   }
 
   ui::AXTreeUpdate CreateHeavyMockAXTreeUpdate() {
+    // AXTree Representation:
+    // kRootWebArea (id: 1)
+    //   ├── kHeading (id: 2)
+    //   │     └── kStaticText (id: 10): "Advanced Rust Concurrency "
+    //   ├── kParagraph (id: 3)
+    //   │     ├── kStaticText (id: 11): "In this article, we discuss "
+    //   │     ├── kStaticText (id: 12): "data races " [Bold]
+    //   │     ├── kStaticText (id: 13): "and how to avoid them. Check the "
+    //   │     ├── kLink (id: 14)
+    //   │     │     └── kStaticText (id: 16): "Concurrency Guide "
+    //   │     └── kStaticText (id: 15): "for resources. "
+    //   ├── kHeading (id: 4)
+    //   │     └── kStaticText (id: 17): "Common Synchronization Primitives "
+    //   ├── kList (id: 5)
+    //   │     ├── kListItem (id: 18)
+    //   │     │     └── kStaticText (id: 20): "Mutex for mutually exclusive
+    //   access " │     └── kListItem (id: 19) │           └── kStaticText (id:
+    //   21): "RwLock for multiple readers or single writer " ├── kHeading (id:
+    //   6) │     └── kStaticText (id: 22): "Channels " ├── kList (id: 7) │ ├──
+    //   kListItem (id: 23) │     │     └── kStaticText (id: 26): "mpsc channels
+    //   for multiple producers " │     ├── kListItem (id: 24) │     │     └──
+    //   kStaticText (id: 27): "oneshot channels for single values " │     └──
+    //   kListItem (id: 25) │           └── kStaticText (id: 28): "thread spawn
+    //   for thread spawning " └── kBlockquote (id: 8)
+    //         └── kStaticText (id: 29): "Do not communicate by sharing memory;
+    //         instead, share memory by communicating. "
+
     ui::AXTreeUpdate update;
 
     // 1. Root Web Area
@@ -458,8 +517,7 @@ TEST_F(ReadingModeMetricsServiceTest, PreventsWordConcatenation) {
   EXPECT_EQ(std::string(results[1].tag_path[0]), "P");
 }
 
-TEST_F(ReadingModeMetricsServiceTest, DirectHtmlParserTesting) {
-  // 1. Unclosed Tags
+TEST_F(ReadingModeMetricsServiceTest, DirectHtmlParserUnclosedTags) {
   auto unclosed_results =
       reading_mode::parse_distilled_html("<li>Unclosed <b>nested</b> text");
   ASSERT_EQ(unclosed_results.size(), 3u);
@@ -476,8 +534,9 @@ TEST_F(ReadingModeMetricsServiceTest, DirectHtmlParserTesting) {
   EXPECT_EQ(std::string(unclosed_results[2].text), "text");
   ASSERT_EQ(unclosed_results[2].tag_path.size(), 1u);
   EXPECT_EQ(std::string(unclosed_results[2].tag_path[0]), "LI");
+}
 
-  // 2. Nested Structures
+TEST_F(ReadingModeMetricsServiceTest, DirectHtmlParserNestedStructures) {
   auto nested_results =
       reading_mode::parse_distilled_html("<div><ul><li>nested</li></ul></div>");
   ASSERT_EQ(nested_results.size(), 1u);
@@ -486,8 +545,9 @@ TEST_F(ReadingModeMetricsServiceTest, DirectHtmlParserTesting) {
   EXPECT_EQ(std::string(nested_results[0].tag_path[0]), "DIV");
   EXPECT_EQ(std::string(nested_results[0].tag_path[1]), "UL");
   EXPECT_EQ(std::string(nested_results[0].tag_path[2]), "LI");
+}
 
-  // 3. Garbage / Empty Inputs
+TEST_F(ReadingModeMetricsServiceTest, DirectHtmlParserGarbageEmptyInputs) {
   auto empty_results =
       reading_mode::parse_distilled_html("<garbage>   </garbage>");
   EXPECT_TRUE(empty_results.empty());
@@ -502,14 +562,15 @@ TEST_F(ReadingModeMetricsServiceTest, RestrictsHeaderTags) {
   EXPECT_FLOAT_EQ(metrics.struct_score, 0.75f);
 }
 
-TEST_F(ReadingModeMetricsServiceTest, ComplexArticleEvaluation) {
+TEST_F(ReadingModeMetricsServiceTest,
+       ComplexArticleEvaluationIdealDistillation) {
   mojo::PendingReceiver<mojom::DistillationEvaluator> receiver;
   ReadingModeMetricsService service(std::move(receiver));
 
-  // 1. Ideal Distillation (100% preservation)
+  // Ideal Distillation (100% preservation)
   // We use single line layout (no leading indentation or extraneous newlines
   // outside tags) so character counts of the HTML matches static text nodes.
-  std::string distilled_html_a =
+  std::string distilled_html =
       "<div class=\"content\"><h1>Rust Programming Language </h1>"
       "<p>By <strong>Graydon Hoare </strong></p>"
       "<h2>Core Architecture </h2>"
@@ -521,14 +582,15 @@ TEST_F(ReadingModeMetricsServiceTest, ComplexArticleEvaluation) {
       "<p><a href=\"https://rust-lang.org\">Read the official guide </a></p>"
       "</div>";
 
-  mojom::EvaluationStatus status_a;
-  mojom::DistillationMetricsPtr metrics_a;
+  mojom::EvaluationStatus status;
+  mojom::DistillationMetricsPtr metrics;
 
-  service.Evaluate(CreateComplexMockAXTreeUpdate(), distilled_html_a,
+  service.Evaluate(CreateComplexMockAXTreeUpdate(), distilled_html,
                    base::BindOnce(
                        [](mojom::EvaluationStatus* out_status,
                           mojom::DistillationMetricsPtr* out_metrics,
-                          base::expected<mojom::DistillationMetricsPtr, mojom::EvaluationStatus> result) {
+                          base::expected<mojom::DistillationMetricsPtr,
+                                         mojom::EvaluationStatus> result) {
                          if (result.has_value()) {
                            *out_status = mojom::EvaluationStatus::kSuccess;
                            *out_metrics = std::move(result.value());
@@ -536,17 +598,22 @@ TEST_F(ReadingModeMetricsServiceTest, ComplexArticleEvaluation) {
                            *out_status = result.error();
                          }
                        },
-                       &status_a, &metrics_a));
+                       &status, &metrics));
 
-  EXPECT_EQ(status_a, mojom::EvaluationStatus::kSuccess);
-  ASSERT_TRUE(metrics_a);
-  EXPECT_GT(metrics_a->rouge_l_f1, 0.95f);
-  EXPECT_FLOAT_EQ(metrics_a->struct_score, 1.0f);
-  EXPECT_FLOAT_EQ(metrics_a->format_score, 1.0f);
-  EXPECT_FLOAT_EQ(metrics_a->link_density_ratio,
+  EXPECT_EQ(status, mojom::EvaluationStatus::kSuccess);
+  ASSERT_TRUE(metrics);
+  EXPECT_GT(metrics->rouge_l_f1, 0.95f);
+  EXPECT_FLOAT_EQ(metrics->struct_score, 1.0f);
+  EXPECT_FLOAT_EQ(metrics->format_score, 1.0f);
+  EXPECT_FLOAT_EQ(metrics->link_density_ratio,
                   0.0f);  // 0% reduction since links are preserved
+}
 
-  // 2. Imperfect Distillation (Omitted formats but text survives)
+TEST_F(ReadingModeMetricsServiceTest, ComplexArticleEvaluationImperfectDistillation) {
+  mojo::PendingReceiver<mojom::DistillationEvaluator> receiver;
+  ReadingModeMetricsService service(std::move(receiver));
+
+  // Imperfect Distillation (Omitted formats but text survives)
   // - Headings: H1 survives inside a <p>, H2 survives inside H2.
   //   Heading ratio = (0 + 1) / 2 = 0.5.
   // - Lists: LI1 survives in <li>, LI2 survives in <p>.
@@ -559,7 +626,7 @@ TEST_F(ReadingModeMetricsServiceTest, ComplexArticleEvaluation) {
   //   = 1.0. Formatting Score = (0 + 1.0 + 0 + 1.0) / 4 = 0.5.
   // - Link: The <a> tag is stripped, text survives as plain.
   //   Link density reduction = (orig - 0) / orig = 1.0.
-  std::string distilled_html_b =
+  std::string distilled_html =
       "<div class=\"content\"><p>Rust Programming Language </p>"
       "<p>By Graydon Hoare </p>"
       "<h2>Core Architecture </h2>"
@@ -569,14 +636,15 @@ TEST_F(ReadingModeMetricsServiceTest, ComplexArticleEvaluation) {
       "<blockquote>Safety is not just about preventing crashes. </blockquote>"
       "Read the official guide </div>";
 
-  mojom::EvaluationStatus status_b;
-  mojom::DistillationMetricsPtr metrics_b;
+  mojom::EvaluationStatus status;
+  mojom::DistillationMetricsPtr metrics;
 
-  service.Evaluate(CreateComplexMockAXTreeUpdate(), distilled_html_b,
+  service.Evaluate(CreateComplexMockAXTreeUpdate(), distilled_html,
                    base::BindOnce(
                        [](mojom::EvaluationStatus* out_status,
                           mojom::DistillationMetricsPtr* out_metrics,
-                          base::expected<mojom::DistillationMetricsPtr, mojom::EvaluationStatus> result) {
+                          base::expected<mojom::DistillationMetricsPtr,
+                                         mojom::EvaluationStatus> result) {
                          if (result.has_value()) {
                            *out_status = mojom::EvaluationStatus::kSuccess;
                            *out_metrics = std::move(result.value());
@@ -584,23 +652,23 @@ TEST_F(ReadingModeMetricsServiceTest, ComplexArticleEvaluation) {
                            *out_status = result.error();
                          }
                        },
-                       &status_b, &metrics_b));
+                       &status, &metrics));
 
-  EXPECT_EQ(status_b, mojom::EvaluationStatus::kSuccess);
-  ASSERT_TRUE(metrics_b);
-  EXPECT_GT(metrics_b->rouge_l_recall, 0.95f);  // text survived
-  EXPECT_FLOAT_EQ(metrics_b->struct_score, 0.5f);
-  EXPECT_FLOAT_EQ(metrics_b->format_score, 0.5f);
-  EXPECT_FLOAT_EQ(metrics_b->link_density_ratio,
+  EXPECT_EQ(status, mojom::EvaluationStatus::kSuccess);
+  ASSERT_TRUE(metrics);
+  EXPECT_GT(metrics->rouge_l_recall, 0.95f);  // text survived
+  EXPECT_FLOAT_EQ(metrics->struct_score, 0.5f);
+  EXPECT_FLOAT_EQ(metrics->format_score, 0.5f);
+  EXPECT_FLOAT_EQ(metrics->link_density_ratio,
                   1.0f);  // 100% reduction of links
 }
 
-TEST_F(ReadingModeMetricsServiceTest, HeavyArticleEvaluation) {
+TEST_F(ReadingModeMetricsServiceTest, HeavyArticleEvaluationIdealDistillation) {
   mojo::PendingReceiver<mojom::DistillationEvaluator> receiver;
   ReadingModeMetricsService service(std::move(receiver));
 
-  // 1. Ideal Distillation (100% preservation)
-  std::string distilled_html_a =
+  // Ideal Distillation (100% preservation)
+  std::string distilled_html =
       "<div class=\"content\"><h1>Advanced Rust Concurrency </h1>"
       "<p>In this article, we discuss <strong>data races </strong>and how to "
       "avoid them. Check the <a href=\"https://rust.org/concurrency\">"
@@ -616,14 +684,15 @@ TEST_F(ReadingModeMetricsServiceTest, HeavyArticleEvaluation) {
       "share memory by communicating. </blockquote>"
       "</div>";
 
-  mojom::EvaluationStatus status_a;
-  mojom::DistillationMetricsPtr metrics_a;
+  mojom::EvaluationStatus status;
+  mojom::DistillationMetricsPtr metrics;
 
-  service.Evaluate(CreateHeavyMockAXTreeUpdate(), distilled_html_a,
+  service.Evaluate(CreateHeavyMockAXTreeUpdate(), distilled_html,
                    base::BindOnce(
                        [](mojom::EvaluationStatus* out_status,
                           mojom::DistillationMetricsPtr* out_metrics,
-                          base::expected<mojom::DistillationMetricsPtr, mojom::EvaluationStatus> result) {
+                          base::expected<mojom::DistillationMetricsPtr,
+                                         mojom::EvaluationStatus> result) {
                          if (result.has_value()) {
                            *out_status = mojom::EvaluationStatus::kSuccess;
                            *out_metrics = std::move(result.value());
@@ -631,17 +700,22 @@ TEST_F(ReadingModeMetricsServiceTest, HeavyArticleEvaluation) {
                            *out_status = result.error();
                          }
                        },
-                       &status_a, &metrics_a));
+                       &status, &metrics));
 
-  EXPECT_EQ(status_a, mojom::EvaluationStatus::kSuccess);
-  ASSERT_TRUE(metrics_a);
-  EXPECT_GT(metrics_a->rouge_l_f1, 0.95f);
-  EXPECT_FLOAT_EQ(metrics_a->struct_score, 1.0f);
-  EXPECT_FLOAT_EQ(metrics_a->format_score, 1.0f);
-  EXPECT_FLOAT_EQ(metrics_a->link_density_ratio,
+  EXPECT_EQ(status, mojom::EvaluationStatus::kSuccess);
+  ASSERT_TRUE(metrics);
+  EXPECT_GT(metrics->rouge_l_f1, 0.95f);
+  EXPECT_FLOAT_EQ(metrics->struct_score, 1.0f);
+  EXPECT_FLOAT_EQ(metrics->format_score, 1.0f);
+  EXPECT_FLOAT_EQ(metrics->link_density_ratio,
                   0.0f);  // 0% reduction since links are preserved
+}
 
-  // 2. Imperfect / Omitted Layout Distillation
+TEST_F(ReadingModeMetricsServiceTest, HeavyArticleEvaluationImperfectDistillation) {
+  mojo::PendingReceiver<mojom::DistillationEvaluator> receiver;
+  ReadingModeMetricsService service(std::move(receiver));
+
+  // Imperfect / Omitted Layout Distillation
   // - Headings: H1 becomes regular <p>, synchronization H2 survives in H2,
   // channels H2 becomes regular <p>.
   //   Heading ratio = (0 + 1 + 0) / 3 = 0.33333333f.
@@ -656,7 +730,7 @@ TEST_F(ReadingModeMetricsServiceTest, HeavyArticleEvaluation) {
   //   Blockquote score = 1.0. Format score = 1.0.
   // - Link: Omitted (stripped).
   //   Link density ratio = 1.0.
-  std::string distilled_html_b =
+  std::string distilled_html =
       "<div class=\"content\"><p>Advanced Rust Concurrency </p>"
       "<p>In this article, we discuss <strong>data races </strong>and how to "
       "avoid them. Check the Concurrency Guide for resources. </p>"
@@ -671,14 +745,15 @@ TEST_F(ReadingModeMetricsServiceTest, HeavyArticleEvaluation) {
       "share memory by communicating. </blockquote>"
       "</div>";
 
-  mojom::EvaluationStatus status_b;
-  mojom::DistillationMetricsPtr metrics_b;
+  mojom::EvaluationStatus status;
+  mojom::DistillationMetricsPtr metrics;
 
-  service.Evaluate(CreateHeavyMockAXTreeUpdate(), distilled_html_b,
+  service.Evaluate(CreateHeavyMockAXTreeUpdate(), distilled_html,
                    base::BindOnce(
                        [](mojom::EvaluationStatus* out_status,
                           mojom::DistillationMetricsPtr* out_metrics,
-                          base::expected<mojom::DistillationMetricsPtr, mojom::EvaluationStatus> result) {
+                          base::expected<mojom::DistillationMetricsPtr,
+                                         mojom::EvaluationStatus> result) {
                          if (result.has_value()) {
                            *out_status = mojom::EvaluationStatus::kSuccess;
                            *out_metrics = std::move(result.value());
@@ -686,14 +761,14 @@ TEST_F(ReadingModeMetricsServiceTest, HeavyArticleEvaluation) {
                            *out_status = result.error();
                          }
                        },
-                       &status_b, &metrics_b));
+                       &status, &metrics));
 
-  EXPECT_EQ(status_b, mojom::EvaluationStatus::kSuccess);
-  ASSERT_TRUE(metrics_b);
-  EXPECT_GT(metrics_b->rouge_l_recall, 0.95f);
-  EXPECT_NEAR(metrics_b->struct_score, 0.58333333f, 0.0001f);
-  EXPECT_FLOAT_EQ(metrics_b->format_score, 1.0f);
-  EXPECT_FLOAT_EQ(metrics_b->link_density_ratio,
+  EXPECT_EQ(status, mojom::EvaluationStatus::kSuccess);
+  ASSERT_TRUE(metrics);
+  EXPECT_GT(metrics->rouge_l_recall, 0.95f);
+  EXPECT_NEAR(metrics->struct_score, 0.58333333f, 0.0001f);
+  EXPECT_FLOAT_EQ(metrics->format_score, 1.0f);
+  EXPECT_FLOAT_EQ(metrics->link_density_ratio,
                   1.0f);  // 100% reduction of links
 }
 
@@ -823,20 +898,20 @@ TEST_F(ReadingModeMetricsServiceTest, AXTreesExtractsNestedProperties) {
   EXPECT_EQ(std::string(structure.code_fragments[0]), "code");
 }
 
-TEST_F(ReadingModeMetricsServiceTest, MalformedHtmlEvaluation) {
+TEST_F(ReadingModeMetricsServiceTest, MalformedHtmlEvaluationWellFormed) {
   mojo::PendingReceiver<mojom::DistillationEvaluator> receiver;
   ReadingModeMetricsService service(std::move(receiver));
 
-  // 1. Well-formed HTML
   std::string good_html = "<div class=\"content\"><h1>Title </h1><p>Some text </p></div>";
-  mojom::EvaluationStatus status_good;
-  mojom::DistillationMetricsPtr metrics_good;
+  mojom::EvaluationStatus status;
+  mojom::DistillationMetricsPtr metrics;
 
   service.Evaluate(CreateComplexMockAXTreeUpdate(), good_html,
                    base::BindOnce(
                        [](mojom::EvaluationStatus* out_status,
                           mojom::DistillationMetricsPtr* out_metrics,
-                          base::expected<mojom::DistillationMetricsPtr, mojom::EvaluationStatus> result) {
+                          base::expected<mojom::DistillationMetricsPtr,
+                                         mojom::EvaluationStatus> result) {
                          if (result.has_value()) {
                            *out_status = mojom::EvaluationStatus::kSuccess;
                            *out_metrics = std::move(result.value());
@@ -844,21 +919,26 @@ TEST_F(ReadingModeMetricsServiceTest, MalformedHtmlEvaluation) {
                            *out_status = result.error();
                          }
                        },
-                       &status_good, &metrics_good));
+                       &status, &metrics));
 
-  EXPECT_EQ(status_good, mojom::EvaluationStatus::kSuccess);
-  ASSERT_TRUE(metrics_good);
+  EXPECT_EQ(status, mojom::EvaluationStatus::kSuccess);
+  ASSERT_TRUE(metrics);
+}
 
-  // 2. Malformed HTML (unclosed tag)
+TEST_F(ReadingModeMetricsServiceTest, MalformedHtmlEvaluationMalformed) {
+  mojo::PendingReceiver<mojom::DistillationEvaluator> receiver;
+  ReadingModeMetricsService service(std::move(receiver));
+
   std::string malformed_html = "<div class=\"content\"><h1>Title </h1><p>Some text </div>";
-  mojom::EvaluationStatus status_malformed;
-  mojom::DistillationMetricsPtr metrics_malformed;
+  mojom::EvaluationStatus status;
+  mojom::DistillationMetricsPtr metrics;
 
   service.Evaluate(CreateComplexMockAXTreeUpdate(), malformed_html,
                    base::BindOnce(
                        [](mojom::EvaluationStatus* out_status,
                           mojom::DistillationMetricsPtr* out_metrics,
-                          base::expected<mojom::DistillationMetricsPtr, mojom::EvaluationStatus> result) {
+                          base::expected<mojom::DistillationMetricsPtr,
+                                         mojom::EvaluationStatus> result) {
                          if (result.has_value()) {
                            *out_status = mojom::EvaluationStatus::kSuccess;
                            *out_metrics = std::move(result.value());
@@ -866,10 +946,10 @@ TEST_F(ReadingModeMetricsServiceTest, MalformedHtmlEvaluation) {
                            *out_status = result.error();
                          }
                        },
-                       &status_malformed, &metrics_malformed));
+                       &status, &metrics));
 
-  EXPECT_EQ(status_malformed, mojom::EvaluationStatus::kMalformedDistilledHtml);
-  EXPECT_FALSE(metrics_malformed);
+  EXPECT_EQ(status, mojom::EvaluationStatus::kMalformedDistilledHtml);
+  EXPECT_FALSE(metrics);
 }
 
 }  // namespace reading_mode
