@@ -119,13 +119,13 @@ bool ContainsValidKey(const webauthn::SharedKeyList& keys,
                                 fetchTrustedVaultKeysCompletion
                  isEnrolled:(BOOL)isEnrolled
                       error:(NSError*)error {
-  if (isEnrolled) {
-    if (error != nil) {
-      // Skip fetching keys if there was an error.
-      fetchTrustedVaultKeysCompletion(/*trustedVaultKeys=*/{}, error);
-      return;
-    }
+  if (error != nil) {
+    // Skip fetching keys if there was an error.
+    fetchTrustedVaultKeysCompletion(/*trustedVaultKeys=*/{}, error);
+    return;
+  }
 
+  if (isEnrolled) {
     [self fetchKeysForGaia:gaia
                 credential:credential
         canMarkKeysAsStale:YES
