@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_ACTOR_AGGREGATED_JOURNAL_IN_MEMORY_SERIALIZER_H_
-#define CHROME_BROWSER_ACTOR_AGGREGATED_JOURNAL_IN_MEMORY_SERIALIZER_H_
+#ifndef COMPONENTS_ACTOR_CORE_AGGREGATED_JOURNAL_IN_MEMORY_SERIALIZER_H_
+#define COMPONENTS_ACTOR_CORE_AGGREGATED_JOURNAL_IN_MEMORY_SERIALIZER_H_
 
 #include "base/files/file.h"
 #include "components/actor/core/aggregated_journal_serializer.h"
@@ -33,4 +33,4 @@ class AggregatedJournalInMemorySerializer : public AggregatedJournalSerializer {
 
 }  // namespace actor
 
-#endif  // CHROME_BROWSER_ACTOR_AGGREGATED_JOURNAL_IN_MEMORY_SERIALIZER_H_
+#endif  // COMPONENTS_ACTOR_CORE_AGGREGATED_JOURNAL_IN_MEMORY_SERIALIZER_H_

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/actor/aggregated_journal_in_memory_serializer.h"
+#include "components/actor/core/aggregated_journal_in_memory_serializer.h"
 
 #include "base/compiler_specific.h"
 #include "third_party/perfetto/include/perfetto/ext/tracing/core/trace_packet.h"

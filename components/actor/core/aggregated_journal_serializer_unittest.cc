@@ -1,24 +1,22 @@
 // Copyright 2025 The Chromium Authors
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+
 #include "components/actor/core/aggregated_journal_serializer.h"
+
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "base/files/file_util.h"
 #include "base/files/scoped_temp_file.h"
-#include "base/test/scoped_feature_list.h"
+#include "base/test/task_environment.h"
 #include "base/test/test_future.h"
 #include "base/test/tracing/test_trace_processor_impl.h"
-#include "chrome/browser/actor/actor_keyed_service.h"
-#include "chrome/browser/actor/aggregated_journal_file_serializer.h"
-#include "chrome/browser/actor/aggregated_journal_in_memory_serializer.h"
-#include "chrome/common/chrome_features.h"
-#include "chrome/test/base/testing_browser_process.h"
-#include "chrome/test/base/testing_profile.h"
-#include "chrome/test/base/testing_profile_manager.h"
 #include "components/actor/core/aggregated_journal.h"
+#include "components/actor/core/aggregated_journal_file_serializer.h"
+#include "components/actor/core/aggregated_journal_in_memory_serializer.h"
 #include "components/actor/core/journal_details_builder.h"
-#include "components/optimization_guide/proto/features/actions_data.pb.h"
-#include "content/public/test/browser_task_environment.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -28,28 +26,15 @@ namespace {
 
 class AggregatedJournalSerializerTest : public testing::Test {
  public:
-  AggregatedJournalSerializerTest()
-      : testing_profile_manager_(TestingBrowserProcess::GetGlobal()) {}
+  AggregatedJournalSerializerTest() = default;
   ~AggregatedJournalSerializerTest() override = default;
 
-  // testing::Test:
-  void SetUp() override {
-    ASSERT_TRUE(testing_profile_manager_.SetUp());
-    scoped_feature_list_.InitAndEnableFeature(features::kGlicActor);
-    profile_ = testing_profile_manager_.CreateTestingProfile("profile");
-  }
-
-  TestingProfile* profile() { return profile_; }
-
  private:
-  content::BrowserTaskEnvironment task_environment_;
-  TestingProfileManager testing_profile_manager_;
-  raw_ptr<TestingProfile> profile_;
-  base::test::ScopedFeatureList scoped_feature_list_;
+  base::test::TaskEnvironment task_environment_;
 };
 
 TEST_F(AggregatedJournalSerializerTest, SerializerInMemory) {
-  AggregatedJournal& journal = ActorKeyedService::Get(profile())->GetJournal();
+  AggregatedJournal journal;
   AggregatedJournalInMemorySerializer serializer(journal,
                                                  /*max_bytes=*/1024 * 1024);
   serializer.Init();
@@ -71,7 +56,7 @@ TEST_F(AggregatedJournalSerializerTest, SerializerInMemory) {
 }
 
 TEST_F(AggregatedJournalSerializerTest, SerializerInMemoryTooSmallBuffer) {
-  AggregatedJournal& journal = ActorKeyedService::Get(profile())->GetJournal();
+  AggregatedJournal journal;
   AggregatedJournalInMemorySerializer serializer(journal, /*max_bytes=*/8);
   serializer.Init();
   journal.Log(GURL(), TaskId(0), "Test",
@@ -83,7 +68,7 @@ TEST_F(AggregatedJournalSerializerTest, SerializerInMemoryTooSmallBuffer) {
 }
 
 TEST_F(AggregatedJournalSerializerTest, SerializerInMemorySmallBuffer) {
-  AggregatedJournal& journal = ActorKeyedService::Get(profile())->GetJournal();
+  AggregatedJournal journal;
   AggregatedJournalInMemorySerializer serializer(journal, /*max_bytes=*/100);
   serializer.Init();
   for (size_t i = 0; i < 10; ++i) {
@@ -98,7 +83,7 @@ TEST_F(AggregatedJournalSerializerTest, SerializerInMemorySmallBuffer) {
 }
 
 TEST_F(AggregatedJournalSerializerTest, SerializerInFile) {
-  AggregatedJournal& journal = ActorKeyedService::Get(profile())->GetJournal();
+  AggregatedJournal journal;
   base::ScopedTempFile temp_file;
   ASSERT_TRUE(temp_file.Create());
   AggregatedJournalFileSerializer serializer(journal);

@@ -16,6 +16,10 @@ source_set("journal") {
   sources = [
     "aggregated_journal.cc",
     "aggregated_journal.h",
+    "aggregated_journal_file_serializer.cc",
+    "aggregated_journal_file_serializer.h",
+    "aggregated_journal_in_memory_serializer.cc",
+    "aggregated_journal_in_memory_serializer.h",
     "aggregated_journal_serializer.cc",
     "aggregated_journal_serializer.h",
     "journal_details_builder.cc",
@@ -69,6 +73,7 @@ source_set("core") {
 source_set("unit_tests") {
   testonly = true
   sources = [
+    "aggregated_journal_serializer_unittest.cc",
     "aggregated_journal_unittest.cc",
     "safety_list_manager_unittest.cc",
     "shared_types_unittest.cc",

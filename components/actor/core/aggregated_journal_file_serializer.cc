@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/actor/aggregated_journal_file_serializer.h"
+#include "components/actor/core/aggregated_journal_file_serializer.h"
 
 #include "base/compiler_specific.h"
 #include "base/containers/span.h"
