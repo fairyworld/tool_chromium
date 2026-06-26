@@ -301,7 +301,7 @@ Widget::~Widget() {
       native_widget_->ClientDestroyedWidget();
     }
 
-    if (!widget_destroying_) {
+    if (!widget_destroying_handled_) {
       HandleWidgetDestroying();
     }
     if (native_widget_) {
@@ -316,7 +316,7 @@ Widget::~Widget() {
     }
   }
 
-  CHECK(widget_destroying_);
+  CHECK(widget_destroying_handled_);
   CHECK(native_widget_destroyed_);
 
   RemoveObserver(&root_view_->GetViewAccessibility());
@@ -2844,8 +2844,8 @@ void Widget::HandleShowRequested() {
 
 void Widget::HandleWidgetDestroying() {
   CHECK(!native_widget_destroyed_);
-  CHECK(!widget_destroying_);
-  widget_destroying_ = true;
+  CHECK(!widget_destroying_handled_);
+  widget_destroying_handled_ = true;
   ClearFocusManagerFromWidget();
   if (parent_) {
     parent_->OnChildRemoved(this);
@@ -2860,7 +2860,7 @@ void Widget::HandleWidgetDestroying() {
 }
 
 void Widget::HandleWidgetDestroyed() {
-  CHECK(widget_destroying_);
+  CHECK(widget_destroying_handled_);
   if (native_widget_destroyed_) {
     return;
   }
