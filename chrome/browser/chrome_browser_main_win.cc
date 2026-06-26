@@ -751,6 +751,13 @@ void ChromeBrowserMainPartsWin::PostBrowserStart() {
                      return;
                    }
 
+                   // If an enterprise administrator has set a Mandatory policy,
+                   // do not allow a field trial to override it.
+                   if (g_browser_process->local_state()->IsManagedPreference(
+                           prefs::kProcessIsolationEnabled)) {
+                     return;
+                   }
+
                    g_browser_process->local_state()->SetString(
                        prefs::kPreviousIsolationState, group_name);
 

@@ -556,9 +556,11 @@ source_set("browser_tests") {
       "test/browser_dynamic_code_blocked_win_browsertest.cc",
       "test/locale_policy_browsertest.cc",
       "test/printing_lpac_sandbox_enabled_win_browsertest.cc",
+      "test/process_isolation_enabled_browsertest.cc",
       "test/renderer_app_container_enabled_win_browsertest.cc",
       "test/restrict_core_sharing_policy_browsertest.cc",
     ]
+    deps += [ "//chrome/browser/win:isolated_browser_support" ]
   }
 
   if (is_win || is_linux) {
