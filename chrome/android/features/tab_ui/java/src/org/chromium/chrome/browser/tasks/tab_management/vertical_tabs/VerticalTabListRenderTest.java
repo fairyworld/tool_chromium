@@ -75,7 +75,6 @@ import java.util.List;
 
 // TODO(crbug.com/524393627): Add tests for Incognito.
 // TODO(crbug.com/521987032): Add tests for nested children with actor indicator.
-// TODO(crbug.com/519325873): Add RenderTest for pinned tab hover state.
 // TODO(crbug.com/509226293): Add tests for RTL layout.
 
 /** Render tests for Vertical Tabs UI (TabVerticalViewBinder). */
@@ -503,6 +502,42 @@ public class VerticalTabListRenderTest {
         CriteriaHelper.pollUiThread(() -> view[0].getHeight() > 0);
 
         mRenderTestRule.render(mRenderView, "pinned_tab_loading");
+    }
+
+    @Test
+    @MediumTest
+    @Feature({"RenderTest"})
+    public void testPinnedTab_Hovered() throws IOException {
+        ViewGroup[] view = new ViewGroup[1];
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    view[0] = inflateAndAttachView(R.layout.vertical_tab_pinned_item);
+                    PropertyModel model =
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
+                                    .with(TabProperties.IS_INCOGNITO, false)
+                                    .build();
+                    PropertyModelChangeProcessor.create(
+                            model, view[0], TabVerticalViewBinder::bindPinnedTab);
+                    model.set(TabProperties.TITLE, "Hovered Pinned Tab");
+                    model.set(TabProperties.IS_SELECTED, false);
+                    model.set(TabProperties.FAVICON_FETCHER, createFaviconFetcher());
+                });
+        CriteriaHelper.pollUiThread(() -> view[0].getHeight() > 0);
+
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    android.view.MotionEvent event =
+                            android.view.MotionEvent.obtain(
+                                    0,
+                                    0,
+                                    android.view.MotionEvent.ACTION_HOVER_ENTER,
+                                    0.0f,
+                                    0.0f,
+                                    0);
+                    view[0].dispatchGenericMotionEvent(event);
+                });
+
+        mRenderTestRule.render(mRenderView, "pinned_tab_hovered");
     }
 
     @Test
