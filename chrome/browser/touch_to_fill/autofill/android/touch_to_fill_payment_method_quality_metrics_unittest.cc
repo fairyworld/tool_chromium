@@ -38,15 +38,16 @@ class TouchToFillForPaymentMethodsTest
     ON_CALL(payments_autofill_client(), ShowTouchToFillCreditCard)
         .WillByDefault(testing::Return(true));
     autofill_manager().set_touch_to_fill_payment_method_delegate(
-        std::make_unique<TouchToFillDelegateAndroidImpl>(&autofill_manager()));
+        std::make_unique<TouchToFillPaymentMethodDelegateAndroidImpl>(
+            &autofill_manager()));
     autofill_client().set_test_strike_database(
         std::make_unique<TestStrikeDatabase>());
   }
 
   void TearDown() override { TearDownHelper(); }
 
-  TouchToFillDelegateAndroidImpl& touch_to_fill_delegate() {
-    return *static_cast<TouchToFillDelegateAndroidImpl*>(
+  TouchToFillPaymentMethodDelegateAndroidImpl& touch_to_fill_delegate() {
+    return *static_cast<TouchToFillPaymentMethodDelegateAndroidImpl*>(
         autofill_manager().touch_to_fill_payment_method_delegate());
   }
 

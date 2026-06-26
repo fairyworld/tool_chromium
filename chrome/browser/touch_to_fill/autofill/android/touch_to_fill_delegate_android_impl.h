@@ -98,14 +98,16 @@ class FormStructure;
 // interact with it and its |AutofillClient| and |AutofillDriver|.
 //
 // TODO(crbug.com/40839529): Consider using more descriptive name.
-class TouchToFillDelegateAndroidImpl : public TouchToFillPaymentMethodDelegate {
+class TouchToFillPaymentMethodDelegateAndroidImpl
+    : public TouchToFillPaymentMethodDelegate {
  public:
-  explicit TouchToFillDelegateAndroidImpl(BrowserAutofillManager* manager);
-  TouchToFillDelegateAndroidImpl(const TouchToFillDelegateAndroidImpl&) =
-      delete;
-  TouchToFillDelegateAndroidImpl& operator=(
-      const TouchToFillDelegateAndroidImpl&) = delete;
-  ~TouchToFillDelegateAndroidImpl() override;
+  explicit TouchToFillPaymentMethodDelegateAndroidImpl(
+      BrowserAutofillManager* manager);
+  TouchToFillPaymentMethodDelegateAndroidImpl(
+      const TouchToFillPaymentMethodDelegateAndroidImpl&) = delete;
+  TouchToFillPaymentMethodDelegateAndroidImpl& operator=(
+      const TouchToFillPaymentMethodDelegateAndroidImpl&) = delete;
+  ~TouchToFillPaymentMethodDelegateAndroidImpl() override;
 
   BrowserAutofillManager& GetAutofillManager() override;
 
@@ -155,7 +157,7 @@ class TouchToFillDelegateAndroidImpl : public TouchToFillPaymentMethodDelegate {
       base::OnceCallback<void(BnplIssuer)> selected_issuer_callback) override;
   void SetBnplTosAcceptCallback(base::OnceClosure accept_tos_callback) override;
 
-  base::WeakPtr<TouchToFillDelegateAndroidImpl> GetWeakPtr();
+  base::WeakPtr<TouchToFillPaymentMethodDelegateAndroidImpl> GetWeakPtr();
 
  private:
   enum class TouchToFillState {
@@ -245,7 +247,8 @@ class TouchToFillDelegateAndroidImpl : public TouchToFillPaymentMethodDelegate {
 
   BnplCallbacks bnpl_callbacks_;
 
-  base::WeakPtrFactory<TouchToFillDelegateAndroidImpl> weak_ptr_factory_{this};
+  base::WeakPtrFactory<TouchToFillPaymentMethodDelegateAndroidImpl>
+      weak_ptr_factory_{this};
 };
 
 }  // namespace autofill

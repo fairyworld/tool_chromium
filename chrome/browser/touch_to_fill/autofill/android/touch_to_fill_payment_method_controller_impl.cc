@@ -43,9 +43,10 @@
 namespace autofill {
 
 namespace {
-TouchToFillDelegateAndroidImpl* GetDelegate(AutofillManager& manager) {
+TouchToFillPaymentMethodDelegateAndroidImpl* GetDelegate(
+    AutofillManager& manager) {
   auto& bam = static_cast<BrowserAutofillManager&>(manager);
-  return static_cast<TouchToFillDelegateAndroidImpl*>(
+  return static_cast<TouchToFillPaymentMethodDelegateAndroidImpl*>(
       bam.touch_to_fill_payment_method_delegate());
 }
 }  // namespace
@@ -324,7 +325,7 @@ void TouchToFillPaymentMethodControllerImpl::OnContentAutofillDriverCreated(
   auto& manager =
       static_cast<BrowserAutofillManager&>(driver.GetAutofillManager());
   manager.set_touch_to_fill_payment_method_delegate(
-      std::make_unique<TouchToFillDelegateAndroidImpl>(&manager));
+      std::make_unique<TouchToFillPaymentMethodDelegateAndroidImpl>(&manager));
 }
 
 void TouchToFillPaymentMethodControllerImpl::OnDismissed(JNIEnv* env,
