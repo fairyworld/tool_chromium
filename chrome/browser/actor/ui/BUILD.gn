@@ -320,7 +320,6 @@ source_set("ui") {
       "//chrome/browser/ui/tabs:tab_strip",
       "//chrome/browser/ui/toasts",
       "//chrome/browser/ui/toasts/api:toasts",
-      "//chrome/browser/ui/views/interaction",
       "//components/prefs",
       "//components/tabs:public",
       "//third_party/abseil-cpp:absl",
