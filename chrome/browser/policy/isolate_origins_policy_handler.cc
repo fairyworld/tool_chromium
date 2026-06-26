@@ -38,11 +38,32 @@ constexpr uint64_t kLowMemoryDeviceThresholdMiB = 3200;
 // Helper to check if a feature is enabled during early startup.
 // In the production browser, base::FeatureList is initialized before this
 // handler runs, so we use the standard IsEnabled() API. In environments where
-// the feature list isn't initialized, we fall back to the feature's default.
+// the feature list isn't initialized (such as early startup and browser tests),
+// we fall back to parsing the raw command line.
 bool IsFeatureEnabled(const base::Feature& feature) {
-  return base::FeatureList::GetInstance()
-             ? base::FeatureList::IsEnabled(feature)
-             : (feature.default_state == base::FEATURE_ENABLED_BY_DEFAULT);
+  if (base::FeatureList::GetInstance()) {
+    return base::FeatureList::IsEnabled(feature);
+  }
+
+  const auto* command_line = base::CommandLine::ForCurrentProcess();
+  if (command_line->HasSwitch(switches::kDisableFeatures)) {
+    std::vector<std::string> disabled = base::SplitString(
+        command_line->GetSwitchValueASCII(switches::kDisableFeatures), ",",
+        base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
+    if (std::ranges::contains(disabled, feature.name)) {
+      return false;
+    }
+  }
+  if (command_line->HasSwitch(switches::kEnableFeatures)) {
+    std::vector<std::string> enabled = base::SplitString(
+        command_line->GetSwitchValueASCII(switches::kEnableFeatures), ",",
+        base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
+    if (std::ranges::contains(enabled, feature.name)) {
+      return true;
+    }
+  }
+
+  return feature.default_state == base::FEATURE_ENABLED_BY_DEFAULT;
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
