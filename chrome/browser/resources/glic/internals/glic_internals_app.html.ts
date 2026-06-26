@@ -136,26 +136,31 @@ export function getHtml(this: GlicInternalsAppElement) {
               @input="${this.onInvokePromptInput_}">
           </input>
           <div style="display: flex; gap: 16px; align-items: center;">
-            <label>
+            <label style="flex: 1;">
               <input type="checkbox" .checked="${this.invokeAutoSubmit_}"
                   @change="${this.onInvokeAutoSubmitChange_}">
               Auto Submit
             </label>
-            <label>
+            <label style="flex: 1;">
               <input type="checkbox" .checked="${this.invokeWaitForPanelOpen_}"
                   @change="${this.onInvokeWaitForPanelOpenChange_}">
               Wait for Panel Open
             </label>
           </div>
-          ${this.invokeAutoSubmit_ ? html`
-            <div style="display: flex; gap: 16px; align-items: center;">
-              <label>
+          <div style="display: flex; gap: 16px; align-items: center;">
+            ${this.invokeAutoSubmit_ ? html`
+              <label style="flex: 1;">
                 <input type="checkbox" .checked="${this.invokeShowPanel_}"
                     @change="${this.onInvokeShowPanelChange_}">
                 Show Panel
               </label>
-            </div>
-          ` : html``}
+            ` : html`<div style="flex: 1;"></div>`}
+            <label style="flex: 1;">
+              <input type="checkbox" .checked="${this.invokeNewConversation_}"
+                  @change="${this.onInvokeNewConversationChange_}">
+              New Conversation
+            </label>
+          </div>
           <label for="invokeInvocationSourceSelect">Invocation Source</label>
           <select id="invokeInvocationSourceSelect"
               .value="${this.invokeInvocationSource_.toString()}"
