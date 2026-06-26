@@ -1158,8 +1158,7 @@ BrowserViewTabbedLayoutImpl::CalculateProposedLayout(
   if (features::IsGlassFrameEnabled()) {
     gfx::RoundedCornersF content_corners;
     if (layout_data_->tab_strip_type == TabStripType::kVertical &&
-        !is_fullscreen(layout_data_->window_state) &&
-        layout_data_->vertical_tab_strip_animation.bottom_corner == 1.0) {
+        !is_fullscreen(layout_data_->window_state)) {
       // Note that this will set a lower leading corner on the multi contents
       // view even if there's a shadow box, but since the curve is effectively
       // the same this will not produce a visual bug.
@@ -1414,12 +1413,7 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
 
     if (features::IsGlassFrameEnabled()) {
       if (!is_fullscreen(layout_data_->window_state)) {
-        if (animation.tab_strip_width != 0.0) {
-          frame_color.opacity = 1.0f - animation.tab_strip_width;
-        } else {
-          frame_color.opacity =
-              delegate().IsVerticalTabStripCollapsed() ? 1.0f : 0.0f;
-        }
+        frame_color.opacity = static_cast<float>(animation.expand_on_hover);
       }
       vertical_tabs_background->SetPrimaryColor(frame_color);
     }
@@ -1544,10 +1538,7 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
     // Do corner cutouts and transparency.
     if (features::IsGlassFrameEnabled()) {
       views().vertical_tab_strip_top_corner->SetAlpha(frame_color.opacity);
-      views().vertical_tab_strip_bottom_corner->SetAlpha(
-          layout_data_->vertical_tab_strip_animation.bottom_corner == 1.0
-              ? frame_color.opacity
-              : 1.0f);
+      views().vertical_tab_strip_bottom_corner->SetAlpha(frame_color.opacity);
       vertical_tabs_background->SetCutoutFrom(tab_strip_cutout_views);
     }
   } else if (layout_data_->tab_strip_type == TabStripType::kHorizontal &&
