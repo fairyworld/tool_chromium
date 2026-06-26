@@ -496,9 +496,6 @@ public class MediaNotificationController {
         /** Called when a notification has been shown and should be logged in UMA. */
         void logNotificationShown(NotificationWrapper notification);
 
-        /** Returns true if multiple media notifications are enabled. */
-        boolean isMultipleMediaNotificationsEnabled();
-
         /** Returns the media type ID associated with this delegate. */
         int getMediaTypeId();
 

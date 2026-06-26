@@ -24,6 +24,24 @@ public class MediaNotificationManager {
         sControllers = new SparseArray<>();
     }
 
+    private static boolean sMultipleMediaNotificationsEnabled;
+
+    /**
+     * Sets whether multiple media notifications are enabled.
+     *
+     * @param enabled True if multiple media notifications should be enabled.
+     */
+    public static void setMultipleMediaNotificationsEnabled(boolean enabled) {
+        sMultipleMediaNotificationsEnabled = enabled;
+    }
+
+    /**
+     * @return True if multiple media notifications are enabled.
+     */
+    public static boolean isMultipleMediaNotificationsEnabled() {
+        return sMultipleMediaNotificationsEnabled;
+    }
+
     private MediaNotificationManager() {}
 
     /**

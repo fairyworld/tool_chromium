@@ -21,7 +21,6 @@ import org.chromium.base.SplitCompatService;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.R;
-import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.notifications.NotificationConstants;
 import org.chromium.chrome.browser.notifications.NotificationUmaTracker;
 import org.chromium.chrome.browser.notifications.NotificationWrapperBuilderFactory;
@@ -236,11 +235,6 @@ class ChromeMediaNotificationControllerDelegate implements MediaNotificationCont
                 .onNotificationShown(
                         NotificationUmaTracker.SystemNotificationType.MEDIA,
                         notification.getNotification());
-    }
-
-    @Override
-    public boolean isMultipleMediaNotificationsEnabled() {
-        return ChromeFeatureList.isEnabled(ChromeFeatureList.ALLOW_MULTIPLE_MEDIA_NOTIFICATIONS);
     }
 
     private static NotificationWrapperBuilder createNotificationWrapperBuilder(int notificationId) {
