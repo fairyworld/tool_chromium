@@ -162,8 +162,8 @@ IN_PROC_BROWSER_TEST_F(BrowserWindowMacTest, DisableCommandsWhenSheetAttached) {
   ASSERT_TRUE(
       AddTabAtIndex(0, GURL("chrome://newtab/"), ui::PAGE_TRANSITION_TYPED));
   NSMenuItem* bookmark_all_tabs_item =
-      [[[[NSApp mainMenu] itemWithTag:AppMenuModel::kBookmarksMenuPlaceholder]
-          submenu] itemWithTag:IDC_BOOKMARK_ALL_TABS];
+      [[[[NSApp mainMenu] itemWithTag:kBookmarksMenuId] submenu]
+          itemWithTag:IDC_BOOKMARK_ALL_TABS];
   ASSERT_TRUE(bookmark_all_tabs_item);
   NSMenuItem* print_item = [[[[NSApp mainMenu] itemWithTag:kMacFileMenuId]
       submenu] itemWithTag:IDC_PRINT];

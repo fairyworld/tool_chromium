@@ -3484,7 +3484,7 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_CONTENT_CONTEXT_GENERATE_QR_CODE:
       return IsQRCodeGeneratorEnabled();
 
-    case IDC_CONTENT_CONTEXT_SHARING_SUBMENU:
+    case kSharingSubmenuMenuId:
       return true;
 
     case IDC_CHECK_SPELLING_WHILE_TYPING:

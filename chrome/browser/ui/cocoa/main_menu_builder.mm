@@ -313,7 +313,7 @@ NSMenuItem* BuildViewMenu(NSApplication* nsapp,
                   .command_id(IDC_TOGGLE_VERTICAL_TABS)
                   .remove_if(!tabs::IsVerticalTabsFeatureEnabled()),
               Item(IDS_CUSTOMIZE_TOUCH_BAR)
-                  .tag(IDC_CUSTOMIZE_TOUCH_BAR)
+                  .tag(kCustomizeTouchBarMenuId)
                   .action(@selector(toggleTouchBarCustomizationPalette:))
                   .remove_if(is_pwa),
               Item().is_separator(),

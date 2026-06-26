@@ -151,20 +151,14 @@
   E(kActionSetBrowserAsDefault, IDC_SET_BROWSER_AS_DEFAULT) \
   E(kActionProfilingEnabled, IDC_PROFILING_ENABLED) \
   E(kActionExtensionErrors, IDC_EXTENSION_ERRORS) \
-  E(kActionShowSettingsChangeFirst, IDC_SHOW_SETTINGS_CHANGE_FIRST) \
-  E(kActionShowSettingsChangeLast, IDC_SHOW_SETTINGS_CHANGE_LAST) \
   E(kActionShowAvatarMenu, IDC_SHOW_AVATAR_MENU) \
   E(kActionExtensionInstallErrorFirst, IDC_EXTENSION_INSTALL_ERROR_FIRST) \
   E(kActionExtensionInstallErrorLast, IDC_EXTENSION_INSTALL_ERROR_LAST) \
   E(kActionToggleRequestTabletSite, IDC_TOGGLE_REQUEST_TABLET_SITE) \
   E(kActionDevToolsToggle, IDC_DEV_TOOLS_TOGGLE) \
   E(kActionRecentTabsNoDeviceTabs, IDC_RECENT_TABS_NO_DEVICE_TABS) \
-  E(kActionShowSettingsResetBubble, IDC_SHOW_SETTINGS_RESET_BUBBLE) \
-  E(kActionShowSrtBubble, IDC_SHOW_SRT_BUBBLE) \
-  E(kActionElevatedRecoveryDialog, IDC_ELEVATED_RECOVERY_DIALOG) \
   E(kActionTakeScreenshot, IDC_TAKE_SCREENSHOT) \
   E(kActionToggleFullscreenToolbar, IDC_TOGGLE_FULLSCREEN_TOOLBAR) \
-  E(kActionCustomizeTouchBar, IDC_CUSTOMIZE_TOUCH_BAR) \
   E(kActionShowBetaForum, IDC_SHOW_BETA_FORUM) \
   E(kActionToggleJavascriptAppleEvents, IDC_TOGGLE_JAVASCRIPT_APPLE_EVENTS) \
   E(kActionInstallPwa, IDC_INSTALL_PWA) \
@@ -239,8 +233,6 @@
   E(kActionContentContextSaveLinkAs, IDC_CONTENT_CONTEXT_SAVELINKAS) \
   E(kActionContentContextCopyLinkLocation, \
     IDC_CONTENT_CONTEXT_COPYLINKLOCATION) \
-  E(kActionContentContextCopyEmailAddress, \
-    IDC_CONTENT_CONTEXT_COPYEMAILADDRESS) \
   E(kActionContentContextOpenLinkWith, IDC_CONTENT_CONTEXT_OPENLINKWITH) \
   E(kActionContentContextCopyLinkText, IDC_CONTENT_CONTEXT_COPYLINKTEXT) \
   E(kActionContentContextOpenLinkInProfile, \
@@ -398,7 +390,6 @@
   E(kActionContentContextSharingSharedClipboardMultipleDevices, \
     IDC_CONTENT_CONTEXT_SHARING_SHARED_CLIPBOARD_MULTIPLE_DEVICES) \
   E(kActionContentContextGenerateQrCode, IDC_CONTENT_CONTEXT_GENERATE_QR_CODE) \
-  E(kActionContentContextSharingSubmenu, IDC_CONTENT_CONTEXT_SHARING_SUBMENU) \
   /* Context menu item to show the clipboard history menu */ \
   E(kActionContentPasteFromClipboard, IDC_CONTENT_PASTE_FROM_CLIPBOARD) \
   /* Context menu items in the status tray */ \
@@ -408,22 +399,16 @@
   E(kActionMediaRouterAbout, IDC_MEDIA_ROUTER_ABOUT) \
   E(kActionMediaRouterHelp, IDC_MEDIA_ROUTER_HELP) \
   E(kActionMediaRouterLearnMore, IDC_MEDIA_ROUTER_LEARN_MORE) \
-  E(kActionMediaRouterAlwaysShowToolbarAction, \
-    IDC_MEDIA_ROUTER_ALWAYS_SHOW_TOOLBAR_ACTION) \
-  E(kActionMediaRouterShownByPolicy, IDC_MEDIA_ROUTER_SHOWN_BY_POLICY) \
-  E(kActionMediaRouterShowInToolbar, IDC_MEDIA_ROUTER_SHOW_IN_TOOLBAR) \
   E(kActionMediaRouterToggleMediaRemoting, \
     IDC_MEDIA_ROUTER_TOGGLE_MEDIA_REMOTING) \
   /* Context menu items for media toolbar button */ \
   E(kActionMediaToolbarContextShowOtherSessions, \
     IDC_MEDIA_TOOLBAR_CONTEXT_SHOW_OTHER_SESSIONS) \
   /* Context menu items for media stream status tray */ \
-  E(kActionMediaStreamDeviceStatusTray, IDC_MEDIA_STREAM_DEVICE_STATUS_TRAY) \
   E(kActionMediaContextMediaStreamCaptureListFirst, \
     IDC_MEDIA_CONTEXT_MEDIA_STREAM_CAPTURE_LIST_FIRST) \
   E(kActionMediaContextMediaStreamCaptureListLast, \
     IDC_MEDIA_CONTEXT_MEDIA_STREAM_CAPTURE_LIST_LAST) \
-  E(kActionMediaStreamDeviceAlwaysAllow, IDC_MEDIA_STREAM_DEVICE_ALWAYS_ALLOW) \
   /* Protocol handler menu entries */ \
   E(kActionContentContextProtocolHandlerFirst, \
     IDC_CONTENT_CONTEXT_PROTOCOL_HANDLER_FIRST) \
