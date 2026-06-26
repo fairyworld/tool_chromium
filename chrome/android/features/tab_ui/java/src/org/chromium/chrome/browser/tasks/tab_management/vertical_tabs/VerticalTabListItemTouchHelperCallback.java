@@ -261,8 +261,14 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
             boolean isCurrentlyActive) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
-        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG
-                && viewHolder.getItemViewType() == TabProperties.UiType.TAB_GROUP) {
+        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+            if (!hasTabPropertiesModel(viewHolder)) return;
+            if (isCurrentlyActive) {
+                setBeingDragged(viewHolder, /* isBeingDragged= */ true);
+            }
+
+            if (viewHolder.getItemViewType() != TabProperties.UiType.TAB_GROUP) return;
+
             Token groupId = getTabGroupId(viewHolder);
             if (groupId == null) return;
 
@@ -326,7 +332,7 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
     @Override
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
-
+        setBeingDragged(viewHolder, /* isBeingDragged= */ false);
         // When the drag completely finishes, clean up all manual visual overrides on children.
         if (viewHolder.getItemViewType() == TabProperties.UiType.TAB_GROUP) {
             Token groupId = getTabGroupId(viewHolder);
@@ -420,6 +426,13 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
         int index = tabModel.indexOf(tab);
         if (index != TabModel.INVALID_TAB_INDEX && index != tabModel.index()) {
             tabModel.setIndex(index, TabSelectionType.FROM_USER);
+        }
+    }
+
+    private void setBeingDragged(RecyclerView.ViewHolder viewHolder, boolean isBeingDragged) {
+        int pos = viewHolder.getBindingAdapterPosition();
+        if (pos >= 0 && pos < mModel.size()) {
+            mModel.get(pos).model.set(TabProperties.IS_BEING_DRAGGED, isBeingDragged);
         }
     }
 
