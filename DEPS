@@ -3070,16 +3070,16 @@ deps = {
       ],
   },
 
-  'src/third_party/vulkan-deps': '{chromium_git}/vulkan-deps@03988e5f7eade4a9ce02df33d19aec32382cf39f',
+  'src/third_party/vulkan-deps': '{chromium_git}/vulkan-deps@5b4ed1c6d8bcc19bcce719d03a99750e77de2cf1',
   'src/third_party/glslang/src': '{chromium_git}/external/github.com/KhronosGroup/glslang@ce138e2c2d6992b31ff4cd2e955904637785a881',
   'src/third_party/spirv-cross/src': '{chromium_git}/external/github.com/KhronosGroup/SPIRV-Cross@b8fcf307f1f347089e3c46eb4451d27f32ebc8d3',
   'src/third_party/spirv-headers/src': '{chromium_git}/external/github.com/KhronosGroup/SPIRV-Headers@daa093dd29aab8cbb6562b808370562f56e399fb',
-  'src/third_party/spirv-tools/src': '{chromium_git}/external/github.com/KhronosGroup/SPIRV-Tools@5befd211432adbde96c71b02037630b1e6ca1012',
+  'src/third_party/spirv-tools/src': '{chromium_git}/external/github.com/KhronosGroup/SPIRV-Tools@74d3c74c919298b1a5b7f6f1083d0d4b28c7ac2d',
   'src/third_party/vulkan-headers/src': '{chromium_git}/external/github.com/KhronosGroup/Vulkan-Headers@d2d8ded679e53c9f27c0c7a18750e661745886eb',
   'src/third_party/vulkan-loader/src': '{chromium_git}/external/github.com/KhronosGroup/Vulkan-Loader@0d210fdf88a81b0e833096079f73dda477da62f8',
   'src/third_party/vulkan-tools/src': '{chromium_git}/external/github.com/KhronosGroup/Vulkan-Tools@b7ae55b37cda76d16368c302f37cb0c7ea2f8409',
   'src/third_party/vulkan-utility-libraries/src': '{chromium_git}/external/github.com/KhronosGroup/Vulkan-Utility-Libraries@ba450228e2ebb4059f8a7d4bb36610464e2f0741',
-  'src/third_party/vulkan-validation-layers/src': '{chromium_git}/external/github.com/KhronosGroup/Vulkan-ValidationLayers@f4d67538b84e9f4ee201a6b6b77eedb8b5c20987',
+  'src/third_party/vulkan-validation-layers/src': '{chromium_git}/external/github.com/KhronosGroup/Vulkan-ValidationLayers@171c28ea2d43b0fa8e6c892e6bc0c679c4edd05a',
 
   'src/third_party/vulkan_memory_allocator':
     Var('chromium_git') + '/external/github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git' + '@' + '7e55b011e16182fc349149abbd3aaf3b1db46421',
