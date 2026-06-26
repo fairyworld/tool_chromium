@@ -3044,6 +3044,21 @@ even if they fit the naming pattern. -->
   </summary>
 </histogram>
 
+<histogram
+    name="Accessibility.ReadAnything.DistillationQuality.EvaluationStatus"
+    enum="ReadAnythingDistillationQualityEvaluationStatus"
+    expires_after="2027-01-01">
+  <owner>alfredohiguera@google.com</owner>
+  <owner>chrome-a11y-core@google.com</owner>
+  <summary>
+    Records the skip or evaluation status when assessing the distillation
+    quality of a page inside Reading Mode. This covers both browser-side skips
+    (empty snapshots, HTML size bounds, etc.) and utility-side extraction
+    failures, as well as final evaluation successes. Recorded once for every
+    evaluation attempt.
+  </summary>
+</histogram>
+
 <histogram name="Accessibility.ReadAnything.DistillationScheme"
     enum="ReadAnythingDistillationScheme" expires_after="2027-01-01">
   <owner>davidsegovia@google.com</owner>

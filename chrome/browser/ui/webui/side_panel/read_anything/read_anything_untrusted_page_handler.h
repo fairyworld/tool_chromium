@@ -16,12 +16,14 @@
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
 #include "base/time/time.h"
+#include "base/types/expected.h"
 #include "chrome/browser/ui/read_anything/read_anything_controller.h"
 #include "chrome/browser/ui/read_anything/read_anything_enums.h"
 #include "chrome/browser/ui/read_anything/read_anything_lifecycle_observer.h"
 #include "chrome/browser/ui/read_anything/read_anything_side_panel_controller.h"
 #include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_model.h"
+#include "chrome/common/read_anything/distillation_evaluator.mojom.h"
 #include "chrome/common/read_anything/read_anything.mojom.h"
 #include "components/dom_distiller/core/task_tracker.h"
 #include "components/translate/core/browser/translate_client.h"
@@ -176,6 +178,7 @@ class ReadAnythingUntrustedPageHandler :
 
   static const int kMaxWordsDistilled = 25000;
   static const int kWordsDistilledBuckets = 100;
+  static const int kMaxNodesForDistillationQualityEvaluation = 5000;
   static constexpr base::TimeDelta kReadingModeHiddenAckTimeout =
       base::Seconds(2);
 
@@ -379,6 +382,13 @@ class ReadAnythingUntrustedPageHandler :
   void ProcessDistilledArticle(
       const dom_distiller::DistilledArticleProto* article_proto);
 
+  void EvaluateDistillationQuality(const std::string& distilled_html);
+  void OnQualityMetricsEvaluated(
+      base::expected<reading_mode::mojom::DistillationMetricsPtr,
+                     reading_mode::mojom::EvaluationStatus> result);
+  void OnAXTreeSnapshotReceived(const std::string& distilled_html,
+                                ui::AXTreeUpdate& snapshot);
+
   // The Reading Mode controller for both immersive and side-panel reading mode,
   // used when the immersive reading mode flag is enabled.
   raw_ptr<ReadAnythingController> read_anything_controller_;
@@ -477,6 +487,9 @@ class ReadAnythingUntrustedPageHandler :
   // Hold DOM distiller distillation results.
   std::optional<std::string> dom_distiller_title_;
   std::optional<std::string> dom_distiller_content_;
+
+  mojo::Remote<reading_mode::mojom::DistillationEvaluator>
+      distillation_evaluator_;
 
   read_anything::mojom::ReadAnythingDistillationState distillation_state_ =
       read_anything::mojom::ReadAnythingDistillationState::kUndefined;

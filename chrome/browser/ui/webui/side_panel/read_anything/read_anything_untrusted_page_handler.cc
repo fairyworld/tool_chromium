@@ -58,6 +58,7 @@
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/scoped_accessibility_mode.h"
+#include "content/public/browser/service_process_host.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui.h"
 #include "content/public/common/content_switches.h"
@@ -66,6 +67,8 @@
 #include "extensions/browser/extension_registry.h"
 #include "net/http/http_status_code.h"
 #include "pdf/buildflags.h"
+#include "services/metrics/public/cpp/ukm_builders.h"
+#include "services/metrics/public/cpp/ukm_recorder.h"
 #include "services/network/public/cpp/header_util.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "ui/accessibility/accessibility_features.h"
@@ -1564,12 +1567,127 @@ void ReadAnythingUntrustedPageHandler::ProcessDistilledArticle(
               kDistillationWithContent);
       page_->UpdateContent(dom_distiller_title().value_or(""),
                            dom_distiller_content().value());
+      if (features::IsReadAnythingDistillationQualityEvaluationEnabled()) {
+        EvaluateDistillationQuality(dom_distiller_content().value());
+      }
     }
   } else {
     page_->OnReadabilityDistillationStateChanged(
         read_anything::mojom::ReadAnythingDistillationState::
             kDistillationEmpty);
     page_->UpdateContent(/*title=*/"", /*content=*/"");
+  }
+}
+
+void ReadAnythingUntrustedPageHandler::EvaluateDistillationQuality(
+    const std::string& distilled_html) {
+  if (!features::IsReadAnythingDistillationQualityEvaluationEnabled()) {
+    return;
+  }
+
+  if (distilled_html.empty()) {
+    base::UmaHistogramEnumeration(
+        "Accessibility.ReadAnything.DistillationQuality.EvaluationStatus",
+        reading_mode::mojom::EvaluationStatus::kEmptyDistilledHtml);
+    return;
+  }
+
+  constexpr size_t kMaxDistilledHtmlLengthForMetrics = 100 * 1024;  // 100KB
+  if (distilled_html.length() > kMaxDistilledHtmlLengthForMetrics) {
+    // To ensure a correct metrics evaluation, we need that both the AX tree
+    // and the distilled HTML are within complete. So we skip the evaluation
+    // if the distilled HTML is too large or if the AX tree is incomplete.
+    LOG(WARNING) << "Skipping distillation quality evaluation: distilled "
+                    "content too large ("
+                 << distilled_html.length() << " chars).";
+    base::UmaHistogramEnumeration(
+        "Accessibility.ReadAnything.DistillationQuality.EvaluationStatus",
+        reading_mode::mojom::EvaluationStatus::kHtmlTooLarge);
+    return;
+  }
+
+  if (!distillation_evaluator_) {
+    content::ServiceProcessHost::Launch(
+        distillation_evaluator_.BindNewPipeAndPassReceiver(),
+        content::ServiceProcessHost::Options()
+            .WithDisplayName("Reading Mode Quality Metrics")
+            .Pass());
+    distillation_evaluator_.reset_on_disconnect();
+  }
+
+  tab_->GetContents()->RequestAXTreeSnapshot(
+      base::BindOnce(
+          &ReadAnythingUntrustedPageHandler::OnAXTreeSnapshotReceived,
+          weak_factory_.GetSafeRef(), distilled_html),
+      ui::kAXModeWebContentsOnly,
+      /* max_nodes= */ kMaxNodesForDistillationQualityEvaluation,
+      /* timeout= */ {}, content::WebContents::AXTreeSnapshotPolicy::kAll);
+}
+
+void ReadAnythingUntrustedPageHandler::OnAXTreeSnapshotReceived(
+    const std::string& distilled_html,
+    ui::AXTreeUpdate& snapshot) {
+  // If the snapshot reached the limit, it's likely incomplete. Skip evaluation.
+  if (snapshot.nodes.size() >= kMaxNodesForDistillationQualityEvaluation) {
+    LOG(WARNING) << "AXTree snapshot reached the limit of "
+                 << kMaxNodesForDistillationQualityEvaluation
+                 << " nodes. Skipping metrics evaluation for incomplete tree.";
+    base::UmaHistogramEnumeration(
+        "Accessibility.ReadAnything.DistillationQuality.EvaluationStatus",
+        reading_mode::mojom::EvaluationStatus::kSnapshotReachedLimit);
+  }
+
+  // Skip evaluation on empty snapshots to prevent metric pollution
+  // (artificially logging 0.0 averages to UKMs) and to completely avoid
+  // spawning or calling the utility process.
+  if (snapshot.nodes.empty()) {
+    VLOG(1) << "AXTree snapshot is empty. Skipping metrics evaluation.";
+    base::UmaHistogramEnumeration(
+        "Accessibility.ReadAnything.DistillationQuality.EvaluationStatus",
+        reading_mode::mojom::EvaluationStatus::kEmptySnapshot);
+    return;
+  }
+
+  distillation_evaluator_->Evaluate(
+      snapshot, distilled_html,
+      base::BindOnce(
+          &ReadAnythingUntrustedPageHandler::OnQualityMetricsEvaluated,
+          weak_factory_.GetSafeRef()));
+}
+
+void ReadAnythingUntrustedPageHandler::OnQualityMetricsEvaluated(
+    base::expected<reading_mode::mojom::DistillationMetricsPtr,
+                   reading_mode::mojom::EvaluationStatus> result) {
+  reading_mode::mojom::EvaluationStatus status =
+      result.has_value() ? reading_mode::mojom::EvaluationStatus::kSuccess
+                         : result.error();
+  // Log distillation quality metrics to UKM to evaluate performance per page
+  // source.
+  base::UmaHistogramEnumeration(
+      "Accessibility.ReadAnything.DistillationQuality.EvaluationStatus",
+      status);
+
+  // Telemetry Integrity Protection: Commit to UKM strictly on Success.
+  if (!result.has_value() || !result.value()) {
+    return;
+  }
+
+  const auto& metrics = result.value();
+
+  if (tab_ && tab_->GetContents()) {
+    ukm::SourceId source_id =
+        tab_->GetContents()->GetPrimaryMainFrame()->GetPageUkmSourceId();
+    ukm::builders::Accessibility_ReadAnything_DistillationQuality(source_id)
+        .SetRougeLF1(static_cast<int>(metrics->rouge_l_f1 * 100.0))
+        .SetRougeLPrecision(
+            static_cast<int>(metrics->rouge_l_precision * 100.0))
+        .SetRougeLRecall(static_cast<int>(metrics->rouge_l_recall * 100.0))
+        .SetRougeLF2(static_cast<int>(metrics->rouge_l_f2 * 100.0))
+        .SetStructScore(static_cast<int>(metrics->struct_score * 100.0))
+        .SetFormatScore(static_cast<int>(metrics->format_score * 100.0))
+        .SetLinkDensityRatio(
+            static_cast<int>(metrics->link_density_ratio * 100.0))
+        .Record(ukm::UkmRecorder::Get());
   }
 }
 

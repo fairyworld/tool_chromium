@@ -468,6 +468,13 @@ bool IsReadAnythingReadabilitySelectTextEnabled() {
          base::FeatureList::IsEnabled(::features::kReadAnythingWithReadability);
 }
 
+BASE_FEATURE(kReadAnythingDistillationQualityEvaluation,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+bool IsReadAnythingDistillationQualityEvaluationEnabled() {
+  return base::FeatureList::IsEnabled(
+      ::features::kReadAnythingDistillationQualityEvaluation);
+}
+
 // This feature is only used in tests and must not be enabled by default.
 BASE_FEATURE(kScreenAITestMode, base::FEATURE_DISABLED_BY_DEFAULT);
 bool IsScreenAITestModeEnabled() {
