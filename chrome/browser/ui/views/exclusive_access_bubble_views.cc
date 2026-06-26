@@ -412,10 +412,16 @@ void ExclusiveAccessBubbleViews::Show() {
   animation_->SetSlideDuration(base::Milliseconds(350));
   animation_->Show();
 
+#if !BUILDFLAG(IS_MAC)
+  // presentation_watchdog_timer_ does not play nicely with the OS-native
+  // fullscreen capabilities on Mac. See crbug.com/524763230 and
+  // crbug.com/527790135
+  // TODO(crbug.com/528276492): Reenable on Mac.
   presentation_watchdog_timer_.Start(
       FROM_HERE, base::Milliseconds(1500),
       base::BindOnce(&ExclusiveAccessBubbleViews::OnPresentationTimeout,
                      weak_ptr_factory_.GetWeakPtr()));
+#endif
 }
 
 void ExclusiveAccessBubbleViews::ShowAndStartTimers() {

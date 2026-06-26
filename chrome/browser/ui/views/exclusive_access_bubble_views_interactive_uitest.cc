@@ -178,7 +178,14 @@ IN_PROC_BROWSER_TEST_F(ExclusiveAccessBubbleViewsTest, MAYBE_ReshowOnClick) {
   EXPECT_TRUE(IsExclusiveAccessBubbleDisplayed());
 }
 
-IN_PROC_BROWSER_TEST_F(ExclusiveAccessBubbleViewsTest, PresentationWatchdog) {
+// TODO(crbug.com/528276492): Reenable on Mac.
+#if BUILDFLAG(IS_MAC)
+#define MAYBE_PresentationWatchdog DISABLED_PresentationWatchdog
+#else
+#define MAYBE_PresentationWatchdog PresentationWatchdog
+#endif
+IN_PROC_BROWSER_TEST_F(ExclusiveAccessBubbleViewsTest,
+                       MAYBE_PresentationWatchdog) {
   ExclusiveAccessBubbleViews::set_simulate_gpu_hang_for_testing(true);
 
   // Enter fullscreen. This should trigger bubble creation.
