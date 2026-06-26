@@ -496,7 +496,6 @@ ProfileSubMenuModel::ProfileSubMenuModel(
       GetLayoutConstant(LayoutConstant::kAppMenuProfileRowAvatarIconSize);
   avatar_image_model_ = ui::ImageModel::FromVectorIcon(
       features::IsRoundedIconsEnabled()   ? kAccountCircleIcon
-      : features::IsRoundedIconsEnabled() ? vector_icons::kAccountCircleIcon
                                           : kAccountCircleChromeRefreshOldIcon,
       ui::kColorMenuIcon, avatar_icon_size);
   if (profile->IsIncognitoProfile()) {
@@ -728,18 +727,16 @@ bool ProfileSubMenuModel::BuildSyncSection() {
   if (identity_manager->HasPrimaryAccount(signin::ConsentLevel::kSync)) {
     AddItemWithStringIdAndVectorIcon(
         this, IDC_SHOW_SYNC_SETTINGS, IDS_PROFILE_ROW_SYNC_IS_ON,
-        features::IsRoundedIconsEnabled() ? kSyncIcon
-        : features::IsRoundedIconsEnabled()
-            ? vector_icons::kSyncIcon
+        features::IsRoundedIconsEnabled()
+            ? kSyncIcon
             : vector_icons::kSyncChromeRefreshOldIcon);
   } else {
     if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
       if (!identity_manager->HasPrimaryAccount(signin::ConsentLevel::kSignin)) {
         AddItemWithStringIdAndVectorIcon(
             this, IDC_SHOW_SIGNIN, IDS_PROFILE_MENU_SIGNIN_PROMO_BUTTON,
-            features::IsRoundedIconsEnabled() ? kAccountCircleFilledIcon
-            : features::IsRoundedIconsEnabled()
-                ? vector_icons::kAccountCircleIcon
+            features::IsRoundedIconsEnabled()
+                ? kAccountCircleFilledIcon
                 : vector_icons::kAccountCircleOldIcon);
         signin_metrics::LogSignInOffered(
             signin_metrics::AccessPoint::kMenu,
@@ -772,9 +769,8 @@ void ProfileSubMenuModel::BuildCustomizeProfileRow(Profile* profile) {
   if (!profile->IsIncognitoProfile() && !profile->IsGuestSession()) {
     AddItemWithStringIdAndVectorIcon(
         this, IDC_CUSTOMIZE_CHROME, IDS_CUSTOMIZE_CHROME,
-        features::IsRoundedIconsEnabled() ? kEditIcon
-        : features::IsRoundedIconsEnabled()
-            ? vector_icons::kEditIcon
+        features::IsRoundedIconsEnabled()
+            ? kEditIcon
             : vector_icons::kEditChromeRefreshOldIcon);
   }
 }
@@ -1132,7 +1128,6 @@ void ToolsMenuModel::Build(Browser* browser) {
         this, IDC_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL,
         IDS_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL,
         features::IsRoundedIconsEnabled()   ? kEditIcon
-        : features::IsRoundedIconsEnabled() ? vector_icons::kEditIcon
                                             : kEditChromeRefreshOldIcon);
   }
 
@@ -1185,7 +1180,6 @@ void ToolsMenuModel::Build(Browser* browser) {
         AddItemWithStringIdAndVectorIcon(
             this, IDC_SHOW_CHROME_LABS, IDS_CHROMELABS,
             features::IsRoundedIconsEnabled()   ? kScienceIcon
-            : features::IsRoundedIconsEnabled() ? vector_icons::kScienceIcon
                                                 : kScienceOldIcon);
         SetElementIdentifierAt(
             GetIndexOfCommandId(IDC_SHOW_CHROME_LABS).value(),
@@ -2154,7 +2148,6 @@ void AppMenuModel::Build() {
     AddSubMenuWithStringIdAndVectorIcon(
         this, IDC_RECENT_TABS_MENU, IDS_HISTORY_MENU, sub_menus_.back().get(),
         features::IsRoundedIconsEnabled()   ? kHistoryIcon
-        : features::IsRoundedIconsEnabled() ? vector_icons::kHistoryIcon
                                             : kHistoryOldIcon);
     SetElementIdentifierAt(GetIndexOfCommandId(IDC_RECENT_TABS_MENU).value(),
                            kHistoryMenuItem);
