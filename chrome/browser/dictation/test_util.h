@@ -11,6 +11,7 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/test/scoped_feature_list.h"
+#include "chrome/browser/dictation/dictation_context.h"
 #include "chrome/browser/dictation/dictation_multiplexer.h"
 #include "chrome/browser/dictation/session_controller_delegate.h"
 #include "chrome/browser/dictation/session_ui.h"
@@ -59,6 +60,18 @@ void ExtensionSendStreamStateUpdate(
     Profile* profile,
     DictationMultiplexer::StreamId stream_id,
     extensions::api::dictation_private::StreamState state);
+
+// Blocks until the extension has received the OnStartStream event for the given
+// stream ID.
+void ExtensionWaitForStreamStart(Profile* profile,
+                                 DictationMultiplexer::StreamId stream_id);
+
+// Blocks until the extension has received the OnStartStream event for the given
+// stream ID, and returns the DictationContext containing the page context
+// passed to the extension.
+DictationContext ExtensionGetDictationContext(
+    Profile* profile,
+    DictationMultiplexer::StreamId stream_id);
 
 class MockStreamProvider : public StreamProvider {
  public:

@@ -30,6 +30,10 @@ source_set("dictation") {
 source_set("impl") {
   sources = [
     "connector_component_extension.cc",
+    "dictation_context.cc",
+    "dictation_context.h",
+    "dictation_context_fetcher.cc",
+    "dictation_context_fetcher.h",
     "dictation_keyed_service.cc",
     "dictation_keyed_service_factory.cc",
     "dictation_multiplexer.cc",
@@ -54,6 +58,8 @@ source_set("impl") {
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/views/interaction",
     "//chrome/common/extensions/api",
+    "//components/optimization_guide/content/browser",
+    "//components/optimization_guide/proto:optimization_guide_proto",
     "//content/public/browser",
     "//extensions/browser",
     "//ui/base",
@@ -111,6 +117,7 @@ source_set("browser_tests") {
   sources = [
     "dictation_browser_test_base.cc",
     "dictation_browser_test_base.h",
+    "dictation_context_browsertest.cc",
     "dictation_interactive_browser_test_base.cc",
     "dictation_interactive_browser_test_base.h",
     "dictation_keyed_service_browsertest.cc",

@@ -19,8 +19,10 @@ enum StreamState {
 dictionary StartStreamDetails {
   // The unique identifier of the stream.
   required long streamId;
-  // The current page context details.
-  required DOMString pageContext;
+  // The captured AnnotatedPageContent proto.
+  ArrayBuffer annotatedPageContent;
+  // The plain text of the page.
+  DOMString innerText;
   // The existing content of the editable field.
   required DOMString editableContent;
 };

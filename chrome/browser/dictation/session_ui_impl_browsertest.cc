@@ -33,20 +33,6 @@ class DictationSessionUiImplBrowserTest
  public:
   DictationSessionUiImplBrowserTest() = default;
   ~DictationSessionUiImplBrowserTest() override = default;
-
-  auto GetSessionState() {
-    return [this]() {
-      return dictation_service().session_controller()->GetState();
-    };
-  }
-
-  auto HasAttachedStreamProvider() {
-    return [this]() {
-      return dictation_service()
-                 .session_controller()
-                 ->attached_stream_provider() != nullptr;
-    };
-  }
 };
 
 IN_PROC_BROWSER_TEST_F(DictationSessionUiImplBrowserTest,

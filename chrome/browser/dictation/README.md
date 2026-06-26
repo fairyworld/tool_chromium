@@ -115,3 +115,12 @@ Views UI components
 
 * render_view_context_menu.cc - Where the context menu item is registered in
   the menu
+
+### chrome/test/data/extensions/dictation/
+
+See test extension [README.md](/chrome/test/data/extensions/dictation/README.md)
+
+* background.js - Service worker script for the "test extension" used by
+  dictation tests. Dictation tests put this test into "manual mode" and use it
+  to communicate with the other side of the extension API.
+

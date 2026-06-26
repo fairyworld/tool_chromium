@@ -111,6 +111,92 @@ void ExtensionSendStreamStateUpdate(
   CHECK_EQ("success", result.GetString());
 }
 
+void ExtensionWaitForStreamStart(Profile* profile,
+                                 DictationMultiplexer::StreamId stream_id) {
+  std::string script = content::JsReplace(
+      R"JS(
+    (async function() {
+      try {
+        await globalThis.waitForStreamStart($1);
+        chrome.test.sendScriptResult('success');
+      } catch (e) {
+        chrome.test.sendScriptResult('error: ' + e.message);
+      }
+    })();
+      )JS",
+      stream_id.value());
+
+  base::Value result =
+      extensions::browsertest_util::ExecuteScriptInBackgroundPage(
+          profile, std::string(kDictationTestExtensionId), script);
+  CHECK_EQ("success", result.GetString());
+}
+
+DictationContext ExtensionGetDictationContext(
+    Profile* profile,
+    DictationMultiplexer::StreamId stream_id) {
+  std::string script = content::JsReplace(
+      R"JS(
+    (async function() {
+      try {
+        const details = await globalThis.waitForStreamStart($1);
+        const result = { success: true };
+        if (details.annotatedPageContent) {
+          result.annotatedPageContent =
+              Array.from(new Uint8Array(details.annotatedPageContent));
+        }
+        if (details.innerText !== undefined) {
+          result.innerText = details.innerText;
+        }
+        if (details.editableContent !== undefined) {
+          result.editableContent = details.editableContent;
+        }
+        chrome.test.sendScriptResult(result);
+      } catch (e) {
+        chrome.test.sendScriptResult({ success: false, error: e.message });
+      }
+    })();
+      )JS",
+      stream_id.value());
+
+  base::Value result_value =
+      extensions::browsertest_util::ExecuteScriptInBackgroundPage(
+          profile, std::string(kDictationTestExtensionId), script);
+
+  CHECK(result_value.is_dict())
+      << "Expected dictionary result, got: " << result_value;
+  const base::DictValue& dict = result_value.GetDict();
+  CHECK(dict.FindBool("success").value_or(false))
+      << "Failed to get dictation context: " << *dict.FindString("error");
+
+  DictationContext context;
+
+  const base::ListValue* apc_bytes = dict.FindList("annotatedPageContent");
+  if (apc_bytes) {
+    optimization_guide::proto::AnnotatedPageContent apc_proto;
+    std::vector<uint8_t> bytes;
+    bytes.reserve(apc_bytes->size());
+    for (const auto& val : *apc_bytes) {
+      CHECK(val.is_int());
+      bytes.push_back(static_cast<uint8_t>(val.GetInt()));
+    }
+    CHECK(apc_proto.ParseFromArray(bytes.data(), bytes.size()));
+    context.annotated_page_content = std::move(apc_proto);
+  }
+
+  const std::string* inner_text = dict.FindString("innerText");
+  if (inner_text) {
+    context.inner_text = *inner_text;
+  }
+
+  const std::string* editable_content = dict.FindString("editableContent");
+  if (editable_content) {
+    context.editable_content = *editable_content;
+  }
+
+  return context;
+}
+
 using ::testing::_;
 
 MockStreamProvider::MockStreamProvider() = default;

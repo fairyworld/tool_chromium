@@ -5,10 +5,12 @@
 #include "chrome/browser/dictation/listener_stream_provider.h"
 
 #include "base/strings/utf_string_conversions.h"
+#include "chrome/browser/dictation/dictation_context_fetcher.h"
 #include "chrome/browser/dictation/dictation_keyed_service.h"
 #include "chrome/browser/dictation/stream_provider_delegate.h"
 #include "chrome/browser/dictation/target.h"
 #include "chrome/common/extensions/api/dictation_private.h"
+#include "components/optimization_guide/proto/features/common_quality_data.pb.h"
 #include "content/public/browser/browser_context.h"
 #include "extensions/browser/event_router.h"
 
@@ -29,15 +31,35 @@ void ListenerStreamProvider::BindToTargetAndConnect(
     std::unique_ptr<Target> target) {
   CHECK(target);
   target_ = std::move(target);
+
   DictationMultiplexer& multiplexer = GetMultiplexer();
   stream_id_ = multiplexer.GenerateStreamId();
   multiplexer.RegisterStreamProvider(stream_id_, this);
 
+  // TODO(b/525847081): We should experiment with an option to start the stream
+  // immediately and provide context as soon as it's ready.
+  context_fetcher_ = std::make_unique<DictationContextFetcher>();
+  context_fetcher_->Fetch(
+      *target_, base::BindOnce(&ListenerStreamProvider::OnPageContextCaptured,
+                               weak_ptr_factory_.GetWeakPtr()));
+}
+
+void ListenerStreamProvider::OnPageContextCaptured(DictationContext result) {
   extensions::api::dictation_private::StartStreamDetails details;
   details.stream_id = stream_id_.value();
-  // TODO(crbug.com/502587072): Populate page context.
-  details.page_context = "";
-  details.editable_content = target_->GetSelectedText();
+
+  if (result.annotated_page_content.has_value()) {
+    std::vector<uint8_t> proto_data(
+        result.annotated_page_content->ByteSizeLong());
+    if (!proto_data.empty()) {
+      result.annotated_page_content->SerializeToArray(proto_data.data(),
+                                                      proto_data.size());
+    }
+    details.annotated_page_content = std::move(proto_data);
+  }
+
+  details.editable_content =
+      std::move(result.editable_content).value_or(std::string());
 
   base::ListValue event_args =
       extensions::api::dictation_private::OnStartStream::Create(details);
@@ -53,6 +75,8 @@ void ListenerStreamProvider::BindToTargetAndConnect(
 }
 
 void ListenerStreamProvider::Stop() {
+  context_fetcher_.reset();
+
   if (!stream_id_) {
     return;
   }

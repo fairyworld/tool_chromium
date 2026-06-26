@@ -176,6 +176,8 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
       controller->attached_stream_provider());
   ASSERT_NE(provider, nullptr);
 
+  ExtensionWaitForStreamStart(profile(), provider->stream_id_for_testing());
+
   ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
                                  ExtensionStreamState::kTranscribing);
   EXPECT_EQ(provider->GetState(), StreamProvider::StreamState::kTranscribing);
@@ -214,6 +216,8 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
   ListenerStreamProvider* provider = static_cast<ListenerStreamProvider*>(
       controller->attached_stream_provider());
   ASSERT_NE(provider, nullptr);
+
+  ExtensionWaitForStreamStart(profile(), provider->stream_id_for_testing());
 
   ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
                                  ExtensionStreamState::kTranscribing);
@@ -258,6 +262,8 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
       controller->attached_stream_provider());
   ASSERT_NE(provider1, nullptr);
 
+  ExtensionWaitForStreamStart(profile(), provider1->stream_id_for_testing());
+
   // Wait for the first stream to transition to transcribing.
   ExtensionSendStreamStateUpdate(profile(), provider1->stream_id_for_testing(),
                                  ExtensionStreamState::kTranscribing);
@@ -283,6 +289,7 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
   // Wait for the stream to enter transcribing state.
   ListenerStreamProvider* provider2 = static_cast<ListenerStreamProvider*>(
       controller->attached_stream_provider());
+  ExtensionWaitForStreamStart(profile(), provider2->stream_id_for_testing());
   ExtensionSendStreamStateUpdate(profile(), provider2->stream_id_for_testing(),
                                  ExtensionStreamState::kTranscribing);
   ASSERT_EQ(controller->GetState(), SessionState::kTranscribing);
@@ -306,6 +313,8 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
   ListenerStreamProvider* provider = static_cast<ListenerStreamProvider*>(
       controller->attached_stream_provider());
   ASSERT_NE(provider, nullptr);
+
+  ExtensionWaitForStreamStart(profile(), provider->stream_id_for_testing());
 
   base::WeakPtr<ListenerStreamProvider> provider_weak = provider->GetWeakPtr();
   ASSERT_NE(provider_weak, nullptr);
@@ -336,6 +345,8 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
   ListenerStreamProvider* provider = static_cast<ListenerStreamProvider*>(
       controller->attached_stream_provider());
   ASSERT_NE(provider, nullptr);
+
+  ExtensionWaitForStreamStart(profile(), provider->stream_id_for_testing());
 
   base::WeakPtr<ListenerStreamProvider> provider_weak = provider->GetWeakPtr();
   ASSERT_NE(provider_weak, nullptr);
@@ -384,6 +395,8 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
   SessionController* controller = dictation_service().session_controller();
   ListenerStreamProvider* provider = static_cast<ListenerStreamProvider*>(
       controller->attached_stream_provider());
+
+  ExtensionWaitForStreamStart(profile(), provider->stream_id_for_testing());
 
   ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
                                  ExtensionStreamState::kTranscribing);

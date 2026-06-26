@@ -4,6 +4,32 @@
 
 const OFFSCREEN_PATH = 'offscreen.html';
 
+const startedStreams = new Map();
+const streamStartWaiters = new Map();
+
+function notifyStreamStarted(streamId, details) {
+  startedStreams.set(streamId, details);
+  const waiters = streamStartWaiters.get(streamId);
+  if (waiters) {
+    for (const resolve of waiters) {
+      resolve(details);
+    }
+    streamStartWaiters.delete(streamId);
+  }
+}
+
+globalThis.waitForStreamStart = function(streamId) {
+  if (startedStreams.has(streamId)) {
+    return Promise.resolve(startedStreams.get(streamId));
+  }
+  return new Promise((resolve) => {
+    if (!streamStartWaiters.has(streamId)) {
+      streamStartWaiters.set(streamId, []);
+    }
+    streamStartWaiters.get(streamId).push(resolve);
+  });
+};
+
 async function isManualTest() {
   const options = await chrome.storage.local.get({manualTest: false});
   return options.manualTest;
@@ -88,6 +114,7 @@ chrome.dictationPrivate.onStartStream.addListener(async (details) => {
   // In a manual test, the test code itself simulates the extension API calls
   // so avoid calling into any of the extension code.
   if (await isManualTest()) {
+    notifyStreamStarted(details.streamId, details);
     return;
   }
 

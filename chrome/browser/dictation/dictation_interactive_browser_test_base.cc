@@ -59,6 +59,12 @@ DictationInteractiveBrowserTestBase::StartSession() {
                                                    .session_controller()
                                                    ->attached_stream_provider())
               ->GetWeakPtr();
+
+      // A stream may not always be created (e.g. onboarding needs to be shown).
+      if (last_started_provider_) {
+        ExtensionWaitForStreamStart(
+            profile(), last_started_provider_->stream_id_for_testing());
+      }
     }
   }));
 }
@@ -83,6 +89,26 @@ DictationInteractiveBrowserTestBase::ExtensionAPIUpdateTranscription(
         profile(), last_started_provider_->stream_id_for_testing(), type,
         text_str);
   }));
+}
+
+base::RepeatingCallback<SessionState()>
+DictationInteractiveBrowserTestBase::GetSessionState() {
+  return base::BindRepeating(
+      [](DictationInteractiveBrowserTestBase* test) {
+        return test->dictation_service().session_controller()->GetState();
+      },
+      base::Unretained(this));
+}
+
+base::RepeatingCallback<bool()>
+DictationInteractiveBrowserTestBase::HasAttachedStreamProvider() {
+  return base::BindRepeating(
+      [](DictationInteractiveBrowserTestBase* test) {
+        return test->dictation_service()
+                   .session_controller()
+                   ->attached_stream_provider() != nullptr;
+      },
+      base::Unretained(this));
 }
 
 }  // namespace dictation
