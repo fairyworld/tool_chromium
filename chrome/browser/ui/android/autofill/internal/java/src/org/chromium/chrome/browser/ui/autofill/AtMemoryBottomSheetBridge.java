@@ -104,11 +104,25 @@ public class AtMemoryBottomSheetBridge implements AtMemoryBottomSheetCoordinator
     }
 
     @Override
+    public void onQueryTextChanged(String query) {
+        if (mNativeAtMemoryBottomSheetBridge != 0) {
+            AtMemoryBottomSheetBridgeJni.get()
+                    .onQueryTextChanged(mNativeAtMemoryBottomSheetBridge, query);
+        }
+    }
+
+    @Override
     public void onSuggestionClicked(int position) {
         if (mNativeAtMemoryBottomSheetBridge != 0) {
             AtMemoryBottomSheetBridgeJni.get()
                     .onSuggestionSelected(mNativeAtMemoryBottomSheetBridge, position);
         }
+    }
+
+    @Override
+    public boolean isSearching() {
+        if (mNativeAtMemoryBottomSheetBridge == 0) return false;
+        return AtMemoryBottomSheetBridgeJni.get().isSearching(mNativeAtMemoryBottomSheetBridge);
     }
 
     @NativeMethods
@@ -118,6 +132,11 @@ public class AtMemoryBottomSheetBridge implements AtMemoryBottomSheetCoordinator
         void onQuerySubmitted(
                 long nativeAtMemoryBottomSheetBridge, @JniType("std::u16string") String query);
 
+        void onQueryTextChanged(
+                long nativeAtMemoryBottomSheetBridge, @JniType("std::u16string") String query);
+
         void onSuggestionSelected(long nativeAtMemoryBottomSheetBridge, int position);
+
+        boolean isSearching(long nativeAtMemoryBottomSheetBridge);
     }
 }

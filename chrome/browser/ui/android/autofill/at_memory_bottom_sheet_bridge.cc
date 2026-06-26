@@ -125,11 +125,23 @@ void AtMemoryBottomSheetBridge::OnQuerySubmitted(JNIEnv* env,
   }
 }
 
+void AtMemoryBottomSheetBridge::OnQueryTextChanged(
+    JNIEnv* env,
+    const std::u16string& query) {
+  if (delegate_) {
+    delegate_->OnQueryTextChanged(query);
+  }
+}
+
 void AtMemoryBottomSheetBridge::OnSuggestionSelected(JNIEnv* env,
                                                      int position) {
   if (delegate_) {
     delegate_->OnSuggestionSelected(position);
   }
+}
+
+bool AtMemoryBottomSheetBridge::IsSearching(JNIEnv* env) {
+  return delegate_ && delegate_->IsSearching();
 }
 
 void AtMemoryBottomSheetBridge::ResetDelegate() {

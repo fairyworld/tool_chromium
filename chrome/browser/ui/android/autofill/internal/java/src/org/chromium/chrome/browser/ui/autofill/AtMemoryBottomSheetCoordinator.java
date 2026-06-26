@@ -49,7 +49,11 @@ public class AtMemoryBottomSheetCoordinator {
 
         void onQuerySubmitted(String query);
 
+        void onQueryTextChanged(String query);
+
         void onSuggestionClicked(int position);
+
+        boolean isSearching();
     }
 
     AtMemoryBottomSheetCoordinator(
@@ -64,7 +68,7 @@ public class AtMemoryBottomSheetCoordinator {
         ModelList modelList = new ModelList();
         mMediator =
                 new AtMemoryBottomSheetMediator(
-                        context, profile, delegate, modelList, view::hideKeyboardAndClearFocus);
+                        profile, delegate, modelList, view::hideKeyboardAndClearFocus);
 
         SimpleRecyclerViewAdapter adapter = new SimpleRecyclerViewAdapter(modelList);
         adapter.registerType(

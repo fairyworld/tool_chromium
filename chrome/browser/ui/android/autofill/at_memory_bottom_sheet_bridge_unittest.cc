@@ -25,7 +25,12 @@ class MockAtMemoryBottomSheetDelegate : public AtMemoryBottomSheetDelegate {
               OnQuerySubmitted,
               (const std::u16string& query),
               (override));
+  MOCK_METHOD(void,
+              OnQueryTextChanged,
+              (const std::u16string& query),
+              (override));
   MOCK_METHOD(void, OnSuggestionSelected, (int position), (override));
+  MOCK_METHOD(bool, IsSearching, (), (const, override));
 };
 
 class AtMemoryBottomSheetBridgeTest : public testing::Test {
