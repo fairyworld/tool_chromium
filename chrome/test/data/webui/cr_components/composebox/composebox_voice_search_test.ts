@@ -106,7 +106,6 @@ suite('ComposeboxVoiceSearch', () => {
       voiceSearchCoherenceAnySearchboxExperimentEnabled: false,
       voiceSearchCoherenceCobrowsingComposeboxEnabled: false,
       isSystemVoiceSearchEnabled: false,
-      composeboxSource: 'NTP_REALBOX',
     });
 
     windowProxy.setResultMapperFor(

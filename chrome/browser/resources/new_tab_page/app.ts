@@ -491,8 +491,6 @@ export class AppElement extends AppElementBase {
   protected contextMenuAnimationLimitingEnabled_: boolean =
       loadTimeData.getBoolean('contextMenuAnimationLimitingEnabled');
   protected accessor searchboxCallbackRouter_: SearchboxPageCallbackRouter;
-
-  private voiceSearchActivatedByKeyboard_: boolean = false;
   private accessor selectedCustomizeDialogPage_: string|null = null;
   private accessor middleSlotPromoLoaded_: boolean = false;
   private accessor modulesLoadedStatus_: ModuleLoadStatus =
@@ -865,7 +863,6 @@ export class AppElement extends AppElementBase {
             this.shadowRoot.querySelector<ComposeboxVoiceSearchElement>(
                 '#voiceSearch');
         assert(voiceSearch);
-        voiceSearch.activatedByKeyboard = this.voiceSearchActivatedByKeyboard_;
         voiceSearch.start();
       }
     }
@@ -1023,19 +1020,11 @@ export class AppElement extends AppElementBase {
 
   protected onOpenVoiceSearch_() {
     this.showVoiceSearchOverlay_ = true;
-    this.voiceSearchActivatedByKeyboard_ = false;
-    // When the experiment is enabled, voice search metrics are logged directly
-    // by the shared component instead of NTP to prevent duplicate emissions.
-    if (!this.voiceSearchCoherenceAnySearchboxExperimentEnabled_) {
-      recordVoiceAction(VoiceAction.ACTIVATE);
-    }
+    recordVoiceAction(VoiceAction.ACTIVATE);
   }
 
   protected onComposeVoiceSearchAction_(
       e: CustomEvent<{value: ComposeVoiceSearchAction}>) {
-    if (this.voiceSearchCoherenceAnySearchboxExperimentEnabled_) {
-      return;
-    }
     switch (e.detail.value) {
       case ComposeVoiceSearchAction.ACTIVATE:
         recordVoiceAction(VoiceAction.ACTIVATE);
@@ -1175,9 +1164,6 @@ export class AppElement extends AppElementBase {
    * voice search.
    */
   private onWindowKeydown_(e: KeyboardEvent) {
-    if (!this.isConnected) {
-      return;
-    }
     let ctrlKeyPressed = e.ctrlKey;
     // <if expr="is_macosx">
     ctrlKeyPressed = ctrlKeyPressed || e.metaKey;
@@ -1193,10 +1179,7 @@ export class AppElement extends AppElementBase {
     }
     if (ctrlKeyPressed && e.code === 'Period' && e.shiftKey) {
       this.showVoiceSearchOverlay_ = true;
-      this.voiceSearchActivatedByKeyboard_ = true;
-      if (!this.voiceSearchCoherenceAnySearchboxExperimentEnabled_) {
-        recordVoiceAction(VoiceAction.ACTIVATE_KEYBOARD);
-      }
+      recordVoiceAction(VoiceAction.ACTIVATE_KEYBOARD);
     }
   }
 

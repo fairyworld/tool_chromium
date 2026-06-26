@@ -58,7 +58,6 @@ suite('ComposeboxVoiceSearchMetrics', () => {
     disableTransitionsRecursively(voiceSearchElement);
     mockVoiceSearch =
         voiceSearchElement as unknown as MockComposeboxVoiceSearch;
-    await searchboxHandler.whenCalled('getPageClassification');
     await microtasksFinished();
   });
 
@@ -92,14 +91,8 @@ suite('ComposeboxVoiceSearchMetrics', () => {
     searchboxHandler.setResultFor(
         'getPageClassification',
         Promise.resolve({metricSource: 'CO_BROWSING_COMPOSEBOX'}));
-    voiceSearchElement.metricSource = '';
-    searchboxHandler.resetResolver('getPageClassification');
-    searchboxHandler.setResultFor(
-        'getPageClassification',
-        Promise.resolve({metricSource: 'CO_BROWSING_COMPOSEBOX'}));
     document.body.removeChild(voiceSearchElement);
     document.body.appendChild(voiceSearchElement);
-    await searchboxHandler.whenCalled('getPageClassification');
     await microtasksFinished();
 
     const errorEvent = new SpeechRecognitionErrorEvent(
@@ -344,7 +337,7 @@ suite('ComposeboxVoiceSearchMetrics', () => {
     // UI migration and to validate the accuracy of the new unified
     // VoiceSearch.* metrics. These legacy metrics should be removed entirely
     // once the new metrics are fully validated and approved.
-    mockVoiceSearch.metricSource = 'NTP_REALBOX';
+    mockVoiceSearch.metricSource_ = 'NTP_REALBOX';
 
     voiceSearchElement.$.closeButton.click();
     await microtasksFinished();
@@ -374,14 +367,9 @@ suite('ComposeboxVoiceSearchMetrics', () => {
   });
 
   test('Does not record legacy NTP metrics for non-NTP surfaces', async () => {
-    searchboxHandler.setResultFor(
-        'getPageClassification',
-        Promise.resolve({metricSource: 'CO_BROWSING_COMPOSEBOX'}));
-    mockVoiceSearch.metricSource = 'CO_BROWSING_COMPOSEBOX';
+    mockVoiceSearch.metricSource_ = 'CO_BROWSING_COMPOSEBOX';
 
-    mockVoiceSearch.onCloseClick_();
-    await microtasksFinished();
-
+    voiceSearchElement.$.closeButton.click();
     mockSpeechRecognition.onerror!
         ({error: 'network'} as SpeechRecognitionErrorEvent);
     await microtasksFinished();
@@ -395,7 +383,7 @@ suite('ComposeboxVoiceSearchMetrics', () => {
 
     // Verify: The legacy NTP histograms are completely ignored and not
     // polluted.
-    assertEquals(0, metrics.count('NewTabPage.VoiceActions', 2));
+    assertEquals(0, metrics.count('NewTabPage.VoiceSearch.Action', 2));
     assertEquals(
         0, metrics.count('NewTabPage.VoiceErrors', VoiceSearchError.NETWORK));
 
