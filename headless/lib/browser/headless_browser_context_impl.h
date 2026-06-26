@@ -34,6 +34,10 @@ class HEADLESS_EXPORT HeadlessBrowserContextImpl final
     : public HeadlessBrowserContext,
       public content::BrowserContext {
  public:
+  HeadlessBrowserContextImpl(
+      HeadlessBrowserImpl* browser,
+      std::unique_ptr<HeadlessBrowserContextOptions> context_options);
+
   HeadlessBrowserContextImpl(const HeadlessBrowserContextImpl&) = delete;
   HeadlessBrowserContextImpl& operator=(const HeadlessBrowserContextImpl&) =
       delete;
@@ -46,7 +50,8 @@ class HEADLESS_EXPORT HeadlessBrowserContextImpl final
       content::BrowserContext* browser_context);
 
   static std::unique_ptr<HeadlessBrowserContextImpl> Create(
-      HeadlessBrowserContext::Builder* builder);
+      HeadlessBrowserImpl* browser,
+      HeadlessBrowserContext::CreateParams params);
 
   // HeadlessBrowserContext implementation:
   HeadlessWebContents* CreateWebContents(
@@ -102,10 +107,6 @@ class HEADLESS_EXPORT HeadlessBrowserContextImpl final
           cert_verifier_creation_params);
 
  private:
-  HeadlessBrowserContextImpl(
-      HeadlessBrowserImpl* browser,
-      std::unique_ptr<HeadlessBrowserContextOptions> context_options);
-
   // Performs initialization of the HeadlessBrowserContextImpl while IO is still
   // allowed on the current thread.
   void InitWhileIOAllowed();

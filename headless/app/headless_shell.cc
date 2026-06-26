@@ -89,13 +89,11 @@ class HeadlessShell {
 void HeadlessShell::OnBrowserStart(HeadlessBrowser* browser) {
   browser_ = browser;
 
-  HeadlessBrowserContext::Builder context_builder =
-      browser_->CreateBrowserContextBuilder();
-
   // Create browser context and set it as the default. The default browser
   // context is used by the Target.createTarget() DevTools command when no other
   // context is given.
-  HeadlessBrowserContext* browser_context = context_builder.Build();
+  HeadlessBrowserContext* browser_context = browser_->CreateBrowserContext();
+  CHECK(browser_context);
   browser_->SetDefaultBrowserContext(browser_context);
 
   const bool devtools_enabled = static_cast<HeadlessBrowserImpl*>(browser)

@@ -65,14 +65,15 @@ namespace headless {
 class HeadlessWebContentsTest : public HeadlessBrowserTest {};
 
 IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest, Navigation) {
-  EXPECT_TRUE(embedded_test_server()->Start());
+  ASSERT_TRUE(embedded_test_server()->Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
+  ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents = browser_context->CreateWebContents(
       embedded_test_server()->GetURL("/hello.html"));
-  EXPECT_TRUE(WaitForLoad(web_contents));
+  ASSERT_TRUE(web_contents);
+  ASSERT_TRUE(WaitForLoad(web_contents));
 
   EXPECT_THAT(browser_context->GetAllWebContents(),
               UnorderedElementsAre(web_contents));
@@ -80,13 +81,14 @@ IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest, Navigation) {
 
 IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest,
                        FocusOfHeadlessWebContents_IsIndependent) {
-  EXPECT_TRUE(embedded_test_server()->Start());
+  ASSERT_TRUE(embedded_test_server()->Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
+  ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents = browser_context->CreateWebContents(
       embedded_test_server()->GetURL("/hello.html"));
+  ASSERT_TRUE(web_contents);
   WaitForLoadAndGainFocus(web_contents);
 
   EXPECT_THAT(EvaluateScript(web_contents, "document.hasFocus()"),
@@ -94,6 +96,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest,
 
   HeadlessWebContents* web_contents2 = browser_context->CreateWebContents(
       embedded_test_server()->GetURL("/hello.html"));
+  ASSERT_TRUE(web_contents2);
   WaitForLoadAndGainFocus(web_contents2);
 
   // Focus of different WebContents is independent.
@@ -108,11 +111,12 @@ IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest, HandleSSLError) {
   https_server.SetSSLConfig(net::EmbeddedTestServer::CERT_EXPIRED);
   ASSERT_TRUE(https_server.Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
+  ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents =
       browser_context->CreateWebContents(https_server.GetURL("/hello.html"));
+  ASSERT_TRUE(web_contents);
 
   EXPECT_FALSE(WaitForLoad(web_contents));
 }
@@ -213,7 +217,7 @@ class HeadlessWebContentsRequestStorageQuotaTest
     : public HeadlessDevTooledBrowserTest {
  public:
   void RunDevTooledTest() override {
-    EXPECT_TRUE(embedded_test_server()->Start());
+    ASSERT_TRUE(embedded_test_server()->Start());
 
     devtools_client_.AddEventHandler(
         "Runtime.consoleAPICalled",
@@ -246,13 +250,14 @@ class HeadlessWebContentsRequestStorageQuotaTest
 HEADLESS_DEVTOOLED_TEST_F(HeadlessWebContentsRequestStorageQuotaTest);
 
 IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest, BrowserTabChangeContent) {
-  EXPECT_TRUE(embedded_test_server()->Start());
+  ASSERT_TRUE(embedded_test_server()->Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
+  ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents = browser_context->CreateWebContents();
-  EXPECT_TRUE(WaitForLoad(web_contents));
+  ASSERT_TRUE(web_contents);
+  ASSERT_TRUE(WaitForLoad(web_contents));
 
   std::string script = "window.location = '" +
                        embedded_test_server()->GetURL("/hello.html").spec() +
@@ -261,18 +266,19 @@ IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest, BrowserTabChangeContent) {
               Not(DictHasKey("exceptionDetails")));
 
   // This will time out if the previous script did not work.
-  EXPECT_TRUE(WaitForLoad(web_contents));
+  ASSERT_TRUE(WaitForLoad(web_contents));
 }
 
 IN_PROC_BROWSER_TEST_F(HeadlessWebContentsTest, BrowserOpenInTab) {
-  EXPECT_TRUE(embedded_test_server()->Start());
+  ASSERT_TRUE(embedded_test_server()->Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
+  ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents = browser_context->CreateWebContents(
       embedded_test_server()->GetURL("/link.html"));
-  EXPECT_TRUE(WaitForLoad(web_contents));
+  ASSERT_TRUE(web_contents);
+  ASSERT_TRUE(WaitForLoad(web_contents));
 
   EXPECT_EQ(1u, browser_context->GetAllWebContents().size());
   // Simulates a middle-button click on a link to ensure that the
@@ -315,12 +321,15 @@ class HeadlessWebContentsBeginFrameControlTest : public HeadlessBrowserTest {
   }
 
   void RunTest() {
-    browser()->SetDefaultBrowserContext(
-        browser()->CreateBrowserContextBuilder().Build());
+    HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
+    ASSERT_TRUE(browser_context);
+
+    browser()->SetDefaultBrowserContext(browser_context);
+
     SimpleDevToolsProtocolClient browser_devtools_client;
     browser_devtools_client.AttachToBrowser();
 
-    EXPECT_TRUE(embedded_test_server()->Start());
+    ASSERT_TRUE(embedded_test_server()->Start());
 
     base::DictValue params;
     params.Set("url", "about:blank");
@@ -569,7 +578,7 @@ DISABLED_HEADLESS_DEVTOOLED_TEST_F(
 class CookiesEnabled : public HeadlessDevTooledBrowserTest {
  public:
   void RunDevTooledTest() override {
-    EXPECT_TRUE(embedded_test_server()->Start());
+    ASSERT_TRUE(embedded_test_server()->Start());
 
     devtools_client_.AddEventHandler(
         "Page.loadEventFired",
@@ -666,15 +675,20 @@ class HeadlessWebContentsAIPageContentTest : public HeadlessWebContentsTest {
 };
 
 IN_PROC_BROWSER_TEST_F(HeadlessWebContentsAIPageContentTest, GetAIPageContent) {
-  EXPECT_TRUE(embedded_test_server()->Start());
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  ASSERT_TRUE(embedded_test_server()->Start());
+
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
+  ASSERT_TRUE(browser_context);
+
   HeadlessWebContents* web_contents = browser_context->CreateWebContents(
       embedded_test_server()->GetURL("/hello.html"));
-  EXPECT_TRUE(WaitForLoad(web_contents));
+  ASSERT_TRUE(web_contents);
+  ASSERT_TRUE(WaitForLoad(web_contents));
 
   content::WebContents* content_web_contents =
       HeadlessWebContentsImpl::From(web_contents)->web_contents();
+  ASSERT_TRUE(content_web_contents);
+
   content::WebContentsDelegate* delegate = content_web_contents->GetDelegate();
   ASSERT_TRUE(delegate);
 

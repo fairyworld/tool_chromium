@@ -26,10 +26,11 @@ HeadlessDevTooledBrowserTest::HeadlessDevTooledBrowserTest() = default;
 HeadlessDevTooledBrowserTest::~HeadlessDevTooledBrowserTest() = default;
 
 void HeadlessDevTooledBrowserTest::RunTest() {
-  HeadlessBrowserContext::Builder builder =
-      browser()->CreateBrowserContextBuilder();
-  CustomizeHeadlessBrowserContext(builder);
-  browser_context_ = builder.Build();
+  HeadlessBrowserContext::CreateParams params;
+  CustomizeHeadlessBrowserContext(params);
+  browser_context_ = browser()->CreateBrowserContext(std::move(params));
+  ASSERT_TRUE(browser_context_);
+
   browser()->SetDefaultBrowserContext(browser_context_);
 
   browser_devtools_client_.AttachToBrowser();
@@ -101,7 +102,7 @@ bool HeadlessDevTooledBrowserTest::GetEnableBeginFrameControl() {
 }
 
 void HeadlessDevTooledBrowserTest::CustomizeHeadlessBrowserContext(
-    HeadlessBrowserContext::Builder& builder) {}
+    HeadlessBrowserContext::CreateParams& params) {}
 
 void HeadlessDevTooledBrowserTest::CustomizeHeadlessWebContents(
     HeadlessWebContents::CreateParams& params) {}

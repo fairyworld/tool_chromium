@@ -92,8 +92,7 @@ namespace headless {
 namespace {
 
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, CreateAndDestroyBrowserContext) {
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   EXPECT_THAT(browser()->GetAllBrowserContexts(),
@@ -106,8 +105,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, CreateAndDestroyBrowserContext) {
 
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest,
                        CreateAndDoNotDestroyBrowserContext) {
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   EXPECT_THAT(browser()->GetAllBrowserContexts(),
@@ -118,8 +116,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest,
 }
 
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, CreateAndDestroyWebContents) {
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents = browser_context->CreateWebContents();
@@ -143,8 +140,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, CreateAndDestroyWebContents) {
 
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest,
                        WebContentsAreDestroyedWithContext) {
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents = browser_context->CreateWebContents();
@@ -163,8 +159,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest,
 }
 
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, CreateAndDoNotDestroyWebContents) {
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents = browser_context->CreateWebContents();
@@ -179,8 +174,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, CreateAndDoNotDestroyWebContents) {
 }
 
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, DestroyAndCreateTwoWebContents) {
-  HeadlessBrowserContext* browser_context1 =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context1 = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context1);
   HeadlessWebContents* web_contents1 = browser_context1->CreateWebContents();
   ASSERT_TRUE(web_contents1);
@@ -190,8 +184,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, DestroyAndCreateTwoWebContents) {
   EXPECT_THAT(browser_context1->GetAllWebContents(),
               UnorderedElementsAre(web_contents1));
 
-  HeadlessBrowserContext* browser_context2 =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context2 = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context2);
   HeadlessWebContents* web_contents2 = browser_context2->CreateWebContents();
   ASSERT_TRUE(web_contents2);
@@ -216,8 +209,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, DestroyAndCreateTwoWebContents) {
 }
 
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, CreateWithBadURL) {
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents =
@@ -261,11 +253,10 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTestWithProxy, MAYBE_SetProxyConfig) {
   std::unique_ptr<net::ProxyConfig> proxy_config(new net::ProxyConfig);
   proxy_config->proxy_rules().ParseFromString(
       proxy_server()->host_port_pair().ToString());
+  HeadlessBrowserContext::CreateParams params;
+  params.proxy_config = std::move(proxy_config);
   HeadlessBrowserContext* browser_context =
-      browser()
-          ->CreateBrowserContextBuilder()
-          .SetProxyConfig(std::move(proxy_config))
-          .Build();
+      browser()->CreateBrowserContext(std::move(params));
   ASSERT_TRUE(browser_context);
 
   // Load a page which doesn't actually exist, but for which our proxy
@@ -274,7 +265,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTestWithProxy, MAYBE_SetProxyConfig) {
       GURL("http://not-an-actual-domain.tld/hello.html"));
   ASSERT_TRUE(web_contents);
 
-  EXPECT_TRUE(WaitForLoad(web_contents));
+  ASSERT_TRUE(WaitForLoad(web_contents));
   EXPECT_THAT(browser()->GetAllBrowserContexts(),
               UnorderedElementsAre(browser_context));
   EXPECT_THAT(browser_context->GetAllWebContents(),
@@ -322,8 +313,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, ClipboardCopyPasteText) {
 }
 
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, DefaultSizes) {
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents = browser_context->CreateWebContents();
@@ -398,8 +388,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserRendererCommandPrefixTest, Prefix) {
   base::ScopedAllowBlockingForTesting allow_blocking;
   ASSERT_TRUE(embedded_test_server()->Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents = browser_context->CreateWebContents(
@@ -467,7 +456,7 @@ IN_PROC_BROWSER_TEST_F(CrashReporterTest, GenerateMinidump) {
   // The case where crash reporting is disabled is covered by
   // HeadlessCrashObserverTest.
   raw_ptr<HeadlessBrowserContext> browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+      browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   raw_ptr<HeadlessWebContents> headless_web_contents =
@@ -530,8 +519,7 @@ IN_PROC_BROWSER_TEST_F(CrashReporterTest, GenerateMinidump) {
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, PermissionManagerAlwaysASK) {
   GURL url("https://example.com");
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* headless_web_contents =
@@ -620,8 +608,7 @@ IN_PROC_BROWSER_TEST_F(BrowserTargetTracingTest, MAYBE_BrowserTargetTracing) {
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, WindowPrint) {
   ASSERT_TRUE(embedded_test_server()->Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents = browser_context->CreateWebContents(
@@ -648,8 +635,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserAllowInsecureLocalhostTest,
   ASSERT_TRUE(https_server.Start());
   GURL test_url = https_server.GetURL("/hello.html");
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* headless_web_contents =
@@ -677,8 +663,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest,
   server.ServeFilesFromSourceDirectory("headless/test/data");
   ASSERT_TRUE(server.Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents =
@@ -695,8 +680,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, AIAFetching) {
   server.AddDefaultHandlers(base::FilePath(FILE_PATH_LITERAL("net/data/ssl")));
   ASSERT_TRUE(server.Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
   browser()->SetDefaultBrowserContext(browser_context);
 
@@ -715,10 +699,9 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, AIAFetching) {
 }
 
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, BadgingAPI) {
-  EXPECT_TRUE(embedded_test_server()->Start());
+  ASSERT_TRUE(embedded_test_server()->Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   GURL url = embedded_test_server()->GetURL("/badging_api.html");
@@ -741,8 +724,7 @@ class PrerenderHeadlessBrowserTest : public HeadlessBrowserTest {
   }
 
   void SetUpOnMainThread() override {
-    headless_browser_context_ =
-        browser()->CreateBrowserContextBuilder().Build();
+    headless_browser_context_ = browser()->CreateBrowserContext();
     ASSERT_TRUE(headless_browser_context_);
     headless_web_contents_ = headless_browser_context_->CreateWebContents();
     ASSERT_TRUE(headless_web_contents_);
@@ -820,8 +802,7 @@ INSTANTIATE_TEST_SUITE_P(HeadlessBrowserTestWithExplicitlyAllowedPorts,
 
 IN_PROC_BROWSER_TEST_P(HeadlessBrowserTestWithExplicitlyAllowedPorts,
                        AllowedPort) {
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents =
@@ -925,8 +906,7 @@ IN_PROC_BROWSER_TEST_P(SelectFileDialogHeadlessBrowserTest, SelectFileDialog) {
   base::ScopedAllowBlockingForTesting allow_blocking;
   ASSERT_TRUE(embedded_test_server()->Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* web_contents = browser_context->CreateWebContents(
@@ -958,8 +938,7 @@ IN_PROC_BROWSER_TEST_P(SelectFileDialogHeadlessBrowserTest, SelectFileDialog) {
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, DISABLED_NetworkServiceCrash) {
   ASSERT_TRUE(embedded_test_server()->Start());
 
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* headless_web_contents =
@@ -1044,8 +1023,7 @@ INSTANTIATE_TEST_SUITE_P(/* no prefix */,
                          ::testing::Bool());
 
 IN_PROC_BROWSER_TEST_P(HeadlessInfobarBrowserTest, InfoBarsCanBeDisabled) {
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
+  HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
   ASSERT_TRUE(browser_context);
 
   HeadlessWebContents* headless_web_contents =

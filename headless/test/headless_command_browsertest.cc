@@ -72,16 +72,18 @@ class HeadlessCommandBrowserTest : public HeadlessBrowserTest,
   void RunTest() {
     ASSERT_TRUE(embedded_test_server()->Start());
 
-    HeadlessBrowserContext::Builder context_builder =
-        browser()->CreateBrowserContextBuilder();
-    HeadlessBrowserContext* browser_context = context_builder.Build();
+    HeadlessBrowserContext* browser_context = browser()->CreateBrowserContext();
+    ASSERT_TRUE(browser_context);
+
     browser()->SetDefaultBrowserContext(browser_context);
 
     HeadlessWebContents* web_contents = browser_context->CreateWebContents(
         HeadlessCommandHandler::GetHandlerUrl());
+    ASSERT_TRUE(web_contents);
 
     content::WebContents* content_web_contents =
         HeadlessWebContentsImpl::From(web_contents)->web_contents();
+    ASSERT_TRUE(content_web_contents);
 
     content::WebContentsObserver::Observe(content_web_contents);
 

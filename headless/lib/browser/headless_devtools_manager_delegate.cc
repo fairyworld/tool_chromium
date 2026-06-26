@@ -90,9 +90,11 @@ content::BrowserContext*
 HeadlessDevToolsManagerDelegate::CreateBrowserContext() {
   if (!browser_)
     return nullptr;
-  auto builder = browser_->CreateBrowserContextBuilder();
-  builder.SetIncognitoMode(true);
-  HeadlessBrowserContext* browser_context = builder.Build();
+  HeadlessBrowserContext::CreateParams params;
+  params.incognito_mode = true;
+  HeadlessBrowserContext* browser_context =
+      browser_->CreateBrowserContext(std::move(params));
+  CHECK(browser_context);
   return HeadlessBrowserContextImpl::From(browser_context);
 }
 

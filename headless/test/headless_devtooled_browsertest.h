@@ -48,7 +48,7 @@ class HeadlessDevTooledBrowserTest : public HeadlessBrowserTest,
 
   // Allows the HeadlessBrowserContext used in testing to be customized.
   virtual void CustomizeHeadlessBrowserContext(
-      HeadlessBrowserContext::Builder& builder);
+      HeadlessBrowserContext::CreateParams& params);
 
   // Allows the HeadlessWebContents used in testing to be customized.
   virtual void CustomizeHeadlessWebContents(

@@ -524,8 +524,8 @@ class PopupWindowOpenTest : public HeadlessProtocolBrowserTest,
   PopupWindowOpenTest() = default;
 
   void CustomizeHeadlessBrowserContext(
-      HeadlessBrowserContext::Builder& builder) override {
-    builder.SetBlockNewWebContents(ShouldBlockNewWebContents());
+      HeadlessBrowserContext::CreateParams& params) override {
+    params.block_new_web_contents = ShouldBlockNewWebContents();
   }
 
   base::DictValue GetPageUrlExtraParams() override {

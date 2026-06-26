@@ -9,7 +9,6 @@
 #include <utility>
 #include <vector>
 
-#include "base/memory/ptr_util.h"
 #include "base/not_fatal_until.h"
 #include "base/path_service.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
@@ -120,9 +119,11 @@ HeadlessBrowserContextImpl* HeadlessBrowserContextImpl::From(
 
 // static
 std::unique_ptr<HeadlessBrowserContextImpl> HeadlessBrowserContextImpl::Create(
-    HeadlessBrowserContext::Builder* builder) {
-  return base::WrapUnique(new HeadlessBrowserContextImpl(
-      builder->browser_, std::move(builder->options_)));
+    HeadlessBrowserImpl* browser,
+    HeadlessBrowserContext::CreateParams params) {
+  return std::make_unique<HeadlessBrowserContextImpl>(
+      browser, std::make_unique<HeadlessBrowserContextOptions>(
+                   browser->options(), std::move(params)));
 }
 
 HeadlessWebContents* HeadlessBrowserContextImpl::CreateWebContents(
@@ -334,69 +335,13 @@ void HeadlessBrowserContextImpl::ConfigureNetworkContextParams(
       cert_verifier_creation_params);
 }
 
-HeadlessBrowserContext::Builder::Builder(HeadlessBrowserImpl* browser)
-    : browser_(browser),
-      options_(new HeadlessBrowserContextOptions(browser->options())) {}
+HeadlessBrowserContext::CreateParams::CreateParams() = default;
 
-HeadlessBrowserContext::Builder::~Builder() = default;
+HeadlessBrowserContext::CreateParams::~CreateParams() = default;
 
-HeadlessBrowserContext::Builder::Builder(Builder&&) = default;
+HeadlessBrowserContext::CreateParams::CreateParams(CreateParams&&) = default;
 
-HeadlessBrowserContext::Builder& HeadlessBrowserContext::Builder::SetUserAgent(
-    const std::string& user_agent) {
-  options_->user_agent_ = user_agent;
-  return *this;
-}
-
-HeadlessBrowserContext::Builder&
-HeadlessBrowserContext::Builder::SetAcceptLanguage(
-    const std::string& accept_language) {
-  options_->accept_language_ = accept_language;
-  return *this;
-}
-
-HeadlessBrowserContext::Builder&
-HeadlessBrowserContext::Builder::SetProxyConfig(
-    std::unique_ptr<net::ProxyConfig> proxy_config) {
-  options_->proxy_config_ = std::move(proxy_config);
-  return *this;
-}
-
-HeadlessBrowserContext::Builder& HeadlessBrowserContext::Builder::SetWindowSize(
-    const gfx::Size& window_size) {
-  options_->window_size_ = window_size;
-  return *this;
-}
-
-HeadlessBrowserContext::Builder&
-HeadlessBrowserContext::Builder::SetUserDataDir(
-    const base::FilePath& user_data_dir) {
-  options_->user_data_dir_ = user_data_dir;
-  return *this;
-}
-
-HeadlessBrowserContext::Builder&
-HeadlessBrowserContext::Builder::SetDiskCacheDir(
-    const base::FilePath& disk_cache_dir) {
-  options_->disk_cache_dir_ = disk_cache_dir;
-  return *this;
-}
-
-HeadlessBrowserContext::Builder&
-HeadlessBrowserContext::Builder::SetIncognitoMode(bool incognito_mode) {
-  options_->incognito_mode_ = incognito_mode;
-  return *this;
-}
-
-HeadlessBrowserContext::Builder&
-HeadlessBrowserContext::Builder::SetBlockNewWebContents(
-    bool block_new_web_contents) {
-  options_->block_new_web_contents_ = block_new_web_contents;
-  return *this;
-}
-
-HeadlessBrowserContext* HeadlessBrowserContext::Builder::Build() {
-  return browser_->CreateBrowserContext(this);
-}
+HeadlessBrowserContext::CreateParams&
+HeadlessBrowserContext::CreateParams::operator=(CreateParams&&) = default;
 
 }  // namespace headless
