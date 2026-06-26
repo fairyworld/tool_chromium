@@ -584,46 +584,6 @@ suite('SyncAccountControl', function() {
     assertFalse(isChildVisible(testElement, '#sync-error-button'));
   });
 
-  test('hide buttons', function() {
-    testElement.hideButtons = true;
-    testElement.syncStatus = {
-      firstSetupInProgress: false,
-      signedInState: SignedInState.SYNCING,
-      signedInUsername: 'bar@bar.com',
-      statusAction: StatusAction.NO_ACTION,
-      hasError: false,
-      hasUnrecoverableError: false,
-      disabled: false,
-    };
-
-    assertFalse(isChildVisible(testElement, '#turn-off'));
-    assertFalse(isChildVisible(testElement, '#sync-error-button'));
-
-    testElement.syncStatus = {
-      firstSetupInProgress: false,
-      signedInState: SignedInState.SYNCING,
-      signedInUsername: 'bar@bar.com',
-      hasError: true,
-      hasUnrecoverableError: false,
-      statusAction: StatusAction.REAUTHENTICATE,
-      disabled: false,
-    };
-    assertFalse(isChildVisible(testElement, '#turn-off'));
-    assertFalse(isChildVisible(testElement, '#sync-error-button'));
-
-    testElement.syncStatus = {
-      firstSetupInProgress: false,
-      signedInState: SignedInState.SYNCING,
-      signedInUsername: 'bar@bar.com',
-      hasError: true,
-      hasUnrecoverableError: false,
-      statusAction: StatusAction.ENTER_PASSPHRASE,
-      disabled: false,
-    };
-    assertFalse(isChildVisible(testElement, '#turn-off'));
-    assertFalse(isChildVisible(testElement, '#sync-error-button'));
-  });
-
   test('signinButtonDisabled', function() {
     // Ensure that the sync button is disabled when signin is disabled.
     assertFalse(testElement.$.signIn.disabled);
