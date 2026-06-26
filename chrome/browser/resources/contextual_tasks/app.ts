@@ -781,6 +781,15 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
             this.requestUpdate();
           }
         });
+
+    // <if expr="is_android and not is_desktop_android">
+    this.isDomContentLoaded_ = true;
+    if (this.isInitialFrameLoad_ && this.isZeroState_) {
+      this.playZeroStateAnimations_();
+      // Omit calling this.forceComposeboxFocus() on mobile Android startup to
+      // avoid automatically popping up the software keyboard on page load.
+    }
+    // </if>
   }
 
   override updated(changedProperties: PropertyValues<this>) {
@@ -941,6 +950,16 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
     }
     this.updateBasicModeAfterNavigation();
     this.maybeOnThreadFrameTopLevelNavigation(ev.url);
+
+    // <if expr="is_android and not is_desktop_android">
+    // On standard mobile Android phones, since guest-to-host script
+    // communication is not supported, must set isDomContentLoaded_ on
+    // loadcommit rather than waiting for a domContentLoaded message.
+    this.isDomContentLoaded_ = true;
+    if (this.isZeroState_) {
+      this.playZeroStateAnimations_();
+    }
+    // </if>
   }
 
   private onThreadFrameContentLoad() {
@@ -1408,26 +1427,6 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
           },
           ['blocking']);
 
-      // Allow downloading files. This is necessary since aim can generate
-      // images for download.
-      this.$.threadFrame.addEventListener(
-          'permissionrequest',
-          (e: chrome.webviewTag.PermissionRequestEvent|
-           PermissionRequestEvent) => {
-            if (e.permission === 'download') {
-              e.request.allow();
-            } else if (e.permission === 'geolocation') {
-              e.request.allow();
-            }
-          });
-
-      // Sets the user agent to the default user agent + the contextual tasks
-      // custom suffix.
-      const userAgent = this.$.threadFrame.getUserAgent();
-      const userAgentSuffix = loadTimeData.getString('userAgentSuffix');
-      this.$.threadFrame.setUserAgentOverride(
-          `${userAgent} ${userAgentSuffix}`);
-
       // Inject a script to notify the embedder when the DOM has loaded so the
       // app knows when to show the header and composebox.
       this.$.threadFrame.addContentScripts([{
@@ -1458,6 +1457,27 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
         },
         run_at: 'document_start',
       }]);
+    }
+
+    // Allow downloading files. This is necessary since aim can generate
+    // images for download.
+    this.$.threadFrame.addEventListener('permissionrequest', (e: Event) => {
+      const permissionEvent = e as chrome.webviewTag.PermissionRequestEvent |
+          PermissionRequestEvent;
+      if (permissionEvent.permission === 'download') {
+        permissionEvent.request.allow();
+      } else if (permissionEvent.permission === 'geolocation') {
+        permissionEvent.request.allow();
+      }
+    });
+
+    const userAgentSuffix = loadTimeData.getString('userAgentSuffix');
+    if (userAgentSuffix) {
+      const userAgent = this.$.threadFrame.getUserAgent();
+      if (!userAgent.endsWith(userAgentSuffix)) {
+        this.$.threadFrame.setUserAgentOverride(
+            `${userAgent} ${userAgentSuffix}`);
+      }
     }
   }
 
