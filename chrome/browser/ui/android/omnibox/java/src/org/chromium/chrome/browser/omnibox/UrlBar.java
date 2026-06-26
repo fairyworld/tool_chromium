@@ -124,6 +124,9 @@ public class UrlBar extends AutocompleteEditText {
     private boolean mAllowMultilineInput;
     private boolean mCurrentInputCanBeWrapped;
 
+    /** Tracks whether a long-press was performed during the current touch gesture. */
+    private boolean mLongPressPerformed;
+
     private boolean mPendingScroll;
 
     // Captures the current intended text scroll type.
@@ -598,14 +601,37 @@ public class UrlBar extends AutocompleteEditText {
     }
 
     @Override
+    public boolean performLongClick() {
+        boolean handled = super.performLongClick();
+        if (handled) {
+            mLongPressPerformed = true;
+        }
+        return handled;
+    }
+
+    @Override
+    public boolean performLongClick(float x, float y) {
+        boolean handled = super.performLongClick(x, y);
+        if (handled) {
+            mLongPressPerformed = true;
+        }
+        return handled;
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
+        int action = event.getActionMasked();
+        if (action == MotionEvent.ACTION_DOWN) {
+            mLongPressPerformed = false;
+        }
+
         // We need to suppress the OS from taking ownership of initial focus.
         // This is because the TextView not only requests focus, but also manipulates
         // selection and cursor placement.
         // This overrides any information we persisted in AutocompleteInput; if we
         // persist user selection ahead of suspending input, we cannot resume from where the
         // user left off.
-        if (!isFocused() && event.getActionMasked() == MotionEvent.ACTION_UP) {
+        if (!isFocused() && action == MotionEvent.ACTION_UP && !mLongPressPerformed) {
             performClick();
             event = MotionEvent.obtain(event);
             event.setAction(MotionEvent.ACTION_CANCEL);
