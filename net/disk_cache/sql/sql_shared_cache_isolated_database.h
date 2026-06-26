@@ -11,7 +11,6 @@
 
 #include "base/files/file_path.h"
 #include "base/memory/scoped_refptr.h"
-#include "base/task/sequenced_task_runner.h"
 #include "base/types/expected.h"
 #include "base/types/pass_key.h"
 #include "components/sqlite_vfs/sqlite_sandboxed_vfs.h"
@@ -67,11 +66,9 @@ class NET_EXPORT_PRIVATE SqlSharedCacheIsolatedDatabase {
   using ReadResult = SqlPersistentStore::ReadResult;
   using ReadResultOrError = base::expected<ReadResult, Error>;
 
-  SqlSharedCacheIsolatedDatabase(
-      std::string nik_string,
-      const base::FilePath& directory,
-      SqlSharedCacheDbId shared_cache_db_id,
-      scoped_refptr<base::SequencedTaskRunner> task_runner);
+  SqlSharedCacheIsolatedDatabase(std::string nik_string,
+                                 const base::FilePath& directory,
+                                 SqlSharedCacheDbId shared_cache_db_id);
   ~SqlSharedCacheIsolatedDatabase();
 
   base::expected<void, Error> Init();
@@ -141,7 +138,6 @@ class NET_EXPORT_PRIVATE SqlSharedCacheIsolatedDatabase {
 
   std::string nik_string_;
   std::unique_ptr<DatabaseAssets> db_assets_;
-  scoped_refptr<base::SequencedTaskRunner> task_runner_;
   bool simulate_db_failure_ = false;
 };
 

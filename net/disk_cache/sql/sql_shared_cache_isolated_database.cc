@@ -87,11 +87,9 @@ SqlSharedCacheIsolatedDatabase::DatabaseAssets::GetDbVirtualFilePath() const {
 SqlSharedCacheIsolatedDatabase::SqlSharedCacheIsolatedDatabase(
     std::string nik_string,
     const base::FilePath& directory,
-    SqlSharedCacheDbId shared_cache_db_id,
-    scoped_refptr<base::SequencedTaskRunner> task_runner)
+    SqlSharedCacheDbId shared_cache_db_id)
     : nik_string_(std::move(nik_string)),
-      db_assets_(DatabaseAssets::MaybeCreate(directory, shared_cache_db_id)),
-      task_runner_(std::move(task_runner)) {}
+      db_assets_(DatabaseAssets::MaybeCreate(directory, shared_cache_db_id)) {}
 
 SqlSharedCacheIsolatedDatabase::~SqlSharedCacheIsolatedDatabase() = default;
 
