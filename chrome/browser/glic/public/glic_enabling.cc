@@ -715,6 +715,11 @@ bool GlicEnabling::IsProfileEligible(Profile* profile) {
     return false;
   }
 
+  // If the main feature flag is disabled, completely kill the feature.
+  if (!base::FeatureList::IsEnabled(features::kGlic)) {
+    return false;
+  }
+
 #if BUILDFLAG(IS_CHROMEOS)
   if (!IsChromeOSProfileEligible(profile)) {
     return false;
