@@ -2461,6 +2461,7 @@ if (!is_android) {
       "//chrome/browser/new_tab_page:browser_tests",
       "//chrome/browser/new_tab_page/chrome_colors",
       "//chrome/browser/new_tab_page/chrome_colors:generate_chrome_colors_info",
+      "//chrome/browser/notifications:browser_tests",
       "//chrome/browser/notifications/scheduler:factory",
       "//chrome/browser/notifications/scheduler/public",
       "//chrome/browser/notifications/scheduler/test:test_support",
@@ -3374,7 +3375,6 @@ if (!is_android) {
       "../browser/metrics/variations/variations_safe_mode_browsertest.cc",
       "../browser/metrics/variations/variations_safe_mode_end_to_end_browsertest.cc",
       "../browser/no_best_effort_tasks_during_startup_browsertest.cc",
-      "../browser/notifications/notification_permission_browsertest.cc",
       "../browser/notifications/scheduler/notification_schedule_service_browsertest.cc",
       "../browser/os_crypt/os_crypt_async_browsertest.cc",
       "../browser/page_load_metrics/observers/abandoned_page_load_metrics_observer_browsertest.cc",
@@ -4602,9 +4602,6 @@ if (!is_android) {
         "../browser/metrics/structured/metadata_processor_ash_browsertest.cc",
         "../browser/metrics/structured/structured_metrics_key_events_observer_browsertest.cc",
         "../browser/metrics/usertype_by_devicetype_metrics_provider_browsertest.cc",
-        "../browser/notifications/notification_platform_bridge_chromeos_browsertest.cc",
-        "../browser/notifications/notifier_settings_test_observer.cc",
-        "../browser/notifications/notifier_settings_test_observer.h",
         "../browser/page_load_metrics/observers/ash_session_restore_page_load_metrics_observer_browsertest.cc",
         "../browser/policy/login_policy_test_base_browsertest.cc",
         "../browser/policy/restricted_mgs_policy_provider_ash_browsertest.cc",
@@ -5742,14 +5739,6 @@ test("unit_tests") {
     "../browser/media/webrtc/capture_policy_utils_unittest.cc",
     "../browser/media/webrtc/media_device_salt_service_factory_unittest.cc",
     "../browser/media/webrtc/media_stream_device_permission_context_unittest.cc",
-    "../browser/notifications/metrics/notification_metrics_logger_unittest.cc",
-    "../browser/notifications/notification_display_queue_unittest.cc",
-    "../browser/notifications/notification_display_service_impl_unittest.cc",
-    "../browser/notifications/notification_permission_context_unittest.cc",
-    "../browser/notifications/notification_platform_bridge_unittest.cc",
-    "../browser/notifications/notification_trigger_scheduler_unittest.cc",
-    "../browser/notifications/persistent_notification_handler_unittest.cc",
-    "../browser/notifications/platform_notification_service_unittest.cc",
     "../browser/page_load_metrics/metrics_web_contents_observer_unittest.cc",
     "../browser/page_load_metrics/observers/captcha_metrics_observer_unittest.cc",
     "../browser/page_load_metrics/observers/captcha_provider_manager_unittest.cc",
@@ -5888,14 +5877,6 @@ test("unit_tests") {
     sources += [
       "../browser/downgrade/snapshot_manager_unittest.cc",
       "../browser/downgrade/user_data_downgrade_unittest.cc",
-    ]
-  }
-
-  if (enable_chrome_notifications) {
-    sources += [
-      "../browser/notifications/notification_system_observer_unittest.cc",
-      "../browser/notifications/notification_ui_manager_unittest.cc",
-      "../browser/notifications/popups_only_ui_controller_unittest.cc",
     ]
   }
 
@@ -6776,12 +6757,6 @@ test("unit_tests") {
       "../browser/enterprise/platform_auth/cloud_ap_utils_win_unittest.cc",
       "../browser/media/cdm_document_service_impl_test.cc",
       "../browser/media/media_foundation_service_monitor_unittest.cc",
-      "../browser/notifications/notification_platform_bridge_win_unittest.cc",
-      "../browser/notifications/win/fake_notification_image_retainer.cc",
-      "../browser/notifications/win/fake_notification_image_retainer.h",
-      "../browser/notifications/win/notification_helper_launches_chrome_unittest.cc",
-      "../browser/notifications/win/notification_launch_id_unittest.cc",
-      "../browser/notifications/win/notification_template_builder_unittest.cc",
       "../browser/performance_manager/policies/dll_pre_read_policy_win_unittest.cc",
       "../browser/policy/browser_dm_token_storage_win_unittest.cc",
       "../browser/process_singleton_win_unittest.cc",
@@ -6895,11 +6870,6 @@ test("unit_tests") {
       "../browser/enterprise/platform_auth/scoped_cf_prefs_observer_override.h",
       "../browser/global_keyboard_shortcuts_mac_unittest.mm",
       "../browser/media/webrtc/thumbnail_capturer_mac_unittest.mm",
-      "../browser/notifications/mac/notification_dispatcher_mojo_unittest.cc",
-      "../browser/notifications/mac/notification_platform_bridge_mac_unittest.cc",
-      "../browser/notifications/mac/notification_utils_unittest.cc",
-      "../browser/notifications/mac/stub_notification_dispatcher_mac.cc",
-      "../browser/notifications/mac/stub_notification_dispatcher_mac.h",
       "../browser/policy/browser_dm_token_storage_mac_unittest.cc",
       "../browser/renderer_host/chrome_render_widget_host_view_mac_history_swiper_unittest.mm",
       "../browser/shell_integration_mac_unittest.mm",
@@ -7098,7 +7068,6 @@ test("unit_tests") {
       "../browser/enterprise/platform_auth/entra_provider_android_unittest.cc",
       "../browser/feedback/android/family_info_feedback_source_unittest.cc",
       "../browser/media/android/cdm/media_drm_origin_id_manager_unittest.cc",
-      "../browser/notifications/notification_channels_provider_android_unittest.cc",
       "../browser/optimization_guide/android/optimization_guide_bridge_unittest.cc",
       "../browser/optimization_guide/android/optimization_guide_tab_url_provider_android_unittest.cc",
       "../browser/page_load_metrics/observers/android_page_load_metrics_observer_unittest.cc",
@@ -7328,8 +7297,6 @@ test("unit_tests") {
       "../browser/media/webrtc/webrtc_rtp_dump_handler_unittest.cc",
       "../browser/media/webrtc/webrtc_rtp_dump_writer_unittest.cc",
       "../browser/media/webrtc/webrtc_text_log_handler_unittest.cc",
-      "../browser/notifications/muted_notification_handler_unittest.cc",
-      "../browser/notifications/screen_capture_notification_blocker_unittest.cc",
       "../browser/performance_manager/execution_context_priority/side_panel_loading_voter_unittest.cc",
       "../browser/policy/policy_path_parser_unittest.cc",
       "../browser/policy/webhid_device_policy_handler_unittest.cc",
@@ -7967,9 +7934,6 @@ test("unit_tests") {
       "../browser/media/platform_verification_chromeos_unittest.cc",
       "../browser/media/webrtc/chrome_screen_enumerator_ash_unittest.cc",
       "../browser/media/webrtc/desktop_media_list_ash_unittest.cc",
-      "../browser/notifications/chrome_ash_message_center_client_unittest.cc",
-      "../browser/notifications/notification_platform_bridge_chromeos_unittest.cc",
-      "../browser/notifications/web_page_notifier_controller_unittest.cc",
       "../browser/performance_manager/mechanisms/working_set_trimmer_chromeos_unittest.cc",
       "../browser/performance_manager/policies/oom_score_policy_chromeos_unittest.cc",
       "../browser/performance_manager/policies/report_page_processes_policy_unittest.cc",
@@ -8464,7 +8428,6 @@ test("unit_tests") {
     if (use_dbus) {
       sources += [
         "../browser/dbus_memory_pressure_evaluator_linux_unittest.cc",
-        "../browser/notifications/notification_platform_bridge_linux_unittest.cc",
         "../browser/ui/views/dark_mode_manager_linux_unittest.cc",
       ]
       deps += [
@@ -9842,7 +9805,6 @@ if (!is_android && !is_chromeos_device) {
       "../browser/media/webrtc/webrtc_interactive_uitest.cc",
       "../browser/media/webrtc/webrtc_mediadevices_interactive_uitest.cc",
       "../browser/mouse_events_interactive_uitest.cc",
-      "../browser/notifications/platform_notification_service_interactive_uitest.cc",
       "../browser/permissions/one_time_permissions_tracker_helper_interactive_uitest.cc",
       "../browser/select_popup_interactive_uitest.cc",
       "../browser/surface_embed_background_tab_capture_interactive_uitest.cc",
@@ -9990,6 +9952,7 @@ if (!is_android && !is_chromeos_device) {
       "//chrome/browser/net:interactive_ui_tests",
       "//chrome/browser/new_tab_page",
       "//chrome/browser/new_tab_page:interactive_ui_tests",
+      "//chrome/browser/notifications:interactive_ui_tests",
       "//chrome/browser/optimization_guide:test_support",
       "//chrome/browser/page_content_annotations",
       "//chrome/browser/password_manager",
@@ -10679,13 +10642,6 @@ if (!is_android && !is_chromeos_device) {
         deps += [ "//components/printing/common:mojo_interfaces" ]
       }
     } else {  # ! is_chromeos
-      # Non-ChromeOS notifications tests.
-      sources += [
-        "../browser/notifications/notification_interactive_uitest.cc",
-        "../browser/notifications/notification_interactive_uitest_support.cc",
-        "../browser/notifications/notification_interactive_uitest_support.h",
-      ]
-
       # Non-ChromeOS tests.
       deps += [ "//chrome/browser/ui/signin:interactive_ui_tests" ]
     }
@@ -10693,9 +10649,6 @@ if (!is_android && !is_chromeos_device) {
     if (is_win) {
       sources += [
         "../browser/downgrade/user_data_downgrade_browsertest.cc",
-        "../browser/notifications/notification_platform_bridge_win_interactive_uitest.cc",
-        "../browser/notifications/win/fake_itoastnotifier.cc",
-        "../browser/notifications/win/fake_itoastnotifier.h",
         "../browser/ui/send_mouse_move_uitest_win.cc",
         "../browser/ui/views/touch_events_interactive_uitest_win.cc",
         "//ui/base/clipboard/clipboard_win_unittest.cc",
@@ -10737,7 +10690,6 @@ if (!is_android && !is_chromeos_device) {
       sources += [
         "../browser/app_controller_mac_interactive_uitest.mm",
         "../browser/global_keyboard_shortcuts_interactive_uitest_mac.mm",
-        "../browser/notifications/mac/notification_interactive_uitest_mac.mm",
         "../browser/ui/cocoa/apps/quit_with_apps_controller_mac_interactive_uitest.mm",
         "../browser/ui/cocoa/confirm_quit_panel_controller_interactive_uitest.mm",
         "../browser/ui/cocoa/status_bubble_mac_interactive_uitest.mm",
@@ -10767,13 +10719,6 @@ if (!is_android && !is_chromeos_device) {
     if (enable_downgrade_processing) {
       sources += [ "../browser/downgrade/user_data_snapshot_browsertest.cc" ]
       deps += [ "//chrome/browser/downgrade" ]
-    }
-
-    if (enable_chrome_notifications) {
-      sources += [
-        "../browser/notifications/notification_ui_manager_browsertest.cc",
-        "../browser/notifications/notification_ui_manager_interactive_uitest.cc",
-      ]
     }
 
     if (is_android) {
