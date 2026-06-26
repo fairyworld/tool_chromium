@@ -1192,6 +1192,8 @@ try_.orchestrator_builder(
         # crbug/940930
         "chromium.enable_cleandead": 100,
         "luci.buildbucket.run_in_turboci": 100,
+        # go/rts-project-proposal
+        "chromium_rts.filter_file_analysis": 10,
     },
     main_list_view = "try",
     # TODO(crbug.com/40241638): Use orchestrator pool once overloaded test pools
