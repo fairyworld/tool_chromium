@@ -87,7 +87,7 @@ BASE_FEATURE(kWebViewMixedContentAutoupgrades,
 // cookie loss and CHECK failures when cookies are set before WebView is fully
 // initialized.
 BASE_FEATURE(kWebViewNonBlockingCookieStoreHandoff,
-             base::FEATURE_ENABLED_BY_DEFAULT);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 // A Feature used for WebView variations tests. Not used in production. Please
 // do not clean up this stale feature: we intentionally keep this feature flag
