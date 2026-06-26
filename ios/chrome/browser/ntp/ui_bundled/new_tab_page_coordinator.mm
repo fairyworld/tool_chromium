@@ -1000,6 +1000,7 @@
 }
 
 - (void)customizationMenuWasTapped:(UIView*)customizationMenu {
+  CHECK(!IsOverflowMenuHomeCustomizationEntrypointEnabled());
   if (_customizationCoordinator) {
     // The menu is already opened, so tapping an entrypoint again should close
     // it.
@@ -1019,6 +1020,8 @@
 - (void)customizationMenuWasTapped {
   CHECK(IsOverflowMenuHomeCustomizationEntrypointEnabled());
   if (_customizationCoordinator) {
+    // The menu is already opened, so tapping an entrypoint again should close
+    // it.
     [self dismissCustomizationMenu];
     return;
   }

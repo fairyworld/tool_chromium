@@ -39,6 +39,7 @@
 #import "ios/chrome/browser/omnibox/public/omnibox_ui_features.h"
 #import "ios/chrome/browser/omnibox/ui/omnibox_container_view.h"
 #import "ios/chrome/browser/omnibox/ui/omnibox_text_field_ios.h"
+#import "ios/chrome/browser/popup_menu/overflow_menu/public/features.h"
 #import "ios/chrome/browser/shared/model/profile/features.h"
 #import "ios/chrome/browser/shared/public/commands/help_commands.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
@@ -385,7 +386,9 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
   [self setupFakeTapView];
   [self setupIdentityDisc];
   [self addSeparatorToSearchField:self.fakeOmniboxContainer];
-  [self addCustomizationMenu];
+  if (!IsOverflowMenuHomeCustomizationEntrypointEnabled()) {
+    [self addCustomizationMenu];
+  }
   if (IsChromeNextIaEnabled()) {
     if (!CanShowTabStrip(self) && !IsRegularXRegularSizeClass(self)) {
       [self addToolsMenu];
@@ -1024,6 +1027,7 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
 
 - (void)setCustomizationMenuButton:(UIButton*)customizationMenuButton
                       withNewBadge:(BOOL)hasNewBadge {
+  CHECK(!IsOverflowMenuHomeCustomizationEntrypointEnabled());
   if (_customizationMenuButton) {
     [_customizationMenuButton removeFromSuperview];
   }
@@ -1135,6 +1139,15 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
 
   [self.toolBarView addSubview:toolsMenuButton];
 
+  NSLayoutAnchor* leadingAnchor =
+      IsOverflowMenuHomeCustomizationEntrypointEnabled()
+          ? self.safeAreaLayoutGuide.leadingAnchor
+          : self.customizationMenuButton.trailingAnchor;
+  CGFloat leadingConstant =
+      IsOverflowMenuHomeCustomizationEntrypointEnabled()
+          ? (ntp_home::kIdentityAvatarPadding + ntp_home::kHeaderIconMargin)
+          : ntp_home::kHeaderIconMargin;
+
   [NSLayoutConstraint activateConstraints:@[
     [toolsMenuButton.centerYAnchor
         constraintEqualToAnchor:self.toolBarView.centerYAnchor],
@@ -1142,9 +1155,8 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
         constraintEqualToConstant:ntp_home::kNTPMenuButtonDimension],
     [toolsMenuButton.widthAnchor
         constraintEqualToAnchor:toolsMenuButton.heightAnchor],
-    [toolsMenuButton.leadingAnchor
-        constraintEqualToAnchor:self.customizationMenuButton.trailingAnchor
-                       constant:ntp_home::kHeaderIconMargin]
+    [toolsMenuButton.leadingAnchor constraintEqualToAnchor:leadingAnchor
+                                                  constant:leadingConstant]
   ]];
 
   _toolsMenuButton = toolsMenuButton;
@@ -1307,6 +1319,7 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
 
 // Creates the Home customization menu and adds it to the header view.
 - (void)addCustomizationMenu {
+  CHECK(!IsOverflowMenuHomeCustomizationEntrypointEnabled());
   UIButton* customizationMenuButton =
       [[ExtendedTouchTargetButton alloc] initWithFrame:CGRectZero];
 

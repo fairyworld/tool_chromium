@@ -311,6 +311,7 @@ source_set("ntp_internal") {
     "//ios/chrome/browser/omnibox/ui:omnibox_popup_shared",
     "//ios/chrome/browser/overscroll_actions/ui_bundled",
     "//ios/chrome/browser/policy/model:policy_util",
+    "//ios/chrome/browser/popup_menu/overflow_menu/public:features",
     "//ios/chrome/browser/push_notification/coordinator:prominence_notification_setting_alert",
     "//ios/chrome/browser/regional_capabilities/model",
     "//ios/chrome/browser/search_engines/model",
