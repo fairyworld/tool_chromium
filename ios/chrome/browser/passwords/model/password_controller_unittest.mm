@@ -2041,7 +2041,6 @@ TEST_F(PasswordControllerTest, PasswordMetricsNoSavedCredentials) {
     std::unique_ptr<PasswordFormManagerForUI> form_manager_to_save;
     EXPECT_CALL(*weak_client_, PromptUserToSaveOrUpdatePassword)
         .WillOnce(MoveArgAndReturn<0>(&form_manager_to_save, false));
-    ;
 
     ExecuteJavaScript(
         @"document.getElementsByName('username')[0].value = 'user';"
