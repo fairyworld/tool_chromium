@@ -43,6 +43,10 @@ class WebState;
 // Called when the mediator starts a new thread.
 - (void)assistantAIMMediatorDidStartNewThread:(AssistantAIMMediator*)mediator;
 
+// Called when the mediator reacts to a tap in the minimized state.
+- (void)assistantAIMMediatorDidFocusFromMinimized:
+    (AssistantAIMMediator*)mediator;
+
 @end
 
 // Mediator that manages the business logic and data for the AI mode Assistant.

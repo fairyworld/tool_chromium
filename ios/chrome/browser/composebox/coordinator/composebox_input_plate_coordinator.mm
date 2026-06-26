@@ -361,6 +361,10 @@ contextual_search::ContextualSearchSource ContextualSearchSourceFromEntrypoint(
   _menuCoorinator = nil;
 }
 
+- (void)focusComposebox {
+  [_omniboxCoordinator focusOmnibox];
+}
+
 #pragma mark - ComposeboxInputPlateViewControllerDelegate
 
 - (void)composeboxViewController:
@@ -695,10 +699,6 @@ contextual_search::ContextualSearchSource ContextualSearchSourceFromEntrypoint(
     }
     [_metricsRecorder recordToolSelected:toolMode];
   }
-}
-
-- (void)focusComposebox {
-  [_omniboxCoordinator focusOmnibox];
 }
 
 /// Dismisses the composebox via a command to the browser coordinator.

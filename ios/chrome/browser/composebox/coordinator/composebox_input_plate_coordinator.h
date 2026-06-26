@@ -56,6 +56,9 @@ class Browser;
 // Hides the menu managed by this composebox instance.
 - (void)hideComposeboxMenu;
 
+// Focuses the Composebox;
+- (void)focusComposebox;
+
 @end
 
 #endif  // IOS_CHROME_BROWSER_COMPOSEBOX_COORDINATOR_COMPOSEBOX_INPUT_PLATE_COORDINATOR_H_

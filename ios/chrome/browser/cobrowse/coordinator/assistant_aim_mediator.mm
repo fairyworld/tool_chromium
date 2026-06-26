@@ -406,6 +406,15 @@
   [self.delegate assistantAIMMediatorDidStartNewThread:self];
 }
 
+- (void)didTapOnMinimizedHeader {
+  [_containerHandler
+      animateAssistantContainerToDetent:AssistantContainerDetent::kLarge
+                               duration:kSheetDetentAnimationDuration
+                                  curve:UIViewAnimationCurveEaseInOut];
+
+  [_delegate assistantAIMMediatorDidFocusFromMinimized:self];
+}
+
 #pragma mark - CRWWebFramesManagerObserver
 
 - (void)webFramesManager:(web::WebFramesManager*)webFramesManager

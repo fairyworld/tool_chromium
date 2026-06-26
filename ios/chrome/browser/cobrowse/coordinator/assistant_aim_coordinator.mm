@@ -444,6 +444,11 @@ class AssistantAIMUIStateProvider
   [self dismissKeyboard];
 }
 
+- (void)assistantAIMMediatorDidFocusFromMinimized:
+    (AssistantAIMMediator*)mediator {
+  [_inputPlateCoordinator focusComposebox];
+}
+
 - (BOOL)assistantContainer:(AssistantContainerViewController*)container
      shouldPauseScrollView:(UIScrollView*)scrollView
                 forGesture:(UIGestureRecognizer*)otherGesture {
