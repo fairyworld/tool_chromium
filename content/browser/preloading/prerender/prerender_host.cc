@@ -1398,8 +1398,10 @@ bool PrerenderHost::ShouldAllowProcessReuse() const {
     return false;
   }
 
-  // TODO(https://crbug.com/524800804): Add the following restrictions:
-  // 1. Disallow cross-origin prerendering to reuse the process.
+  if (!attributes_.initiator_origin->IsSameOriginWith(
+          attributes_.prerendering_url)) {
+    return false;
+  }
 
   if (attributes_.GetTargetHint() ==
       blink::mojom::SpeculationTargetHint::kBlank) {
