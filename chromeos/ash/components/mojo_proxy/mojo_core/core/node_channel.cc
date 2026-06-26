@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/node_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_channel.h"
 
 #include <cstring>
 #include <limits>
@@ -15,14 +15,14 @@
 #include "base/memory/ptr_util.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "mojo/core/broker_host.h"
-#include "mojo/core/channel.h"
-#include "mojo/core/configuration.h"
-#include "mojo/core/core.h"
-#include "mojo/core/ipcz_driver/envelope.h"
-#include "mojo/core/request_context.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/broker_host.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/configuration.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ipcz_driver/envelope.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/request_context.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace {
@@ -930,4 +930,4 @@ void NodeChannel::InitializeLocalCapabilities() {
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

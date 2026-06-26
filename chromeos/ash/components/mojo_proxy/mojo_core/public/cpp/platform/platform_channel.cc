@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/platform/platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -13,15 +13,15 @@
 #include "base/logging.h"
 #include "base/numerics/clamped_math.h"
 #include "build/build_config.h"
-#include "mojo/buildflags.h"
-#include "mojo/core/embedder/features.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/features.h"
 
 #if BUILDFLAG(IS_WIN)
 #include <windows.h>
 
 #include "base/debug/dump_without_crashing.h"
 #include "base/win/scoped_handle.h"
-#include "mojo/public/cpp/platform/named_platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/named_platform_channel.h"
 #elif BUILDFLAG(IS_FUCHSIA)
 #include <lib/zx/channel.h>
 #include <zircon/process.h>
@@ -37,7 +37,7 @@
 #include "base/posix/global_descriptors.h"
 #endif
 
-#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
 #include <mach/port.h>
 
 #include "base/apple/mach_logging.h"
@@ -48,7 +48,7 @@
 #include <sys/socket.h>
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 
 namespace {
 
@@ -124,7 +124,7 @@ void CreateChannel(PlatformHandle* local_endpoint,
   DCHECK(local_endpoint->is_valid());
   DCHECK(remote_endpoint->is_valid());
 }
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
 void CreateChannel(PlatformHandle* local_endpoint,
                    PlatformHandle* remote_endpoint) {
   // Mach messaging is simplex; and in order to enable full-duplex
@@ -227,4 +227,4 @@ bool PlatformChannel::CommandLineHasPassedEndpoint(
   return command_line.HasSwitch(kHandleSwitch);
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

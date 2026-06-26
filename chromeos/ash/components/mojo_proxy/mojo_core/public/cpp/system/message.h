@@ -2,21 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_SYSTEM_MESSAGE_H_
-#define MOJO_PUBLIC_CPP_SYSTEM_MESSAGE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_MESSAGE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_MESSAGE_H_
 
 #include <string_view>
 #include <vector>
 
 #include "base/check.h"
-#include "mojo/public/c/system/message_pipe.h"
-#include "mojo/public/cpp/system/handle.h"
-#include "mojo/public/cpp/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/system_export.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 const MojoMessageHandle kInvalidMessageHandleValue =
-    MOJO_MESSAGE_HANDLE_INVALID;
+    MOJO_LEGACY_MESSAGE_HANDLE_INVALID;
 
 // Handle wrapper base class for a |MojoMessageHandle|.
 class MessageHandle {
@@ -40,7 +40,7 @@ class MessageHandle {
   void Close() {
     DCHECK(is_valid());
     [[maybe_unused]] MojoResult result = MojoDestroyMessage(value_);
-    DCHECK_EQ(MOJO_RESULT_OK, result);
+    DCHECK_EQ(MOJO_LEGACY_RESULT_OK, result);
   }
 
  private:
@@ -56,12 +56,12 @@ inline MojoResult CreateMessage(ScopedMessageHandle* handle,
   options.flags = flags;
   MojoMessageHandle raw_handle;
   MojoResult rv = MojoCreateMessage(&options, &raw_handle);
-  if (rv != MOJO_RESULT_OK) {
+  if (rv != MOJO_LEGACY_RESULT_OK) {
     return rv;
   }
 
   handle->reset(MessageHandle(raw_handle));
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 inline MojoResult GetMessageData(MessageHandle message,
@@ -79,7 +79,7 @@ inline MojoResult GetMessageData(MessageHandle message,
   options.flags = flags;
   MojoResult rv = MojoGetMessageData(message.value(), &options, buffer,
                                      num_bytes, nullptr, &num_handles);
-  if (rv != MOJO_RESULT_RESOURCE_EXHAUSTED) {
+  if (rv != MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED) {
     if (handles) {
       handles->clear();
     }
@@ -92,9 +92,9 @@ inline MojoResult GetMessageData(MessageHandle message,
                             &num_handles);
 }
 
-MOJO_CPP_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_CPP_SYSTEM_EXPORT MojoResult
 NotifyBadMessage(MessageHandle message, const std::string_view& error);
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_SYSTEM_MESSAGE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_MESSAGE_H_

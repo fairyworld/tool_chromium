@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_TEST_SCOPED_MOJO_SUPPORT_H_
-#define MOJO_CORE_TEST_SCOPED_MOJO_SUPPORT_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_SCOPED_MOJO_SUPPORT_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_SCOPED_MOJO_SUPPORT_H_
 
 #include "base/test/test_io_thread.h"
-#include "mojo/core/embedder/scoped_ipc_support.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/scoped_ipc_support.h"
 
-namespace mojo::core::test {
+namespace mojo_legacy::core::test {
 
 // Brings up and cleanly tears down a Mojo Core instance in the current process,
 // including a dedicated IO thread and ScopedIPCSupport. In order for Mojo to
@@ -29,11 +29,11 @@ class ScopedMojoSupport {
 
   std::unique_ptr<CoreInstance> core_;
   base::TestIOThread test_io_thread_{base::TestIOThread::kAutoStart};
-  mojo::core::ScopedIPCSupport ipc_support_{
+  mojo_legacy::core::ScopedIPCSupport ipc_support_{
       test_io_thread_.task_runner(),
-      mojo::core::ScopedIPCSupport::ShutdownPolicy::CLEAN};
+      mojo_legacy::core::ScopedIPCSupport::ShutdownPolicy::CLEAN};
 };
 
-}  // namespace mojo::core::test
+}  // namespace mojo_legacy::core::test
 
-#endif  // MOJO_CORE_TEST_SCOPED_MOJO_SUPPORT_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_SCOPED_MOJO_SUPPORT_H_

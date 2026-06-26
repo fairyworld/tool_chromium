@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/system/buffer.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/buffer.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // static
 ScopedSharedBufferHandle SharedBufferHandle::Create(uint64_t num_bytes) {
-  MojoCreateSharedBufferOptions options = {sizeof(options),
-                                           MOJO_CREATE_SHARED_BUFFER_FLAG_NONE};
+  MojoCreateSharedBufferOptions options = {
+      sizeof(options), MOJO_LEGACY_CREATE_SHARED_BUFFER_FLAG_NONE};
   SharedBufferHandle handle;
   MojoCreateSharedBuffer(num_bytes, &options, handle.mutable_value());
   return MakeScopedHandle(handle);
@@ -23,9 +23,9 @@ ScopedSharedBufferHandle SharedBufferHandle::Clone(
   }
 
   MojoDuplicateBufferHandleOptions options = {
-      sizeof(options), MOJO_DUPLICATE_BUFFER_HANDLE_FLAG_NONE};
+      sizeof(options), MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_FLAG_NONE};
   if (access_mode == AccessMode::READ_ONLY) {
-    options.flags |= MOJO_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY;
+    options.flags |= MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY;
   }
   SharedBufferHandle result_handle;
   MojoDuplicateBufferHandle(value(), &options, result_handle.mutable_value());
@@ -48,9 +48,10 @@ ScopedSharedBufferMapping SharedBufferHandle::MapAtOffset(
 uint64_t SharedBufferHandle::GetSize() const {
   MojoSharedBufferInfo buffer_info;
   buffer_info.struct_size = sizeof(buffer_info);
-  return MojoGetBufferInfo(value(), nullptr, &buffer_info) == MOJO_RESULT_OK
+  return MojoGetBufferInfo(value(), nullptr, &buffer_info) ==
+                 MOJO_LEGACY_RESULT_OK
              ? buffer_info.size
              : 0;
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

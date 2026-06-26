@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_SYSTEM_INVITATION_H_
-#define MOJO_PUBLIC_CPP_SYSTEM_INVITATION_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_INVITATION_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_INVITATION_H_
 
 #include <cstdint>
 #include <string>
@@ -12,14 +12,14 @@
 #include "base/component_export.h"
 #include "base/functional/callback.h"
 #include "base/process/process_handle.h"
-#include "mojo/public/c/system/invitation.h"
-#include "mojo/public/cpp/platform/platform_channel_endpoint.h"
-#include "mojo/public/cpp/platform/platform_channel_server_endpoint.h"
-#include "mojo/public/cpp/system/handle.h"
-#include "mojo/public/cpp/system/message_pipe.h"
-#include "mojo/public/cpp/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/invitation.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_server_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/system_export.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // A callback which may be provided when sending an invitation to another
 // process. In the event of any validation errors regarding messages from that
@@ -51,7 +51,7 @@ static_assert(sizeof(ScopedInvitationHandle) == sizeof(InvitationHandle),
 // process.
 //
 // This may also be used with the server endpoint of a |NamedPlatformChannel|.
-class MOJO_CPP_SYSTEM_EXPORT OutgoingInvitation {
+class MOJO_LEGACY_CPP_SYSTEM_EXPORT OutgoingInvitation {
  public:
   OutgoingInvitation();
   OutgoingInvitation(OutgoingInvitation&& other);
@@ -141,7 +141,7 @@ class MOJO_CPP_SYSTEM_EXPORT OutgoingInvitation {
       std::string_view connection_name = {},
       base::ProcessHandle target_process = base::kNullProcessHandle,
       MojoSendInvitationFlags invitation_flags =
-          MOJO_SEND_INVITATION_FLAG_NONE);
+          MOJO_LEGACY_SEND_INVITATION_FLAG_NONE);
 
   // Similar to above but sends |invitation| via |server_endpoint|, which should
   // correspond to a |PlatformChannelServerEndpoint| taken from a
@@ -154,17 +154,17 @@ class MOJO_CPP_SYSTEM_EXPORT OutgoingInvitation {
       std::string_view connection_name = {},
       base::ProcessHandle target_process = base::kNullProcessHandle,
       MojoSendInvitationFlags invitation_flags =
-          MOJO_SEND_INVITATION_FLAG_NONE);
+          MOJO_LEGACY_SEND_INVITATION_FLAG_NONE);
 
  private:
-  MojoSendInvitationFlags extra_flags_ = MOJO_SEND_INVITATION_FLAG_NONE;
+  MojoSendInvitationFlags extra_flags_ = MOJO_LEGACY_SEND_INVITATION_FLAG_NONE;
   ScopedInvitationHandle handle_;
 };
 
 // An IncomingInvitation can be accepted by an invited process by calling
 // |IncomingInvitation::Accept()|. Once accepted, the invitation can be used
 // to extract attached message pipes by name.
-class MOJO_CPP_SYSTEM_EXPORT IncomingInvitation {
+class MOJO_LEGACY_CPP_SYSTEM_EXPORT IncomingInvitation {
  public:
   IncomingInvitation();
   IncomingInvitation(IncomingInvitation&& other);
@@ -186,9 +186,9 @@ class MOJO_CPP_SYSTEM_EXPORT IncomingInvitation {
   // by |NamedPlatformChannel::ConnectToServer|.
   //
   // Note that this performs blocking I/O on the calling thread.
-  static IncomingInvitation Accept(
-      PlatformChannelEndpoint channel_endpoint,
-      MojoAcceptInvitationFlags flags = MOJO_ACCEPT_INVITATION_FLAG_NONE);
+  static IncomingInvitation Accept(PlatformChannelEndpoint channel_endpoint,
+                                   MojoAcceptInvitationFlags flags =
+                                       MOJO_LEGACY_ACCEPT_INVITATION_FLAG_NONE);
 
   // Like above, but does not perform any blocking I/O. Not all platforms and
   // sandbox configurations are compatible with this API. In such cases, the
@@ -213,6 +213,6 @@ class MOJO_CPP_SYSTEM_EXPORT IncomingInvitation {
   ScopedInvitationHandle handle_;
 };
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_SYSTEM_INVITATION_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_INVITATION_H_

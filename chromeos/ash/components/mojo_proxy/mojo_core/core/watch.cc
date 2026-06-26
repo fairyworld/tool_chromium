@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/watch.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/watch.h"
 
-#include "mojo/core/request_context.h"
-#include "mojo/core/watcher_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/request_context.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/watcher_dispatcher.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 Watch::Watch(const scoped_refptr<WatcherDispatcher>& watcher,
@@ -27,24 +27,25 @@ bool Watch::NotifyState(const HandleSignalsState& state,
 
   // NOTE: This method must NEVER call into |dispatcher_| directly, because it
   // may be called while |dispatcher_| holds a lock.
-  MojoResult rv = MOJO_RESULT_SHOULD_WAIT;
+  MojoResult rv = MOJO_LEGACY_RESULT_SHOULD_WAIT;
   RequestContext* const request_context = RequestContext::current();
   const bool notify_success =
       (state.satisfies_any(signals_) &&
-       condition_ == MOJO_TRIGGER_CONDITION_SIGNALS_SATISFIED) ||
+       condition_ == MOJO_LEGACY_TRIGGER_CONDITION_SIGNALS_SATISFIED) ||
       (!state.satisfies_all(signals_) &&
-       condition_ == MOJO_TRIGGER_CONDITION_SIGNALS_UNSATISFIED);
+       condition_ == MOJO_LEGACY_TRIGGER_CONDITION_SIGNALS_UNSATISFIED);
   if (notify_success) {
-    rv = MOJO_RESULT_OK;
+    rv = MOJO_LEGACY_RESULT_OK;
     if (allowed_to_call_callback && rv != last_known_result_) {
-      request_context->AddWatchNotifyFinalizer(this, MOJO_RESULT_OK, state);
+      request_context->AddWatchNotifyFinalizer(this, MOJO_LEGACY_RESULT_OK,
+                                               state);
     }
-  } else if (condition_ == MOJO_TRIGGER_CONDITION_SIGNALS_SATISFIED &&
+  } else if (condition_ == MOJO_LEGACY_TRIGGER_CONDITION_SIGNALS_SATISFIED &&
              !state.can_satisfy_any(signals_)) {
-    rv = MOJO_RESULT_FAILED_PRECONDITION;
+    rv = MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
     if (allowed_to_call_callback && rv != last_known_result_) {
       request_context->AddWatchNotifyFinalizer(
-          this, MOJO_RESULT_FAILED_PRECONDITION, state);
+          this, MOJO_LEGACY_RESULT_FAILED_PRECONDITION, state);
     }
   }
 
@@ -70,7 +71,7 @@ void Watch::InvokeCallback(MojoResult result,
     return;
   }
 
-  if (result == MOJO_RESULT_CANCELLED) {
+  if (result == MOJO_LEGACY_RESULT_CANCELLED) {
     is_cancelled_ = true;
   }
 
@@ -89,4 +90,4 @@ void Watch::AssertWatcherLockAcquired() const {
 #endif
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

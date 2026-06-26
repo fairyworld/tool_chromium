@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/shared_buffer_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/shared_buffer_dispatcher.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -15,15 +15,15 @@
 #include "base/logging.h"
 #include "base/memory/ptr_util.h"
 #include "build/build_config.h"
-#include "mojo/buildflags.h"
-#include "mojo/core/configuration.h"
-#include "mojo/core/node_controller.h"
-#include "mojo/core/options_validation.h"
-#include "mojo/core/platform_handle_utils.h"
-#include "mojo/core/platform_shared_memory_mapping.h"
-#include "mojo/public/c/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/configuration.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_controller.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/options_validation.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_utils.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_shared_memory_mapping.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/platform_handle.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace {
@@ -49,31 +49,31 @@ static_assert(sizeof(SerializedState) % 8 == 0,
 const MojoCreateSharedBufferOptions
     SharedBufferDispatcher::kDefaultCreateOptions = {
         static_cast<uint32_t>(sizeof(MojoCreateSharedBufferOptions)),
-        MOJO_CREATE_SHARED_BUFFER_FLAG_NONE};
+        MOJO_LEGACY_CREATE_SHARED_BUFFER_FLAG_NONE};
 
 // static
 MojoResult SharedBufferDispatcher::ValidateCreateOptions(
     const MojoCreateSharedBufferOptions* in_options,
     MojoCreateSharedBufferOptions* out_options) {
   const MojoCreateSharedBufferFlags kKnownFlags =
-      MOJO_CREATE_SHARED_BUFFER_FLAG_NONE;
+      MOJO_LEGACY_CREATE_SHARED_BUFFER_FLAG_NONE;
 
   *out_options = kDefaultCreateOptions;
   if (!in_options) {
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   UserOptionsReader<MojoCreateSharedBufferOptions> reader(in_options);
   if (!reader.is_valid()) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   if (!OPTIONS_STRUCT_HAS_MEMBER(MojoCreateSharedBufferOptions, flags,
                                  reader)) {
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
   if ((reader.options().flags & ~kKnownFlags)) {
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
   }
   out_options->flags = reader.options().flags;
 
@@ -81,7 +81,7 @@ MojoResult SharedBufferDispatcher::ValidateCreateOptions(
 
   // (Nothing here yet.)
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 // static
@@ -91,10 +91,10 @@ MojoResult SharedBufferDispatcher::Create(
     uint64_t num_bytes,
     scoped_refptr<SharedBufferDispatcher>* result) {
   if (!num_bytes) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (num_bytes > GetConfiguration().max_shared_memory_num_bytes) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
   base::WritableSharedMemoryRegion writable_region;
@@ -106,13 +106,13 @@ MojoResult SharedBufferDispatcher::Create(
         static_cast<size_t>(num_bytes));
   }
   if (!writable_region.IsValid()) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
   *result = CreateInternal(
       base::WritableSharedMemoryRegion::TakeHandleForSerialization(
           std::move(writable_region)));
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 // static
@@ -120,11 +120,11 @@ MojoResult SharedBufferDispatcher::CreateFromPlatformSharedMemoryRegion(
     base::subtle::PlatformSharedMemoryRegion region,
     scoped_refptr<SharedBufferDispatcher>* result) {
   if (!region.IsValid()) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   *result = CreateInternal(std::move(region));
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 // static
@@ -157,9 +157,9 @@ scoped_refptr<SharedBufferDispatcher> SharedBufferDispatcher::Deserialize(
 
   PlatformHandle handles[2];
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && \
-    !BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+    !BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   if (serialized_state->access_mode ==
-      MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE) {
+      MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE) {
     if (num_platform_handles != 2) {
       return nullptr;
     }
@@ -187,13 +187,13 @@ scoped_refptr<SharedBufferDispatcher> SharedBufferDispatcher::Deserialize(
 
   base::subtle::PlatformSharedMemoryRegion::Mode mode;
   switch (serialized_state->access_mode) {
-    case MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_READ_ONLY:
+    case MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_READ_ONLY:
       mode = base::subtle::PlatformSharedMemoryRegion::Mode::kReadOnly;
       break;
-    case MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE:
+    case MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE:
       mode = base::subtle::PlatformSharedMemoryRegion::Mode::kWritable;
       break;
-    case MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE:
+    case MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE:
       mode = base::subtle::PlatformSharedMemoryRegion::Mode::kUnsafe;
       break;
     default:
@@ -239,11 +239,11 @@ Dispatcher::Type SharedBufferDispatcher::GetType() const {
 MojoResult SharedBufferDispatcher::Close() {
   base::AutoLock lock(lock_);
   if (in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   region_ = base::subtle::PlatformSharedMemoryRegion();
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult SharedBufferDispatcher::DuplicateBufferHandle(
@@ -251,22 +251,23 @@ MojoResult SharedBufferDispatcher::DuplicateBufferHandle(
     scoped_refptr<Dispatcher>* new_dispatcher) {
   MojoDuplicateBufferHandleOptions validated_options;
   MojoResult result = ValidateDuplicateOptions(options, &validated_options);
-  if (result != MOJO_RESULT_OK) {
+  if (result != MOJO_LEGACY_RESULT_OK) {
     return result;
   }
 
   base::AutoLock lock(lock_);
   if (in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
-  if ((validated_options.flags & MOJO_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY)) {
+  if ((validated_options.flags &
+       MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY)) {
     // If a read-only duplicate is requested and this handle is not already
     // read-only, we need to make it read-only before duplicating. If it's
     // unsafe it can't be made read-only, and we must fail instead.
     if (region_.GetMode() ==
         base::subtle::PlatformSharedMemoryRegion::Mode::kUnsafe) {
-      return MOJO_RESULT_FAILED_PRECONDITION;
+      return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
     } else if (region_.GetMode() ==
                base::subtle::PlatformSharedMemoryRegion::Mode::kWritable) {
       region_ = base::ReadOnlySharedMemoryRegion::TakeHandleForSerialization(
@@ -283,7 +284,7 @@ MojoResult SharedBufferDispatcher::DuplicateBufferHandle(
     // no future read-only duplication requests can succeed.
     if (region_.GetMode() ==
         base::subtle::PlatformSharedMemoryRegion::Mode::kReadOnly) {
-      return MOJO_RESULT_FAILED_PRECONDITION;
+      return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
     } else if (region_.GetMode() ==
                base::subtle::PlatformSharedMemoryRegion::Mode::kWritable) {
       auto handle = region_.PassPlatformHandle();
@@ -301,7 +302,7 @@ MojoResult SharedBufferDispatcher::DuplicateBufferHandle(
   }
 
   *new_dispatcher = CreateInternal(region_.Duplicate());
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult SharedBufferDispatcher::MapBuffer(
@@ -309,17 +310,17 @@ MojoResult SharedBufferDispatcher::MapBuffer(
     uint64_t num_bytes,
     std::unique_ptr<PlatformSharedMemoryMapping>* mapping) {
   if (offset > static_cast<uint64_t>(std::numeric_limits<size_t>::max())) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (num_bytes > static_cast<uint64_t>(std::numeric_limits<size_t>::max())) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   base::AutoLock lock(lock_);
   DCHECK(region_.IsValid());
   if (in_transit_ || num_bytes == 0 ||
       static_cast<size_t>(offset + num_bytes) > region_.GetSize()) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   DCHECK(mapping);
@@ -327,21 +328,21 @@ MojoResult SharedBufferDispatcher::MapBuffer(
       &region_, static_cast<size_t>(offset), static_cast<size_t>(num_bytes));
   if (!(*mapping)->IsValid()) {
     LOG(ERROR) << "Failed to map shared memory region.";
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult SharedBufferDispatcher::GetBufferInfo(MojoSharedBufferInfo* info) {
   if (!info) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   base::AutoLock lock(lock_);
   info->struct_size = sizeof(*info);
   info->size = region_.GetSize();
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 void SharedBufferDispatcher::StartSerialize(uint32_t* num_bytes,
@@ -351,7 +352,7 @@ void SharedBufferDispatcher::StartSerialize(uint32_t* num_bytes,
   *num_ports = 0;
   *num_platform_handles = 1;
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && \
-    !BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+    !BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   if (region_.GetMode() ==
       base::subtle::PlatformSharedMemoryRegion::Mode::kWritable) {
     *num_platform_handles = 2;
@@ -369,15 +370,15 @@ bool SharedBufferDispatcher::EndSerialize(void* destination,
   switch (region_.GetMode()) {
     case base::subtle::PlatformSharedMemoryRegion::Mode::kReadOnly:
       serialized_state->access_mode =
-          MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_READ_ONLY;
+          MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_READ_ONLY;
       break;
     case base::subtle::PlatformSharedMemoryRegion::Mode::kWritable:
       serialized_state->access_mode =
-          MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE;
+          MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE;
       break;
     case base::subtle::PlatformSharedMemoryRegion::Mode::kUnsafe:
       serialized_state->access_mode =
-          MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE;
+          MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE;
       break;
     default:
       NOTREACHED();
@@ -390,7 +391,7 @@ bool SharedBufferDispatcher::EndSerialize(void* destination,
 
   auto region = std::move(region_);
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && \
-    !BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+    !BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   if (region.GetMode() ==
       base::subtle::PlatformSharedMemoryRegion::Mode::kWritable) {
     PlatformHandle platform_handles[2];
@@ -452,27 +453,27 @@ MojoResult SharedBufferDispatcher::ValidateDuplicateOptions(
     const MojoDuplicateBufferHandleOptions* in_options,
     MojoDuplicateBufferHandleOptions* out_options) {
   const MojoDuplicateBufferHandleFlags kKnownFlags =
-      MOJO_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY;
+      MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY;
   static const MojoDuplicateBufferHandleOptions kDefaultOptions = {
       static_cast<uint32_t>(sizeof(MojoDuplicateBufferHandleOptions)),
-      MOJO_DUPLICATE_BUFFER_HANDLE_FLAG_NONE};
+      MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_FLAG_NONE};
 
   *out_options = kDefaultOptions;
   if (!in_options) {
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   UserOptionsReader<MojoDuplicateBufferHandleOptions> reader(in_options);
   if (!reader.is_valid()) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   if (!OPTIONS_STRUCT_HAS_MEMBER(MojoDuplicateBufferHandleOptions, flags,
                                  reader)) {
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
   if ((reader.options().flags & ~kKnownFlags)) {
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
   }
   out_options->flags = reader.options().flags;
 
@@ -480,8 +481,8 @@ MojoResult SharedBufferDispatcher::ValidateDuplicateOptions(
 
   // (Nothing here yet.)
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

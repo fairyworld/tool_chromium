@@ -6,10 +6,10 @@
 // (public, C) API. These are "extensible" structs, which all have |struct_size|
 // as their first member. All fields (other than |struct_size|) are optional,
 // but any |flags| specified must be known to the system (otherwise, an error of
-// |MOJO_RESULT_UNIMPLEMENTED| should be returned).
+// |MOJO_LEGACY_RESULT_UNIMPLEMENTED| should be returned).
 
-#ifndef MOJO_CORE_OPTIONS_VALIDATION_H_
-#define MOJO_CORE_OPTIONS_VALIDATION_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_OPTIONS_VALIDATION_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_OPTIONS_VALIDATION_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -18,10 +18,10 @@
 
 #include "base/check.h"
 #include "base/memory/raw_ptr.h"
-#include "mojo/core/system_impl_export.h"
-#include "mojo/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 template <class Options>
@@ -32,7 +32,7 @@ class UserOptionsReader {
   // Note: We initialize |options_reader_| without checking, since we do a check
   // in |GetSizeForReader()|.
   explicit UserOptionsReader(const Options* options) {
-    CHECK(options && IsAligned<MOJO_ALIGNOF(Options)>(options));
+    CHECK(options && IsAligned<MOJO_LEGACY_ALIGNOF(Options)>(options));
     options_ = GetSizeForReader(options) == 0 ? nullptr : options;
     static_assert(offsetof(Options, struct_size) == 0,
                   "struct_size not first member of Options");
@@ -94,6 +94,6 @@ class UserOptionsReader {
   reader.HasMember(offsetof(Options, member), sizeof(reader.options().member))
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_OPTIONS_VALIDATION_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_OPTIONS_VALIDATION_H_

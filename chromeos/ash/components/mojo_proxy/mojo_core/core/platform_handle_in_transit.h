@@ -2,18 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_PLATFORM_HANDLE_IN_TRANSIT_H_
-#define MOJO_CORE_PLATFORM_HANDLE_IN_TRANSIT_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PLATFORM_HANDLE_IN_TRANSIT_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PLATFORM_HANDLE_IN_TRANSIT_H_
 
 #include "base/process/process.h"
 #include "build/build_config.h"
-#include "mojo/public/cpp/platform/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle.h"
 
 #if BUILDFLAG(IS_WIN)
 #include <windows.h>
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // Owns a PlatformHandle which may actually belong to another process. On
@@ -115,6 +115,6 @@ class PlatformHandleInTransit {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_PLATFORM_HANDLE_IN_TRANSIT_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PLATFORM_HANDLE_IN_TRANSIT_H_

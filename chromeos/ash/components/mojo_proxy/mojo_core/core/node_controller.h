@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_NODE_CONTROLLER_H_
-#define MOJO_CORE_NODE_CONTROLLER_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_NODE_CONTROLLER_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_NODE_CONTROLLER_H_
 
 #include <map>
 #include <memory>
@@ -23,16 +23,16 @@
 #include "base/process/process.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "mojo/core/atomic_flag.h"
-#include "mojo/core/node_channel.h"
-#include "mojo/core/ports/event.h"
-#include "mojo/core/ports/name.h"
-#include "mojo/core/ports/node.h"
-#include "mojo/core/ports/node_delegate.h"
-#include "mojo/core/system_impl_export.h"
-#include "mojo/public/cpp/platform/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/atomic_flag.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/name.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/node.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/node_delegate.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 class Broker;
@@ -60,8 +60,9 @@ class BoundedPeerSet {
 
 // The owner of ports::Node which facilitates core EDK implementation. All
 // public interface methods are safe to call from any thread.
-class MOJO_SYSTEM_IMPL_EXPORT NodeController : public ports::NodeDelegate,
-                                               public NodeChannel::Delegate {
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT NodeController
+    : public ports::NodeDelegate,
+      public NodeChannel::Delegate {
  public:
   class PortObserver : public ports::UserData {
    public:
@@ -377,6 +378,6 @@ class MOJO_SYSTEM_IMPL_EXPORT NodeController : public ports::NodeDelegate,
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_NODE_CONTROLLER_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_NODE_CONTROLLER_H_

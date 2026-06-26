@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/message_pipe_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/message_pipe_dispatcher.h"
 
 #include <limits>
 #include <memory>
@@ -11,16 +11,16 @@
 #include "base/logging.h"
 #include "base/memory/ref_counted.h"
 #include "base/trace_event/trace_event.h"
-#include "mojo/core/core.h"
-#include "mojo/core/node_controller.h"
-#include "mojo/core/ports/event.h"
-#include "mojo/core/ports/message_filter.h"
-#include "mojo/core/request_context.h"
-#include "mojo/core/user_message_impl.h"
-#include "mojo/public/cpp/bindings/mojo_buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_controller.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/message_filter.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/request_context.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/user_message_impl.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/bindings/mojo_buildflags.h"
 #include "third_party/perfetto/include/perfetto/tracing/track_event_args.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace {
@@ -145,7 +145,7 @@ MojoResult MessagePipeDispatcher::Close() {
 MojoResult MessagePipeDispatcher::WriteMessage(
     std::unique_ptr<ports::UserMessageEvent> message) {
   if (port_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   int rv = node_controller_->SendUserMessage(port_, std::move(message));
@@ -157,9 +157,9 @@ MojoResult MessagePipeDispatcher::WriteMessage(
     if (rv == ports::ERROR_PORT_UNKNOWN ||
         rv == ports::ERROR_PORT_STATE_UNEXPECTED ||
         rv == ports::ERROR_PORT_CANNOT_SEND_PEER) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     } else if (rv == ports::ERROR_PORT_PEER_CLOSED) {
-      return MOJO_RESULT_FAILED_PRECONDITION;
+      return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
     }
 
     NOTREACHED();
@@ -169,21 +169,21 @@ MojoResult MessagePipeDispatcher::WriteMessage(
   // the unread message count quota.
   base::AutoLock lock(signal_lock_);
   watchers_.NotifyState(GetHandleSignalsStateNoLock());
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult MessagePipeDispatcher::ReadMessage(
     std::unique_ptr<ports::UserMessageEvent>* message) {
   // We can't read from a port that's closed or in transit!
   if (port_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   int rv = node_controller_->node()->GetMessage(port_, message, nullptr);
   if (rv != ports::OK && rv != ports::ERROR_PORT_PEER_CLOSED) {
     if (rv == ports::ERROR_PORT_UNKNOWN ||
         rv == ports::ERROR_PORT_STATE_UNEXPECTED) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
 
     NOTREACHED();
@@ -192,18 +192,18 @@ MojoResult MessagePipeDispatcher::ReadMessage(
   if (!*message) {
     // No message was available in queue.
     if (rv == ports::OK) {
-      return MOJO_RESULT_SHOULD_WAIT;
+      return MOJO_LEGACY_RESULT_SHOULD_WAIT;
     }
     // Peer is closed and there are no more messages to read.
     DCHECK_EQ(rv, ports::ERROR_PORT_PEER_CLOSED);
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
   // We may need to update anyone watching our signals in case we just read the
   // last available message.
   base::AutoLock lock(signal_lock_);
   watchers_.NotifyState(GetHandleSignalsStateNoLock());
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult MessagePipeDispatcher::SetQuota(MojoQuotaType type, uint64_t limit) {
@@ -211,24 +211,24 @@ MojoResult MessagePipeDispatcher::SetQuota(MojoQuotaType type, uint64_t limit) {
   {
     base::AutoLock lock(signal_lock_);
     switch (type) {
-      case MOJO_QUOTA_TYPE_RECEIVE_QUEUE_LENGTH:
-        if (limit == MOJO_QUOTA_LIMIT_NONE) {
+      case MOJO_LEGACY_QUOTA_TYPE_RECEIVE_QUEUE_LENGTH:
+        if (limit == MOJO_LEGACY_QUOTA_LIMIT_NONE) {
           receive_queue_length_limit_.reset();
         } else {
           receive_queue_length_limit_ = limit;
         }
         break;
 
-      case MOJO_QUOTA_TYPE_RECEIVE_QUEUE_MEMORY_SIZE:
-        if (limit == MOJO_QUOTA_LIMIT_NONE) {
+      case MOJO_LEGACY_QUOTA_TYPE_RECEIVE_QUEUE_MEMORY_SIZE:
+        if (limit == MOJO_LEGACY_QUOTA_LIMIT_NONE) {
           receive_queue_memory_size_limit_.reset();
         } else {
           receive_queue_memory_size_limit_ = limit;
         }
         break;
 
-      case MOJO_QUOTA_TYPE_UNREAD_MESSAGE_COUNT:
-        if (limit == MOJO_QUOTA_LIMIT_NONE) {
+      case MOJO_LEGACY_QUOTA_TYPE_UNREAD_MESSAGE_COUNT:
+        if (limit == MOJO_LEGACY_QUOTA_LIMIT_NONE) {
           unread_message_count_limit_.reset();
           new_ack_request_interval = 0;
         } else {
@@ -244,7 +244,7 @@ MojoResult MessagePipeDispatcher::SetQuota(MojoQuotaType type, uint64_t limit) {
         break;
 
       default:
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
   }
 
@@ -256,7 +256,7 @@ MojoResult MessagePipeDispatcher::SetQuota(MojoQuotaType type, uint64_t limit) {
         port_, *new_ack_request_interval);
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult MessagePipeDispatcher::QueryQuota(MojoQuotaType type,
@@ -267,30 +267,33 @@ MojoResult MessagePipeDispatcher::QueryQuota(MojoQuotaType type,
   ports::PortStatus port_status;
   if (node_controller_->node()->GetStatus(port_, &port_status) != ports::OK) {
     CHECK(in_transit_ || port_transferred_ || port_closed_);
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   switch (type) {
-    case MOJO_QUOTA_TYPE_RECEIVE_QUEUE_LENGTH:
-      *limit = receive_queue_length_limit_.value_or(MOJO_QUOTA_LIMIT_NONE);
+    case MOJO_LEGACY_QUOTA_TYPE_RECEIVE_QUEUE_LENGTH:
+      *limit =
+          receive_queue_length_limit_.value_or(MOJO_LEGACY_QUOTA_LIMIT_NONE);
       *usage = port_status.queued_message_count;
       break;
 
-    case MOJO_QUOTA_TYPE_RECEIVE_QUEUE_MEMORY_SIZE:
-      *limit = receive_queue_memory_size_limit_.value_or(MOJO_QUOTA_LIMIT_NONE);
+    case MOJO_LEGACY_QUOTA_TYPE_RECEIVE_QUEUE_MEMORY_SIZE:
+      *limit = receive_queue_memory_size_limit_.value_or(
+          MOJO_LEGACY_QUOTA_LIMIT_NONE);
       *usage = port_status.queued_num_bytes;
       break;
 
-    case MOJO_QUOTA_TYPE_UNREAD_MESSAGE_COUNT:
-      *limit = unread_message_count_limit_.value_or(MOJO_QUOTA_LIMIT_NONE);
+    case MOJO_LEGACY_QUOTA_TYPE_UNREAD_MESSAGE_COUNT:
+      *limit =
+          unread_message_count_limit_.value_or(MOJO_LEGACY_QUOTA_LIMIT_NONE);
       *usage = port_status.unacknowledged_message_count;
       break;
 
     default:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 HandleSignalsState MessagePipeDispatcher::GetHandleSignalsState() const {
@@ -303,7 +306,7 @@ MojoResult MessagePipeDispatcher::AddWatcherRef(
     uintptr_t context) {
   base::AutoLock lock(signal_lock_);
   if (port_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   return watchers_.Add(watcher, context, GetHandleSignalsStateNoLock());
 }
@@ -312,7 +315,7 @@ MojoResult MessagePipeDispatcher::RemoveWatcherRef(WatcherDispatcher* watcher,
                                                    uintptr_t context) {
   base::AutoLock lock(signal_lock_);
   if (port_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   return watchers_.Remove(watcher, context);
 }
@@ -399,7 +402,7 @@ MessagePipeDispatcher::~MessagePipeDispatcher() = default;
 MojoResult MessagePipeDispatcher::CloseNoLock() {
   signal_lock_.AssertAcquired();
   if (port_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   port_closed_.Set(true);
@@ -413,7 +416,7 @@ MojoResult MessagePipeDispatcher::CloseNoLock() {
                 perfetto::Flow::ProcessScoped(pipe_id_ + endpoint_));
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 HandleSignalsState MessagePipeDispatcher::GetHandleSignalsStateNoLock() const {
@@ -426,40 +429,40 @@ HandleSignalsState MessagePipeDispatcher::GetHandleSignalsStateNoLock() const {
   }
 
   if (port_status.has_messages) {
-    rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_READABLE;
-    rv.satisfiable_signals |= MOJO_HANDLE_SIGNAL_READABLE;
+    rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_READABLE;
+    rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_READABLE;
   }
   if (port_status.receiving_messages) {
-    rv.satisfiable_signals |= MOJO_HANDLE_SIGNAL_READABLE;
+    rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_READABLE;
   }
   if (!port_status.peer_closed) {
-    rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_WRITABLE;
-    rv.satisfiable_signals |= MOJO_HANDLE_SIGNAL_WRITABLE;
-    rv.satisfiable_signals |= MOJO_HANDLE_SIGNAL_READABLE;
-    rv.satisfiable_signals |= MOJO_HANDLE_SIGNAL_PEER_REMOTE;
+    rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE;
+    rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE;
+    rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_READABLE;
+    rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE;
     if (port_status.peer_remote) {
-      rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_PEER_REMOTE;
+      rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE;
     }
   } else {
-    rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_PEER_CLOSED;
+    rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED;
   }
   if (receive_queue_length_limit_ &&
       port_status.queued_message_count > *receive_queue_length_limit_) {
-    rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_QUOTA_EXCEEDED;
+    rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_QUOTA_EXCEEDED;
   } else if (receive_queue_memory_size_limit_ &&
              port_status.queued_num_bytes > *receive_queue_memory_size_limit_) {
-    rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_QUOTA_EXCEEDED;
+    rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_QUOTA_EXCEEDED;
   } else if (unread_message_count_limit_ &&
              port_status.unacknowledged_message_count >
                  *unread_message_count_limit_) {
-    rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_QUOTA_EXCEEDED;
+    rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_QUOTA_EXCEEDED;
   }
-  rv.satisfiable_signals |=
-      MOJO_HANDLE_SIGNAL_PEER_CLOSED | MOJO_HANDLE_SIGNAL_QUOTA_EXCEEDED;
+  rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                            MOJO_LEGACY_HANDLE_SIGNAL_QUOTA_EXCEEDED;
   const bool was_peer_closed =
-      last_known_satisfied_signals_ & MOJO_HANDLE_SIGNAL_PEER_CLOSED;
+      last_known_satisfied_signals_ & MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED;
   const bool is_peer_closed =
-      rv.satisfied_signals & MOJO_HANDLE_SIGNAL_PEER_CLOSED;
+      rv.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED;
   if (is_peer_closed && !was_peer_closed) {
     TRACE_EVENT(
         TRACE_DISABLED_BY_DEFAULT("mojom"), "MessagePipe peer closed",
@@ -504,4 +507,4 @@ void MessagePipeDispatcher::OnPortStatusChanged() {
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

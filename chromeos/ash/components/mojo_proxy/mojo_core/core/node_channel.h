@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_NODE_CHANNEL_H_
-#define MOJO_CORE_NODE_CHANNEL_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_NODE_CHANNEL_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_NODE_CHANNEL_H_
 
 #include <utility>
 #include <vector>
@@ -18,13 +18,13 @@
 #include "base/synchronization/lock.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "mojo/core/channel.h"
-#include "mojo/core/connection_params.h"
-#include "mojo/core/embedder/process_error_callback.h"
-#include "mojo/core/ports/name.h"
-#include "mojo/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/connection_params.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/process_error_callback.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/name.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 inline constexpr uint64_t kNodeCapabilityNone = 0;
@@ -35,7 +35,7 @@ inline constexpr uint64_t kNodeCapabilitySupportsUpgradeRemoved = 1;
 inline constexpr uint32_t kNodeChannelHeaderSize = 8;
 
 // Wraps a Channel to send and receive Node control messages.
-class MOJO_SYSTEM_IMPL_EXPORT NodeChannel
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT NodeChannel
     : public base::RefCountedDeleteOnSequence<NodeChannel>,
       public Channel::Delegate {
  public:
@@ -235,6 +235,6 @@ class MOJO_SYSTEM_IMPL_EXPORT NodeChannel
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_NODE_CHANNEL_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_NODE_CHANNEL_H_

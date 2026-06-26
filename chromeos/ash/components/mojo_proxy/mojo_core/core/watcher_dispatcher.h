@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_WATCHER_DISPATCHER_H_
-#define MOJO_CORE_WATCHER_DISPATCHER_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_WATCHER_DISPATCHER_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_WATCHER_DISPATCHER_H_
 
 #include <stdint.h>
 
@@ -13,12 +13,12 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/synchronization/lock.h"
-#include "mojo/core/dispatcher.h"
-#include "mojo/core/handle_signals_state.h"
-#include "mojo/core/system_impl_export.h"
-#include "mojo/public/c/system/trap.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/handle_signals_state.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/trap.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 class Watch;
@@ -100,6 +100,6 @@ class WatcherDispatcher : public Dispatcher {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_WATCHER_DISPATCHER_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_WATCHER_DISPATCHER_H_

@@ -8,18 +8,18 @@
 // Please see "mojo/public/c/system/platform_handle.h" for complete
 // documentation of the API.
 
-#ifndef MOJO_PUBLIC_CPP_SYSTEM_PLATFORM_HANDLE_H_
-#define MOJO_PUBLIC_CPP_SYSTEM_PLATFORM_HANDLE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_PLATFORM_HANDLE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_PLATFORM_HANDLE_H_
 
 #include <stdint.h>
 
 #include "base/files/platform_file.h"
 #include "build/build_config.h"
-#include "mojo/public/c/system/platform_handle.h"
-#include "mojo/public/cpp/platform/platform_handle.h"
-#include "mojo/public/cpp/system/buffer.h"
-#include "mojo/public/cpp/system/handle.h"
-#include "mojo/public/cpp/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/buffer.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/system_export.h"
 
 namespace base {
 class ReadOnlySharedMemoryRegion;
@@ -32,45 +32,47 @@ class PlatformSharedMemoryRegion;
 
 }  // namespace base
 
-namespace mojo {
+namespace mojo_legacy {
 
 #if BUILDFLAG(IS_WIN)
 const MojoPlatformHandleType kPlatformFileHandleType =
-    MOJO_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE;
+    MOJO_LEGACY_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE;
 #else
 const MojoPlatformHandleType kPlatformFileHandleType =
-    MOJO_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR;
+    MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR;
 #endif  // BUILDFLAG(IS_WIN)
 
 // Wraps and unwraps base::subtle::PlatformSharedMemoryRegions. This should be
 // used only while transitioning from the legacy shared memory API. In new code
 // only base::*SharedMemoryRegion should be used instead.
-MOJO_CPP_SYSTEM_EXPORT ScopedSharedBufferHandle
+MOJO_LEGACY_CPP_SYSTEM_EXPORT ScopedSharedBufferHandle
 WrapPlatformSharedMemoryRegion(base::subtle::PlatformSharedMemoryRegion region);
-MOJO_CPP_SYSTEM_EXPORT base::subtle::PlatformSharedMemoryRegion
+MOJO_LEGACY_CPP_SYSTEM_EXPORT base::subtle::PlatformSharedMemoryRegion
 UnwrapPlatformSharedMemoryRegion(ScopedSharedBufferHandle mojo_handle);
 
 // Wraps a PlatformHandle from the C++ platform support library as a Mojo
 // handle.
-MOJO_CPP_SYSTEM_EXPORT ScopedHandle WrapPlatformHandle(PlatformHandle handle);
+MOJO_LEGACY_CPP_SYSTEM_EXPORT ScopedHandle
+WrapPlatformHandle(PlatformHandle handle);
 
 // Unwraps a Mojo handle to a PlatformHandle object from the C++ platform
 // support library.
-MOJO_CPP_SYSTEM_EXPORT PlatformHandle UnwrapPlatformHandle(ScopedHandle handle);
+MOJO_LEGACY_CPP_SYSTEM_EXPORT PlatformHandle
+UnwrapPlatformHandle(ScopedHandle handle);
 
 // Wraps a ScopedPlatformFile as a Mojo handle. Takes ownership of the file
 // object. If |platform_file| is valid, this will return a valid handle.
-MOJO_CPP_SYSTEM_EXPORT
+MOJO_LEGACY_CPP_SYSTEM_EXPORT
 ScopedHandle WrapPlatformFile(base::ScopedPlatformFile platform_file);
 
 // Unwraps a PlatformFile from a Mojo handle. If |handle| does wrap a platform
 // file handle, this function unwraps it and stores it in |file|. This function
-// returns MOJO_RESULT_OK if this unwrapping step succeeds, *even if* the
+// returns MOJO_LEGACY_RESULT_OK if this unwrapping step succeeds, *even if* the
 // unwrapped handle is actually invalid, since validity can't always be
 // determined until the unwrapped handle is used. Regardless of whether the
 // unwrapping succeeds or fails, |handle| is always closed after this function
 // returns.
-MOJO_CPP_SYSTEM_EXPORT
+MOJO_LEGACY_CPP_SYSTEM_EXPORT
 MojoResult UnwrapPlatformFile(ScopedHandle handle,
                               base::ScopedPlatformFile* file);
 
@@ -78,24 +80,24 @@ MojoResult UnwrapPlatformFile(ScopedHandle handle,
 // If the input |region| is valid for the Wrap* functions, they will always
 // succeed and return a valid Mojo shared buffer handle.
 
-MOJO_CPP_SYSTEM_EXPORT ScopedSharedBufferHandle
+MOJO_LEGACY_CPP_SYSTEM_EXPORT ScopedSharedBufferHandle
 WrapReadOnlySharedMemoryRegion(base::ReadOnlySharedMemoryRegion region);
 
-MOJO_CPP_SYSTEM_EXPORT ScopedSharedBufferHandle
+MOJO_LEGACY_CPP_SYSTEM_EXPORT ScopedSharedBufferHandle
 WrapUnsafeSharedMemoryRegion(base::UnsafeSharedMemoryRegion region);
 
-MOJO_CPP_SYSTEM_EXPORT ScopedSharedBufferHandle
+MOJO_LEGACY_CPP_SYSTEM_EXPORT ScopedSharedBufferHandle
 WrapWritableSharedMemoryRegion(base::WritableSharedMemoryRegion region);
 
-MOJO_CPP_SYSTEM_EXPORT base::ReadOnlySharedMemoryRegion
+MOJO_LEGACY_CPP_SYSTEM_EXPORT base::ReadOnlySharedMemoryRegion
 UnwrapReadOnlySharedMemoryRegion(ScopedSharedBufferHandle handle);
 
-MOJO_CPP_SYSTEM_EXPORT base::UnsafeSharedMemoryRegion
+MOJO_LEGACY_CPP_SYSTEM_EXPORT base::UnsafeSharedMemoryRegion
 UnwrapUnsafeSharedMemoryRegion(ScopedSharedBufferHandle handle);
 
-MOJO_CPP_SYSTEM_EXPORT base::WritableSharedMemoryRegion
+MOJO_LEGACY_CPP_SYSTEM_EXPORT base::WritableSharedMemoryRegion
 UnwrapWritableSharedMemoryRegion(ScopedSharedBufferHandle handle);
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_SYSTEM_PLATFORM_HANDLE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_PLATFORM_HANDLE_H_

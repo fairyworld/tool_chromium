@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/test/test_switches.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/test_switches.h"
 
 namespace test_switches {
 

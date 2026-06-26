@@ -2,18 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_TEST_TEST_SUPPORT_IMPL_H_
-#define MOJO_CORE_TEST_TEST_SUPPORT_IMPL_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_TEST_SUPPORT_IMPL_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_TEST_SUPPORT_IMPL_H_
 
 #include <stdio.h>
 
-#include "mojo/public/tests/test_support_private.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/tests/test_support_private.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace test {
 
-class TestSupportImpl : public mojo::test::TestSupport {
+class TestSupportImpl : public mojo_legacy::test::TestSupport {
  public:
   TestSupportImpl();
 
@@ -33,6 +33,6 @@ class TestSupportImpl : public mojo::test::TestSupport {
 
 }  // namespace test
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_TEST_TEST_SUPPORT_IMPL_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_TEST_SUPPORT_IMPL_H_

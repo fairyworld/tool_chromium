@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/c/system/data_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/data_pipe.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -21,16 +21,16 @@
 #include "base/test/bind.h"
 #include "base/test/task_environment.h"
 #include "build/build_config.h"
-#include "mojo/core/embedder/embedder.h"
-#include "mojo/core/test/mojo_test_base.h"
-#include "mojo/public/c/system/functions.h"
-#include "mojo/public/c/system/message_pipe.h"
-#include "mojo/public/cpp/system/data_pipe.h"
-#include "mojo/public/cpp/system/message_pipe.h"
-#include "mojo/public/cpp/system/simple_watcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/mojo_test_base.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/functions.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/data_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/simple_watcher.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace {
 
@@ -79,17 +79,18 @@ base::TimeDelta EpsilonDeadline() {
 class DataPipeTest : public test::MojoTestBase {
  public:
   DataPipeTest()
-      : producer_(MOJO_HANDLE_INVALID), consumer_(MOJO_HANDLE_INVALID) {}
+      : producer_(MOJO_LEGACY_HANDLE_INVALID),
+        consumer_(MOJO_LEGACY_HANDLE_INVALID) {}
 
   DataPipeTest(const DataPipeTest&) = delete;
   DataPipeTest& operator=(const DataPipeTest&) = delete;
 
   ~DataPipeTest() override {
-    if (producer_ != MOJO_HANDLE_INVALID) {
-      CHECK_EQ(MOJO_RESULT_OK, MojoClose(producer_));
+    if (producer_ != MOJO_LEGACY_HANDLE_INVALID) {
+      CHECK_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(producer_));
     }
-    if (consumer_ != MOJO_HANDLE_INVALID) {
-      CHECK_EQ(MOJO_RESULT_OK, MojoClose(consumer_));
+    if (consumer_ != MOJO_LEGACY_HANDLE_INVALID) {
+      CHECK_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(consumer_));
     }
   }
 
@@ -99,8 +100,8 @@ class DataPipeTest : public test::MojoTestBase {
     std::vector<uint8_t> bytes;
     std::vector<ScopedHandle> handles;
     MojoResult rv = ReadMessageRaw(MessagePipeHandle(pipe), &bytes, &handles,
-                                   MOJO_READ_MESSAGE_FLAG_NONE);
-    if (rv == MOJO_RESULT_OK) {
+                                   MOJO_LEGACY_READ_MESSAGE_FLAG_NONE);
+    if (rv == MOJO_LEGACY_RESULT_OK) {
       CHECK_EQ(0u, bytes.size());
       CHECK_EQ(num_handles, handles.size());
       for (size_t i = 0; i < num_handles; ++i) {
@@ -119,8 +120,8 @@ class DataPipeTest : public test::MojoTestBase {
                        bool all_or_none = false) {
     MojoWriteDataOptions options;
     options.struct_size = sizeof(options);
-    options.flags = all_or_none ? MOJO_WRITE_DATA_FLAG_ALL_OR_NONE
-                                : MOJO_WRITE_DATA_FLAG_NONE;
+    options.flags = all_or_none ? MOJO_LEGACY_WRITE_DATA_FLAG_ALL_OR_NONE
+                                : MOJO_LEGACY_WRITE_DATA_FLAG_NONE;
     return MojoWriteData(producer_, elements, num_bytes, &options);
   }
 
@@ -128,12 +129,12 @@ class DataPipeTest : public test::MojoTestBase {
                       uint32_t* num_bytes,
                       bool all_or_none = false,
                       bool peek = false) {
-    MojoReadDataFlags flags = MOJO_READ_DATA_FLAG_NONE;
+    MojoReadDataFlags flags = MOJO_LEGACY_READ_DATA_FLAG_NONE;
     if (all_or_none) {
-      flags |= MOJO_READ_DATA_FLAG_ALL_OR_NONE;
+      flags |= MOJO_LEGACY_READ_DATA_FLAG_ALL_OR_NONE;
     }
     if (peek) {
-      flags |= MOJO_READ_DATA_FLAG_PEEK;
+      flags |= MOJO_LEGACY_READ_DATA_FLAG_PEEK;
     }
 
     MojoReadDataOptions options;
@@ -145,14 +146,14 @@ class DataPipeTest : public test::MojoTestBase {
   MojoResult QueryData(uint32_t* num_bytes) {
     MojoReadDataOptions options;
     options.struct_size = sizeof(options);
-    options.flags = MOJO_READ_DATA_FLAG_QUERY;
+    options.flags = MOJO_LEGACY_READ_DATA_FLAG_QUERY;
     return MojoReadData(consumer_, &options, nullptr, num_bytes);
   }
 
   MojoResult DiscardData(uint32_t* num_bytes, bool all_or_none = false) {
-    MojoReadDataFlags flags = MOJO_READ_DATA_FLAG_DISCARD;
+    MojoReadDataFlags flags = MOJO_LEGACY_READ_DATA_FLAG_DISCARD;
     if (all_or_none) {
-      flags |= MOJO_READ_DATA_FLAG_ALL_OR_NONE;
+      flags |= MOJO_LEGACY_READ_DATA_FLAG_ALL_OR_NONE;
     }
     MojoReadDataOptions options;
     options.struct_size = sizeof(options);
@@ -178,13 +179,13 @@ class DataPipeTest : public test::MojoTestBase {
 
   MojoResult CloseProducer() {
     MojoResult rv = MojoClose(producer_);
-    producer_ = MOJO_HANDLE_INVALID;
+    producer_ = MOJO_LEGACY_HANDLE_INVALID;
     return rv;
   }
 
   MojoResult CloseConsumer() {
     MojoResult rv = MojoClose(consumer_);
-    consumer_ = MOJO_HANDLE_INVALID;
+    consumer_ = MOJO_LEGACY_HANDLE_INVALID;
     return rv;
   }
 
@@ -194,12 +195,12 @@ class DataPipeTest : public test::MojoTestBase {
 TEST_F(DataPipeTest, Basic) {
   const MojoCreateDataPipeOptions options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       1000 * sizeof(int32_t)                   // |capacity_num_bytes|.
   };
 
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
 
   // We can write to a data pipe handle immediately.
   int32_t elements[10] = {};
@@ -210,18 +211,20 @@ TEST_F(DataPipeTest, Basic) {
   elements[0] = 123;
   elements[1] = 456;
   num_bytes = static_cast<uint32_t>(2u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(&elements[0], &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(&elements[0], &num_bytes));
 
   // Now wait for the other side to become readable.
   MojoHandleSignalsState state;
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &state));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &state));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             state.satisfied_signals);
 
   elements[0] = -1;
   elements[1] = -1;
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(&elements[0], &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(&elements[0], &num_bytes));
   ASSERT_EQ(static_cast<uint32_t>(2u * sizeof(elements[0])), num_bytes);
   ASSERT_EQ(elements[0], 123);
   ASSERT_EQ(elements[1], 456);
@@ -233,41 +236,41 @@ TEST_F(DataPipeTest, CreateAndMaybeTransfer) {
       // Default options.
       {},
       // Trivial element size, non-default capacity.
-      {kSizeOfOptions,                   // |struct_size|.
-       MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-       1,                                // |element_num_bytes|.
-       1000},                            // |capacity_num_bytes|.
+      {kSizeOfOptions,                          // |struct_size|.
+       MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+       1,                                       // |element_num_bytes|.
+       1000},                                   // |capacity_num_bytes|.
       // Nontrivial element size, non-default capacity.
-      {kSizeOfOptions,                   // |struct_size|.
-       MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-       4,                                // |element_num_bytes|.
-       4000},                            // |capacity_num_bytes|.
+      {kSizeOfOptions,                          // |struct_size|.
+       MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+       4,                                       // |element_num_bytes|.
+       4000},                                   // |capacity_num_bytes|.
       // Nontrivial element size, default capacity.
-      {kSizeOfOptions,                   // |struct_size|.
-       MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-       100,                              // |element_num_bytes|.
-       0}                                // |capacity_num_bytes|.
+      {kSizeOfOptions,                          // |struct_size|.
+       MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+       100,                                     // |element_num_bytes|.
+       0}                                       // |capacity_num_bytes|.
       ,
   });
   for (size_t i = 0; i < std::size(test_options); i++) {
     MojoHandle producer_handle, consumer_handle;
     MojoCreateDataPipeOptions* options = i ? &test_options[i] : nullptr;
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               MojoCreateDataPipe(options, &producer_handle, &consumer_handle));
-    ASSERT_EQ(MOJO_RESULT_OK, MojoClose(producer_handle));
-    ASSERT_EQ(MOJO_RESULT_OK, MojoClose(consumer_handle));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(producer_handle));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(consumer_handle));
   }
 }
 
 TEST_F(DataPipeTest, SimpleReadWrite) {
   const MojoCreateDataPipeOptions options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       1000 * sizeof(int32_t)                   // |capacity_num_bytes|.
   };
 
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   int32_t elements[10] = {};
@@ -275,37 +278,41 @@ TEST_F(DataPipeTest, SimpleReadWrite) {
 
   // Try reading; nothing there yet.
   num_bytes = static_cast<uint32_t>(std::size(elements) * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_SHOULD_WAIT, ReadData(elements, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_SHOULD_WAIT, ReadData(elements, &num_bytes));
 
   // Query; nothing there yet.
   num_bytes = 0;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(0u, num_bytes);
 
   // Discard; nothing there yet.
   num_bytes = static_cast<uint32_t>(5u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_SHOULD_WAIT, DiscardData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_SHOULD_WAIT, DiscardData(&num_bytes));
 
   // Read with invalid |num_bytes|.
   num_bytes = sizeof(elements[0]) + 1;
-  ASSERT_EQ(MOJO_RESULT_INVALID_ARGUMENT, ReadData(elements, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_INVALID_ARGUMENT,
+            ReadData(elements, &num_bytes));
 
   // Write two elements.
   elements[0] = 123;
   elements[1] = 456;
   num_bytes = static_cast<uint32_t>(2u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(elements, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(elements, &num_bytes));
   // It should have written everything (even without "all or none").
   ASSERT_EQ(2u * sizeof(elements[0]), num_bytes);
 
   // Wait.
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Query.
@@ -314,14 +321,14 @@ TEST_F(DataPipeTest, SimpleReadWrite) {
   // (The theoretically-correct assertion here is that |num_bytes| is |1 * ...|
   // or |2 * ...|.)
   num_bytes = 0;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(2 * sizeof(elements[0]), num_bytes);
 
   // Read one element.
   elements[0] = -1;
   elements[1] = -1;
   num_bytes = static_cast<uint32_t>(1u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(elements, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(elements, &num_bytes));
   ASSERT_EQ(1u * sizeof(elements[0]), num_bytes);
   ASSERT_EQ(123, elements[0]);
   ASSERT_EQ(-1, elements[1]);
@@ -330,28 +337,28 @@ TEST_F(DataPipeTest, SimpleReadWrite) {
   // TODO(vtl): See previous TODO. (If we got 2 elements there, however, we
   // should get 1 here.)
   num_bytes = 0;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(1 * sizeof(elements[0]), num_bytes);
 
   // Peek one element.
   elements[0] = -1;
   elements[1] = -1;
   num_bytes = static_cast<uint32_t>(1u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(elements, &num_bytes, false, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(elements, &num_bytes, false, true));
   ASSERT_EQ(1u * sizeof(elements[0]), num_bytes);
   ASSERT_EQ(456, elements[0]);
   ASSERT_EQ(-1, elements[1]);
 
   // Query. Still has 1 element remaining.
   num_bytes = 0;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(1 * sizeof(elements[0]), num_bytes);
 
   // Try to read two elements, with "all or none".
   elements[0] = -1;
   elements[1] = -1;
   num_bytes = static_cast<uint32_t>(2u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OUT_OF_RANGE,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OUT_OF_RANGE,
             ReadData(elements, &num_bytes, true, false));
   ASSERT_EQ(-1, elements[0]);
   ASSERT_EQ(-1, elements[1]);
@@ -360,14 +367,15 @@ TEST_F(DataPipeTest, SimpleReadWrite) {
   elements[0] = -1;
   elements[1] = -1;
   num_bytes = static_cast<uint32_t>(2u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(elements, &num_bytes, false, false));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            ReadData(elements, &num_bytes, false, false));
   ASSERT_EQ(1u * sizeof(elements[0]), num_bytes);
   ASSERT_EQ(456, elements[0]);
   ASSERT_EQ(-1, elements[1]);
 
   // Query.
   num_bytes = 0;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(0u, num_bytes);
 }
 
@@ -381,7 +389,7 @@ TEST_F(DataPipeTest, BasicProducerWaiting) {
 
   const MojoCreateDataPipeOptions options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       2 * sizeof(int32_t)                      // |capacity_num_bytes|.
   };
@@ -390,32 +398,36 @@ TEST_F(DataPipeTest, BasicProducerWaiting) {
 
   // Never readable. Already writable.
   hss = GetSignalsState(producer_);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE, hss.satisfied_signals);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE, hss.satisfied_signals);
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Write two elements.
   int32_t elements[2] = {123, 456};
   uint32_t num_bytes = static_cast<uint32_t>(2u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(elements, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(elements, &num_bytes, true));
   ASSERT_EQ(static_cast<uint32_t>(2u * sizeof(elements[0])), num_bytes);
 
   // Wait for data to become available to the consumer.
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Peek one element.
   elements[0] = -1;
   elements[1] = -1;
   num_bytes = static_cast<uint32_t>(1u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(elements, &num_bytes, true, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(elements, &num_bytes, true, true));
   ASSERT_EQ(static_cast<uint32_t>(1u * sizeof(elements[0])), num_bytes);
   ASSERT_EQ(123, elements[0]);
   ASSERT_EQ(-1, elements[1]);
@@ -424,7 +436,7 @@ TEST_F(DataPipeTest, BasicProducerWaiting) {
   elements[0] = -1;
   elements[1] = -1;
   num_bytes = static_cast<uint32_t>(1u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(elements, &num_bytes, true, false));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(elements, &num_bytes, true, false));
   ASSERT_EQ(static_cast<uint32_t>(1u * sizeof(elements[0])), num_bytes);
   ASSERT_EQ(123, elements[0]);
   ASSERT_EQ(-1, elements[1]);
@@ -432,29 +444,29 @@ TEST_F(DataPipeTest, BasicProducerWaiting) {
   // Try writing, using a two-phase write.
   void* buffer = nullptr;
   num_bytes = static_cast<uint32_t>(3u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, BeginWriteData(&buffer, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginWriteData(&buffer, &num_bytes));
   EXPECT_TRUE(buffer);
   ASSERT_GE(num_bytes, static_cast<uint32_t>(1u * sizeof(elements[0])));
 
   static_cast<int32_t*>(buffer)[0] = 789;
-  ASSERT_EQ(MOJO_RESULT_OK,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
             EndWriteData(static_cast<uint32_t>(1u * sizeof(elements[0]))));
 
   // Read one element, using a two-phase read.
   const void* read_buffer = nullptr;
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_buffer, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_buffer, &num_bytes));
   EXPECT_TRUE(read_buffer);
   // The two-phase read should be able to read at least one element.
   ASSERT_GE(num_bytes, static_cast<uint32_t>(1u * sizeof(elements[0])));
   ASSERT_EQ(456, static_cast<const int32_t*>(read_buffer)[0]);
-  ASSERT_EQ(MOJO_RESULT_OK,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
             EndReadData(static_cast<uint32_t>(1u * sizeof(elements[0]))));
 
   // Write one element.
   elements[0] = 123;
   num_bytes = static_cast<uint32_t>(1u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(elements, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(elements, &num_bytes));
   ASSERT_EQ(static_cast<uint32_t>(1u * sizeof(elements[0])), num_bytes);
 
   // Close the consumer.
@@ -462,20 +474,21 @@ TEST_F(DataPipeTest, BasicProducerWaiting) {
 
   // It should now be never-writable.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(producer_, MOJO_HANDLE_SIGNAL_PEER_CLOSED, &hss));
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(producer_, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, &hss));
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
 }
 
 TEST_F(DataPipeTest, PeerClosedProducerWaiting) {
   const MojoCreateDataPipeOptions options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       2 * sizeof(int32_t)                      // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // Close the consumer.
@@ -483,20 +496,21 @@ TEST_F(DataPipeTest, PeerClosedProducerWaiting) {
 
   // It should be signaled.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(producer_, MOJO_HANDLE_SIGNAL_PEER_CLOSED, &hss));
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(producer_, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, &hss));
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
 }
 
 TEST_F(DataPipeTest, PeerClosedConsumerWaiting) {
   const MojoCreateDataPipeOptions options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       2 * sizeof(int32_t)                      // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // Close the producer.
@@ -504,86 +518,96 @@ TEST_F(DataPipeTest, PeerClosedConsumerWaiting) {
 
   // It should be signaled.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_PEER_CLOSED, &hss));
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, &hss));
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
 }
 
 TEST_F(DataPipeTest, BasicConsumerWaiting) {
   const MojoCreateDataPipeOptions options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       1000 * sizeof(int32_t)                   // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // Never writable.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_WRITABLE, &hss));
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE, &hss));
   EXPECT_EQ(0u, hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Write two elements.
   int32_t elements[2] = {123, 456};
   uint32_t num_bytes = static_cast<uint32_t>(2u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(elements, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(elements, &num_bytes, true));
 
   // Wait for readability.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Discard one element.
   num_bytes = static_cast<uint32_t>(1u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, DiscardData(&num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, DiscardData(&num_bytes, true));
   ASSERT_EQ(static_cast<uint32_t>(1u * sizeof(elements[0])), num_bytes);
 
   // Should still be readable.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_TRUE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_TRUE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Peek one element.
   elements[0] = -1;
   elements[1] = -1;
   num_bytes = static_cast<uint32_t>(1u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(elements, &num_bytes, true, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(elements, &num_bytes, true, true));
   ASSERT_EQ(456, elements[0]);
   ASSERT_EQ(-1, elements[1]);
 
   // Should still be readable.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_TRUE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_TRUE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Read one element.
   elements[0] = -1;
   elements[1] = -1;
   num_bytes = static_cast<uint32_t>(1u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(elements, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(elements, &num_bytes, true));
   ASSERT_EQ(static_cast<uint32_t>(1u * sizeof(elements[0])), num_bytes);
   ASSERT_EQ(456, elements[0]);
   ASSERT_EQ(-1, elements[1]);
@@ -592,17 +616,20 @@ TEST_F(DataPipeTest, BasicConsumerWaiting) {
   elements[0] = 789;
   elements[1] = -1;
   num_bytes = static_cast<uint32_t>(1u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(elements, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(elements, &num_bytes, true));
 
   // Waiting should now succeed.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Close the producer.
@@ -610,94 +637,102 @@ TEST_F(DataPipeTest, BasicConsumerWaiting) {
 
   // Should still be readable.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_TRUE(hss.satisfied_signals & (MOJO_HANDLE_SIGNAL_READABLE |
-                                       MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_TRUE(hss.satisfied_signals &
+              (MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+               MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfiable_signals);
 
   // Wait for the peer closed signal.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_PEER_CLOSED, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_CLOSED,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfiable_signals);
 
   // Read one element.
   elements[0] = -1;
   elements[1] = -1;
   num_bytes = static_cast<uint32_t>(1u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(elements, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(elements, &num_bytes, true));
   ASSERT_EQ(static_cast<uint32_t>(1u * sizeof(elements[0])), num_bytes);
   ASSERT_EQ(789, elements[0]);
   ASSERT_EQ(-1, elements[1]);
 
   // Should be never-readable.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
 }
 
 TEST_F(DataPipeTest, ConsumerNewDataReadable) {
   const MojoCreateDataPipeOptions create_options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       1000 * sizeof(int32_t)                   // |capacity_num_bytes|.
   };
-  EXPECT_EQ(MOJO_RESULT_OK, Create(&create_options));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, Create(&create_options));
 
   int32_t elements[2] = {123, 456};
   uint32_t num_bytes = static_cast<uint32_t>(2u * sizeof(elements[0]));
-  EXPECT_EQ(MOJO_RESULT_OK, WriteData(elements, &num_bytes, true));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(elements, &num_bytes, true));
 
   // The consumer handle should appear to be readable and have new data.
-  EXPECT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+            WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
   EXPECT_TRUE(GetSignalsState(consumer_).satisfied_signals &
-              MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE);
+              MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE);
 
   // Now try to read a minimum of 6 elements.
   int32_t read_elements[6];
   uint32_t num_read_bytes = sizeof(read_elements);
   MojoReadDataOptions read_options;
   read_options.struct_size = sizeof(read_options);
-  read_options.flags = MOJO_READ_DATA_FLAG_ALL_OR_NONE;
+  read_options.flags = MOJO_LEGACY_READ_DATA_FLAG_ALL_OR_NONE;
   EXPECT_EQ(
-      MOJO_RESULT_OUT_OF_RANGE,
+      MOJO_LEGACY_RESULT_OUT_OF_RANGE,
       MojoReadData(consumer_, &read_options, read_elements, &num_read_bytes));
 
   // The consumer should still appear to be readable but not with new data.
   EXPECT_TRUE(GetSignalsState(consumer_).satisfied_signals &
-              MOJO_HANDLE_SIGNAL_READABLE);
+              MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
   EXPECT_FALSE(GetSignalsState(consumer_).satisfied_signals &
-               MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE);
+               MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE);
 
   // Write four more elements.
-  EXPECT_EQ(MOJO_RESULT_OK, WriteData(elements, &num_bytes, true));
-  EXPECT_EQ(MOJO_RESULT_OK, WriteData(elements, &num_bytes, true));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(elements, &num_bytes, true));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(elements, &num_bytes, true));
 
   // The consumer handle should once again appear to be readable.
-  EXPECT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+            WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
 
   // Try again to read a minimum of 6 elements. Should succeed this time.
-  EXPECT_EQ(MOJO_RESULT_OK, MojoReadData(consumer_, &read_options,
-                                         read_elements, &num_read_bytes));
+  EXPECT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      MojoReadData(consumer_, &read_options, read_elements, &num_read_bytes));
 
   // And now the consumer is unreadable.
   EXPECT_FALSE(GetSignalsState(consumer_).satisfied_signals &
-               MOJO_HANDLE_SIGNAL_READABLE);
+               MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
   EXPECT_FALSE(GetSignalsState(consumer_).satisfied_signals &
-               MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE);
+               MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE);
 }
 
 // Test with two-phase APIs and also closing the producer with an active
@@ -705,11 +740,11 @@ TEST_F(DataPipeTest, ConsumerNewDataReadable) {
 TEST_F(DataPipeTest, ConsumerWaitingTwoPhase) {
   const MojoCreateDataPipeOptions options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       1000 * sizeof(int32_t)                   // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // Write two elements.
@@ -717,165 +752,182 @@ TEST_F(DataPipeTest, ConsumerWaitingTwoPhase) {
   void* buffer = nullptr;
   // Request room for three (but we'll only write two).
   uint32_t num_bytes = static_cast<uint32_t>(3u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, BeginWriteData(&buffer, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginWriteData(&buffer, &num_bytes));
   EXPECT_TRUE(buffer);
   EXPECT_GE(num_bytes, static_cast<uint32_t>(3u * sizeof(elements[0])));
   elements = static_cast<int32_t*>(buffer);
   elements[0] = 123;
   UNSAFE_TODO(elements[1]) = 456;
-  ASSERT_EQ(MOJO_RESULT_OK, EndWriteData(2u * sizeof(elements[0])));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, EndWriteData(2u * sizeof(elements[0])));
 
   // Wait for readability.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Read one element.
   // Two should be available, but only read one.
   const void* read_buffer = nullptr;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_buffer, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_buffer, &num_bytes));
   EXPECT_TRUE(read_buffer);
   ASSERT_EQ(static_cast<uint32_t>(2u * sizeof(elements[0])), num_bytes);
   const int32_t* read_elements = static_cast<const int32_t*>(read_buffer);
   ASSERT_EQ(123, read_elements[0]);
-  ASSERT_EQ(MOJO_RESULT_OK, EndReadData(1u * sizeof(elements[0])));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, EndReadData(1u * sizeof(elements[0])));
 
   // Should still be readable.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_TRUE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_TRUE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Read one element.
   // Request three, but not in all-or-none mode.
   read_buffer = nullptr;
   num_bytes = static_cast<uint32_t>(3u * sizeof(elements[0]));
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_buffer, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_buffer, &num_bytes));
   EXPECT_TRUE(read_buffer);
   ASSERT_EQ(static_cast<uint32_t>(1u * sizeof(elements[0])), num_bytes);
   read_elements = static_cast<const int32_t*>(read_buffer);
   ASSERT_EQ(456, read_elements[0]);
-  ASSERT_EQ(MOJO_RESULT_OK, EndReadData(1u * sizeof(elements[0])));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, EndReadData(1u * sizeof(elements[0])));
 
   // Close the producer.
   CloseProducer();
 
   // Should be never-readable.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
 }
 
 // Tests that data pipes aren't writable/readable during two-phase writes/reads.
 TEST_F(DataPipeTest, BasicTwoPhaseWaiting) {
   const MojoCreateDataPipeOptions options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       1000 * sizeof(int32_t)                   // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // It should be writable.
   hss = GetSignalsState(producer_);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE, hss.satisfied_signals);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE, hss.satisfied_signals);
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   uint32_t num_bytes = static_cast<uint32_t>(1u * sizeof(int32_t));
   void* write_ptr = nullptr;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginWriteData(&write_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginWriteData(&write_ptr, &num_bytes));
   EXPECT_TRUE(write_ptr);
   EXPECT_GE(num_bytes, static_cast<uint32_t>(1u * sizeof(int32_t)));
 
   // It shouldn't be readable yet (we'll wait later).
   hss = GetSignalsState(consumer_);
   ASSERT_EQ(0u, hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   static_cast<int32_t*>(write_ptr)[0] = 123;
-  ASSERT_EQ(MOJO_RESULT_OK, EndWriteData(1u * sizeof(int32_t)));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, EndWriteData(1u * sizeof(int32_t)));
 
   // It should immediately be writable again.
   hss = GetSignalsState(producer_);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE, hss.satisfied_signals);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE, hss.satisfied_signals);
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // It should become readable.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Start another two-phase write and check that it's readable even in the
   // middle of it.
   num_bytes = static_cast<uint32_t>(1u * sizeof(int32_t));
   write_ptr = nullptr;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginWriteData(&write_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginWriteData(&write_ptr, &num_bytes));
   EXPECT_TRUE(write_ptr);
   EXPECT_GE(num_bytes, static_cast<uint32_t>(1u * sizeof(int32_t)));
 
   // It should be readable.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // End the two-phase write without writing anything.
-  ASSERT_EQ(MOJO_RESULT_OK, EndWriteData(0u));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, EndWriteData(0u));
 
   // Start a two-phase read.
   num_bytes = static_cast<uint32_t>(1u * sizeof(int32_t));
   const void* read_ptr = nullptr;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_ptr, &num_bytes));
   EXPECT_TRUE(read_ptr);
   ASSERT_EQ(static_cast<uint32_t>(1u * sizeof(int32_t)), num_bytes);
 
   // At this point, it should still be writable.
   hss = GetSignalsState(producer_);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE, hss.satisfied_signals);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE, hss.satisfied_signals);
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // End the two-phase read without reading anything.
-  ASSERT_EQ(MOJO_RESULT_OK, EndReadData(0u));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, EndReadData(0u));
 
   // It should still be readable.
   hss = GetSignalsState(consumer_);
-  ASSERT_TRUE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  ASSERT_TRUE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 }
 
@@ -888,28 +940,29 @@ void Seq(int32_t start, size_t count, int32_t* out) {
 TEST_F(DataPipeTest, AllOrNone) {
   const MojoCreateDataPipeOptions options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       10 * sizeof(int32_t)                     // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // Try writing more than the total capacity of the pipe.
   uint32_t num_bytes = 20u * sizeof(int32_t);
   int32_t buffer[100];
   Seq(0, std::size(buffer), buffer);
-  ASSERT_EQ(MOJO_RESULT_OUT_OF_RANGE, WriteData(buffer, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OUT_OF_RANGE,
+            WriteData(buffer, &num_bytes, true));
 
   // Should still be empty.
   num_bytes = ~0u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(0u, num_bytes);
 
   // Write some data.
   num_bytes = 5u * sizeof(int32_t);
   Seq(100, std::size(buffer), buffer);
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(buffer, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(buffer, &num_bytes, true));
   ASSERT_EQ(5u * sizeof(int32_t), num_bytes);
 
   // Wait for data.
@@ -918,54 +971,60 @@ TEST_F(DataPipeTest, AllOrNone) {
   // limits, it will). Eventually, we'll be able to wait for a specified amount
   // of data to become available.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_CLOSED | MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Half full.
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(5u * sizeof(int32_t), num_bytes);
 
   // Try writing more than the available capacity of the pipe, but less than the
   // total capacity.
   num_bytes = 6u * sizeof(int32_t);
   Seq(200, std::size(buffer), buffer);
-  ASSERT_EQ(MOJO_RESULT_OUT_OF_RANGE, WriteData(buffer, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OUT_OF_RANGE,
+            WriteData(buffer, &num_bytes, true));
 
   // Try reading too much.
   num_bytes = 11u * sizeof(int32_t);
   UNSAFE_TODO(memset(buffer, 0xab, sizeof(buffer)));
-  ASSERT_EQ(MOJO_RESULT_OUT_OF_RANGE, ReadData(buffer, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OUT_OF_RANGE,
+            ReadData(buffer, &num_bytes, true));
   int32_t expected_buffer[100];
   UNSAFE_TODO(memset(expected_buffer, 0xab, sizeof(expected_buffer)));
   UNSAFE_TODO(ASSERT_EQ(0, memcmp(buffer, expected_buffer, sizeof(buffer))));
 
   // Try discarding too much.
   num_bytes = 11u * sizeof(int32_t);
-  ASSERT_EQ(MOJO_RESULT_OUT_OF_RANGE, DiscardData(&num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OUT_OF_RANGE, DiscardData(&num_bytes, true));
 
   // Just a little.
   num_bytes = 2u * sizeof(int32_t);
   Seq(300, std::size(buffer), buffer);
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(buffer, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(buffer, &num_bytes, true));
   ASSERT_EQ(2u * sizeof(int32_t), num_bytes);
 
   // Just right.
   num_bytes = 3u * sizeof(int32_t);
   Seq(400, std::size(buffer), buffer);
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(buffer, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(buffer, &num_bytes, true));
   ASSERT_EQ(3u * sizeof(int32_t), num_bytes);
 
   // TODO(vtl): Hack (see also the TODO above): We can't currently wait for a
   // specified amount of data to be available, so poll.
   for (size_t i = 0; i < kMaxPoll; i++) {
     num_bytes = 0u;
-    ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
     if (num_bytes >= 10u * sizeof(int32_t)) {
       break;
     }
@@ -977,7 +1036,7 @@ TEST_F(DataPipeTest, AllOrNone) {
   // Read half.
   num_bytes = 5u * sizeof(int32_t);
   UNSAFE_TODO(memset(buffer, 0xab, sizeof(buffer)));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(buffer, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(buffer, &num_bytes, true));
   ASSERT_EQ(5u * sizeof(int32_t), num_bytes);
   UNSAFE_TODO(memset(expected_buffer, 0xab, sizeof(expected_buffer)));
   Seq(100, 5, expected_buffer);
@@ -986,22 +1045,23 @@ TEST_F(DataPipeTest, AllOrNone) {
   // Try reading too much again.
   num_bytes = 6u * sizeof(int32_t);
   UNSAFE_TODO(memset(buffer, 0xab, sizeof(buffer)));
-  ASSERT_EQ(MOJO_RESULT_OUT_OF_RANGE, ReadData(buffer, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OUT_OF_RANGE,
+            ReadData(buffer, &num_bytes, true));
   UNSAFE_TODO(memset(expected_buffer, 0xab, sizeof(expected_buffer)));
   UNSAFE_TODO(ASSERT_EQ(0, memcmp(buffer, expected_buffer, sizeof(buffer))));
 
   // Try discarding too much again.
   num_bytes = 6u * sizeof(int32_t);
-  ASSERT_EQ(MOJO_RESULT_OUT_OF_RANGE, DiscardData(&num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OUT_OF_RANGE, DiscardData(&num_bytes, true));
 
   // Discard a little.
   num_bytes = 2u * sizeof(int32_t);
-  ASSERT_EQ(MOJO_RESULT_OK, DiscardData(&num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, DiscardData(&num_bytes, true));
   ASSERT_EQ(2u * sizeof(int32_t), num_bytes);
 
   // Three left.
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(3u * sizeof(int32_t), num_bytes);
 
   // Close the producer, then test producer-closed cases.
@@ -1009,29 +1069,31 @@ TEST_F(DataPipeTest, AllOrNone) {
 
   // Wait.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_PEER_CLOSED, &hss));
-  EXPECT_TRUE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  EXPECT_TRUE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_PEER_CLOSED);
-  EXPECT_TRUE(hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  EXPECT_TRUE(hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_PEER_CLOSED);
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, &hss));
+  EXPECT_TRUE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  EXPECT_TRUE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED);
+  EXPECT_TRUE(hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  EXPECT_TRUE(hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED);
 
   // Try reading too much; "failed precondition" since the producer is closed.
   num_bytes = 4u * sizeof(int32_t);
   UNSAFE_TODO(memset(buffer, 0xab, sizeof(buffer)));
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
             ReadData(buffer, &num_bytes, true));
   UNSAFE_TODO(memset(expected_buffer, 0xab, sizeof(expected_buffer)));
   UNSAFE_TODO(ASSERT_EQ(0, memcmp(buffer, expected_buffer, sizeof(buffer))));
 
   // Try discarding too much; "failed precondition" again.
   num_bytes = 4u * sizeof(int32_t);
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION, DiscardData(&num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+            DiscardData(&num_bytes, true));
 
   // Read a little.
   num_bytes = 2u * sizeof(int32_t);
   UNSAFE_TODO(memset(buffer, 0xab, sizeof(buffer)));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(buffer, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(buffer, &num_bytes, true));
   ASSERT_EQ(2u * sizeof(int32_t), num_bytes);
   UNSAFE_TODO(memset(expected_buffer, 0xab, sizeof(expected_buffer)));
   Seq(400, 2, expected_buffer);
@@ -1039,12 +1101,12 @@ TEST_F(DataPipeTest, AllOrNone) {
 
   // Discard the remaining element.
   num_bytes = 1u * sizeof(int32_t);
-  ASSERT_EQ(MOJO_RESULT_OK, DiscardData(&num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, DiscardData(&num_bytes, true));
   ASSERT_EQ(1u * sizeof(int32_t), num_bytes);
 
   // Empty again.
   num_bytes = ~0u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(0u, num_bytes);
 }
 
@@ -1065,33 +1127,35 @@ TEST_F(DataPipeTest, WrapAround) {
   }
 
   const MojoCreateDataPipeOptions options = {
-      kSizeOfOptions,                   // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-      1u,                               // |element_num_bytes|.
-      100u                              // |capacity_num_bytes|.
+      kSizeOfOptions,                          // |struct_size|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+      1u,                                      // |element_num_bytes|.
+      100u                                     // |capacity_num_bytes|.
   };
 
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // Write 20 bytes.
   uint32_t num_bytes = 20u;
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(&test_data[0], &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(&test_data[0], &num_bytes, true));
   ASSERT_EQ(20u, num_bytes);
 
   // Wait for data.
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_TRUE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_TRUE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Read 10 bytes.
   unsigned char read_buffer[1000] = {};
   num_bytes = 10u;
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(read_buffer, &num_bytes, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(read_buffer, &num_bytes, true));
   ASSERT_EQ(10u, num_bytes);
   UNSAFE_TODO(ASSERT_EQ(0, memcmp(read_buffer, &test_data[0], 10u)));
 
@@ -1099,24 +1163,27 @@ TEST_F(DataPipeTest, WrapAround) {
   // checks an implementation detail; this behavior is not guaranteed.)
   void* write_buffer_ptr = nullptr;
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginWriteData(&write_buffer_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            BeginWriteData(&write_buffer_ptr, &num_bytes));
   EXPECT_TRUE(write_buffer_ptr);
   ASSERT_EQ(80u, num_bytes);
-  ASSERT_EQ(MOJO_RESULT_OK, EndWriteData(0));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, EndWriteData(0));
 
   size_t total_num_bytes = 0;
   while (total_num_bytes < 90) {
     // Wait to write.
-    ASSERT_EQ(MOJO_RESULT_OK,
-              WaitForSignals(producer_, MOJO_HANDLE_SIGNAL_WRITABLE, &hss));
-    ASSERT_EQ(hss.satisfied_signals, MOJO_HANDLE_SIGNAL_WRITABLE);
-    ASSERT_EQ(hss.satisfiable_signals, MOJO_HANDLE_SIGNAL_WRITABLE |
-                                           MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                                           MOJO_HANDLE_SIGNAL_PEER_REMOTE);
+    ASSERT_EQ(
+        MOJO_LEGACY_RESULT_OK,
+        WaitForSignals(producer_, MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE, &hss));
+    ASSERT_EQ(hss.satisfied_signals, MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
+    ASSERT_EQ(hss.satisfiable_signals,
+              MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE |
+                  MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                  MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE);
 
     // Write as much as we can.
     num_bytes = 100;
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               WriteData(&test_data[20 + total_num_bytes], &num_bytes, false));
     total_num_bytes += num_bytes;
   }
@@ -1124,23 +1191,23 @@ TEST_F(DataPipeTest, WrapAround) {
   ASSERT_EQ(90u, total_num_bytes);
 
   num_bytes = 0;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(100u, num_bytes);
 
   // Check that a two-phase read can now only read (at most) 90 bytes. (This
   // checks an implementation detail; this behavior is not guaranteed.)
   const void* read_buffer_ptr = nullptr;
   num_bytes = 0;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_buffer_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_buffer_ptr, &num_bytes));
   EXPECT_TRUE(read_buffer_ptr);
   ASSERT_EQ(90u, num_bytes);
-  ASSERT_EQ(MOJO_RESULT_OK, EndReadData(0));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, EndReadData(0));
 
   // Read as much as possible. We should read 100 bytes.
   num_bytes =
       static_cast<uint32_t>(std::size(read_buffer) * sizeof(read_buffer[0]));
   UNSAFE_TODO(memset(read_buffer, 0, num_bytes));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(read_buffer, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(read_buffer, &num_bytes));
   ASSERT_EQ(100u, num_bytes);
   UNSAFE_TODO(ASSERT_EQ(0, memcmp(read_buffer, &test_data[10], 100u)));
 }
@@ -1152,34 +1219,35 @@ TEST_F(DataPipeTest, WriteCloseProducerRead) {
   const uint32_t kTestDataSize = static_cast<uint32_t>(sizeof(kTestData));
 
   const MojoCreateDataPipeOptions options = {
-      kSizeOfOptions,                   // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-      1u,                               // |element_num_bytes|.
-      1000u                             // |capacity_num_bytes|.
+      kSizeOfOptions,                          // |struct_size|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+      1u,                                      // |element_num_bytes|.
+      1000u                                    // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
 
   // Write some data, so we'll have something to read.
   uint32_t num_bytes = kTestDataSize;
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(kTestData, &num_bytes, false));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(kTestData, &num_bytes, false));
   ASSERT_EQ(kTestDataSize, num_bytes);
 
   // Write it again, so we'll have something left over.
   num_bytes = kTestDataSize;
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(kTestData, &num_bytes, false));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(kTestData, &num_bytes, false));
   ASSERT_EQ(kTestDataSize, num_bytes);
 
   // Start two-phase write.
   void* write_buffer_ptr = nullptr;
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginWriteData(&write_buffer_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            BeginWriteData(&write_buffer_ptr, &num_bytes));
   EXPECT_TRUE(write_buffer_ptr);
   EXPECT_GT(num_bytes, 0u);
 
   // TODO(vtl): (See corresponding TODO in TwoPhaseAllOrNone.)
   for (size_t i = 0; i < kMaxPoll; i++) {
     num_bytes = 0u;
-    ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
     if (num_bytes >= 2u * kTestDataSize) {
       break;
     }
@@ -1191,7 +1259,7 @@ TEST_F(DataPipeTest, WriteCloseProducerRead) {
   // Start two-phase read.
   const void* read_buffer_ptr = nullptr;
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_buffer_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_buffer_ptr, &num_bytes));
   EXPECT_TRUE(read_buffer_ptr);
   ASSERT_GE(num_bytes, kTestDataSize);
 
@@ -1200,12 +1268,12 @@ TEST_F(DataPipeTest, WriteCloseProducerRead) {
 
   // The consumer can finish its two-phase read.
   UNSAFE_TODO(ASSERT_EQ(0, memcmp(read_buffer_ptr, kTestData, kTestDataSize)));
-  ASSERT_EQ(MOJO_RESULT_OK, EndReadData(kTestDataSize));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, EndReadData(kTestDataSize));
 
   // And start another.
   read_buffer_ptr = nullptr;
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_buffer_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_buffer_ptr, &num_bytes));
   EXPECT_TRUE(read_buffer_ptr);
   ASSERT_EQ(kTestDataSize, num_bytes);
 }
@@ -1217,42 +1285,46 @@ TEST_F(DataPipeTest, TwoPhaseWriteReadCloseConsumer) {
   const uint32_t kTestDataSize = static_cast<uint32_t>(sizeof(kTestData));
 
   const MojoCreateDataPipeOptions options = {
-      kSizeOfOptions,                   // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-      1u,                               // |element_num_bytes|.
-      1000u                             // |capacity_num_bytes|.
+      kSizeOfOptions,                          // |struct_size|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+      1u,                                      // |element_num_bytes|.
+      1000u                                    // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // Write some data, so we'll have something to read.
   uint32_t num_bytes = kTestDataSize;
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(kTestData, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(kTestData, &num_bytes));
   ASSERT_EQ(kTestDataSize, num_bytes);
 
   // Start two-phase write.
   void* write_buffer_ptr = nullptr;
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginWriteData(&write_buffer_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            BeginWriteData(&write_buffer_ptr, &num_bytes));
   EXPECT_TRUE(write_buffer_ptr);
   ASSERT_GT(num_bytes, kTestDataSize);
 
   // Wait for data.
   // TODO(vtl): (See corresponding TODO in AllOrNone.)
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Start two-phase read.
   const void* read_buffer_ptr = nullptr;
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_buffer_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_buffer_ptr, &num_bytes));
   EXPECT_TRUE(read_buffer_ptr);
   ASSERT_EQ(kTestDataSize, num_bytes);
 
@@ -1261,26 +1333,28 @@ TEST_F(DataPipeTest, TwoPhaseWriteReadCloseConsumer) {
 
   // Wait for producer to know that the consumer is closed.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(producer_, MOJO_HANDLE_SIGNAL_PEER_CLOSED, &hss));
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(producer_, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, &hss));
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfied_signals);
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, hss.satisfiable_signals);
 
   // Actually write some data. (Note: Premature freeing of the buffer would
   // probably only be detected under ASAN or similar.)
   UNSAFE_TODO(memcpy(write_buffer_ptr, kTestData, kTestDataSize));
   // Note: Even though the consumer has been closed, ending the two-phase
   // write will report success.
-  ASSERT_EQ(MOJO_RESULT_OK, EndWriteData(kTestDataSize));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, EndWriteData(kTestDataSize));
 
   // But trying to write should result in failure.
   num_bytes = kTestDataSize;
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION, WriteData(kTestData, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+            WriteData(kTestData, &num_bytes));
 
   // As will trying to start another two-phase write.
   write_buffer_ptr = nullptr;
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
             BeginWriteData(&write_buffer_ptr, &num_bytes));
 }
 
@@ -1290,17 +1364,18 @@ TEST_F(DataPipeTest, TwoPhaseWriteCloseBoth) {
   const uint32_t kTestDataSize = 15u;
 
   const MojoCreateDataPipeOptions options = {
-      kSizeOfOptions,                   // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-      1u,                               // |element_num_bytes|.
-      1000u                             // |capacity_num_bytes|.
+      kSizeOfOptions,                          // |struct_size|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+      1u,                                      // |element_num_bytes|.
+      1000u                                    // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
 
   // Start two-phase write.
   void* write_buffer_ptr = nullptr;
   uint32_t num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginWriteData(&write_buffer_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            BeginWriteData(&write_buffer_ptr, &num_bytes));
   EXPECT_TRUE(write_buffer_ptr);
   ASSERT_GT(num_bytes, kTestDataSize);
 }
@@ -1312,17 +1387,17 @@ TEST_F(DataPipeTest, WriteCloseProducerReadNoData) {
   const uint32_t kTestDataSize = static_cast<uint32_t>(sizeof(kTestData));
 
   const MojoCreateDataPipeOptions options = {
-      kSizeOfOptions,                   // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-      1u,                               // |element_num_bytes|.
-      1000u                             // |capacity_num_bytes|.
+      kSizeOfOptions,                          // |struct_size|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+      1u,                                      // |element_num_bytes|.
+      1000u                                    // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // Write some data, so we'll have something to read.
   uint32_t num_bytes = kTestDataSize;
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(kTestData, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(kTestData, &num_bytes));
   ASSERT_EQ(kTestDataSize, num_bytes);
 
   // Close the producer.
@@ -1331,42 +1406,46 @@ TEST_F(DataPipeTest, WriteCloseProducerReadNoData) {
   // Wait. (Note that once the consumer knows that the producer is closed, it
   // must also know about all the data that was sent.)
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_PEER_CLOSED, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfiable_signals);
 
   // Peek that data.
   char buffer[1000];
   num_bytes = static_cast<uint32_t>(sizeof(buffer));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(buffer, &num_bytes, false, true));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(buffer, &num_bytes, false, true));
   ASSERT_EQ(kTestDataSize, num_bytes);
   UNSAFE_TODO(ASSERT_EQ(0, memcmp(buffer, kTestData, kTestDataSize)));
 
   // Read that data.
   UNSAFE_TODO(memset(buffer, 0, 1000));
   num_bytes = static_cast<uint32_t>(sizeof(buffer));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(buffer, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(buffer, &num_bytes));
   ASSERT_EQ(kTestDataSize, num_bytes);
   UNSAFE_TODO(ASSERT_EQ(0, memcmp(buffer, kTestData, kTestDataSize)));
 
   // A second read should fail.
   num_bytes = static_cast<uint32_t>(sizeof(buffer));
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION, ReadData(buffer, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+            ReadData(buffer, &num_bytes));
 
   // A two-phase read should also fail.
   const void* read_buffer_ptr = nullptr;
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
             BeginReadData(&read_buffer_ptr, &num_bytes));
 
   // Ditto for discard.
   num_bytes = 10u;
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION, DiscardData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION, DiscardData(&num_bytes));
 }
 
 // Test that during a two phase read the memory stays valid even if more data
@@ -1376,40 +1455,44 @@ TEST_F(DataPipeTest, TwoPhaseReadMemoryStable) {
   const uint32_t kTestDataSize = static_cast<uint32_t>(sizeof(kTestData));
 
   const MojoCreateDataPipeOptions options = {
-      kSizeOfOptions,                   // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-      1u,                               // |element_num_bytes|.
-      1000u                             // |capacity_num_bytes|.
+      kSizeOfOptions,                          // |struct_size|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+      1u,                                      // |element_num_bytes|.
+      1000u                                    // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // Write some data.
   uint32_t num_bytes = kTestDataSize;
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(kTestData, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(kTestData, &num_bytes));
   ASSERT_EQ(kTestDataSize, num_bytes);
 
   // Wait for the data.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Begin a two-phase read.
   const void* read_buffer_ptr = nullptr;
   uint32_t read_buffer_size = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_buffer_ptr, &read_buffer_size));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            BeginReadData(&read_buffer_ptr, &read_buffer_size));
 
   // Write more data.
   const char kExtraData[] = "bye world";
   const uint32_t kExtraDataSize = static_cast<uint32_t>(sizeof(kExtraData));
   num_bytes = kExtraDataSize;
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(kExtraData, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(kExtraData, &num_bytes));
   ASSERT_EQ(kExtraDataSize, num_bytes);
 
   // Close the producer.
@@ -1418,11 +1501,13 @@ TEST_F(DataPipeTest, TwoPhaseReadMemoryStable) {
   // Wait. (Note that once the consumer knows that the producer is closed, it
   // must also have received the extra data).
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_PEER_CLOSED, &hss));
-  EXPECT_TRUE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_PEER_CLOSED);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, &hss));
+  EXPECT_TRUE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED);
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfiable_signals);
 
   // Read the two phase memory to check it's still valid.
@@ -1435,20 +1520,20 @@ TEST_F(DataPipeTest, TwoPhaseReadMemoryStable) {
 TEST_F(DataPipeTest, TwoPhaseMoreInvalidArguments) {
   const MojoCreateDataPipeOptions options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       10 * sizeof(int32_t)                     // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // No data.
   uint32_t num_bytes = 1000u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(0u, num_bytes);
 
   // Try "ending" a two-phase write when one isn't active.
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
             EndWriteData(1u * sizeof(int32_t)));
 
   // Wait a bit, to make sure that if a signal were (incorrectly) sent, it'd
@@ -1457,100 +1542,104 @@ TEST_F(DataPipeTest, TwoPhaseMoreInvalidArguments) {
 
   // Still no data.
   num_bytes = 1000u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(0u, num_bytes);
 
   // Try ending a two-phase write with an invalid amount (too much).
   num_bytes = 0u;
   void* write_ptr = nullptr;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginWriteData(&write_ptr, &num_bytes));
-  ASSERT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginWriteData(&write_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_INVALID_ARGUMENT,
             EndWriteData(num_bytes + static_cast<uint32_t>(sizeof(int32_t))));
 
   // But the two-phase write still ended.
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION, EndWriteData(0u));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION, EndWriteData(0u));
 
   // Wait a bit (as above).
   base::PlatformThread::Sleep(EpsilonDeadline());
 
   // Still no data.
   num_bytes = 1000u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(0u, num_bytes);
 
   // Try ending a two-phase write with an invalid amount (not a multiple of the
   // element size).
   num_bytes = 0u;
   write_ptr = nullptr;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginWriteData(&write_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginWriteData(&write_ptr, &num_bytes));
   EXPECT_GE(num_bytes, 1u);
-  ASSERT_EQ(MOJO_RESULT_INVALID_ARGUMENT, EndWriteData(1u));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_INVALID_ARGUMENT, EndWriteData(1u));
 
   // But the two-phase write still ended.
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION, EndWriteData(0u));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION, EndWriteData(0u));
 
   // Wait a bit (as above).
   base::PlatformThread::Sleep(EpsilonDeadline());
 
   // Still no data.
   num_bytes = 1000u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(0u, num_bytes);
 
   // Now write some data, so we'll be able to try reading.
   int32_t element = 123;
   num_bytes = 1u * sizeof(int32_t);
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(&element, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(&element, &num_bytes));
 
   // Wait for data.
   // TODO(vtl): (See corresponding TODO in AllOrNone.)
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // One element available.
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(1u * sizeof(int32_t), num_bytes);
 
   // Try "ending" a two-phase read when one isn't active.
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION, EndReadData(1u * sizeof(int32_t)));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+            EndReadData(1u * sizeof(int32_t)));
 
   // Still one element available.
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(1u * sizeof(int32_t), num_bytes);
 
   // Try ending a two-phase read with an invalid amount (too much).
   num_bytes = 0u;
   const void* read_ptr = nullptr;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_ptr, &num_bytes));
-  ASSERT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_INVALID_ARGUMENT,
             EndReadData(num_bytes + static_cast<uint32_t>(sizeof(int32_t))));
 
   // Still one element available.
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(1u * sizeof(int32_t), num_bytes);
 
   // Try ending a two-phase read with an invalid amount (not a multiple of the
   // element size).
   num_bytes = 0u;
   read_ptr = nullptr;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_ptr, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_ptr, &num_bytes));
   ASSERT_EQ(1u * sizeof(int32_t), num_bytes);
   ASSERT_EQ(123, static_cast<const int32_t*>(read_ptr)[0]);
-  ASSERT_EQ(MOJO_RESULT_INVALID_ARGUMENT, EndReadData(1u));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_INVALID_ARGUMENT, EndReadData(1u));
 
   // Still one element available.
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, QueryData(&num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, QueryData(&num_bytes));
   ASSERT_EQ(1u * sizeof(int32_t), num_bytes);
 }
 
@@ -1560,75 +1649,83 @@ TEST_F(DataPipeTest, SendProducer) {
   const uint32_t kTestDataSize = static_cast<uint32_t>(sizeof(kTestData));
 
   const MojoCreateDataPipeOptions options = {
-      kSizeOfOptions,                   // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-      1u,                               // |element_num_bytes|.
-      1000u                             // |capacity_num_bytes|.
+      kSizeOfOptions,                          // |struct_size|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+      1u,                                      // |element_num_bytes|.
+      1000u                                    // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
   MojoHandleSignalsState hss;
 
   // Write some data.
   uint32_t num_bytes = kTestDataSize;
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(kTestData, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(kTestData, &num_bytes));
   ASSERT_EQ(kTestDataSize, num_bytes);
 
   // Wait for the data.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Check the data.
   const void* read_buffer = nullptr;
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_buffer, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_buffer, &num_bytes));
   UNSAFE_TODO(ASSERT_EQ(0, memcmp(read_buffer, kTestData, kTestDataSize)));
   EndReadData(num_bytes);
 
   // Now send the producer over a MP so that it's serialized.
   MojoHandle pipe0, pipe1;
-  ASSERT_EQ(MOJO_RESULT_OK, MojoCreateMessagePipe(nullptr, &pipe0, &pipe1));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            MojoCreateMessagePipe(nullptr, &pipe0, &pipe1));
 
-  ASSERT_EQ(MOJO_RESULT_OK,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
             WriteMessageRaw(MessagePipeHandle(pipe0), nullptr, 0, &producer_, 1,
-                            MOJO_WRITE_MESSAGE_FLAG_NONE));
-  producer_ = MOJO_HANDLE_INVALID;
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(pipe1, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadEmptyMessageWithHandles(pipe1, &producer_, 1));
+                            MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
+  producer_ = MOJO_LEGACY_HANDLE_INVALID;
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            WaitForSignals(pipe1, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            ReadEmptyMessageWithHandles(pipe1, &producer_, 1));
 
   // Write more data.
   const char kExtraData[] = "bye world";
   const uint32_t kExtraDataSize = static_cast<uint32_t>(sizeof(kExtraData));
   num_bytes = kExtraDataSize;
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(kExtraData, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(kExtraData, &num_bytes));
   ASSERT_EQ(kExtraDataSize, num_bytes);
 
   // Wait for it.
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE |
-                MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
             hss.satisfiable_signals);
 
   // Check the second write.
   num_bytes = 0u;
-  ASSERT_EQ(MOJO_RESULT_OK, BeginReadData(&read_buffer, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, BeginReadData(&read_buffer, &num_bytes));
   UNSAFE_TODO(ASSERT_EQ(0, memcmp(read_buffer, kExtraData, kExtraDataSize)));
   EndReadData(num_bytes);
 
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(pipe0));
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(pipe1));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(pipe0));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(pipe1));
 }
 
 // Ensures that if a data pipe consumer whose producer has closed is passed over
@@ -1637,58 +1734,66 @@ TEST_F(DataPipeTest, SendProducer) {
 TEST_F(DataPipeTest, ConsumerWithClosedProducerSent) {
   const MojoCreateDataPipeOptions options = {
       kSizeOfOptions,                          // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,         // |flags|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
       static_cast<uint32_t>(sizeof(int32_t)),  // |element_num_bytes|.
       1000 * sizeof(int32_t)                   // |capacity_num_bytes|.
   };
 
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
 
   // We can write to a data pipe handle immediately.
   int32_t data = 123;
   uint32_t num_bytes = sizeof(data);
-  ASSERT_EQ(MOJO_RESULT_OK, WriteData(&data, &num_bytes));
-  ASSERT_EQ(MOJO_RESULT_OK, CloseProducer());
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, WriteData(&data, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, CloseProducer());
 
   // Now wait for the other side to become readable and to see the peer closed.
   MojoHandleSignalsState state;
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_PEER_CLOSED, &state));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, &state));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             state.satisfied_signals);
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             state.satisfiable_signals);
 
   // Now send the consumer over a MP so that it's serialized.
   MojoHandle pipe0, pipe1;
-  ASSERT_EQ(MOJO_RESULT_OK, MojoCreateMessagePipe(nullptr, &pipe0, &pipe1));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            MojoCreateMessagePipe(nullptr, &pipe0, &pipe1));
 
-  ASSERT_EQ(MOJO_RESULT_OK,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
             WriteMessageRaw(MessagePipeHandle(pipe0), nullptr, 0, &consumer_, 1,
-                            MOJO_WRITE_MESSAGE_FLAG_NONE));
-  consumer_ = MOJO_HANDLE_INVALID;
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(pipe1, MOJO_HANDLE_SIGNAL_READABLE, &state));
-  ASSERT_EQ(MOJO_RESULT_OK, ReadEmptyMessageWithHandles(pipe1, &consumer_, 1));
+                            MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
+  consumer_ = MOJO_LEGACY_HANDLE_INVALID;
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            WaitForSignals(pipe1, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &state));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            ReadEmptyMessageWithHandles(pipe1, &consumer_, 1));
 
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumer_, MOJO_HANDLE_SIGNAL_PEER_CLOSED, &state));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumer_, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, &state));
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             state.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE,
+  EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE,
             state.satisfiable_signals);
 
   int32_t read_data;
-  ASSERT_EQ(MOJO_RESULT_OK, ReadData(&read_data, &num_bytes));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, ReadData(&read_data, &num_bytes));
   ASSERT_EQ(sizeof(read_data), num_bytes);
   ASSERT_EQ(data, read_data);
 
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(pipe0));
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(pipe1));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(pipe0));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(pipe1));
 }
 
 bool WriteAllData(MojoHandle producer,
@@ -1699,7 +1804,7 @@ bool WriteAllData(MojoHandle producer,
     uint32_t write_bytes = num_bytes;
     MojoResult result =
         MojoWriteData(producer, elements, &write_bytes, nullptr);
-    if (result == MOJO_RESULT_OK) {
+    if (result == MOJO_LEGACY_RESULT_OK) {
       num_bytes -= write_bytes;
       elements =
           UNSAFE_TODO(static_cast<const uint8_t*>(elements) + write_bytes);
@@ -1707,15 +1812,17 @@ bool WriteAllData(MojoHandle producer,
         return true;
       }
     } else {
-      EXPECT_EQ(MOJO_RESULT_SHOULD_WAIT, result);
+      EXPECT_EQ(MOJO_LEGACY_RESULT_SHOULD_WAIT, result);
     }
 
     MojoHandleSignalsState hss = MojoHandleSignalsState();
-    EXPECT_EQ(MOJO_RESULT_OK, test::MojoTestBase::WaitForSignals(
-                                  producer, MOJO_HANDLE_SIGNAL_WRITABLE, &hss));
-    EXPECT_TRUE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_WRITABLE);
-    EXPECT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
-                  MOJO_HANDLE_SIGNAL_PEER_REMOTE,
+    EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+              test::MojoTestBase::WaitForSignals(
+                  producer, MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE, &hss));
+    EXPECT_TRUE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
+    EXPECT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE |
+                  MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+                  MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE,
               hss.satisfiable_signals);
   }
 
@@ -1731,7 +1838,7 @@ bool ReadAllData(MojoHandle consumer,
     // Read as much data as we can.
     uint32_t read_bytes = num_bytes;
     MojoResult result = MojoReadData(consumer, nullptr, elements, &read_bytes);
-    if (result == MOJO_RESULT_OK) {
+    if (result == MOJO_LEGACY_RESULT_OK) {
       num_bytes -= read_bytes;
       elements = UNSAFE_TODO(static_cast<uint8_t*>(elements) + read_bytes);
       if (num_bytes == 0) {
@@ -1740,23 +1847,25 @@ bool ReadAllData(MojoHandle consumer,
           base::PlatformThread::Sleep(TestTimeouts::tiny_timeout());
           MojoReadDataOptions options;
           options.struct_size = sizeof(options);
-          options.flags = MOJO_READ_DATA_FLAG_QUERY;
+          options.flags = MOJO_LEGACY_READ_DATA_FLAG_QUERY;
           MojoReadData(consumer, &options, nullptr, &num_bytes);
           EXPECT_EQ(0u, num_bytes);
         }
         return true;
       }
     } else {
-      EXPECT_EQ(MOJO_RESULT_SHOULD_WAIT, result);
+      EXPECT_EQ(MOJO_LEGACY_RESULT_SHOULD_WAIT, result);
     }
 
     MojoHandleSignalsState hss = MojoHandleSignalsState();
-    EXPECT_EQ(MOJO_RESULT_OK, test::MojoTestBase::WaitForSignals(
-                                  consumer, MOJO_HANDLE_SIGNAL_READABLE, &hss));
+    EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+              test::MojoTestBase::WaitForSignals(
+                  consumer, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
     // Peer could have become closed while we're still waiting for data.
-    EXPECT_TRUE(MOJO_HANDLE_SIGNAL_READABLE & hss.satisfied_signals);
-    EXPECT_TRUE(hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE);
-    EXPECT_TRUE(hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_PEER_CLOSED);
+    EXPECT_TRUE(MOJO_LEGACY_HANDLE_SIGNAL_READABLE & hss.satisfied_signals);
+    EXPECT_TRUE(hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+    EXPECT_TRUE(hss.satisfiable_signals &
+                MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED);
   }
 
   return num_bytes == 0;
@@ -1770,13 +1879,13 @@ TEST_F(DataPipeTest, CreateOversized) {
   }
 
   const MojoCreateDataPipeOptions options = {
-      kSizeOfOptions,                   // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-      1,                                // |element_num_bytes|.
-      kOversizedCapacity,               // |capacity_num_bytes|.
+      kSizeOfOptions,                          // |struct_size|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+      1,                                       // |element_num_bytes|.
+      kOversizedCapacity,                      // |capacity_num_bytes|.
   };
 
-  ASSERT_EQ(MOJO_RESULT_RESOURCE_EXHAUSTED, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED, Create(&options));
 }
 
 #if BUILDFLAG(USE_BLINK)
@@ -1810,16 +1919,18 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(NoSpuriousEventsHost, DataPipeTest, parent) {
   for (size_t j = 0; j < kNoSpuriousEvents_NumIterations; ++j) {
     ScopedDataPipeProducerHandle producer;
     ScopedDataPipeConsumerHandle consumer;
-    CHECK_EQ(MOJO_RESULT_OK, mojo::CreateDataPipe(2048, producer, consumer));
+    CHECK_EQ(MOJO_LEGACY_RESULT_OK,
+             mojo_legacy::CreateDataPipe(2048, producer, consumer));
 
     MojoHandle ch = consumer.release().value();
     WriteMessageWithHandles(client, "hi", &ch, 1);
 
     for (size_t i = 0; i < 9; ++i) {
-      WaitForSignals(producer.get().value(), MOJO_HANDLE_SIGNAL_WRITABLE);
+      WaitForSignals(producer.get().value(),
+                     MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
       size_t bytes_written = 0;
-      producer->WriteData(base::as_byte_span(kData), MOJO_WRITE_DATA_FLAG_NONE,
-                          bytes_written);
+      producer->WriteData(base::as_byte_span(kData),
+                          MOJO_LEGACY_WRITE_DATA_FLAG_NONE, bytes_written);
     }
   }
 
@@ -1845,11 +1956,11 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(NoSpuriousEventsClient,
 
     SimpleWatcher watcher(FROM_HERE, SimpleWatcher::ArmingPolicy::MANUAL);
     base::RunLoop loop;
-    watcher.Watch(consumer.get(), MOJO_HANDLE_SIGNAL_READABLE,
-                  MOJO_TRIGGER_CONDITION_SIGNALS_SATISFIED,
+    watcher.Watch(consumer.get(), MOJO_LEGACY_HANDLE_SIGNAL_READABLE,
+                  MOJO_LEGACY_TRIGGER_CONDITION_SIGNALS_SATISFIED,
                   base::BindLambdaForTesting(
                       [&](MojoResult result, const HandleSignalsState& state) {
-                        if (result == MOJO_RESULT_OK) {
+                        if (result == MOJO_LEGACY_RESULT_OK) {
                           if (!state.readable()) {
                             ++num_spurious_events;
                           }
@@ -1880,25 +1991,26 @@ TEST_F(DataPipeTest, Multiprocess) {
   const uint32_t kTestDataSize =
       static_cast<uint32_t>(sizeof(kMultiprocessTestData));
   const MojoCreateDataPipeOptions options = {
-      kSizeOfOptions,                   // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-      1,                                // |element_num_bytes|.
-      kMultiprocessCapacity             // |capacity_num_bytes|.
+      kSizeOfOptions,                          // |struct_size|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+      1,                                       // |element_num_bytes|.
+      kMultiprocessCapacity                    // |capacity_num_bytes|.
   };
-  ASSERT_EQ(MOJO_RESULT_OK, Create(&options));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, Create(&options));
 
   RunTestClient("MultiprocessClient", [&](MojoHandle server_mp) {
     // Send some data before serialising and sending the data pipe over.
     // This is the first write so we don't need to use WriteAllData.
     uint32_t num_bytes = kTestDataSize;
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               WriteData(kMultiprocessTestData, &num_bytes, true));
     ASSERT_EQ(kTestDataSize, num_bytes);
 
     // Send child process the data pipe.
-    ASSERT_EQ(MOJO_RESULT_OK,
-              WriteMessageRaw(MessagePipeHandle(server_mp), nullptr, 0,
-                              &consumer_, 1, MOJO_WRITE_MESSAGE_FLAG_NONE));
+    ASSERT_EQ(
+        MOJO_LEGACY_RESULT_OK,
+        WriteMessageRaw(MessagePipeHandle(server_mp), nullptr, 0, &consumer_, 1,
+                        MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
 
     // Send a bunch of data of varying sizes.
     uint8_t buffer[100];
@@ -1917,16 +2029,18 @@ TEST_F(DataPipeTest, Multiprocess) {
     ASSERT_TRUE(WriteAllData(producer_, kMultiprocessTestData, kTestDataSize));
 
     // Swap ends.
-    ASSERT_EQ(MOJO_RESULT_OK,
-              WriteMessageRaw(MessagePipeHandle(server_mp), nullptr, 0,
-                              &producer_, 1, MOJO_WRITE_MESSAGE_FLAG_NONE));
+    ASSERT_EQ(
+        MOJO_LEGACY_RESULT_OK,
+        WriteMessageRaw(MessagePipeHandle(server_mp), nullptr, 0, &producer_, 1,
+                        MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
 
     // Receive the consumer from the other side.
-    producer_ = MOJO_HANDLE_INVALID;
+    producer_ = MOJO_LEGACY_HANDLE_INVALID;
     MojoHandleSignalsState hss = MojoHandleSignalsState();
-    ASSERT_EQ(MOJO_RESULT_OK,
-              WaitForSignals(server_mp, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(
+        MOJO_LEGACY_RESULT_OK,
+        WaitForSignals(server_mp, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               ReadEmptyMessageWithHandles(server_mp, &consumer_, 1));
 
     // Read the test string twice. Once for when we sent it, and once for the
@@ -1948,11 +2062,12 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MultiprocessClient, DataPipeTest, client_mp) {
       static_cast<uint32_t>(sizeof(kMultiprocessTestData));
 
   // Receive the data pipe from the other side.
-  MojoHandle consumer = MOJO_HANDLE_INVALID;
+  MojoHandle consumer = MOJO_LEGACY_HANDLE_INVALID;
   MojoHandleSignalsState hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(client_mp, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  ASSERT_EQ(MOJO_RESULT_OK,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(client_mp, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
             ReadEmptyMessageWithHandles(client_mp, &consumer, 1));
 
   // Read the initial string that was sent.
@@ -1977,27 +2092,28 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MultiprocessClient, DataPipeTest, client_mp) {
   }
 
   // Swap ends.
-  ASSERT_EQ(MOJO_RESULT_OK,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
             WriteMessageRaw(MessagePipeHandle(client_mp), nullptr, 0, &consumer,
-                            1, MOJO_WRITE_MESSAGE_FLAG_NONE));
+                            1, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
 
   // Receive the producer from the other side.
-  MojoHandle producer = MOJO_HANDLE_INVALID;
+  MojoHandle producer = MOJO_LEGACY_HANDLE_INVALID;
   hss = MojoHandleSignalsState();
-  ASSERT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(client_mp, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-  ASSERT_EQ(MOJO_RESULT_OK,
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(client_mp, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
             ReadEmptyMessageWithHandles(client_mp, &producer, 1));
 
   // Write the test string one more time.
   EXPECT_TRUE(WriteAllData(producer, kMultiprocessTestData, kTestDataSize));
 
   // We swapped ends, so close the producer.
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(producer));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(producer));
 
   // Wait to receive a "quit" message before exiting.
   EXPECT_EQ("quit", ReadMessage(client_mp));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(client_mp));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(client_mp));
 }
 
 DEFINE_TEST_CLIENT_TEST_WITH_PIPE(WriteAndCloseProducer, DataPipeTest, h) {
@@ -2006,16 +2122,16 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(WriteAndCloseProducer, DataPipeTest, h) {
 
   // Write some data to the producer and close it.
   uint32_t num_bytes = static_cast<uint32_t>(message.size());
-  EXPECT_EQ(MOJO_RESULT_OK,
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
             MojoWriteData(p, message.data(), &num_bytes, nullptr));
   EXPECT_EQ(num_bytes, static_cast<uint32_t>(message.size()));
 
   // Close the producer before quitting.
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(p));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(p));
 
   // Wait for a quit message.
   EXPECT_EQ("quit", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
 }
 
 DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReadAndCloseConsumer, DataPipeTest, h) {
@@ -2023,28 +2139,30 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReadAndCloseConsumer, DataPipeTest, h) {
   std::string expected_message = ReadMessageWithHandles(h, &c, 1);
 
   // Wait for the consumer to become readable.
-  EXPECT_EQ(MOJO_RESULT_OK, WaitForSignals(c, MOJO_HANDLE_SIGNAL_READABLE));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+            WaitForSignals(c, MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
 
   // Drain the consumer and expect to find the given message.
   uint32_t num_bytes = static_cast<uint32_t>(expected_message.size());
   std::vector<char> bytes(expected_message.size());
-  EXPECT_EQ(MOJO_RESULT_OK, MojoReadData(c, nullptr, bytes.data(), &num_bytes));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+            MojoReadData(c, nullptr, bytes.data(), &num_bytes));
   EXPECT_EQ(num_bytes, static_cast<uint32_t>(bytes.size()));
 
   std::string message(bytes.data(), bytes.size());
   EXPECT_EQ(expected_message, message);
 
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(c));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(c));
 
   // Wait for a quit message.
   EXPECT_EQ("quit", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
 }
 
 TEST_F(DataPipeTest, SendConsumerAndCloseProducer) {
   // Create a new data pipe.
   MojoHandle p, c;
-  EXPECT_EQ(MOJO_RESULT_OK, MojoCreateDataPipe(nullptr, &p, &c));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoCreateDataPipe(nullptr, &p, &c));
 
   RunTestClient("WriteAndCloseProducer", [&](MojoHandle producer_client) {
     RunTestClient("ReadAndCloseConsumer", [&](MojoHandle consumer_client) {
@@ -2061,28 +2179,28 @@ TEST_F(DataPipeTest, SendConsumerAndCloseProducer) {
 
 DEFINE_TEST_CLIENT_TEST_WITH_PIPE(CreateAndWrite, DataPipeTest, h) {
   const MojoCreateDataPipeOptions options = {
-      kSizeOfOptions,                   // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-      1,                                // |element_num_bytes|.
-      kMultiprocessCapacity             // |capacity_num_bytes|.
+      kSizeOfOptions,                          // |struct_size|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+      1,                                       // |element_num_bytes|.
+      kMultiprocessCapacity                    // |capacity_num_bytes|.
   };
 
   MojoHandle p, c;
-  ASSERT_EQ(MOJO_RESULT_OK, MojoCreateDataPipe(&options, &p, &c));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoCreateDataPipe(&options, &p, &c));
 
   const std::string kMessage = "Hello, world!";
   WriteMessageWithHandles(h, kMessage, &c, 1);
 
   // Write some data to the producer and close it.
   uint32_t num_bytes = static_cast<uint32_t>(kMessage.size());
-  EXPECT_EQ(MOJO_RESULT_OK,
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
             MojoWriteData(p, kMessage.data(), &num_bytes, nullptr));
   EXPECT_EQ(num_bytes, static_cast<uint32_t>(kMessage.size()));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(p));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(p));
 
   // Wait for a quit message.
   EXPECT_EQ("quit", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
 }
 
 TEST_F(DataPipeTest, CreateInChild) {
@@ -2091,19 +2209,20 @@ TEST_F(DataPipeTest, CreateInChild) {
     std::string expected_message = ReadMessageWithHandles(child, &c, 1);
 
     // Wait for the consumer to become readable.
-    EXPECT_EQ(MOJO_RESULT_OK, WaitForSignals(c, MOJO_HANDLE_SIGNAL_READABLE));
+    EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+              WaitForSignals(c, MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
 
     // Drain the consumer and expect to find the given message.
     uint32_t num_bytes = static_cast<uint32_t>(expected_message.size());
     std::vector<char> bytes(expected_message.size());
-    EXPECT_EQ(MOJO_RESULT_OK,
+    EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
               MojoReadData(c, nullptr, bytes.data(), &num_bytes));
     EXPECT_EQ(num_bytes, static_cast<uint32_t>(bytes.size()));
 
     std::string message(bytes.data(), bytes.size());
     EXPECT_EQ(expected_message, message);
 
-    EXPECT_EQ(MOJO_RESULT_OK, MojoClose(c));
+    EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(c));
     WriteMessage(child, "quit");
   });
 }
@@ -2121,12 +2240,14 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(DataPipeStatusChangeInTransitClient,
       base::span<MojoHandle>(handles).subspan(3u);
 
   // Wait on producer 0
-  EXPECT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(producers[0], MOJO_HANDLE_SIGNAL_PEER_CLOSED));
+  EXPECT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(producers[0], MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED));
 
   // Wait on consumer 0
-  EXPECT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(consumers[0], MOJO_HANDLE_SIGNAL_PEER_CLOSED));
+  EXPECT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(consumers[0], MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED));
 
   base::test::SingleThreadTaskEnvironment task_environment;
 
@@ -2136,7 +2257,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(DataPipeStatusChangeInTransitClient,
     int count = 0;
     auto callback = base::BindRepeating(
         [](base::RunLoop* loop, int* count, MojoResult result) {
-          EXPECT_EQ(MOJO_RESULT_OK, result);
+          EXPECT_EQ(MOJO_LEGACY_RESULT_OK, result);
           if (++*count == 2) {
             loop->Quit();
           }
@@ -2148,10 +2269,10 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(DataPipeStatusChangeInTransitClient,
     SimpleWatcher consumer_watcher(
         FROM_HERE, SimpleWatcher::ArmingPolicy::AUTOMATIC,
         base::SequencedTaskRunner::GetCurrentDefault());
-    producer_watcher.Watch(Handle(producers[1]), MOJO_HANDLE_SIGNAL_PEER_CLOSED,
-                           callback);
-    consumer_watcher.Watch(Handle(consumers[1]), MOJO_HANDLE_SIGNAL_PEER_CLOSED,
-                           callback);
+    producer_watcher.Watch(Handle(producers[1]),
+                           MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, callback);
+    consumer_watcher.Watch(Handle(consumers[1]),
+                           MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, callback);
     run_loop.Run();
     EXPECT_EQ(2, count);
   }
@@ -2161,21 +2282,21 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(DataPipeStatusChangeInTransitClient,
   do {
     uint32_t num_bytes = 0;
     result = MojoWriteData(producers[2], nullptr, &num_bytes, nullptr);
-  } while (result == MOJO_RESULT_OK);
-  EXPECT_EQ(MOJO_RESULT_FAILED_PRECONDITION, result);
+  } while (result == MOJO_LEGACY_RESULT_OK);
+  EXPECT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION, result);
 
   // Wait on consumer 2 by polling with MojoReadData.
   do {
     char byte;
     uint32_t num_bytes = 1;
     result = MojoReadData(consumers[2], nullptr, &byte, &num_bytes);
-  } while (result == MOJO_RESULT_SHOULD_WAIT);
-  EXPECT_EQ(MOJO_RESULT_FAILED_PRECONDITION, result);
+  } while (result == MOJO_LEGACY_RESULT_SHOULD_WAIT);
+  EXPECT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION, result);
 
   for (size_t i = 0; i < 6; ++i) {
     CloseHandle(UNSAFE_TODO(handles[i]));
   }
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(parent));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(parent));
 }
 
 TEST_F(DataPipeTest, StatusChangeInTransit) {
@@ -2204,20 +2325,20 @@ TEST_F(DataPipeTest, StatusChangeInTransit) {
 
 DEFINE_TEST_CLIENT_TEST_WITH_PIPE(CreateOversizedChild, DataPipeTest, h) {
   const MojoCreateDataPipeOptions options = {
-      kSizeOfOptions,                   // |struct_size|.
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
-      1,                                // |element_num_bytes|.
-      kOversizedCapacity                // |capacity_num_bytes|.
+      kSizeOfOptions,                          // |struct_size|.
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,  // |flags|.
+      1,                                       // |element_num_bytes|.
+      kOversizedCapacity                       // |capacity_num_bytes|.
   };
 
   MojoHandle p, c;
-  ASSERT_EQ(MOJO_RESULT_RESOURCE_EXHAUSTED,
+  ASSERT_EQ(MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED,
             MojoCreateDataPipe(&options, &p, &c));
   WriteMessage(h, "success");
 
   // Wait for a quit message.
   EXPECT_EQ("quit", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
 }
 
 TEST_F(DataPipeTest, CreateOversizedInChild) {
@@ -2251,10 +2372,10 @@ class TestDataProducer {
         quit_closure_(std::move(quit_closure)),
         chunk_size_(chunk_size),
         bytes_remaining_(total_size) {
-    watcher_.Watch(producer_.get(), MOJO_HANDLE_SIGNAL_WRITABLE,
+    watcher_.Watch(producer_.get(), MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE,
                    base::BindRepeating(&TestDataProducer::ProduceMore,
                                        base::Unretained(this)));
-    ProduceMore(MOJO_RESULT_OK);
+    ProduceMore(MOJO_LEGACY_RESULT_OK);
   }
 
   ~TestDataProducer() = default;
@@ -2270,19 +2391,19 @@ class TestDataProducer {
     }
     MojoResult rv =
         MojoBeginWriteData(producer_->value(), nullptr, &data, &num_bytes);
-    if (rv == MOJO_RESULT_SHOULD_WAIT) {
+    if (rv == MOJO_LEGACY_RESULT_SHOULD_WAIT) {
       watcher_.ArmOrNotify();
       return;
     }
-    CHECK_EQ(rv, MOJO_RESULT_OK);
+    CHECK_EQ(rv, MOJO_LEGACY_RESULT_OK);
 
     num_bytes = std::min(num_bytes, bytes_remaining_);
     UNSAFE_TODO(memset(data, 42, num_bytes));
-    CHECK_EQ(MOJO_RESULT_OK,
+    CHECK_EQ(MOJO_LEGACY_RESULT_OK,
              MojoEndWriteData(producer_->value(), num_bytes, nullptr));
     bytes_remaining_ -= num_bytes;
 
-    ProduceMore(MOJO_RESULT_OK);
+    ProduceMore(MOJO_LEGACY_RESULT_OK);
   }
 
   ScopedDataPipeProducerHandle producer_;
@@ -2303,7 +2424,8 @@ class TestDataDrain {
       : consumer_(std::move(consumer)), quit_closure_(std::move(quit_closure)) {
     watcher_.Watch(
         consumer_.get(),
-        MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED,
+        MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+            MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED,
         base::BindRepeating(&TestDataDrain::Notify, base::Unretained(this)));
     Update();
   }
@@ -2344,7 +2466,7 @@ class TestDataDrain {
       for (size_t i = 0; i < kNumReadAttempts; ++i) {
         result =
             MojoBeginReadData(consumer_->value(), nullptr, &data, &num_bytes);
-        if (result == MOJO_RESULT_OK) {
+        if (result == MOJO_LEGACY_RESULT_OK) {
           const uint32_t num_bytes_read =
               (i == kNumReadAttempts - 1) ? num_bytes : 0;
 
@@ -2359,18 +2481,18 @@ class TestDataDrain {
       }
 
       switch (result) {
-        case MOJO_RESULT_SHOULD_WAIT:
+        case MOJO_LEGACY_RESULT_SHOULD_WAIT:
           // If the bug we're testing for is present, this arming attempt can
           // be incorrectly ignored while nothing is actually watching the pipe,
           // resulting in no further Update() calls and an effectively stalled
           // consumer.
           watcher_.ArmOrNotify();
           return;
-        case MOJO_RESULT_OK:
+        case MOJO_LEGACY_RESULT_OK:
           num_bytes_drained_ += num_bytes;
           break;
-        case MOJO_RESULT_FAILED_PRECONDITION:
-          Notify(MOJO_RESULT_FAILED_PRECONDITION);
+        case MOJO_LEGACY_RESULT_FAILED_PRECONDITION:
+          Notify(MOJO_LEGACY_RESULT_FAILED_PRECONDITION);
           return;
       }
     }
@@ -2399,7 +2521,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(StressTestRacyTrapsClient, DataPipeTest, h) {
 
   WriteMessage(h, "bye");
   EXPECT_EQ("bye", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
 }
 
 // Temporarily disabled during experimentation with suppression of this fix for
@@ -2417,13 +2539,13 @@ TEST_F(DataPipeTest, DISABLED_StressTestRacyTraps) {
 
   const MojoCreateDataPipeOptions options = {
       sizeof(options),
-      MOJO_CREATE_DATA_PIPE_FLAG_NONE,
+      MOJO_LEGACY_CREATE_DATA_PIPE_FLAG_NONE,
       1,
       128 * 1024,
   };
 
   MojoHandle p, c;
-  ASSERT_EQ(MOJO_RESULT_OK, MojoCreateDataPipe(&options, &p, &c));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoCreateDataPipe(&options, &p, &c));
 
   RunTestClient("StressTestRacyTrapsClient", [&](MojoHandle child) {
     WriteMessageWithHandles(child, "sup", &p, 1);
@@ -2443,4 +2565,4 @@ TEST_F(DataPipeTest, DISABLED_StressTestRacyTraps) {
 
 }  // namespace
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/channel_linux.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel_linux.h"
 
 #include <fcntl.h>
 #include <linux/futex.h>
@@ -44,10 +44,10 @@
 #include "base/task/task_runner.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "mojo/buildflags.h"
-#include "mojo/core/embedder/features.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/features.h"
 
-namespace mojo::core {
+namespace mojo_legacy::core {
 
 // DataAvailableNotifier is a simple interface which allows us to
 // substitute how we notify the reader that we've made data available,
@@ -971,4 +971,4 @@ void ChannelLinux::SetSharedMemParameters(bool enabled, uint32_t num_pages) {
   g_shared_mem_pages.store(num_pages);
 }
 
-}  // namespace mojo::core
+}  // namespace mojo_legacy::core

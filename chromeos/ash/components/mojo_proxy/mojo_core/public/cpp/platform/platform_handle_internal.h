@@ -6,13 +6,13 @@
 // base::UnguessableToken. Helpful so base::UnguessableToken can grant access
 // to its internal serialization/deserialization helpers.
 
-#ifndef MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_INTERNAL_H_
-#define MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_INTERNAL_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_INTERNAL_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_INTERNAL_H_
 
 #include "base/unguessable_token.h"
-#include "mojo/public/c/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/platform_handle.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace internal {
 
 class PlatformHandleInternal {
@@ -29,6 +29,6 @@ class PlatformHandleInternal {
 };
 
 }  // namespace internal
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_INTERNAL_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_INTERNAL_H_

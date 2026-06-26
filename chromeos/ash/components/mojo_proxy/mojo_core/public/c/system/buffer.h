@@ -6,75 +6,77 @@
 //
 // Note: This header should be compilable as C.
 
-#ifndef MOJO_PUBLIC_C_SYSTEM_BUFFER_H_
-#define MOJO_PUBLIC_C_SYSTEM_BUFFER_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_BUFFER_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_BUFFER_H_
 
 #include <stdint.h>
 
-#include "mojo/public/c/system/macros.h"
-#include "mojo/public/c/system/system_export.h"
-#include "mojo/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/macros.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
 
+namespace mojo_legacy {
 // Flags passed to |MojoCreateSharedBuffer()| via
 // |MojoCreateSharedBufferOptions|. See values defined below.
 typedef uint32_t MojoCreateSharedBufferFlags;
 
 // No flags. Default behavior.
-#define MOJO_CREATE_SHARED_BUFFER_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_CREATE_SHARED_BUFFER_FLAG_NONE ((uint32_t)0)
 
 // Options passed to |MojoCreateSharedBuffer()|.
-struct MOJO_ALIGNAS(8) MojoCreateSharedBufferOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoCreateSharedBufferOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoCreateSharedBufferFlags|.
   MojoCreateSharedBufferFlags flags;
 };
-MOJO_STATIC_ASSERT(MOJO_ALIGNOF(int64_t) <= 8, "int64_t has weird alignment");
-MOJO_STATIC_ASSERT(sizeof(struct MojoCreateSharedBufferOptions) == 8,
-                   "MojoCreateSharedBufferOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(MOJO_LEGACY_ALIGNOF(int64_t) <= 8,
+                          "int64_t has weird alignment");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoCreateSharedBufferOptions) == 8,
+                          "MojoCreateSharedBufferOptions has wrong size");
 
 // Flags passed to |MojoGetBufferInfo()| via |MojoGetBufferInfoOptions|. See
 // values defined below.
 typedef uint32_t MojoGetBufferInfoFlags;
 
 // No flags. Default behavior.
-#define MOJO_GET_BUFFER_INFO_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_GET_BUFFER_INFO_FLAG_NONE ((uint32_t)0)
 
 // Options passed to |MojoGetBufferInfo()|.
-struct MOJO_ALIGNAS(8) MojoGetBufferInfoOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoGetBufferInfoOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoGetBufferInfoFlags|.
   MojoGetBufferInfoFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoGetBufferInfoOptions) == 8,
-                   "MojoSharedBufferOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoGetBufferInfoOptions) == 8,
+                          "MojoSharedBufferOptions has wrong size");
 
 // Structure used to receive information about a shared buffer via
 // |MojoGetBufferInfo()|.
-struct MOJO_ALIGNAS(8) MojoSharedBufferInfo {
+struct MOJO_LEGACY_ALIGNAS(8) MojoSharedBufferInfo {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // The size of the shared buffer.
   uint64_t size;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoSharedBufferInfo) == 16,
-                   "MojoSharedBufferInfo has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoSharedBufferInfo) == 16,
+                          "MojoSharedBufferInfo has wrong size");
 
 // Flags passed to |MojoDuplicateBufferHandle()| via
 // |MojoDuplicateBufferHandleOptions|. See values defined below.
 typedef uint32_t MojoDuplicateBufferHandleFlags;
 
 // No options. Default behavior. Note that if a shared buffer handle is ever
-// duplicated without |MOJO_DUPLICATE_BUFFER_HANDLE_READ_ONLY| (see below),
-// neither it nor any of its duplicates can ever be duplicated *with*
-// |MOJO_DUPLICATE_BUFFER_HANDLE_READ_ONLY| in the future. That is, once a
-// writable handle has been duplicated as another writable handle, it is no
+// duplicated without |MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_READ_ONLY| (see
+// below), neither it nor any of its duplicates can ever be duplicated *with*
+// |MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_READ_ONLY| in the future. That is, once
+// a writable handle has been duplicated as another writable handle, it is no
 // longer possible to create read-only handles to the underlying buffer object.
-#define MOJO_DUPLICATE_BUFFER_HANDLE_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_FLAG_NONE ((uint32_t)0)
 
 // Duplicates the handle as read-only. If successful, the resulting new handle
 // will always map to a read-only memory region. Successful use of this flag
@@ -82,7 +84,7 @@ typedef uint32_t MojoDuplicateBufferHandleFlags;
 // duplicates may never be duplicated *without* this flag in the future. That
 // is, once a read-only handle is produced for a buffer object, all future
 // handles to that object must also be read-only.
-#define MOJO_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY ((uint32_t)1 << 0)
+#define MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY ((uint32_t)1 << 0)
 
 // Options passed to |MojoDuplicateBufferHandle()|.
 struct MojoDuplicateBufferHandleOptions {
@@ -92,15 +94,15 @@ struct MojoDuplicateBufferHandleOptions {
   // See |MojoDuplicateBufferHandleFlags|.
   MojoDuplicateBufferHandleFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoDuplicateBufferHandleOptions) == 8,
-                   "MojoDuplicateBufferHandleOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoDuplicateBufferHandleOptions) == 8,
+                          "MojoDuplicateBufferHandleOptions has wrong size");
 
 // Flags passed to |MojoMapBuffer()| via |MojoMapBufferOptions|. See values
 // defined below.
 typedef uint32_t MojoMapBufferFlags;
 
 // No flags. Default behavior.
-#define MOJO_MAP_BUFFER_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_MAP_BUFFER_FLAG_NONE ((uint32_t)0)
 
 // Options passed to |MojoMapBuffer()|.
 struct MojoMapBufferOptions {
@@ -110,12 +112,8 @@ struct MojoMapBufferOptions {
   // See |MojoMapBufferFlags|.
   MojoMapBufferFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoMapBufferOptions) == 8,
-                   "MojoMapBufferOptions has wrong size");
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoMapBufferOptions) == 8,
+                          "MojoMapBufferOptions has wrong size");
 
 // Creates a buffer of size |num_bytes| bytes that can be shared between
 // processes. The returned handle may be duplicated any number of times by
@@ -129,14 +127,16 @@ extern "C" {
 // buffer. On failure it is not modified.
 //
 // Returns:
-//   |MOJO_RESULT_OK| on success.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if some argument was invalid (e.g.,
+//   |MOJO_LEGACY_RESULT_OK| on success.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if some argument was invalid (e.g.,
 //       |*options| is invalid).
-//   |MOJO_RESULT_RESOURCE_EXHAUSTED| if a process/system/quota/etc. limit has
+//   |MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED| if a process/system/quota/etc.
+//   limit has
 //       been reached (e.g., if the requested size was too large, or if the
 //       maximum number of handles was exceeded).
-//   |MOJO_RESULT_UNIMPLEMENTED| if an unsupported flag was set in |*options|.
-MOJO_SYSTEM_EXPORT MojoResult
+//   |MOJO_LEGACY_RESULT_UNIMPLEMENTED| if an unsupported flag was set in
+//   |*options|.
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoCreateSharedBuffer(uint64_t num_bytes,
                        const struct MojoCreateSharedBufferOptions* options,
                        MojoHandle* shared_buffer_handle);
@@ -151,21 +151,21 @@ MojoCreateSharedBuffer(uint64_t num_bytes,
 //
 // Access rights to mapped memory from the duplicated handle may be controlled
 // by flags in |*options|, with some limitations. See notes on
-// |MOJO_DUPLICATE_BUFFER_HANDLE_FLAG_NONE| and
-// |MOJO_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY| regarding restrictions on
-// duplication with respect to these flags.
+// |MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_FLAG_NONE| and
+// |MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY| regarding restrictions
+// on duplication with respect to these flags.
 //
 // Returns:
-//   |MOJO_RESULT_OK| on success.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if some argument was invalid (e.g.,
+//   |MOJO_LEGACY_RESULT_OK| on success.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if some argument was invalid (e.g.,
 //       |buffer_handle| is not a valid buffer handle or |*options| is invalid).
-//   |MOJO_RESULT_UNIMPLEMENTED| if an unsupported flag was set in |*options|.
-//   |MOJO_RESULT_FAILED_PRECONDITION| if
-//       |MOJO_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY| was set but the handle
-//       was already previously duplicated without that flag; or if
-//       |MOJO_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY| was not set but the
-//       handle was already previously duplicated with that flag.
-MOJO_SYSTEM_EXPORT MojoResult MojoDuplicateBufferHandle(
+//   |MOJO_LEGACY_RESULT_UNIMPLEMENTED| if an unsupported flag was set in
+//   |*options|. |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| if
+//       |MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY| was set but the
+//       handle was already previously duplicated without that flag; or if
+//       |MOJO_LEGACY_DUPLICATE_BUFFER_HANDLE_FLAG_READ_ONLY| was not set but
+//       the handle was already previously duplicated with that flag.
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult MojoDuplicateBufferHandle(
     MojoHandle buffer_handle,
     const struct MojoDuplicateBufferHandleOptions* options,
     MojoHandle* new_buffer_handle);
@@ -187,13 +187,14 @@ MOJO_SYSTEM_EXPORT MojoResult MojoDuplicateBufferHandle(
 // |options| may be null to map the buffer with default behavior.
 //
 // Returns:
-//   |MOJO_RESULT_OK| on success.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if some argument was invalid (e.g.,
+//   |MOJO_LEGACY_RESULT_OK| on success.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if some argument was invalid (e.g.,
 //       |buffer_handle| is not a valid buffer handle, the range specified by
 //       |offset| and |num_bytes| is not valid, or |*options| is invalid).
-//   |MOJO_RESULT_RESOURCE_EXHAUSTED| if the mapping operation itself failed
+//   |MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED| if the mapping operation itself
+//   failed
 //       (e.g., due to not having appropriate address space available).
-MOJO_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoMapBuffer(MojoHandle buffer_handle,
               uint64_t offset,
               uint64_t num_bytes,
@@ -207,10 +208,11 @@ MojoMapBuffer(MojoHandle buffer_handle,
 // A mapping may only be unmapped once.
 //
 // Returns:
-//   |MOJO_RESULT_OK| on success.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |buffer| is invalid (e.g., is not the
+//   |MOJO_LEGACY_RESULT_OK| on success.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |buffer| is invalid (e.g., is not
+//   the
 //       result of |MojoMapBuffer()| or has already been unmapped).
-MOJO_SYSTEM_EXPORT MojoResult MojoUnmapBuffer(void* buffer);
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult MojoUnmapBuffer(void* buffer);
 
 // Retrieve information about |buffer_handle| into |info|.
 //
@@ -220,19 +222,18 @@ MOJO_SYSTEM_EXPORT MojoResult MojoUnmapBuffer(void* buffer);
 // |options| may be null for default options.
 //
 // Returns:
-//   |MOJO_RESULT_OK| on success.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |buffer_handle| is invalid, |info| is
+//   |MOJO_LEGACY_RESULT_OK| on success.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |buffer_handle| is invalid, |info|
+//   is
 //       null, or |*options| is invalid.
 //
 // On success, |info->size| will be set to the size of the buffer. On failure it
 // is not modified.
-MOJO_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoGetBufferInfo(MojoHandle buffer_handle,
                   const struct MojoGetBufferInfoOptions* options,
                   struct MojoSharedBufferInfo* info);
 
-#ifdef __cplusplus
-}  // extern "C"
-#endif
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_C_SYSTEM_BUFFER_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_BUFFER_H_

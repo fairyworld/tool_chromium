@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_H_
-#define MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_H_
 
 #include "base/check_op.h"
 #include "base/component_export.h"
 #include "base/files/platform_file.h"
 #include "build/build_config.h"
-#include "mojo/public/c/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/platform_handle.h"
 
 #if BUILDFLAG(IS_WIN)
 #include "base/win/scoped_handle.h"
@@ -24,7 +24,7 @@
 #include "base/files/scoped_file.h"
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 
 // A PlatformHandle is a generic wrapper around a platform-specific system
 // handle type, e.g. a POSIX file descriptor, Windows HANDLE, or macOS Mach
@@ -40,7 +40,7 @@ namespace mojo {
 //   stable wire representation via Mojo handles.
 //
 // NOTE: This assumes ownership if the handle it represents.
-class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformHandle {
+class COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM) PlatformHandle {
  public:
   enum class Type {
     kNone,
@@ -242,6 +242,6 @@ class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformHandle {
 #endif
 };
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_HANDLE_H_

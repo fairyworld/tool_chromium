@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel.h"
 
 #include <atomic>
 #include <optional>
@@ -23,14 +23,14 @@
 #include "base/test/task_environment.h"
 #include "base/threading/thread.h"
 #include "build/build_config.h"
-#include "mojo/core/embedder/features.h"
-#include "mojo/core/ipcz_driver/envelope.h"
-#include "mojo/core/platform_handle_utils.h"
-#include "mojo/public/cpp/platform/platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/features.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ipcz_driver/envelope.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_utils.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace mojo::core {
+namespace mojo_legacy::core {
 
 class TestChannel : public Channel {
  public:
@@ -354,7 +354,7 @@ TEST(ChannelTest, RejectHandles) {
   // receiver to reject it and close the Channel without ever dispatching the
   // message.
   PlatformChannel dummy_channel;
-  std::vector<mojo::PlatformHandle> handles;
+  std::vector<mojo_legacy::PlatformHandle> handles;
   handles.push_back(dummy_channel.TakeLocalEndpoint().TakePlatformHandle());
   auto message = Channel::Message::CreateMessage(0 /* payload_size */,
                                                  1 /* max_handles */);
@@ -839,7 +839,8 @@ TEST(ChannelTest, IpczHeaderCompatibilityTest) {
   if (Channel::SupportsMultipleNotifiers()) {
     // The test constructs messages as if the feature is enabled. Enable the
     // feature to match behavior on the receiving side.
-    scoped_feature_list.InitAndEnableFeature(mojo::core::kMojoUseEventFd);
+    scoped_feature_list.InitAndEnableFeature(
+        mojo_legacy::core::kMojoUseEventFd);
   }
 #endif
 
@@ -988,4 +989,4 @@ TEST(ChannelTest, TryDispatchMessageWithEnvelope) {
   channel->ShutDown();
 }
 
-}  // namespace mojo::core
+}  // namespace mojo_legacy::core

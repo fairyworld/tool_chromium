@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/watcher_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/watcher_dispatcher.h"
 
 #include <algorithm>
 #include <limits>
@@ -10,9 +10,9 @@
 #include "base/compiler_specific.h"
 #include "base/debug/alias.h"
 #include "base/memory/ptr_util.h"
-#include "mojo/core/watch.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/watch.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 WatcherDispatcher::WatcherDispatcher(MojoTrapEventHandler handler)
@@ -82,13 +82,13 @@ void WatcherDispatcher::InvokeWatchCallback(uintptr_t context,
     //
     // Because cancellation synchronously blocks all future notifications, and
     // because notifications themselves are mutually exclusive for any given
-    // context, we still guarantee that a single MOJO_RESULT_CANCELLED result
-    // is the last notification received for any given context.
+    // context, we still guarantee that a single MOJO_LEGACY_RESULT_CANCELLED
+    // result is the last notification received for any given context.
     //
     // This guarantee is sufficient to make safe, synchronized, per-context
     // state management possible in user code.
     base::AutoLock lock(lock_);
-    if (closed_ && result != MOJO_RESULT_CANCELLED) {
+    if (closed_ && result != MOJO_LEGACY_RESULT_CANCELLED) {
       return;
     }
   }
@@ -107,7 +107,7 @@ MojoResult WatcherDispatcher::Close() {
   {
     base::AutoLock lock(lock_);
     if (closed_) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
     closed_ = true;
     std::swap(watches, watches_);
@@ -120,7 +120,7 @@ MojoResult WatcherDispatcher::Close() {
     entry.second->Cancel();
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult WatcherDispatcher::WatchDispatcher(
@@ -134,11 +134,11 @@ MojoResult WatcherDispatcher::WatchDispatcher(
   {
     base::AutoLock lock(lock_);
     if (closed_) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
 
     if (watches_.count(context) || watched_handles_.count(dispatcher.get())) {
-      return MOJO_RESULT_ALREADY_EXISTS;
+      return MOJO_LEGACY_RESULT_ALREADY_EXISTS;
     }
 
     scoped_refptr<Watch> watch =
@@ -150,7 +150,7 @@ MojoResult WatcherDispatcher::WatchDispatcher(
   }
 
   MojoResult rv = dispatcher->AddWatcherRef(this, context);
-  if (rv != MOJO_RESULT_OK) {
+  if (rv != MOJO_LEGACY_RESULT_OK) {
     // Oops. This was not a valid handle to watch. Undo the above work and
     // fail gracefully.
     base::AutoLock lock(lock_);
@@ -172,7 +172,7 @@ MojoResult WatcherDispatcher::WatchDispatcher(
     dispatcher->RemoveWatcherRef(this, context);
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult WatcherDispatcher::CancelWatch(uintptr_t context) {
@@ -182,11 +182,11 @@ MojoResult WatcherDispatcher::CancelWatch(uintptr_t context) {
   {
     base::AutoLock lock(lock_);
     if (closed_) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
     auto it = watches_.find(context);
     if (it == watches_.end()) {
-      return MOJO_RESULT_NOT_FOUND;
+      return MOJO_LEGACY_RESULT_NOT_FOUND;
     }
     watch = it->second;
     watches_.erase(it);
@@ -207,34 +207,34 @@ MojoResult WatcherDispatcher::CancelWatch(uintptr_t context) {
     // If another thread races to close this watcher handler, |watched_handles_|
     // may have been cleared by the time we reach this section.
     if (handle_it == watched_handles_.end()) {
-      return MOJO_RESULT_OK;
+      return MOJO_LEGACY_RESULT_OK;
     }
 
     ready_watches_.erase(handle_it->second.get());
     watched_handles_.erase(handle_it);
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult WatcherDispatcher::Arm(uint32_t* num_blocking_events,
                                   MojoTrapEvent* blocking_events) {
   base::AutoLock lock(lock_);
   if (num_blocking_events && !blocking_events) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (closed_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   if (watched_handles_.empty()) {
-    return MOJO_RESULT_NOT_FOUND;
+    return MOJO_LEGACY_RESULT_NOT_FOUND;
   }
 
   if (ready_watches_.empty()) {
     // Fast path: No watches are ready to notify, so we're done.
     armed_ = true;
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   if (num_blocking_events) {
@@ -260,10 +260,10 @@ MojoResult WatcherDispatcher::Arm(uint32_t* num_blocking_events,
       const Watch* const watch = *next_ready_iter;
       if (UNSAFE_TODO(blocking_events[i]).struct_size <
           sizeof(*blocking_events)) {
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
       }
       UNSAFE_TODO(blocking_events[i]).flags =
-          MOJO_TRAP_EVENT_FLAG_WITHIN_API_CALL;
+          MOJO_LEGACY_TRAP_EVENT_FLAG_WITHIN_API_CALL;
       UNSAFE_TODO(blocking_events[i]).trigger_context = watch->context();
       UNSAFE_TODO(blocking_events[i]).result = watch->last_known_result();
       UNSAFE_TODO(blocking_events[i]).signals_state =
@@ -278,10 +278,10 @@ MojoResult WatcherDispatcher::Arm(uint32_t* num_blocking_events,
     }
   }
 
-  return MOJO_RESULT_FAILED_PRECONDITION;
+  return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
 }
 
 WatcherDispatcher::~WatcherDispatcher() = default;
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

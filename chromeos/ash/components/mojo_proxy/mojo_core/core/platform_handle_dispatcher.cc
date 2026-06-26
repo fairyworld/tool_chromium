@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/platform_handle_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_dispatcher.h"
 
 #include "base/synchronization/lock.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // static
@@ -26,11 +26,11 @@ Dispatcher::Type PlatformHandleDispatcher::GetType() const {
 MojoResult PlatformHandleDispatcher::Close() {
   base::AutoLock lock(lock_);
   if (is_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   is_closed_ = true;
   platform_handle_.reset();
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 void PlatformHandleDispatcher::StartSerialize(uint32_t* num_bytes,
@@ -98,4 +98,4 @@ PlatformHandleDispatcher::~PlatformHandleDispatcher() {
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

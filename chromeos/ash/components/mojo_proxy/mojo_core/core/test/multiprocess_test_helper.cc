@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/test/multiprocess_test_helper.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/multiprocess_test_helper.h"
 
 #include <functional>
 #include <set>
@@ -28,19 +28,19 @@
 #include "base/task/task_runner.h"
 #include "base/test/test_switches.h"
 #include "build/build_config.h"
-#include "mojo/public/cpp/platform/platform_channel.h"
-#include "mojo/public/cpp/platform/platform_channel_endpoint.h"
-#include "mojo/public/cpp/platform/platform_channel_server_endpoint.h"
-#include "mojo/public/cpp/system/invitation.h"
-#include "mojo/public/cpp/system/isolated_connection.h"
-#include "mojo/public/cpp/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_server_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/invitation.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/isolated_connection.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/platform_handle.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 #if !BUILDFLAG(IS_FUCHSIA)
-#include "mojo/public/cpp/platform/named_platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/named_platform_channel.h"
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace test {
 
@@ -82,7 +82,7 @@ MultiprocessTestHelper::~MultiprocessTestHelper() {
 void MultiprocessTestHelper::InitForMultiprocessTest() {
   auto& command_line = *base::CommandLine::ForCurrentProcess();
   bool is_broker = !command_line.HasSwitch(kRunAsBrokerClient);
-  mojo::core::Init({.is_broker_process = is_broker});
+  mojo_legacy::core::Init({.is_broker_process = is_broker});
 }
 
 ScopedMessagePipeHandle MultiprocessTestHelper::StartChild(
@@ -352,4 +352,4 @@ ScopedMessagePipeHandle MultiprocessTestHelper::primordial_pipe;
 
 }  // namespace test
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/test/mojo_test_suite_base.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/mojo_test_suite_base.h"
 
 #include "base/base_switches.h"
 #include "base/check.h"
@@ -11,11 +11,11 @@
 #include "base/strings/string_util.h"
 #include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
-#include "mojo/core/test/scoped_mojo_support.h"
-#include "mojo/core/test/test_switches.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/scoped_mojo_support.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/test_switches.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace mojo::core::test {
+namespace mojo_legacy::core::test {
 
 namespace {
 
@@ -114,4 +114,4 @@ void MojoTestSuiteBase::MaybeInitializeChildProcessEnvironment() {
   }
 }
 
-}  // namespace mojo::core::test
+}  // namespace mojo_legacy::core::test

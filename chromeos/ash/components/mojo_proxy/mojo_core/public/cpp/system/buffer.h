@@ -9,8 +9,8 @@
 // Please see "mojo/public/c/system/buffer.h" for complete documentation of the
 // API.
 
-#ifndef MOJO_PUBLIC_CPP_SYSTEM_BUFFER_H_
-#define MOJO_PUBLIC_CPP_SYSTEM_BUFFER_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_BUFFER_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_BUFFER_H_
 
 #include <stdint.h>
 
@@ -18,17 +18,17 @@
 
 #include "base/check_op.h"
 #include "base/compiler_specific.h"
-#include "mojo/public/c/system/buffer.h"
-#include "mojo/public/cpp/system/handle.h"
-#include "mojo/public/cpp/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/buffer.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/system_export.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace internal {
 
 struct Unmapper {
   void operator()(void* buffer) {
     [[maybe_unused]] MojoResult result = MojoUnmapBuffer(buffer);
-    DCHECK_EQ(MOJO_RESULT_OK, result);
+    DCHECK_EQ(MOJO_LEGACY_RESULT_OK, result);
   }
 };
 
@@ -42,7 +42,7 @@ typedef ScopedHandleBase<SharedBufferHandle> ScopedSharedBufferHandle;
 
 // A strongly-typed representation of a |MojoHandle| referring to a shared
 // buffer.
-class MOJO_CPP_SYSTEM_EXPORT SharedBufferHandle : public Handle {
+class MOJO_LEGACY_CPP_SYSTEM_EXPORT SharedBufferHandle : public Handle {
  public:
   enum class AccessMode {
     READ_WRITE,
@@ -79,6 +79,6 @@ static_assert(sizeof(SharedBufferHandle) == sizeof(Handle),
 static_assert(sizeof(ScopedSharedBufferHandle) == sizeof(SharedBufferHandle),
               "Bad size for C++ ScopedSharedBufferHandle");
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_SYSTEM_BUFFER_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_BUFFER_H_

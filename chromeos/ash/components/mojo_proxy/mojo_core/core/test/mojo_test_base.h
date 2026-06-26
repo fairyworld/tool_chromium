@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_TEST_MOJO_TEST_BASE_H_
-#define MOJO_CORE_TEST_MOJO_TEST_BASE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MOJO_TEST_BASE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MOJO_TEST_BASE_H_
 
 #include <memory>
 #include <string>
@@ -13,13 +13,13 @@
 #include "base/functional/bind.h"
 #include "build/blink_buildflags.h"
 #include "build/build_config.h"
-#include "mojo/core/test/multiprocess_test_helper.h"
-#include "mojo/public/c/system/trap.h"
-#include "mojo/public/c/system/types.h"
-#include "mojo/public/cpp/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/multiprocess_test_helper.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/trap.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/message_pipe.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace test {
 
@@ -202,21 +202,21 @@ class MojoTestBase : public testing::Test {
 // to the test process (see RunTestClient* above.) This pipe handle is
 // automatically closed on test client teardown.
 #if BUILDFLAG(USE_BLINK)
-#define DEFINE_TEST_CLIENT_WITH_PIPE(client_name, test_base, pipe_name) \
-  class client_name##_MainFixture : public test_base {                  \
-    void TestBody() override {}                                         \
-                                                                        \
-   public:                                                              \
-    int Main(MojoHandle);                                               \
-  };                                                                    \
-  MULTIPROCESS_TEST_MAIN_WITH_SETUP(                                    \
-      client_name##TestChildMain,                                       \
-      ::mojo::core::test::MultiprocessTestHelper::ChildSetup) {         \
-    client_name##_MainFixture test;                                     \
-    return ::mojo::core::test::MultiprocessTestHelper::RunClientMain(   \
-        base::BindOnce(&client_name##_MainFixture::Main,                \
-                       base::Unretained(&test)));                       \
-  }                                                                     \
+#define DEFINE_TEST_CLIENT_WITH_PIPE(client_name, test_base, pipe_name)      \
+  class client_name##_MainFixture : public test_base {                       \
+    void TestBody() override {}                                              \
+                                                                             \
+   public:                                                                   \
+    int Main(MojoHandle);                                                    \
+  };                                                                         \
+  MULTIPROCESS_TEST_MAIN_WITH_SETUP(                                         \
+      client_name##TestChildMain,                                            \
+      ::mojo_legacy::core::test::MultiprocessTestHelper::ChildSetup) {       \
+    client_name##_MainFixture test;                                          \
+    return ::mojo_legacy::core::test::MultiprocessTestHelper::RunClientMain( \
+        base::BindOnce(&client_name##_MainFixture::Main,                     \
+                       base::Unretained(&test)));                            \
+  }                                                                          \
   int client_name##_MainFixture::Main(MojoHandle pipe_name)
 
 // This is a version of DEFINE_TEST_CLIENT_WITH_PIPE which can be used with
@@ -230,11 +230,11 @@ class MojoTestBase : public testing::Test {
   };                                                                         \
   MULTIPROCESS_TEST_MAIN_WITH_SETUP(                                         \
       client_name##TestChildMain,                                            \
-      ::mojo::core::test::MultiprocessTestHelper::ChildSetup) {              \
+      ::mojo_legacy::core::test::MultiprocessTestHelper::ChildSetup) {       \
     client_name##_MainFixture test;                                          \
-    return ::mojo::core::test::MultiprocessTestHelper::RunClientTestMain(    \
-        base::BindOnce(&client_name##_MainFixture::Main,                     \
-                       base::Unretained(&test)));                            \
+    return ::mojo_legacy::core::test::MultiprocessTestHelper::               \
+        RunClientTestMain(base::BindOnce(&client_name##_MainFixture::Main,   \
+                                         base::Unretained(&test)));          \
   }                                                                          \
   void client_name##_MainFixture::Main(MojoHandle pipe_name)
 #else  // BUILDFLAG(USE_BLINK)
@@ -258,6 +258,6 @@ class MojoTestBase : public testing::Test {
 
 }  // namespace test
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_TEST_MOJO_TEST_BASE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MOJO_TEST_BASE_H_

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_H_
-#define MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_H_
 
 #include <string_view>
 
@@ -11,9 +11,9 @@
 #include "base/component_export.h"
 #include "base/process/launch.h"
 #include "build/build_config.h"
-#include "mojo/public/cpp/platform/platform_channel_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_endpoint.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // PlatformChannel encapsulates construction and ownership of two entangled
 // endpoints of a platform-specific communication primitive, e.g. a Windows
@@ -30,7 +30,7 @@ namespace mojo {
 // For a channel which allows clients to connect by name (i.e. a named pipe
 // or socket server, supported only on Windows and POSIX systems) see
 // NamedPlatformChannel.
-class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformChannel {
+class COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM) PlatformChannel {
  public:
   // A common helper constant that is used to pass handle values on the
   // command line when the relevant methods are used on this class.
@@ -110,6 +110,6 @@ class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformChannel {
   PlatformChannelEndpoint remote_endpoint_;
 };
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_H_

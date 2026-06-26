@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/ipcz_driver/shared_buffer.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ipcz_driver/shared_buffer.h"
 
 #include <string.h>
 
@@ -14,17 +14,17 @@
 #include "base/notreached.h"
 #include "build/blink_buildflags.h"
 #include "build/build_config.h"
-#include "mojo/core/embedder/embedder.h"
-#include "mojo/core/test/mojo_test_base.h"
-#include "mojo/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/mojo_test_base.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
-#include "mojo/core/core.h"
-#include "mojo/core/shared_buffer_dispatcher.h"
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/shared_buffer_dispatcher.h"
 #endif
 
-namespace mojo::core {
+namespace mojo_legacy::core {
 namespace {
 
 using SharedBufferTest = test::MojoTestBase;
@@ -34,7 +34,7 @@ TEST_F(SharedBufferTest, CreateSharedBuffer) {
   MojoHandle h = CreateBuffer(message.size());
   WriteToBuffer(h, 0, message);
   ExpectBufferContents(h, 0, message);
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
 }
 
 TEST_F(SharedBufferTest, DuplicateSharedBuffer) {
@@ -44,8 +44,8 @@ TEST_F(SharedBufferTest, DuplicateSharedBuffer) {
 
   MojoHandle dupe = DuplicateBuffer(h, false);
   ExpectBufferContents(dupe, 0, message);
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(dupe));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(dupe));
 }
 
 TEST_F(SharedBufferTest, PassSharedBufferLocal) {
@@ -61,10 +61,10 @@ TEST_F(SharedBufferTest, PassSharedBufferLocal) {
   EXPECT_EQ("...", ReadMessageWithHandles(p1, &dupe, 1));
 
   ExpectBufferContents(dupe, 0, message);
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(dupe));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(p0));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(p1));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(dupe));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(p0));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(p1));
 }
 
 #if BUILDFLAG(USE_BLINK)
@@ -77,8 +77,8 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(CopyToBufferClient, SharedBufferTest, h) {
   WriteToBuffer(b, 0, message);
 
   EXPECT_EQ("quit", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(b));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(b));
 }
 
 #if BUILDFLAG(IS_IOS)
@@ -110,7 +110,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(CreateBufferClient, SharedBufferTest, h) {
   WriteMessageWithHandles(h, "have a buffer", &b, 1);
 
   EXPECT_EQ("quit", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
 }
 
 #if BUILDFLAG(IS_IOS)
@@ -147,8 +147,8 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(CreateAndPassBuffer, SharedBufferTest, h) {
   WriteMessageWithHandles(other_child, "", &dupe, 1);
 
   EXPECT_EQ("quit", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(other_child));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(other_child));
 }
 
 DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReceiveAndEditBuffer, SharedBufferTest, h) {
@@ -163,10 +163,10 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReceiveAndEditBuffer, SharedBufferTest, h) {
 
   // Write the message from the parent into the buffer and exit.
   WriteToBuffer(b, 0, message);
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(b));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(b));
   EXPECT_EQ("quit", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(other_child));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(other_child));
 }
 
 #if BUILDFLAG(IS_IOS)
@@ -200,7 +200,7 @@ TEST_F(SharedBufferTest, MAYBE_PassSharedBufferFromChildToChild) {
 
   // The second child should have written this message.
   ExpectBufferContents(b, 0, message);
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(b));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(b));
 }
 
 DEFINE_TEST_CLIENT_TEST_WITH_PIPE(CreateAndPassBufferParent,
@@ -221,7 +221,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(CreateAndPassBufferParent,
     EXPECT_EQ("quit", ReadMessage(parent));
     WriteMessage(child, "quit");
   });
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(parent));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(parent));
 }
 
 DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReceiveAndEditBufferParent,
@@ -236,7 +236,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReceiveAndEditBufferParent,
     EXPECT_EQ("quit", ReadMessage(parent));
     WriteMessage(child, "quit");
   });
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(parent));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(parent));
 }
 
 #if BUILDFLAG(IS_ANDROID)
@@ -295,14 +295,14 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReadAndMapWriteSharedBuffer,
     EXPECT_EQ(buffer->region().GetMode(),
               base::subtle::PlatformSharedMemoryRegion::Mode::kReadOnly);
   } else {
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
     auto* dispatcher = static_cast<SharedBufferDispatcher*>(
         Core::Get()->GetDispatcher(b).get());
     base::subtle::PlatformSharedMemoryRegion& region =
         dispatcher->GetRegionForTesting();
     EXPECT_EQ(region.GetMode(),
               base::subtle::PlatformSharedMemoryRegion::Mode::kReadOnly);
-    EXPECT_EQ(MOJO_RESULT_OK, MojoClose(b));
+    EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(b));
 #else
     NOTREACHED();
 #endif
@@ -310,7 +310,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReadAndMapWriteSharedBuffer,
 
   WriteMessage(h, "ok");
   EXPECT_EQ("quit", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
 }
 
 #if BUILDFLAG(IS_IOS)
@@ -348,7 +348,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(CreateAndPassReadOnlyBuffer,
 
   WriteMessage(h, "ok");
   EXPECT_EQ("quit", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
   MojoClose(b);
 }
 
@@ -372,14 +372,14 @@ TEST_F(SharedBufferTest, MAYBE_CreateAndPassFromChildReadOnlyBuffer) {
       EXPECT_EQ(buffer->region().GetMode(),
                 base::subtle::PlatformSharedMemoryRegion::Mode::kReadOnly);
     } else {
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
       auto* dispatcher = static_cast<SharedBufferDispatcher*>(
           Core::Get()->GetDispatcher(b).get());
       base::subtle::PlatformSharedMemoryRegion& region =
           dispatcher->GetRegionForTesting();
       EXPECT_EQ(region.GetMode(),
                 base::subtle::PlatformSharedMemoryRegion::Mode::kReadOnly);
-      EXPECT_EQ(MOJO_RESULT_OK, MojoClose(b));
+      EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(b));
 #else
       NOTREACHED();
 #endif
@@ -393,4 +393,4 @@ TEST_F(SharedBufferTest, MAYBE_CreateAndPassFromChildReadOnlyBuffer) {
 #endif  // BUILDFLAG(USE_BLINK)
 
 }  // namespace
-}  // namespace mojo::core
+}  // namespace mojo_legacy::core

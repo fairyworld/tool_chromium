@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/system/isolated_connection.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/isolated_connection.h"
 
-#include "mojo/core/embedder/embedder.h"
-#include "mojo/public/cpp/platform/platform_channel.h"
-#include "mojo/public/cpp/system/invitation.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/invitation.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 IsolatedConnection::IsolatedConnection()
     : token_(base::UnguessableToken::Create()) {}
@@ -25,7 +25,7 @@ IsolatedConnection::~IsolatedConnection() {
   //
   // This is not done with MojoIpcz enabled, because with MojoIpcz, isolated
   // connections are not transient and can outlive this object.
-  if (!mojo::core::IsMojoIpczEnabled()) {
+  if (!mojo_legacy::core::IsMojoIpczEnabled()) {
     PlatformChannel channel;
     OutgoingInvitation::SendIsolated(channel.TakeLocalEndpoint(),
                                      token_.ToString());
@@ -41,7 +41,7 @@ ScopedMessagePipeHandle IsolatedConnection::Connect(
     PlatformChannelEndpoint endpoint,
     base::Process process) {
   return Connect(std::move(endpoint), std::move(process),
-                 MOJO_SEND_INVITATION_FLAG_NONE);
+                 MOJO_LEGACY_SEND_INVITATION_FLAG_NONE);
 }
 
 ScopedMessagePipeHandle IsolatedConnection::Connect(
@@ -59,4 +59,4 @@ ScopedMessagePipeHandle IsolatedConnection::Connect(
                                           token_.ToString());
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

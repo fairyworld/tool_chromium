@@ -2,18 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_WATCHER_SET_H_
-#define MOJO_CORE_WATCHER_SET_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_WATCHER_SET_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_WATCHER_SET_H_
 
 #include <optional>
 
 #include "base/containers/flat_map.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
-#include "mojo/core/handle_signals_state.h"
-#include "mojo/core/watcher_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/handle_signals_state.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/watcher_dispatcher.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // A WatcherSet maintains a set of references to WatcherDispatchers to be
@@ -70,6 +70,6 @@ class WatcherSet {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_WATCHER_SET_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_WATCHER_SET_H_

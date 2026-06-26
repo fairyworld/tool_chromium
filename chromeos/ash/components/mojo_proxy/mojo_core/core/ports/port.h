@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_PORTS_PORT_H_
-#define MOJO_CORE_PORTS_PORT_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_PORT_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_PORT_H_
 
 #include <map>
 #include <memory>
@@ -13,11 +13,11 @@
 #include "base/containers/queue.h"
 #include "base/memory/ref_counted.h"
 #include "base/synchronization/lock.h"
-#include "mojo/core/ports/event.h"
-#include "mojo/core/ports/message_queue.h"
-#include "mojo/core/ports/user_data.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/message_queue.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/user_data.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 
@@ -236,6 +236,6 @@ class Port : public base::RefCountedThreadSafe<Port> {
 
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_PORTS_PORT_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_PORT_H_

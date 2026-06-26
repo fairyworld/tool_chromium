@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/test/scoped_mojo_support.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/scoped_mojo_support.h"
 
 #include "base/base_switches.h"
 #include "base/command_line.h"
@@ -10,15 +10,15 @@
 #include "base/synchronization/waitable_event.h"
 #include "base/test/bind.h"
 #include "base/test/test_io_thread.h"
-#include "mojo/core/embedder/configuration.h"
-#include "mojo/core/embedder/embedder.h"
-#include "mojo/core/embedder/scoped_ipc_support.h"
-#include "mojo/core/test/mojo_test_base.h"
-#include "mojo/core/test/test_support_impl.h"
-#include "mojo/core/test/test_switches.h"
-#include "mojo/public/tests/test_support_private.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/configuration.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/scoped_ipc_support.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/mojo_test_base.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/test_support_impl.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/test_switches.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/tests/test_support_private.h"
 
-namespace mojo::core::test {
+namespace mojo_legacy::core::test {
 
 namespace {
 
@@ -29,7 +29,8 @@ const char kDisableAllCapabilities[] = "disable-all-capabilities";
 class TestSupportInitializer {
  public:
   TestSupportInitializer() {
-    mojo::test::TestSupport::Init(new mojo::core::test::TestSupportImpl());
+    mojo_legacy::test::TestSupport::Init(
+        new mojo_legacy::core::test::TestSupportImpl());
   }
 };
 
@@ -38,11 +39,11 @@ class TestSupportInitializer {
 class ScopedMojoSupport::CoreInstance {
  public:
   CoreInstance() {
-    mojo::core::Configuration mojo_config;
+    mojo_legacy::core::Configuration mojo_config;
 
     // A relatively low limit to make it easier to test behavior at the limit.
     mojo_config.max_message_num_bytes =
-        mojo::core::test::MojoTestBase::kMaxMessageSizeInTests;
+        mojo_legacy::core::test::MojoTestBase::kMaxMessageSizeInTests;
     if (!base::CommandLine::ForCurrentProcess()->HasSwitch(
             switches::kTestChildProcess) ||
         base::CommandLine::ForCurrentProcess()->HasSwitch(
@@ -55,13 +56,13 @@ class ScopedMojoSupport::CoreInstance {
       mojo_config.dont_advertise_capabilities = true;
     }
 
-    mojo::core::InitFeatures();
-    mojo::core::Init(mojo_config);
+    mojo_legacy::core::InitFeatures();
+    mojo_legacy::core::Init(mojo_config);
 
     static TestSupportInitializer initializer;
   }
 
-  ~CoreInstance() { mojo::core::ShutDown(); }
+  ~CoreInstance() { mojo_legacy::core::ShutDown(); }
 };
 
 ScopedMojoSupport::ScopedMojoSupport()
@@ -79,4 +80,4 @@ ScopedMojoSupport::ScopedMojoSupport()
 
 ScopedMojoSupport::~ScopedMojoSupport() = default;
 
-}  // namespace mojo::core::test
+}  // namespace mojo_legacy::core::test

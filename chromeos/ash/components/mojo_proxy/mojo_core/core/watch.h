@@ -2,16 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_WATCH_H_
-#define MOJO_CORE_WATCH_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_WATCH_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_WATCH_H_
 
 #include "base/memory/ref_counted.h"
 #include "base/synchronization/lock.h"
-#include "mojo/core/atomic_flag.h"
-#include "mojo/core/handle_signals_state.h"
-#include "mojo/public/c/system/trap.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/atomic_flag.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/handle_signals_state.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/trap.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 class Dispatcher;
@@ -80,8 +80,8 @@ class Watch : public base::RefCountedThreadSafe<Watch> {
 
   bool ready() const {
     AssertWatcherLockAcquired();
-    return last_known_result_ == MOJO_RESULT_OK ||
-           last_known_result_ == MOJO_RESULT_FAILED_PRECONDITION;
+    return last_known_result_ == MOJO_LEGACY_RESULT_OK ||
+           last_known_result_ == MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
  private:
@@ -104,7 +104,7 @@ class Watch : public base::RefCountedThreadSafe<Watch> {
   // The result code with which this Watch would notify if currently armed,
   // based on the last known signaling state of |dispatcher_|. Guarded by the
   // owning WatcherDispatcher's lock.
-  MojoResult last_known_result_ = MOJO_RESULT_UNKNOWN;
+  MojoResult last_known_result_ = MOJO_LEGACY_RESULT_UNKNOWN;
 
   // The last known signaling state of |dispatcher_|. Guarded by the owning
   // WatcherDispatcher's lock.
@@ -122,6 +122,6 @@ class Watch : public base::RefCountedThreadSafe<Watch> {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_WATCH_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_WATCH_H_

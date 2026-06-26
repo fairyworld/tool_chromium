@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/data_pipe_consumer_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/data_pipe_consumer_dispatcher.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -17,15 +17,15 @@
 #include "base/memory/ref_counted.h"
 #include "base/numerics/checked_math.h"
 #include "base/trace_event/trace_event.h"
-#include "mojo/core/core.h"
-#include "mojo/core/data_pipe_control_message.h"
-#include "mojo/core/node_controller.h"
-#include "mojo/core/platform_handle_utils.h"
-#include "mojo/core/request_context.h"
-#include "mojo/core/user_message_impl.h"
-#include "mojo/public/c/system/data_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/data_pipe_control_message.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_controller.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_utils.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/request_context.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/user_message_impl.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/data_pipe.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace {
@@ -108,36 +108,37 @@ MojoResult DataPipeConsumerDispatcher::ReadData(
   base::AutoLock lock(lock_);
 
   if (!shared_ring_buffer_.IsValid() || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   if (in_two_phase_read_) {
-    return MOJO_RESULT_BUSY;
+    return MOJO_LEGACY_RESULT_BUSY;
   }
 
   const bool had_new_data = new_data_available_;
   new_data_available_ = false;
 
-  if ((options.flags & MOJO_READ_DATA_FLAG_QUERY)) {
-    if ((options.flags & MOJO_READ_DATA_FLAG_PEEK) ||
-        (options.flags & MOJO_READ_DATA_FLAG_DISCARD)) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+  if ((options.flags & MOJO_LEGACY_READ_DATA_FLAG_QUERY)) {
+    if ((options.flags & MOJO_LEGACY_READ_DATA_FLAG_PEEK) ||
+        (options.flags & MOJO_LEGACY_READ_DATA_FLAG_DISCARD)) {
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
-    DCHECK(!(options.flags & MOJO_READ_DATA_FLAG_DISCARD));  // Handled above.
+    DCHECK(!(options.flags &
+             MOJO_LEGACY_READ_DATA_FLAG_DISCARD));  // Handled above.
     DVLOG_IF(2, elements) << "Query mode: ignoring non-null |elements|";
     *num_bytes = static_cast<uint32_t>(bytes_available_);
 
     if (had_new_data) {
       watchers_.NotifyState(GetHandleSignalsStateNoLock());
     }
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   bool discard = false;
-  if ((options.flags & MOJO_READ_DATA_FLAG_DISCARD)) {
+  if ((options.flags & MOJO_LEGACY_READ_DATA_FLAG_DISCARD)) {
     // These flags are mutally exclusive.
-    if (options.flags & MOJO_READ_DATA_FLAG_PEEK) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+    if (options.flags & MOJO_LEGACY_READ_DATA_FLAG_PEEK) {
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
     DVLOG_IF(2, elements) << "Discard mode: ignoring non-null |elements|";
     discard = true;
@@ -145,18 +146,18 @@ MojoResult DataPipeConsumerDispatcher::ReadData(
 
   uint32_t max_num_bytes_to_read = *num_bytes;
   if (max_num_bytes_to_read % options_.element_num_bytes != 0) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
-  bool all_or_none = options.flags & MOJO_READ_DATA_FLAG_ALL_OR_NONE;
+  bool all_or_none = options.flags & MOJO_LEGACY_READ_DATA_FLAG_ALL_OR_NONE;
   uint32_t min_num_bytes_to_read = all_or_none ? max_num_bytes_to_read : 0;
 
   if (min_num_bytes_to_read > bytes_available_) {
     if (had_new_data) {
       watchers_.NotifyState(GetHandleSignalsStateNoLock());
     }
-    return peer_closed_ ? MOJO_RESULT_FAILED_PRECONDITION
-                        : MOJO_RESULT_OUT_OF_RANGE;
+    return peer_closed_ ? MOJO_LEGACY_RESULT_FAILED_PRECONDITION
+                        : MOJO_LEGACY_RESULT_OUT_OF_RANGE;
   }
 
   uint32_t bytes_to_read = std::min(max_num_bytes_to_read, bytes_available_);
@@ -164,8 +165,8 @@ MojoResult DataPipeConsumerDispatcher::ReadData(
     if (had_new_data) {
       watchers_.NotifyState(GetHandleSignalsStateNoLock());
     }
-    return peer_closed_ ? MOJO_RESULT_FAILED_PRECONDITION
-                        : MOJO_RESULT_SHOULD_WAIT;
+    return peer_closed_ ? MOJO_LEGACY_RESULT_FAILED_PRECONDITION
+                        : MOJO_LEGACY_RESULT_SHOULD_WAIT;
   }
 
   if (!discard) {
@@ -190,7 +191,7 @@ MojoResult DataPipeConsumerDispatcher::ReadData(
   }
   *num_bytes = bytes_to_read;
 
-  bool peek = !!(options.flags & MOJO_READ_DATA_FLAG_PEEK);
+  bool peek = !!(options.flags & MOJO_LEGACY_READ_DATA_FLAG_PEEK);
   if (discard || !peek) {
     read_offset_ = (read_offset_ + bytes_to_read) % options_.capacity_num_bytes;
     bytes_available_ -= bytes_to_read;
@@ -203,7 +204,7 @@ MojoResult DataPipeConsumerDispatcher::ReadData(
   // state.
   watchers_.NotifyState(GetHandleSignalsStateNoLock());
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult DataPipeConsumerDispatcher::BeginReadData(
@@ -211,11 +212,11 @@ MojoResult DataPipeConsumerDispatcher::BeginReadData(
     uint32_t* buffer_num_bytes) {
   base::AutoLock lock(lock_);
   if (!shared_ring_buffer_.IsValid() || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   if (in_two_phase_read_) {
-    return MOJO_RESULT_BUSY;
+    return MOJO_LEGACY_RESULT_BUSY;
   }
 
   const bool had_new_data = new_data_available_;
@@ -225,8 +226,8 @@ MojoResult DataPipeConsumerDispatcher::BeginReadData(
     if (had_new_data) {
       watchers_.NotifyState(GetHandleSignalsStateNoLock());
     }
-    return peer_closed_ ? MOJO_RESULT_FAILED_PRECONDITION
-                        : MOJO_RESULT_SHOULD_WAIT;
+    return peer_closed_ ? MOJO_LEGACY_RESULT_FAILED_PRECONDITION
+                        : MOJO_LEGACY_RESULT_SHOULD_WAIT;
   }
 
   DCHECK_LT(read_offset_, options_.capacity_num_bytes);
@@ -246,17 +247,17 @@ MojoResult DataPipeConsumerDispatcher::BeginReadData(
     watchers_.NotifyState(GetHandleSignalsStateNoLock());
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult DataPipeConsumerDispatcher::EndReadData(uint32_t num_bytes_read) {
   base::AutoLock lock(lock_);
   if (!in_two_phase_read_) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
   if (in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   CHECK(shared_ring_buffer_.IsValid());
@@ -264,9 +265,9 @@ MojoResult DataPipeConsumerDispatcher::EndReadData(uint32_t num_bytes_read) {
   MojoResult rv;
   if (num_bytes_read > two_phase_max_bytes_read_ ||
       num_bytes_read % options_.element_num_bytes != 0) {
-    rv = MOJO_RESULT_INVALID_ARGUMENT;
+    rv = MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   } else {
-    rv = MOJO_RESULT_OK;
+    rv = MOJO_LEGACY_RESULT_OK;
     read_offset_ =
         (read_offset_ + num_bytes_read) % options_.capacity_num_bytes;
 
@@ -295,7 +296,7 @@ MojoResult DataPipeConsumerDispatcher::AddWatcherRef(
     uintptr_t context) {
   base::AutoLock lock(lock_);
   if (is_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   return watchers_.Add(watcher, context, GetHandleSignalsStateNoLock());
 }
@@ -305,7 +306,7 @@ MojoResult DataPipeConsumerDispatcher::RemoveWatcherRef(
     uintptr_t context) {
   base::AutoLock lock(lock_);
   if (is_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   return watchers_.Remove(watcher, context);
 }
@@ -510,7 +511,7 @@ bool DataPipeConsumerDispatcher::InitializeNoLock() {
 MojoResult DataPipeConsumerDispatcher::CloseNoLock() {
   lock_.AssertAcquired();
   if (is_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   is_closed_ = true;
   ring_buffer_mapping_ = base::WritableSharedMemoryMapping();
@@ -522,7 +523,7 @@ MojoResult DataPipeConsumerDispatcher::CloseNoLock() {
     node_controller_->ClosePort(control_port_);
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 HandleSignalsState DataPipeConsumerDispatcher::GetHandleSignalsStateNoLock()
@@ -532,31 +533,31 @@ HandleSignalsState DataPipeConsumerDispatcher::GetHandleSignalsStateNoLock()
   HandleSignalsState rv;
   if (shared_ring_buffer_.IsValid() && bytes_available_) {
     if (!in_two_phase_read_) {
-      rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_READABLE;
+      rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_READABLE;
       if (new_data_available_) {
-        rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE;
+        rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE;
       }
     }
-    rv.satisfiable_signals |= MOJO_HANDLE_SIGNAL_READABLE;
+    rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_READABLE;
   } else if (!peer_closed_ && shared_ring_buffer_.IsValid()) {
-    rv.satisfiable_signals |= MOJO_HANDLE_SIGNAL_READABLE;
+    rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_READABLE;
   }
 
   if (shared_ring_buffer_.IsValid()) {
     if (new_data_available_ || !peer_closed_) {
-      rv.satisfiable_signals |= MOJO_HANDLE_SIGNAL_NEW_DATA_READABLE;
+      rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_NEW_DATA_READABLE;
     }
   }
 
   if (peer_closed_) {
-    rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_PEER_CLOSED;
+    rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED;
   } else {
-    rv.satisfiable_signals |= MOJO_HANDLE_SIGNAL_PEER_REMOTE;
+    rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE;
     if (peer_remote_) {
-      rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_PEER_REMOTE;
+      rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE;
     }
   }
-  rv.satisfiable_signals |= MOJO_HANDLE_SIGNAL_PEER_CLOSED;
+  rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED;
 
   return rv;
 }
@@ -658,4 +659,4 @@ void DataPipeConsumerDispatcher::UpdateSignalsStateNoLock() {
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

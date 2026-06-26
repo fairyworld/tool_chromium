@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/platform/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle.h"
 
 #include <tuple>
 
@@ -32,7 +32,7 @@
 #include "base/files/scoped_file.h"
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 
 namespace {
 
@@ -150,30 +150,30 @@ void PlatformHandle::ToMojoPlatformHandle(PlatformHandle handle,
   DCHECK(out_handle);
   out_handle->struct_size = sizeof(MojoPlatformHandle);
   if (handle.type_ == Type::kNone) {
-    out_handle->type = MOJO_PLATFORM_HANDLE_TYPE_INVALID;
+    out_handle->type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_INVALID;
     out_handle->value = 0;
     return;
   }
 
   do {
 #if BUILDFLAG(IS_WIN)
-    out_handle->type = MOJO_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE;
+    out_handle->type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE;
     out_handle->value =
         static_cast<uint64_t>(HandleToLong(handle.TakeHandle().Take()));
     break;
 #elif BUILDFLAG(IS_FUCHSIA)
     if (handle.is_handle()) {
-      out_handle->type = MOJO_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE;
+      out_handle->type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE;
       out_handle->value = handle.TakeHandle().release();
       break;
     }
 #elif BUILDFLAG(IS_APPLE)
     if (handle.is_mach_send()) {
-      out_handle->type = MOJO_PLATFORM_HANDLE_TYPE_MACH_SEND_RIGHT;
+      out_handle->type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_SEND_RIGHT;
       out_handle->value = static_cast<uint64_t>(handle.ReleaseMachSendRight());
       break;
     } else if (handle.is_mach_receive()) {
-      out_handle->type = MOJO_PLATFORM_HANDLE_TYPE_MACH_RECEIVE_RIGHT;
+      out_handle->type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_RECEIVE_RIGHT;
       out_handle->value =
           static_cast<uint64_t>(handle.ReleaseMachReceiveRight());
       break;
@@ -182,7 +182,7 @@ void PlatformHandle::ToMojoPlatformHandle(PlatformHandle handle,
 
 #if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
     DCHECK(handle.is_fd());
-    out_handle->type = MOJO_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR;
+    out_handle->type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR;
     out_handle->value = static_cast<uint64_t>(handle.TakeFD().release());
 #endif
   } while (false);
@@ -195,32 +195,33 @@ void PlatformHandle::ToMojoPlatformHandle(PlatformHandle handle,
 PlatformHandle PlatformHandle::FromMojoPlatformHandle(
     const MojoPlatformHandle* handle) {
   if (handle->struct_size < sizeof(*handle) ||
-      handle->type == MOJO_PLATFORM_HANDLE_TYPE_INVALID) {
+      handle->type == MOJO_LEGACY_PLATFORM_HANDLE_TYPE_INVALID) {
     return PlatformHandle();
   }
 
 #if BUILDFLAG(IS_WIN)
-  if (handle->type != MOJO_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE) {
+  if (handle->type != MOJO_LEGACY_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE) {
     return PlatformHandle();
   }
   return PlatformHandle(
       base::win::ScopedHandle(LongToHandle(static_cast<long>(handle->value))));
 #elif BUILDFLAG(IS_FUCHSIA)
-  if (handle->type == MOJO_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE) {
+  if (handle->type == MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE) {
     return PlatformHandle(zx::handle(handle->value));
   }
 #elif BUILDFLAG(IS_APPLE)
-  if (handle->type == MOJO_PLATFORM_HANDLE_TYPE_MACH_SEND_RIGHT) {
+  if (handle->type == MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_SEND_RIGHT) {
     return PlatformHandle(base::apple::ScopedMachSendRight(
         static_cast<mach_port_t>(handle->value)));
-  } else if (handle->type == MOJO_PLATFORM_HANDLE_TYPE_MACH_RECEIVE_RIGHT) {
+  } else if (handle->type ==
+             MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_RECEIVE_RIGHT) {
     return PlatformHandle(base::apple::ScopedMachReceiveRight(
         static_cast<mach_port_t>(handle->value)));
   }
 #endif
 
 #if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
-  if (handle->type != MOJO_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR) {
+  if (handle->type != MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR) {
     return PlatformHandle();
   }
   return PlatformHandle(base::ScopedFD(static_cast<int>(handle->value)));
@@ -280,4 +281,4 @@ PlatformHandle PlatformHandle::Clone() const {
 #endif
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

@@ -2,18 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_SYSTEM_ISOLATED_CONNECTION_H_
-#define MOJO_PUBLIC_CPP_SYSTEM_ISOLATED_CONNECTION_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_ISOLATED_CONNECTION_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_ISOLATED_CONNECTION_H_
 
 #include "base/process/process.h"
 #include "base/unguessable_token.h"
-#include "mojo/public/c/system/invitation.h"
-#include "mojo/public/cpp/platform/platform_channel_endpoint.h"
-#include "mojo/public/cpp/platform/platform_channel_server_endpoint.h"
-#include "mojo/public/cpp/system/message_pipe.h"
-#include "mojo/public/cpp/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/invitation.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_server_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/system_export.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // IsolatedConnection establishes a one-off Mojo IPC connection between two
 // processes. Unlike more common connections established by invitation
@@ -36,7 +36,7 @@ namespace mojo {
 // A connection established via |Connect()|, and any opened message pipes
 // spanning that connection, will remain valid and connected as long as this
 // object remains alive.
-class MOJO_CPP_SYSTEM_EXPORT IsolatedConnection {
+class MOJO_LEGACY_CPP_SYSTEM_EXPORT IsolatedConnection {
  public:
   IsolatedConnection();
 
@@ -74,6 +74,6 @@ class MOJO_CPP_SYSTEM_EXPORT IsolatedConnection {
   const base::UnguessableToken token_;
 };
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_SYSTEM_ISOLATED_CONNECTION_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_ISOLATED_CONNECTION_H_

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_EMBEDDER_SCOPED_IPC_SUPPORT_H_
-#define MOJO_CORE_EMBEDDER_SCOPED_IPC_SUPPORT_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_EMBEDDER_SCOPED_IPC_SUPPORT_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_EMBEDDER_SCOPED_IPC_SUPPORT_H_
 
 #include "base/component_export.h"
 #include "base/memory/scoped_refptr.h"
@@ -12,18 +12,18 @@ namespace base {
 class SingleThreadTaskRunner;
 }
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // A simple class that initialized Mojo IPC support on construction and shuts
 // down IPC support on destruction, optionally blocking the destructor on clean
 // IPC shutdown completion.
-class COMPONENT_EXPORT(MOJO_CORE_EMBEDDER) ScopedIPCSupport {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_EMBEDDER) ScopedIPCSupport {
  public:
   // ShutdownPolicy is a type for specifying the desired Mojo IPC support
   // shutdown behavior used during ScopedIPCSupport destruction.
   //
-  // It only has an effect if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE),
+  // It only has an effect if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE),
   // which currently is on ChromeOS and in fuzzer builds.
   //
   // What follows is a quick overview of why shutdown behavior is interesting
@@ -119,6 +119,6 @@ class COMPONENT_EXPORT(MOJO_CORE_EMBEDDER) ScopedIPCSupport {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_EMBEDDER_SCOPED_IPC_SUPPORT_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_EMBEDDER_SCOPED_IPC_SUPPORT_H_

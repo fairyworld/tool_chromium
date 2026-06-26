@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_HANDLE_TABLE_H_
-#define MOJO_CORE_HANDLE_TABLE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_HANDLE_TABLE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_HANDLE_TABLE_H_
 
 #include <stdint.h>
 
@@ -13,14 +13,14 @@
 #include "base/gtest_prod_util.h"
 #include "base/synchronization/lock.h"
 #include "base/trace_event/memory_dump_provider.h"
-#include "mojo/core/dispatcher.h"
-#include "mojo/core/system_impl_export.h"
-#include "mojo/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
-class MOJO_SYSTEM_IMPL_EXPORT HandleTable
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT HandleTable
     : public base::trace_event::MemoryDumpProvider {
  public:
   HandleTable();
@@ -45,9 +45,10 @@ class MOJO_SYSTEM_IMPL_EXPORT HandleTable
   MojoResult GetAndRemoveDispatcher(MojoHandle,
                                     scoped_refptr<Dispatcher>* dispatcher);
 
-  // Marks handles as busy and populates |dispatchers|. Returns MOJO_RESULT_BUSY
-  // if any of the handles are already in transit; MOJO_RESULT_INVALID_ARGUMENT
-  // if any of the handles are invalid; or MOJO_RESULT_OK if successful.
+  // Marks handles as busy and populates |dispatchers|. Returns
+  // MOJO_LEGACY_RESULT_BUSY if any of the handles are already in transit;
+  // MOJO_LEGACY_RESULT_INVALID_ARGUMENT if any of the handles are invalid; or
+  // MOJO_LEGACY_RESULT_OK if successful.
   MojoResult BeginTransit(
       const MojoHandle* handles,
       size_t num_handles,
@@ -98,9 +99,10 @@ class MOJO_SYSTEM_IMPL_EXPORT HandleTable
     // See `Remove` below.
     enum RemovalCondition { kRemoveOnlyIfBusy, kRemoveOnlyIfNotBusy };
 
-    // Returns whether an entry was found, and if found, `MOJO_RESULT_BUSY` if
-    // `Entry.busy` is true and `MOJO_RESULT_OK` if `Entry.busy` is false. If an
-    // entry is not found, `MOJO_RESULT_NOT_FOUND` is returned.
+    // Returns whether an entry was found, and if found,
+    // `MOJO_LEGACY_RESULT_BUSY` if `Entry.busy` is true and
+    // `MOJO_LEGACY_RESULT_OK` if `Entry.busy` is false. If an entry is not
+    // found, `MOJO_LEGACY_RESULT_NOT_FOUND` is returned.
     //
     // If an entry is found, and if `removal_condition` matches `Entry.busy`, it
     // is removed from storage and -- if `dispatcher` is not nullptr -- the
@@ -115,7 +117,7 @@ class MOJO_SYSTEM_IMPL_EXPORT HandleTable
    private:
     std::unordered_map<MojoHandle, Entry> handles_;
     scoped_refptr<Dispatcher> last_read_dispatcher_;
-    MojoHandle last_read_handle_ = MOJO_HANDLE_INVALID;
+    MojoHandle last_read_handle_ = MOJO_LEGACY_HANDLE_INVALID;
   };
 
   EntriesAccessor entries_;
@@ -126,6 +128,6 @@ class MOJO_SYSTEM_IMPL_EXPORT HandleTable
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_HANDLE_TABLE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_HANDLE_TABLE_H_

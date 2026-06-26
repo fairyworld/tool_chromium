@@ -2,24 +2,24 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_CONFIGURATION_H_
-#define MOJO_CORE_CONFIGURATION_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CONFIGURATION_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CONFIGURATION_H_
 
-#include "mojo/core/embedder/configuration.h"
-#include "mojo/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/configuration.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace internal {
-MOJO_SYSTEM_IMPL_EXPORT extern Configuration g_configuration;
+MOJO_LEGACY_SYSTEM_IMPL_EXPORT extern Configuration g_configuration;
 }  // namespace internal
 
-MOJO_SYSTEM_IMPL_EXPORT inline const Configuration& GetConfiguration() {
+MOJO_LEGACY_SYSTEM_IMPL_EXPORT inline const Configuration& GetConfiguration() {
   return internal::g_configuration;
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_CONFIGURATION_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CONFIGURATION_H_

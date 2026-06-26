@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/platform/platform_channel_server.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_server.h"
 
 #include <memory>
 #include <utility>
@@ -12,11 +12,11 @@
 #include "base/message_loop/message_pump_for_io.h"
 #include "base/notreached.h"
 #include "base/task/current_thread.h"
-#include "mojo/public/cpp/platform/platform_channel_endpoint.h"
-#include "mojo/public/cpp/platform/platform_handle.h"
-#include "mojo/public/cpp/platform/socket_utils_posix.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/socket_utils_posix.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 namespace {
 
@@ -87,4 +87,4 @@ PlatformChannelServer::Listener::Create() {
   return std::make_unique<ListenerImpl>();
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

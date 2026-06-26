@@ -28,14 +28,14 @@
 #include "base/test/mock_log.h"
 #include "base/test/task_environment.h"
 #include "base/threading/thread.h"
-#include "mojo/core/ports/event.h"
-#include "mojo/core/ports/node.h"
-#include "mojo/core/ports/node_delegate.h"
-#include "mojo/core/ports/port_locker.h"
-#include "mojo/core/ports/user_message.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/node.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/node_delegate.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/port_locker.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/user_message.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 namespace test {
@@ -1909,4 +1909,4 @@ TEST_F(PortsTest, SetAcknowledgeRequestInterval) {
 }  // namespace test
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_SYSTEM_TRAP_H_
-#define MOJO_PUBLIC_CPP_SYSTEM_TRAP_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_TRAP_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_TRAP_H_
 
-#include "mojo/public/c/system/trap.h"
-#include "mojo/public/c/system/types.h"
-#include "mojo/public/cpp/system/handle.h"
-#include "mojo/public/cpp/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/trap.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/system_export.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // A strongly-typed representation of a |MojoHandle| for a trap.
 class TrapHandle : public Handle {
@@ -28,9 +28,9 @@ typedef ScopedHandleBase<TrapHandle> ScopedTrapHandle;
 static_assert(sizeof(ScopedTrapHandle) == sizeof(TrapHandle),
               "Bad size for C++ ScopedTrapHandle");
 
-MOJO_CPP_SYSTEM_EXPORT MojoResult CreateTrap(MojoTrapEventHandler handler,
-                                             ScopedTrapHandle* trap_handle);
+MOJO_LEGACY_CPP_SYSTEM_EXPORT MojoResult
+CreateTrap(MojoTrapEventHandler handler, ScopedTrapHandle* trap_handle);
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_SYSTEM_TRAP_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_TRAP_H_

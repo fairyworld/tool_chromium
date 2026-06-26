@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/data_pipe_producer_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/data_pipe_producer_dispatcher.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -15,16 +15,16 @@
 #include "base/memory/ref_counted.h"
 #include "base/numerics/checked_math.h"
 #include "base/trace_event/trace_event.h"
-#include "mojo/core/configuration.h"
-#include "mojo/core/core.h"
-#include "mojo/core/data_pipe_control_message.h"
-#include "mojo/core/node_controller.h"
-#include "mojo/core/platform_handle_utils.h"
-#include "mojo/core/request_context.h"
-#include "mojo/core/user_message_impl.h"
-#include "mojo/public/c/system/data_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/configuration.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/data_pipe_control_message.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_controller.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_utils.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/request_context.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/user_message_impl.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/data_pipe.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace {
@@ -106,35 +106,35 @@ MojoResult DataPipeProducerDispatcher::WriteData(
     const MojoWriteDataOptions& options) {
   base::AutoLock lock(lock_);
   if (!shared_ring_buffer_.IsValid() || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   if (in_two_phase_write_) {
-    return MOJO_RESULT_BUSY;
+    return MOJO_LEGACY_RESULT_BUSY;
   }
 
   if (peer_closed_) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
   if (*num_bytes % options_.element_num_bytes != 0) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (*num_bytes == 0) {
-    return MOJO_RESULT_OK;  // Nothing to do.
+    return MOJO_LEGACY_RESULT_OK;  // Nothing to do.
   }
 
-  if ((options.flags & MOJO_WRITE_DATA_FLAG_ALL_OR_NONE) &&
+  if ((options.flags & MOJO_LEGACY_WRITE_DATA_FLAG_ALL_OR_NONE) &&
       (*num_bytes > available_capacity_)) {
     // Don't return "should wait" since you can't wait for a specified amount of
     // data.
-    return MOJO_RESULT_OUT_OF_RANGE;
+    return MOJO_LEGACY_RESULT_OUT_OF_RANGE;
   }
 
   DCHECK_LE(available_capacity_, options_.capacity_num_bytes);
   uint32_t num_bytes_to_write = std::min(*num_bytes, available_capacity_);
   if (num_bytes_to_write == 0) {
-    return MOJO_RESULT_SHOULD_WAIT;
+    return MOJO_LEGACY_RESULT_SHOULD_WAIT;
   }
 
   *num_bytes = num_bytes_to_write;
@@ -168,7 +168,7 @@ MojoResult DataPipeProducerDispatcher::WriteData(
   base::AutoUnlock unlock(lock_);
   NotifyWrite(num_bytes_to_write);
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult DataPipeProducerDispatcher::BeginWriteData(
@@ -177,19 +177,19 @@ MojoResult DataPipeProducerDispatcher::BeginWriteData(
     MojoBeginWriteDataFlags flags) {
   base::AutoLock lock(lock_);
   if (!shared_ring_buffer_.IsValid() || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   if (in_two_phase_write_) {
-    return MOJO_RESULT_BUSY;
+    return MOJO_LEGACY_RESULT_BUSY;
   }
   if (peer_closed_) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
   if (available_capacity_ == 0) {
-    return peer_closed_ ? MOJO_RESULT_FAILED_PRECONDITION
-                        : MOJO_RESULT_SHOULD_WAIT;
+    return peer_closed_ ? MOJO_LEGACY_RESULT_FAILED_PRECONDITION
+                        : MOJO_LEGACY_RESULT_SHOULD_WAIT;
   }
 
   in_two_phase_write_ = true;
@@ -201,27 +201,27 @@ MojoResult DataPipeProducerDispatcher::BeginWriteData(
   uint8_t* data = static_cast<uint8_t*>(ring_buffer_mapping_.memory());
   *buffer = UNSAFE_TODO(data + write_offset_);
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult DataPipeProducerDispatcher::EndWriteData(
     uint32_t num_bytes_written) {
   base::AutoLock lock(lock_);
   if (is_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   if (!in_two_phase_write_) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
   // Note: Allow successful completion of the two-phase write even if the other
   // side has been closed.
-  MojoResult rv = MOJO_RESULT_OK;
+  MojoResult rv = MOJO_LEGACY_RESULT_OK;
   if (num_bytes_written > available_capacity_ ||
       num_bytes_written % options_.element_num_bytes != 0 ||
       write_offset_ + num_bytes_written > options_.capacity_num_bytes) {
-    rv = MOJO_RESULT_INVALID_ARGUMENT;
+    rv = MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   } else {
     DCHECK_LE(num_bytes_written + write_offset_, options_.capacity_num_bytes);
     available_capacity_ -= num_bytes_written;
@@ -251,7 +251,7 @@ MojoResult DataPipeProducerDispatcher::AddWatcherRef(
     uintptr_t context) {
   base::AutoLock lock(lock_);
   if (is_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   return watchers_.Add(watcher, context, GetHandleSignalsStateNoLock());
 }
@@ -261,7 +261,7 @@ MojoResult DataPipeProducerDispatcher::RemoveWatcherRef(
     uintptr_t context) {
   base::AutoLock lock(lock_);
   if (is_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   return watchers_.Remove(watcher, context);
 }
@@ -467,7 +467,7 @@ bool DataPipeProducerDispatcher::InitializeNoLock() {
 MojoResult DataPipeProducerDispatcher::CloseNoLock() {
   lock_.AssertAcquired();
   if (is_closed_ || in_transit_) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   is_closed_ = true;
   ring_buffer_mapping_ = base::WritableSharedMemoryMapping();
@@ -479,7 +479,7 @@ MojoResult DataPipeProducerDispatcher::CloseNoLock() {
     node_controller_->ClosePort(control_port_);
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 HandleSignalsState DataPipeProducerDispatcher::GetHandleSignalsStateNoLock()
@@ -489,17 +489,17 @@ HandleSignalsState DataPipeProducerDispatcher::GetHandleSignalsStateNoLock()
   if (!peer_closed_) {
     if (!in_two_phase_write_ && shared_ring_buffer_.IsValid() &&
         available_capacity_ > 0) {
-      rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_WRITABLE;
+      rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE;
     }
     if (peer_remote_) {
-      rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_PEER_REMOTE;
+      rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE;
     }
-    rv.satisfiable_signals |=
-        MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_PEER_REMOTE;
+    rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE |
+                              MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE;
   } else {
-    rv.satisfied_signals |= MOJO_HANDLE_SIGNAL_PEER_CLOSED;
+    rv.satisfied_signals |= MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED;
   }
-  rv.satisfiable_signals |= MOJO_HANDLE_SIGNAL_PEER_CLOSED;
+  rv.satisfiable_signals |= MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED;
   return rv;
 }
 
@@ -596,4 +596,4 @@ void DataPipeProducerDispatcher::UpdateSignalsStateNoLock() {
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

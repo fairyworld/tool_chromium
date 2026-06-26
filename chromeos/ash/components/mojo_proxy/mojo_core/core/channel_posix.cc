@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/channel_posix.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel_posix.h"
 
 #include <errno.h>
 #include <limits.h>
@@ -28,13 +28,13 @@
 #include "base/time/time.h"
 #include "base/types/fixed_array.h"
 #include "build/build_config.h"
-#include "mojo/public/cpp/platform/socket_utils_posix.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/socket_utils_posix.h"
 
 #if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID))
-#include "mojo/core/channel_linux.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel_linux.h"
 #endif
 
-namespace mojo::core {
+namespace mojo_legacy::core {
 
 namespace {
 
@@ -625,4 +625,4 @@ void Channel::OfferChannelUpgrade() {
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
         // BUILDFLAG(IS_ANDROID)
 
-}  // namespace mojo::core
+}  // namespace mojo_legacy::core

@@ -6,230 +6,228 @@
 //
 // Note: This header should be compilable as C.
 
-#ifndef MOJO_PUBLIC_C_SYSTEM_MESSAGE_PIPE_H_
-#define MOJO_PUBLIC_C_SYSTEM_MESSAGE_PIPE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_MESSAGE_PIPE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_MESSAGE_PIPE_H_
 
 #include <stdint.h>
 
-#include "mojo/public/c/system/macros.h"
-#include "mojo/public/c/system/system_export.h"
-#include "mojo/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/macros.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
 
+namespace mojo_legacy {
 // Used to refer to message objects created by |MojoCreateMessage()|.
 typedef uintptr_t MojoMessageHandle;
 
-#define MOJO_MESSAGE_HANDLE_INVALID ((MojoMessageHandle)0)
+#define MOJO_LEGACY_MESSAGE_HANDLE_INVALID ((MojoMessageHandle)0)
 
 // Flags passed to |MojoCreateMessagePipe()| via |MojoCreateMessagePipeOptions|.
 // See values defined below.
 typedef uint32_t MojoCreateMessagePipeFlags;
 
 // No flags. Default behavior.
-#define MOJO_CREATE_MESSAGE_PIPE_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_CREATE_MESSAGE_PIPE_FLAG_NONE ((uint32_t)0)
 
 // Options passed to |MojoCreateMessagePipe()|.
-struct MOJO_ALIGNAS(8) MojoCreateMessagePipeOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoCreateMessagePipeOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoCreateMessagePipeFlags|.
   MojoCreateMessagePipeFlags flags;
 };
-MOJO_STATIC_ASSERT(MOJO_ALIGNOF(int64_t) <= 8, "int64_t has weird alignment");
-MOJO_STATIC_ASSERT(sizeof(struct MojoCreateMessagePipeOptions) == 8,
-                   "MojoCreateMessagePipeOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(MOJO_LEGACY_ALIGNOF(int64_t) <= 8,
+                          "int64_t has weird alignment");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoCreateMessagePipeOptions) == 8,
+                          "MojoCreateMessagePipeOptions has wrong size");
 
 // Flags passed to |MojoWriteMessage()| via |MojoWriteMessageOptions|. See
 // values defined below.
 typedef uint32_t MojoWriteMessageFlags;
 
 // No flags. Default behavior.
-#define MOJO_WRITE_MESSAGE_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE ((uint32_t)0)
 
 // Options passed to |MojoWriteMessage()|.
-struct MOJO_ALIGNAS(8) MojoWriteMessageOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoWriteMessageOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoWriteMessageFlags|.
   MojoWriteMessageFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoWriteMessageOptions) == 8,
-                   "MojoWriteMessageOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoWriteMessageOptions) == 8,
+                          "MojoWriteMessageOptions has wrong size");
 
 // Flags passed to |MojoReadMessage()| via |MojoReadMessageOptions|. See values
 // defined below.
 typedef uint32_t MojoReadMessageFlags;
 
 // No flags. Default behavior.
-#define MOJO_READ_MESSAGE_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_READ_MESSAGE_FLAG_NONE ((uint32_t)0)
 
 // Options passed to |MojoReadMessage()|.
-struct MOJO_ALIGNAS(8) MojoReadMessageOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoReadMessageOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoReadMessageFlags|.
   MojoReadMessageFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoReadMessageOptions) == 8,
-                   "MojoReadMessageOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoReadMessageOptions) == 8,
+                          "MojoReadMessageOptions has wrong size");
 
 // Flags passed to |MojoFuseMessagePipes()| via |MojoFuseMessagePipeOptions|.
 // See values defined below.
 typedef uint32_t MojoFuseMessagePipesFlags;
 
 // No flags. Default behavior.
-#define MOJO_FUSE_MESSAGE_PIPES_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_FUSE_MESSAGE_PIPES_FLAG_NONE ((uint32_t)0)
 
 // Options passed to |MojoFuseMessagePipes()|.
-struct MOJO_ALIGNAS(8) MojoFuseMessagePipesOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoFuseMessagePipesOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoFuseMessagePipesFlags|.
   MojoFuseMessagePipesFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoFuseMessagePipesOptions) == 8,
-                   "MojoFuseMessagePipesOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoFuseMessagePipesOptions) == 8,
+                          "MojoFuseMessagePipesOptions has wrong size");
 
 // Flags passed to |MojoCreateMessage()| via |MojoCreateMessageOptions|.
 typedef uint32_t MojoCreateMessageFlags;
 
 // No flags. Default behavior.
-#define MOJO_CREATE_MESSAGE_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_CREATE_MESSAGE_FLAG_NONE ((uint32_t)0)
 
 // Do not enforce size restrictions on this message, allowing its serialized
 // payload to grow arbitrarily large. If this flag is NOT specified, Mojo will
 // throw an assertion failure at serialization time when the message exceeds a
 // globally configured maximum size.
-#define MOJO_CREATE_MESSAGE_FLAG_UNLIMITED_SIZE ((uint32_t)1)
+#define MOJO_LEGACY_CREATE_MESSAGE_FLAG_UNLIMITED_SIZE ((uint32_t)1)
 
 // Options passed to |MojoCreateMessage()|.
-struct MOJO_ALIGNAS(8) MojoCreateMessageOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoCreateMessageOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoCreateMessageFlags|.
   MojoCreateMessageFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoCreateMessageOptions) == 8,
-                   "MojoCreateMessageOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoCreateMessageOptions) == 8,
+                          "MojoCreateMessageOptions has wrong size");
 
 // Flags passed to |MojoSerializeMessage()| via |MojoSerializeMessageOptions|.
 typedef uint32_t MojoSerializeMessageFlags;
 
 // No flags. Default behavior.
-#define MOJO_SERIALIZE_MESSAGE_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_SERIALIZE_MESSAGE_FLAG_NONE ((uint32_t)0)
 
 // Options passed to |MojoSerializeMessage()|.
-struct MOJO_ALIGNAS(8) MojoSerializeMessageOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoSerializeMessageOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoSerializeMessageFlags|.
   MojoSerializeMessageFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoSerializeMessageOptions) == 8,
-                   "MojoSerializeMessageOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoSerializeMessageOptions) == 8,
+                          "MojoSerializeMessageOptions has wrong size");
 
 // Flags passed to |MojoAppendMessageData()| via |MojoAppendMessageDataOptions|.
 typedef uint32_t MojoAppendMessageDataFlags;
 
 // No flags. Default behavior.
-#define MOJO_APPEND_MESSAGE_DATA_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_APPEND_MESSAGE_DATA_FLAG_NONE ((uint32_t)0)
 
 // If set, this comments the resulting (post-append) message size as the final
 // size of the message payload, in terms of both bytes and attached handles.
-#define MOJO_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE \
+#define MOJO_LEGACY_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE \
   ((MojoAppendMessageDataFlags)1)
 
 // Options passed to |MojoAppendMessageData()|.
-struct MOJO_ALIGNAS(8) MojoAppendMessageDataOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoAppendMessageDataOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoAppendMessageDataFlags|.
   MojoAppendMessageDataFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoAppendMessageDataOptions) == 8,
-                   "MojoAppendMessageDataOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoAppendMessageDataOptions) == 8,
+                          "MojoAppendMessageDataOptions has wrong size");
 
 // Flags passed to |MojoGetMessageData()| via |MojoGetMessageDataOptions|.
 typedef uint32_t MojoGetMessageDataFlags;
 
 // No flags. Default behavior.
-#define MOJO_GET_MESSAGE_DATA_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_GET_MESSAGE_DATA_FLAG_NONE ((uint32_t)0)
 
 // Ignores attached handles when retrieving message data. This leaves any
 // attached handles intact and owned by the message object.
-#define MOJO_GET_MESSAGE_DATA_FLAG_IGNORE_HANDLES ((uint32_t)1)
+#define MOJO_LEGACY_GET_MESSAGE_DATA_FLAG_IGNORE_HANDLES ((uint32_t)1)
 
 // Options passed to |MojoGetMessageData()|.
-struct MOJO_ALIGNAS(8) MojoGetMessageDataOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoGetMessageDataOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoGetMessageDataFlags|.
   MojoGetMessageDataFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoGetMessageDataOptions) == 8,
-                   "MojoGetMessageDataOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoGetMessageDataOptions) == 8,
+                          "MojoGetMessageDataOptions has wrong size");
 
 // Flags passed to |MojoSetMessageContext()| via |MojoSetMessageContextOptions|.
 typedef uint32_t MojoSetMessageContextFlags;
 
 // No flags. Default behavior.
-#define MOJO_SET_MESSAGE_CONTEXT_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_SET_MESSAGE_CONTEXT_FLAG_NONE ((uint32_t)0)
 
 // Options passed to |MojoSetMessageContext()|.
-struct MOJO_ALIGNAS(8) MojoSetMessageContextOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoSetMessageContextOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoSetMessageContextFlags|.
   MojoSetMessageContextFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoSetMessageContextOptions) == 8,
-                   "MojoSetMessageContextOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoSetMessageContextOptions) == 8,
+                          "MojoSetMessageContextOptions has wrong size");
 
 // Flags passed to |MojoGetMessageContext()| via |MojoGetMessageContextOptions|.
 typedef uint32_t MojoGetMessageContextFlags;
 
 // No flags. Default behavior.
-#define MOJO_GET_MESSAGE_CONTEXT_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_GET_MESSAGE_CONTEXT_FLAG_NONE ((uint32_t)0)
 
 // Options passed to |MojoGetMessageContext()|.
-struct MOJO_ALIGNAS(8) MojoGetMessageContextOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoGetMessageContextOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoGetMessageContextFlags|.
   MojoGetMessageContextFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoGetMessageContextOptions) == 8,
-                   "MojoGetMessageContextOptions has wrong size");
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoGetMessageContextOptions) == 8,
+                          "MojoGetMessageContextOptions has wrong size");
 
 // Flags passed to |MojoNotifyBadMessage()| via |MojoNotifyBadMessageOptions|.
 typedef uint32_t MojoNotifyBadMessageFlags;
 
 // No flags. Default behavior.
-#define MOJO_NOTIFY_BAD_MESSAGE_FLAG_NONE ((uint32_t)0)
+#define MOJO_LEGACY_NOTIFY_BAD_MESSAGE_FLAG_NONE ((uint32_t)0)
 
 // Options passed to |MojoNotifyBadMessage()|.
-struct MOJO_ALIGNAS(8) MojoNotifyBadMessageOptions {
+struct MOJO_LEGACY_ALIGNAS(8) MojoNotifyBadMessageOptions {
   // The size of this structure, used for versioning.
   uint32_t struct_size;
 
   // See |MojoNotifyBadMessageFlags|.
   MojoNotifyBadMessageFlags flags;
 };
-MOJO_STATIC_ASSERT(sizeof(struct MojoNotifyBadMessageOptions) == 8,
-                   "MojoNotifyBadMessageOptions has wrong size");
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+MOJO_LEGACY_STATIC_ASSERT(sizeof(struct MojoNotifyBadMessageOptions) == 8,
+                          "MojoNotifyBadMessageOptions has wrong size");
 
 // A callback which can serialize a message given some context. Passed to
 // |MojoSetMessageContext()| along with a context it knows how to serialize.
@@ -262,12 +260,13 @@ typedef void (*MojoMessageContextDestructor)(uintptr_t context);
 // handles for the two endpoints (ports) for the message pipe.
 //
 // Returns:
-//   |MOJO_RESULT_OK| on success.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if some argument was invalid (e.g.,
+//   |MOJO_LEGACY_RESULT_OK| on success.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if some argument was invalid (e.g.,
 //       |*options| is invalid).
-//   |MOJO_RESULT_RESOURCE_EXHAUSTED| if a process/system/quota/etc. limit has
+//   |MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED| if a process/system/quota/etc.
+//   limit has
 //       been reached.
-MOJO_SYSTEM_EXPORT MojoResult MojoCreateMessagePipe(
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult MojoCreateMessagePipe(
     const struct MojoCreateMessagePipeOptions* options,  // Optional.
     MojoHandle* message_pipe_handle0,                    // Out.
     MojoHandle* message_pipe_handle1);                   // Out.
@@ -280,16 +279,19 @@ MOJO_SYSTEM_EXPORT MojoResult MojoCreateMessagePipe(
 // |options| may be null.
 //
 // Returns:
-//   |MOJO_RESULT_OK| on success (i.e., the message was enqueued).
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |message_pipe_handle| or |message| is
+//   |MOJO_LEGACY_RESULT_OK| on success (i.e., the message was enqueued).
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |message_pipe_handle| or |message|
+//   is
 //       invalid.
-//   |MOJO_RESULT_FAILED_PRECONDITION| if the other endpoint has been closed.
+//   |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| if the other endpoint has been
+//   closed.
 //       Note that closing an endpoint is not necessarily synchronous (e.g.,
 //       across processes), so this function may succeed even if the other
 //       endpoint has been closed (in which case the message would be dropped).
-//   |MOJO_RESULT_NOT_FOUND| if |message| has neither a context nor serialized
+//   |MOJO_LEGACY_RESULT_NOT_FOUND| if |message| has neither a context nor
+//   serialized
 //       buffer attached and therefore has nothing to be written.
-MOJO_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoWriteMessage(MojoHandle message_pipe_handle,
                  MojoMessageHandle message,
                  const struct MojoWriteMessageOptions* options);
@@ -305,12 +307,13 @@ MojoWriteMessage(MojoHandle message_pipe_handle,
 // |options| may be null. |message| must be non-null.
 //
 // Returns:
-//   |MOJO_RESULT_OK| on success (i.e., a message was actually read).
-//   |MOJO_RESULT_INVALID_ARGUMENT| if some argument was invalid.
-//   |MOJO_RESULT_FAILED_PRECONDITION| if the other endpoint has been closed
+//   |MOJO_LEGACY_RESULT_OK| on success (i.e., a message was actually read).
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if some argument was invalid.
+//   |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| if the other endpoint has been
+//   closed
 //       and there are no more messages to read.
-//   |MOJO_RESULT_SHOULD_WAIT| if no message was available to be read.
-MOJO_SYSTEM_EXPORT MojoResult
+//   |MOJO_LEGACY_RESULT_SHOULD_WAIT| if no message was available to be read.
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoReadMessage(MojoHandle message_pipe_handle,
                 const struct MojoReadMessageOptions* options,
                 MojoMessageHandle* message);
@@ -333,12 +336,14 @@ MojoReadMessage(MojoHandle message_pipe_handle,
 // |options| may be null.
 //
 // Returns:
-//   |MOJO_RESULT_OK| on success.
-//   |MOJO_RESULT_FAILED_PRECONDITION| if both handles were valid message pipe
+//   |MOJO_LEGACY_RESULT_OK| on success.
+//   |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| if both handles were valid message
+//   pipe
 //       handles but could not be merged (e.g. one of them has been written to).
-//   |MOJO_INVALID_ARGUMENT| if either handle is not a fusable message pipe
+//   |MOJO_LEGACY_INVALID_ARGUMENT| if either handle is not a fusable message
+//   pipe
 //       handle.
-MOJO_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoFuseMessagePipes(MojoHandle handle0,
                      MojoHandle handle1,
                      const struct MojoFuseMessagePipesOptions* options);
@@ -357,10 +362,11 @@ MojoFuseMessagePipes(MojoHandle handle0,
 // any given |MojoMessageHandle| to a single thread at a time.
 //
 // Returns:
-//   |MOJO_RESULT_OK| if a new message was created. |*message| contains a handle
+//   |MOJO_LEGACY_RESULT_OK| if a new message was created. |*message| contains a
+//   handle
 //       to the new message object upon return.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |message| is null.
-MOJO_SYSTEM_EXPORT MojoResult
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |message| is null.
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoCreateMessage(const struct MojoCreateMessageOptions* options,
                   MojoMessageHandle* message);
 
@@ -372,32 +378,38 @@ MojoCreateMessage(const struct MojoCreateMessageOptions* options,
 //     valid to attempt to destroy it.
 //
 // Returns:
-//   |MOJO_RESULT_OK| if |message| was valid and has been freed.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |message| was not a valid message.
-MOJO_SYSTEM_EXPORT MojoResult MojoDestroyMessage(MojoMessageHandle message);
+//   |MOJO_LEGACY_RESULT_OK| if |message| was valid and has been freed.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |message| was not a valid message.
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
+MojoDestroyMessage(MojoMessageHandle message);
 
 // Forces a message to be serialized in-place if not already serialized.
 //
 // Returns:
-//   |MOJO_RESULT_OK| if |message| was not serialized and is now serialized.
+//   |MOJO_LEGACY_RESULT_OK| if |message| was not serialized and is now
+//   serialized.
 //       In this case its thunks were invoked to perform serialization and
 //       ultimately destroy its associated context. The message may still be
 //       written to a pipe or decomposed by |MojoGetMessageData()|.
-//   |MOJO_RESULT_FAILED_PRECONDITION| if |message| was already serialized.
-//   |MOJO_RESULT_NOT_FOUND| if |message| cannot be serialized (i.e. it was
+//   |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| if |message| was already
+//   serialized. |MOJO_LEGACY_RESULT_NOT_FOUND| if |message| cannot be
+//   serialized (i.e. it was
 //       created with null |MojoMessageContextSerializer|.)
-//   |MOJO_RESULT_BUSY| if one or more handles provided by the user context
+//   |MOJO_LEGACY_RESULT_BUSY| if one or more handles provided by the user
+//   context
 //       reported itself as busy during the serialization attempt. In this case
 //       all serialized handles are closed automatically.
-//   |MOJO_RESULT_ABORTED| if some other unspecified error occurred during
+//   |MOJO_LEGACY_RESULT_ABORTED| if some other unspecified error occurred
+//   during
 //       handle serialization. In this case all serialized handles are closed
 //       automatically.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |message| is not a valid message handle.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |message| is not a valid message
+//   handle.
 //
 // Note that unserialized messages may be successfully transferred from one
 // message pipe endpoint to another without ever being serialized. This function
 // allows callers to coerce eager serialization.
-MOJO_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoSerializeMessage(MojoMessageHandle message,
                      const struct MojoSerializeMessageOptions* options);
 
@@ -414,12 +426,14 @@ MojoSerializeMessage(MojoMessageHandle message,
 // will contain the storage capacity.
 //
 // Returns:
-//   `MOJO_RESULT_OK` upon success. The message's payload capacity is stored
+//   `MOJO_LEGACY_RESULT_OK` upon success. The message's payload capacity is
+//   stored
 //       into `*buffer_size`.
-//   `MOJO_RESULT_INVALID_ARGUMENT` if `message` is not a valid message object.
-//   `MOJO_RESULT_FAILED_PRECONDITION` if `message` has a context attached,
+//   `MOJO_LEGACY_RESULT_INVALID_ARGUMENT` if `message` is not a valid message
+//   object. `MOJO_LEGACY_RESULT_FAILED_PRECONDITION` if `message` has a context
+//   attached,
 //       or if the `message` is already partly or fully serialized.
-MOJO_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoReserveMessageCapacity(MojoMessageHandle message,
                            uint32_t payload_buffer_size,
                            uint32_t* buffer_size);
@@ -447,31 +461,34 @@ MojoReserveMessageCapacity(MojoMessageHandle message,
 //
 // A message with attached data must have its capacity finalized before it can
 // be transmitted by calling this function with
-// |MOJO_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE| set in |options->flags|. Note
-// that even after this happens, the returned |*buffer| remains valid and
+// |MOJO_LEGACY_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE| set in |options->flags|.
+// Note that even after this happens, the returned |*buffer| remains valid and
 // writable until the message is passed to either |MojoWriteMessage()| or
 // |MojoDestroyMessage()|.
 //
 // Ownership of all handles in |handles| is transferred to the message object if
-// and ONLY if this operation succeeds and returns |MOJO_RESULT_OK|. Otherwise
-// the caller retains ownership.
+// and ONLY if this operation succeeds and returns |MOJO_LEGACY_RESULT_OK|.
+// Otherwise the caller retains ownership.
 //
 // Returns:
-//   |MOJO_RESULT_OK| upon success. The message's data buffer and size are
+//   |MOJO_LEGACY_RESULT_OK| upon success. The message's data buffer and size
+//   are
 //       stored to |*buffer| and |*buffer_size| respectively. Any previously
 //       appended data remains intact but may be moved in the event that
 //       |*buffer| itself is moved. If
-//       |MOJO_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE| was set in
+//       |MOJO_LEGACY_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE| was set in
 //       |options->flags|, the message is ready for transmission.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |message| is not a valid message object;
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |message| is not a valid message
+//   object;
 //       if |num_handles| is non-zero but |handles| is null; or if any handle in
 //       |handles| is invalid.
-//   |MOJO_RESULT_RESOURCE_EXHAUSTED| if |additional_payload_size| or
+//   |MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED| if |additional_payload_size| or
 //       |num_handles| exceeds some implementation- or embedder-defined maximum.
-//   |MOJO_RESULT_FAILED_PRECONDITION| if |message| has a context attached.
-//   |MOJO_RESULT_BUSY| if one or more handles in |handles| is currently busy
+//   |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| if |message| has a context
+//   attached. |MOJO_LEGACY_RESULT_BUSY| if one or more handles in |handles| is
+//   currently busy
 //       and unable to be serialized.
-MOJO_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoAppendMessageData(MojoMessageHandle message,
                       uint32_t payload_size,
                       const MojoHandle* handles,
@@ -499,36 +516,42 @@ MojoAppendMessageData(MojoMessageHandle message,
 // |options| may be null.
 //
 // Returns:
-//   |MOJO_RESULT_OK| if |message| is a message with data attached and the
+//   |MOJO_LEGACY_RESULT_OK| if |message| is a message with data attached and
+//   the
 //       provided handle storage is sufficient to contain all handles attached
-//       to the message. If |MOJO_GET_MESSAGE_DATA_FLAG_IGNORE_HANDLES| was set
-//       in |options->flags|, any attached handles in the message are left
-//       intact and both |handles| and |num_handles| are ignored. Otherwise
+//       to the message. If |MOJO_LEGACY_GET_MESSAGE_DATA_FLAG_IGNORE_HANDLES|
+//       was set in |options->flags|, any attached handles in the message are
+//       left intact and both |handles| and |num_handles| are ignored. Otherwise
 //       ownership of any attached handles is transferred to the caller, and
 //       |MojoGetMessageData()| may no longer be called on |message| unless
-//       |MOJO_GET_MESSAGE_DATA_FLAG_IGNORE_HANDLES| is used.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |num_handles| is non-null and
+//       |MOJO_LEGACY_GET_MESSAGE_DATA_FLAG_IGNORE_HANDLES| is used.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |num_handles| is non-null and
 //       |*num_handles| is non-zero, but |handles| is null; or if |message| is
 //       not a valid message handle.
-//   |MOJO_RESULT_FAILED_PRECONDITION| if |message| is not a fully serialized
+//   |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| if |message| is not a fully
+//   serialized
 //       message. The caller may use |MojoSerializeMessage()| and try again,
 //       or |MojoAppendMessageData()| with the
-//       |MOJO_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE| flag set to complete a
-//       partially serialized |message|.
-//   |MOJO_RESULT_NOT_FOUND| if the message's handles (if any) contents have
+//       |MOJO_LEGACY_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE| flag set to complete
+//       a partially serialized |message|.
+//   |MOJO_LEGACY_RESULT_NOT_FOUND| if the message's handles (if any) contents
+//   have
 //       already  been extracted (or have failed to be extracted) by a previous
 //       call to |MojoGetMessageData()|.
-//   |MOJO_RESULT_RESOURCE_EXHAUSTED| if |num_handles| is null and there are
+//   |MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED| if |num_handles| is null and there
+//   are
 //       handles attached to the message, or if |*num_handles| on input is less
 //       than the number of handles attached to the message. Also may be
 //       returned if |num_bytes| or |buffer| is null and the message has a non-
-//       empty payload. Note that if |MOJO_GET_MESSAGE_DATA_FLAG_IGNORE_HANDLES|
-//       is set in |options->flags| any current or previously attached handles
-//       are ignored.
-//   |MOJO_RESULT_ARBORTED| if the message is in an invalid state and its data
+//       empty payload. Note that if
+//       |MOJO_LEGACY_GET_MESSAGE_DATA_FLAG_IGNORE_HANDLES| is set in
+//       |options->flags| any current or previously attached handles are
+//       ignored.
+//   |MOJO_LEGACY_RESULT_ARBORTED| if the message is in an invalid state and its
+//   data
 //       and/or handles are unrecoverable. The message is left in this state but
 //       future calls to this API will yield the same result.
-MOJO_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoGetMessageData(MojoMessageHandle message,
                    const struct MojoGetMessageDataOptions* options,
                    void** buffer,
@@ -571,14 +594,16 @@ MojoGetMessageData(MojoMessageHandle message,
 // |options| may be null.
 //
 // Returns:
-//   |MOJO_RESULT_OK| if the opaque context value was successfully set.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |message| is not a valid message object;
+//   |MOJO_LEGACY_RESULT_OK| if the opaque context value was successfully set.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |message| is not a valid message
+//   object;
 //       |options| is non-null and |*options| contains one or more malformed
 //       fields; or |context| is zero but either |serializer| or |destructor| is
 //       non-null.
-//   |MOJO_RESULT_ALREADY_EXISTS| if |message| already has a non-zero context.
-//   |MOJO_RESULT_FAILED_PRECONDITION| if |message| has data attached.
-MOJO_SYSTEM_EXPORT MojoResult
+//   |MOJO_LEGACY_RESULT_ALREADY_EXISTS| if |message| already has a non-zero
+//   context. |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| if |message| has data
+//   attached.
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoSetMessageContext(MojoMessageHandle message,
                       uintptr_t context,
                       MojoMessageContextSerializer serializer,
@@ -590,12 +615,13 @@ MojoSetMessageContext(MojoMessageHandle message,
 // |options| may be null.
 //
 // Returns:
-//   |MOJO_RESULT_OK| if |message| is a valid message object. |*context|
+//   |MOJO_LEGACY_RESULT_OK| if |message| is a valid message object. |*context|
 //       contains its opaque context value, which may be zero.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |message| is not a valid message object
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |message| is not a valid message
+//   object
 //       or |options| is non-null and |*options| contains one or more malformed
 //       fields.
-MOJO_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoGetMessageContext(MojoMessageHandle message,
                       const struct MojoGetMessageContextOptions* options,
                       uintptr_t* context);
@@ -615,16 +641,14 @@ MojoGetMessageContext(MojoMessageHandle message,
 // |options| may be null.
 //
 // Returns:
-//   |MOJO_RESULT_OK| if successful.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |message| is not a valid message.
-MOJO_SYSTEM_EXPORT MojoResult
+//   |MOJO_LEGACY_RESULT_OK| if successful.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |message| is not a valid message.
+MOJO_LEGACY_SYSTEM_EXPORT MojoResult
 MojoNotifyBadMessage(MojoMessageHandle message,
                      const char* error,
                      uint32_t error_num_bytes,
                      const struct MojoNotifyBadMessageOptions* options);
 
-#ifdef __cplusplus
-}  // extern "C"
-#endif
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_C_SYSTEM_MESSAGE_PIPE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_MESSAGE_PIPE_H_

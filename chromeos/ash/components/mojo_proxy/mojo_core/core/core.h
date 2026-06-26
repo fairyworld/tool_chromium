@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_CORE_H_
-#define MOJO_CORE_CORE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CORE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CORE_H_
 
 #include <memory>
 #include <string>
@@ -15,28 +15,28 @@
 #include "base/synchronization/lock.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "mojo/core/dispatcher.h"
-#include "mojo/core/handle_signals_state.h"
-#include "mojo/core/handle_table.h"
-#include "mojo/core/node_controller.h"
-#include "mojo/core/system_impl_export.h"
-#include "mojo/public/c/system/buffer.h"
-#include "mojo/public/c/system/data_pipe.h"
-#include "mojo/public/c/system/invitation.h"
-#include "mojo/public/c/system/message_pipe.h"
-#include "mojo/public/c/system/platform_handle.h"
-#include "mojo/public/c/system/quota.h"
-#include "mojo/public/c/system/trap.h"
-#include "mojo/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/handle_signals_state.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/handle_table.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_controller.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/buffer.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/data_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/invitation.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/quota.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/trap.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 class PlatformSharedMemoryMapping;
 
 // |Core| is an object that implements the Mojo system calls. All public methods
 // are thread-safe.
-class MOJO_SYSTEM_IMPL_EXPORT Core {
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT Core {
  public:
   Core();
 
@@ -370,6 +370,6 @@ class MOJO_SYSTEM_IMPL_EXPORT Core {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_CORE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CORE_H_

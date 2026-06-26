@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
 
 #include <stdint.h>
 
@@ -17,36 +17,36 @@
 #include "base/task/single_thread_task_runner.h"
 #include "base/task/task_runner.h"
 #include "build/build_config.h"
-#include "mojo/buildflags.h"
-#include "mojo/core/channel.h"
-#include "mojo/core/configuration.h"
-#include "mojo/core/core_ipcz.h"
-#include "mojo/core/embedder/features.h"
-#include "mojo/core/ipcz_api.h"
-#include "mojo/core/ipcz_driver/base_shared_memory_service.h"
-#include "mojo/core/ipcz_driver/driver.h"
-#include "mojo/core/ipcz_driver/transport.h"
-#include "mojo/public/c/system/thunks.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/configuration.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core_ipcz.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/features.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ipcz_api.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ipcz_driver/base_shared_memory_service.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ipcz_driver/driver.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ipcz_driver/transport.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/thunks.h"
 
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
 #include <atomic>
 
 #include "base/environment.h"
-#include "mojo/core/core.h"
-#include "mojo/core/entrypoints.h"
-#include "mojo/core/node_controller.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/entrypoints.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_controller.h"
 #endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
-#include "mojo/core/channel_linux.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel_linux.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
         // BUILDFLAG(IS_ANDROID)
 
-namespace mojo::core {
+namespace mojo_legacy::core {
 
 namespace {
 
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
 #if BUILDFLAG(IS_CHROMEOS) && !defined(ENABLE_IPCZ_ON_CHROMEOS)
 std::atomic<bool> g_mojo_ipcz_enabled{false};
 #else
@@ -58,17 +58,17 @@ bool g_mojo_ipcz_force_disabled = false;
 
 std::optional<std::string> GetMojoIpczEnvVar() {
   auto env = base::Environment::Create();
-  return env->GetVar("MOJO_IPCZ");
+  return env->GetVar("MOJO_LEGACY_IPCZ");
 }
 
-// Allows MojoIpcz to be forcibly enabled if and only if MOJO_IPCZ=1 in the
-// environment. Note that any other value (or absence) has no influence on
+// Allows MojoIpcz to be forcibly enabled if and only if MOJO_LEGACY_IPCZ=1 in
+// the environment. Note that any other value (or absence) has no influence on
 // whether or not MojoIpcz is enabled.
 bool IsMojoIpczForceEnabledByEnvironment() {
   static bool force_enabled = GetMojoIpczEnvVar() == "1";
   return force_enabled;
 }
-#endif  // BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#endif  // BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
 
 bool g_enable_memv2 = false;
 
@@ -78,7 +78,7 @@ bool g_enable_memv2 = false;
 void InitFeatures() {
   CHECK(base::FeatureList::GetInstance());
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   bool shared_mem_enabled = base::FeatureList::IsEnabled(kMojoUseEventFd);
   int num_pages = kMojoUseEventFdPages.Get();
@@ -94,7 +94,7 @@ void InitFeatures() {
         // BUILDFLAG(IS_ANDROID)
 #endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
   if (base::FeatureList::IsEnabled(kMojoIpcz)) {
     EnableMojoIpcz();
   } else {
@@ -106,7 +106,7 @@ void InitFeatures() {
 }
 
 void EnableMojoIpcz() {
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
   g_mojo_ipcz_enabled.store(true, std::memory_order_release);
 #endif
 }
@@ -114,7 +114,7 @@ void EnableMojoIpcz() {
 void Init(const Configuration& configuration) {
   internal::g_configuration = configuration;
 
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
   if (configuration.disable_ipcz) {
     // Allow the caller to override MojoIpcz even when enabled by Feature or
     // environment.
@@ -134,7 +134,7 @@ void Init(const Configuration& configuration) {
     }));
     MojoEmbedderSetSystemThunks(GetMojoIpczImpl());
   } else {
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
     InitializeCore();
     MojoEmbedderSetSystemThunks(&GetSystemThunks());
 #else
@@ -151,7 +151,7 @@ void ShutDown() {
   if (IsMojoIpczEnabled()) {
     DestroyIpczNodeForProcess();
   } else {
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
     ShutDownCore();
 #else
     NOTREACHED();
@@ -163,7 +163,7 @@ scoped_refptr<base::SingleThreadTaskRunner> GetIOTaskRunner() {
   if (IsMojoIpczEnabled()) {
     return ipcz_driver::Transport::GetIOTaskRunner();
   } else {
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
     return Core::Get()->GetNodeController()->io_task_runner();
 #else
     NOTREACHED();
@@ -172,7 +172,7 @@ scoped_refptr<base::SingleThreadTaskRunner> GetIOTaskRunner() {
 }
 
 bool IsMojoIpczEnabled() {
-#if !BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if !BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
   return true;
 #else
   // Because Mojo and FeatureList are both brought up early in many binaries, it
@@ -205,7 +205,7 @@ const IpczDriver& GetIpczDriverForMojo() {
 }
 
 IpczDriverHandle CreateIpczTransportFromEndpoint(
-    mojo::PlatformChannelEndpoint endpoint,
+    mojo_legacy::PlatformChannelEndpoint endpoint,
     const TransportEndpointTypes& endpoint_types,
     base::Process remote_process) {
   auto transport = ipcz_driver::Transport::Create(
@@ -221,4 +221,4 @@ IpczDriverHandle CreateIpczTransportFromEndpoint(
   return ipcz_driver::ObjectBase::ReleaseAsHandle(std::move(transport));
 }
 
-}  // namespace mojo::core
+}  // namespace mojo_legacy::core

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/user_message_impl.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/user_message_impl.h"
 
 #include <algorithm>
 #include <atomic>
@@ -18,16 +18,16 @@
 #include "base/trace_event/memory_dump_manager.h"
 #include "base/trace_event/memory_dump_provider.h"
 #include "base/trace_event/trace_event.h"
-#include "mojo/core/configuration.h"
-#include "mojo/core/core.h"
-#include "mojo/core/node_channel.h"
-#include "mojo/core/node_controller.h"
-#include "mojo/core/ports/event.h"
-#include "mojo/core/ports/message_filter.h"
-#include "mojo/core/ports/node.h"
-#include "mojo/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/configuration.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_controller.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/message_filter.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/node.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace {
@@ -211,7 +211,7 @@ MojoResult CreateOrExtendSerializedEventMessage(
   // |header_size| is the total number of bytes preceding the message payload,
   // including all dispatcher headers and serialized dispatcher state.
   if (!base::IsValueInRangeForNumericType<uint32_t>(header_size)) {
-    return MOJO_RESULT_OUT_OF_RANGE;
+    return MOJO_LEGACY_RESULT_OUT_OF_RANGE;
   }
 
   header->header_size = static_cast<uint32_t>(header_size);
@@ -260,7 +260,7 @@ MojoResult CreateOrExtendSerializedEventMessage(
       if (original_message) {
         *out_message = std::move(original_message);
       }
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
 
     // Take ownership of all the handles and move them into message storage.
@@ -272,7 +272,7 @@ MojoResult CreateOrExtendSerializedEventMessage(
   *out_header_size = header_size;
   *out_user_payload =
       UNSAFE_TODO(reinterpret_cast<uint8_t*>(header) + header_size);
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 std::atomic<uint32_t> g_message_count{0};
@@ -334,9 +334,9 @@ UserMessageImpl::~UserMessageImpl() {
     std::vector<MojoHandle> handles(num_handles());
     MojoResult result =
         ExtractSerializedHandles(ExtractBadHandlePolicy::kSkip, handles.data());
-    if (result == MOJO_RESULT_OK) {
+    if (result == MOJO_LEGACY_RESULT_OK) {
       for (auto handle : handles) {
-        if (handle != MOJO_HANDLE_INVALID) {
+        if (handle != MOJO_LEGACY_HANDLE_INVALID) {
           Core::Get()->Close(handle);
         }
       }
@@ -377,14 +377,14 @@ MojoResult UserMessageImpl::CreateEventForNewSerializedMessage(
   MojoResult rv = CreateOrExtendSerializedEventMessage(
       event.get(), num_bytes, num_bytes, dispatchers, num_dispatchers,
       &channel_message, &header, &header_size, &user_payload);
-  if (rv != MOJO_RESULT_OK) {
+  if (rv != MOJO_LEGACY_RESULT_OK) {
     return rv;
   }
   event->AttachMessage(base::WrapUnique(
       new UserMessageImpl(event.get(), std::move(channel_message), header,
                           header_size, user_payload, num_bytes)));
   *out_event = std::move(event);
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 // static
@@ -470,29 +470,29 @@ MojoResult UserMessageImpl::SetContext(
     MojoMessageContextSerializer serializer,
     MojoMessageContextDestructor destructor) {
   if (!context && (serializer || destructor)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (context && HasContext()) {
-    return MOJO_RESULT_ALREADY_EXISTS;
+    return MOJO_LEGACY_RESULT_ALREADY_EXISTS;
   }
   if (IsSerialized()) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
   context_ = context;
   context_serializer_ = serializer;
   context_destructor_ = destructor;
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult UserMessageImpl::ReserveCapacity(uint32_t payload_buffer_size) {
   if (HasContext() || IsSerialized()) {
     // TODO(andreaorru): support reserving additional capacity
     // in the middle of the serialization.
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
   if (payload_buffer_size >
       std::numeric_limits<uint32_t>::max() - kNodeChannelHeaderSize) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
   Channel::MessagePtr channel_message;
@@ -503,8 +503,8 @@ MojoResult UserMessageImpl::ReserveCapacity(uint32_t payload_buffer_size) {
                kMinimumPayloadBufferSize),
       /*new_dispatchers=*/nullptr, /*num_new_dispatchers=*/0, &channel_message,
       &header_, &header_size_, &user_payload_);
-  if (rv != MOJO_RESULT_OK) {
-    return MOJO_RESULT_ABORTED;
+  if (rv != MOJO_LEGACY_RESULT_OK) {
+    return MOJO_LEGACY_RESULT_ABORTED;
   }
 
   user_payload_size_ = 0;
@@ -513,21 +513,21 @@ MojoResult UserMessageImpl::ReserveCapacity(uint32_t payload_buffer_size) {
   // with no handles in `AppendData`.
   has_serialized_handles_ = true;
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult UserMessageImpl::AppendData(uint32_t additional_payload_size,
                                        const MojoHandle* handles,
                                        uint32_t num_handles) {
   if (HasContext()) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
   std::vector<Dispatcher::DispatcherInTransit> dispatchers;
   if (num_handles > 0) {
     MojoResult acquire_result = Core::Get()->AcquireDispatchersForTransit(
         handles, num_handles, &dispatchers);
-    if (acquire_result != MOJO_RESULT_OK) {
+    if (acquire_result != MOJO_LEGACY_RESULT_OK) {
       return acquire_result;
     }
   }
@@ -542,10 +542,10 @@ MojoResult UserMessageImpl::AppendData(uint32_t additional_payload_size,
         &header_size_, &user_payload_);
     if (num_handles > 0) {
       Core::Get()->ReleaseDispatchersForTransit(dispatchers,
-                                                rv == MOJO_RESULT_OK);
+                                                rv == MOJO_LEGACY_RESULT_OK);
     }
-    if (rv != MOJO_RESULT_OK) {
-      return MOJO_RESULT_ABORTED;
+    if (rv != MOJO_LEGACY_RESULT_OK) {
+      return MOJO_LEGACY_RESULT_ABORTED;
     }
 
     user_payload_size_ = additional_payload_size;
@@ -590,16 +590,16 @@ MojoResult UserMessageImpl::AppendData(uint32_t additional_payload_size,
     base::debug::DumpWithoutCrashing();
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult UserMessageImpl::CommitSize() {
   if (!IsSerialized()) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
   if (is_committed_) {
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   if (!pending_handle_attachments_.empty()) {
@@ -613,18 +613,18 @@ MojoResult UserMessageImpl::CommitSize() {
   }
 
   is_committed_ = true;
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult UserMessageImpl::SerializeIfNecessary() {
   if (IsSerialized()) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
   DCHECK(HasContext());
   DCHECK(!has_serialized_handles_);
   if (!context_serializer_) {
-    return MOJO_RESULT_NOT_FOUND;
+    return MOJO_LEGACY_RESULT_NOT_FOUND;
   }
 
   uintptr_t context = context_;
@@ -637,18 +637,18 @@ MojoResult UserMessageImpl::SerializeIfNecessary() {
   }
 
   has_serialized_handles_ = true;
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult UserMessageImpl::ExtractSerializedHandles(
     ExtractBadHandlePolicy bad_handle_policy,
     MojoHandle* handles) {
   if (!IsSerialized()) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
   if (!has_serialized_handles_) {
-    return MOJO_RESULT_NOT_FOUND;
+    return MOJO_LEGACY_RESULT_NOT_FOUND;
   }
 
   const MessageHeader* header = static_cast<const MessageHeader*>(header_);
@@ -656,11 +656,11 @@ MojoResult UserMessageImpl::ExtractSerializedHandles(
       reinterpret_cast<const DispatcherHeader*>(UNSAFE_TODO(header + 1));
 
   if (header->num_dispatchers > std::numeric_limits<uint16_t>::max()) {
-    return MOJO_RESULT_ABORTED;
+    return MOJO_LEGACY_RESULT_ABORTED;
   }
 
   if (header->num_dispatchers == 0) {
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   has_serialized_handles_ = false;
@@ -672,7 +672,7 @@ MojoResult UserMessageImpl::ExtractSerializedHandles(
       sizeof(MessageHeader) +
       header->num_dispatchers * sizeof(DispatcherHeader);
   if (data_payload_index > header->header_size) {
-    return MOJO_RESULT_ABORTED;
+    return MOJO_LEGACY_RESULT_ABORTED;
   }
   const char* dispatcher_data = reinterpret_cast<const char*>(
       UNSAFE_TODO(dispatcher_headers + header->num_dispatchers));
@@ -693,14 +693,14 @@ MojoResult UserMessageImpl::ExtractSerializedHandles(
     next_payload_index += dh.num_bytes;
     if (!next_payload_index.IsValid() ||
         header->header_size < next_payload_index.ValueOrDie()) {
-      return MOJO_RESULT_ABORTED;
+      return MOJO_LEGACY_RESULT_ABORTED;
     }
 
     base::CheckedNumeric<size_t> next_port_index = port_index;
     next_port_index += dh.num_ports;
     if (!next_port_index.IsValid() ||
         message_event_->num_ports() < next_port_index.ValueOrDie()) {
-      return MOJO_RESULT_ABORTED;
+      return MOJO_LEGACY_RESULT_ABORTED;
     }
 
     base::CheckedNumeric<size_t> next_platform_handle_index =
@@ -708,7 +708,7 @@ MojoResult UserMessageImpl::ExtractSerializedHandles(
     next_platform_handle_index += dh.num_platform_handles;
     if (!next_platform_handle_index.IsValid() ||
         msg_handles.size() < next_platform_handle_index.ValueOrDie()) {
-      return MOJO_RESULT_ABORTED;
+      return MOJO_LEGACY_RESULT_ABORTED;
     }
 
     PlatformHandle* out_handles =
@@ -721,7 +721,7 @@ MojoResult UserMessageImpl::ExtractSerializedHandles(
         out_handles, dh.num_platform_handles);
     if (!dispatchers[i].dispatcher &&
         bad_handle_policy == ExtractBadHandlePolicy::kAbort) {
-      return MOJO_RESULT_ABORTED;
+      return MOJO_LEGACY_RESULT_ABORTED;
     }
 
     UNSAFE_TODO(dispatcher_data += dh.num_bytes);
@@ -731,10 +731,10 @@ MojoResult UserMessageImpl::ExtractSerializedHandles(
   }
 
   if (!Core::Get()->AddDispatchersFromTransit(dispatchers, handles)) {
-    return MOJO_RESULT_ABORTED;
+    return MOJO_LEGACY_RESULT_ABORTED;
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 // static
@@ -746,7 +746,8 @@ UserMessageImpl::UserMessageImpl(ports::UserMessageEvent* message_event,
                                  MojoCreateMessageFlags flags)
     : ports::UserMessage(&kUserMessageTypeInfo),
       message_event_(message_event),
-      unlimited_size_((flags & MOJO_CREATE_MESSAGE_FLAG_UNLIMITED_SIZE) != 0) {
+      unlimited_size_(
+          (flags & MOJO_LEGACY_CREATE_MESSAGE_FLAG_UNLIMITED_SIZE) != 0) {
   EnsureMemoryDumpProviderExists();
   IncrementMessageCount();
 }
@@ -772,7 +773,8 @@ UserMessageImpl::UserMessageImpl(ports::UserMessageEvent* message_event,
 
 bool UserMessageImpl::WillBeRoutedExternally() {
   MojoResult result = SerializeIfNecessary();
-  return result == MOJO_RESULT_OK || result == MOJO_RESULT_FAILED_PRECONDITION;
+  return result == MOJO_LEGACY_RESULT_OK ||
+         result == MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
 }
 
 size_t UserMessageImpl::GetSizeIfSerialized() const {
@@ -783,4 +785,4 @@ size_t UserMessageImpl::GetSizeIfSerialized() const {
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

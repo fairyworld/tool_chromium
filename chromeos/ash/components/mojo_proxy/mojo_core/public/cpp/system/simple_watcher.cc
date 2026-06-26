@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/system/simple_watcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/simple_watcher.h"
 
 #include "base/functional/bind.h"
 #include "base/memory/ptr_util.h"
@@ -13,10 +13,10 @@
 #include "base/trace_event/heap_profiler.h"
 #include "base/trace_event/trace_event.h"
 #include "base/trace_event/typed_macros.h"
-#include "mojo/public/c/system/trap.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/trap.h"
 #include "third_party/perfetto/protos/perfetto/trace/track_event/chrome_mojo_event_info.pbzero.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // Thread-safe Context object used to schedule trap events from arbitrary
 // threads.
@@ -39,12 +39,12 @@ class SimpleWatcher::Context : public base::RefCountedThreadSafe<Context> {
 
     // If MojoAddTrigger succeeds, it effectively assumes ownership of a
     // reference to |context|. In that case, this reference is balanced in
-    // CallNotify() when |result| is |MOJO_RESULT_CANCELLED|.
+    // CallNotify() when |result| is |MOJO_LEGACY_RESULT_CANCELLED|.
     context->AddRef();
 
     *result = MojoAddTrigger(trap_handle.value(), handle.value(), signals,
                              condition, context->value(), nullptr);
-    if (*result != MOJO_RESULT_OK) {
+    if (*result != MOJO_LEGACY_RESULT_OK) {
       // Balanced by the AddRef() above since MojoAddTrigger failed.
       context->Release();
       return nullptr;
@@ -62,7 +62,7 @@ class SimpleWatcher::Context : public base::RefCountedThreadSafe<Context> {
 
     // The trigger was removed. We can release the ref it owned, which in turn
     // may delete the Context.
-    if (event->result == MOJO_RESULT_CANCELLED) {
+    if (event->result == MOJO_LEGACY_RESULT_CANCELLED) {
       context->Release();
     }
   }
@@ -88,12 +88,12 @@ class SimpleWatcher::Context : public base::RefCountedThreadSafe<Context> {
               MojoTrapEventFlags flags) {
     HandleSignalsState state(signals_state.satisfied_signals,
                              signals_state.satisfiable_signals);
-    if (!(flags & MOJO_TRAP_EVENT_FLAG_WITHIN_API_CALL) &&
+    if (!(flags & MOJO_LEGACY_TRAP_EVENT_FLAG_WITHIN_API_CALL) &&
         task_runner_->RunsTasksInCurrentSequence() && weak_watcher_ &&
         weak_watcher_->is_default_task_runner_) {
       // System notifications will trigger from the task runner passed to
-      // mojo::core::ScopedIPCSupport. In Chrome this happens to always be
-      // the default task runner for the IO thread.
+      // mojo_legacy::core::ScopedIPCSupport. In Chrome this happens to always
+      // be the default task runner for the IO thread.
       weak_watcher_->OnHandleReady(watch_id_, result, state);
     } else {
       {
@@ -123,7 +123,7 @@ SimpleWatcher::SimpleWatcher(const base::Location& from_here,
           task_runner_ == base::SingleThreadTaskRunner::GetCurrentDefault()),
       handler_tag_(handler_tag ? handler_tag : from_here.file_name()) {
   MojoResult rv = CreateTrap(&Context::CallNotify, &trap_handle_);
-  DCHECK_EQ(MOJO_RESULT_OK, rv);
+  DCHECK_EQ(MOJO_LEGACY_RESULT_OK, rv);
   DCHECK(task_runner_->RunsTasksInCurrentSequence());
 }
 
@@ -150,14 +150,14 @@ MojoResult SimpleWatcher::Watch(Handle handle,
   handle_ = handle;
   watch_id_ += 1;
 
-  MojoResult result = MOJO_RESULT_UNKNOWN;
+  MojoResult result = MOJO_LEGACY_RESULT_UNKNOWN;
   context_ = Context::Create(weak_factory_.GetWeakPtr(), task_runner_,
                              trap_handle_.get(), handle_, signals, condition,
                              watch_id_, &result, handler_tag_);
   if (!context_) {
     handle_.set_value(kInvalidHandleValue);
     callback_.Reset();
-    DCHECK_EQ(MOJO_RESULT_INVALID_ARGUMENT, result);
+    DCHECK_EQ(MOJO_LEGACY_RESULT_INVALID_ARGUMENT, result);
     return result;
   }
 
@@ -165,7 +165,7 @@ MojoResult SimpleWatcher::Watch(Handle handle,
     ArmOrNotify();
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 void SimpleWatcher::Cancel() {
@@ -190,7 +190,7 @@ void SimpleWatcher::Cancel() {
   // It's possible this cancellation could race with a handle closure
   // notification, in which case the watch may have already been implicitly
   // cancelled.
-  DCHECK(rv == MOJO_RESULT_OK || rv == MOJO_RESULT_NOT_FOUND);
+  DCHECK(rv == MOJO_LEGACY_RESULT_OK || rv == MOJO_LEGACY_RESULT_NOT_FOUND);
 
   weak_factory_.InvalidateWeakPtrs();
 }
@@ -202,7 +202,7 @@ MojoResult SimpleWatcher::Arm(MojoResult* ready_result,
   MojoTrapEvent blocking_event = {sizeof(blocking_event)};
   MojoResult rv = MojoArmTrap(trap_handle_.get().value(), nullptr,
                               &num_blocking_events, &blocking_event);
-  if (rv == MOJO_RESULT_FAILED_PRECONDITION) {
+  if (rv == MOJO_LEGACY_RESULT_FAILED_PRECONDITION) {
     DCHECK(context_);
     DCHECK_EQ(1u, num_blocking_events);
     DCHECK_EQ(context_->value(), blocking_event.trigger_context);
@@ -232,13 +232,14 @@ void SimpleWatcher::ArmOrNotify() {
   MojoResult rv = Arm(&ready_result, &ready_state);
 
   // NOTE: If the watched handle has been closed, the above call will result in
-  // MOJO_RESULT_NOT_FOUND. A MOJO_RESULT_CANCELLED notification will already
-  // have been posted to this object as a result, so there's nothing else to do.
-  if (rv == MOJO_RESULT_OK || rv == MOJO_RESULT_NOT_FOUND) {
+  // MOJO_LEGACY_RESULT_NOT_FOUND. A MOJO_LEGACY_RESULT_CANCELLED notification
+  // will already have been posted to this object as a result, so there's
+  // nothing else to do.
+  if (rv == MOJO_LEGACY_RESULT_OK || rv == MOJO_LEGACY_RESULT_NOT_FOUND) {
     return;
   }
 
-  DCHECK_EQ(MOJO_RESULT_FAILED_PRECONDITION, rv);
+  DCHECK_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION, rv);
   {
     // Annotate the posted task with |handler_tag_| as the IPC interface.
     base::TaskAnnotator::ScopedSetIpcHash scoped_set_ipc_hash(handler_tag_);
@@ -261,7 +262,7 @@ void SimpleWatcher::OnHandleReady(int watch_id,
   }
 
   ReadyCallbackWithState callback = callback_;
-  if (result == MOJO_RESULT_CANCELLED) {
+  if (result == MOJO_LEGACY_RESULT_CANCELLED) {
     // Implicit cancellation due to someone closing the watched handle. We clear
     // the SimpleWatcher's state before dispatching this.
     context_ = nullptr;
@@ -288,9 +289,9 @@ void SimpleWatcher::OnHandleReady(int watch_id,
       return;
     }
 
-    // Prevent |MOJO_RESULT_FAILED_PRECONDITION| task spam by only notifying
-    // at most once in AUTOMATIC arming mode.
-    if (result == MOJO_RESULT_FAILED_PRECONDITION) {
+    // Prevent |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| task spam by only
+    // notifying at most once in AUTOMATIC arming mode.
+    if (result == MOJO_LEGACY_RESULT_FAILED_PRECONDITION) {
       return;
     }
 
@@ -299,4 +300,4 @@ void SimpleWatcher::OnHandleReady(int watch_id,
     }
   }
 }
-}  // namespace mojo
+}  // namespace mojo_legacy

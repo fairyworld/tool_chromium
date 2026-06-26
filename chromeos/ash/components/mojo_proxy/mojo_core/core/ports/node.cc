@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/ports/node.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/node.h"
 
 #include <string.h>
 
@@ -22,12 +22,12 @@
 #include "base/synchronization/lock.h"
 #include "base/threading/thread_local.h"
 #include "build/build_config.h"
-#include "mojo/core/ports/event.h"
-#include "mojo/core/ports/node_delegate.h"
-#include "mojo/core/ports/port_locker.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/node_delegate.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/port_locker.h"
 #include "third_party/abseil-cpp/absl/container/inlined_vector.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 
@@ -531,7 +531,7 @@ int Node::AcceptEvent(const NodeName& from_node, ScopedEvent event) {
   PortRef port_ref;
   GetPort(event->port_name(), &port_ref);
 
-#ifndef MOJO_BACKWARDS_COMPAT
+#ifndef MOJO_LEGACY_BACKWARDS_COMPAT
   DVLOG(2) << "AcceptEvent type: " << event->type() << ", "
            << event->from_port() << "@" << from_node << " => "
            << port_ref.name() << "@" << name_
@@ -629,7 +629,7 @@ int Node::MergePorts(const PortRef& port_ref,
                    &new_port_descriptor, &pending_update_event);
   }
 
-#ifndef MOJO_BACKWARDS_COMPAT
+#ifndef MOJO_LEGACY_BACKWARDS_COMPAT
   delegate_->ForwardEvent(
       pending_update_event.receiver,
       std::make_unique<UpdatePreviousPeerEvent>(
@@ -1415,7 +1415,7 @@ int Node::MergePortsInternal(const PortRef& port0_ref,
   // the merge by initiating proxy removals.
   if (ForwardUserMessagesFromProxy(port0_ref) == OK &&
       ForwardUserMessagesFromProxy(port1_ref) == OK) {
-#ifndef MOJO_BACKWARDS_COMPAT
+#ifndef MOJO_LEGACY_BACKWARDS_COMPAT
     // Send the prev peer updates out after the forwarding the user messages
     // succeeded. Otherwise, we won't be able to restore the previous state
     // below.
@@ -1708,7 +1708,7 @@ int Node::PrepareToForwardUserMessage(const PortRef& forwarding_port_ref,
     break;
   }
 
-#ifndef MOJO_BACKWARDS_COMPAT
+#ifndef MOJO_LEGACY_BACKWARDS_COMPAT
   while (!peer_update_events.empty()) {
     auto pending_update_event = peer_update_events.front();
     peer_update_events.pop();
@@ -1895,7 +1895,7 @@ void Node::TryRemoveProxy(const PortRef& port_ref) {
   }
 
   if (should_erase) {
-#ifndef MOJO_BACKWARDS_COMPAT
+#ifndef MOJO_LEGACY_BACKWARDS_COMPAT
     delegate_->ForwardEvent(
         pending_update_event.receiver,
         std::make_unique<UpdatePreviousPeerEvent>(
@@ -2005,7 +2005,7 @@ void Node::DestroyAllPortsWithPeer(const NodeName& node_name,
     }
   }
 
-#ifdef MOJO_BACKWARDS_COMPAT
+#ifdef MOJO_LEGACY_BACKWARDS_COMPAT
   for (const auto& proxy_name : dead_proxies_to_broadcast) {
     ErasePort(proxy_name);
     DVLOG(2) << "Forcibly deleted port " << proxy_name << "@" << name_;
@@ -2206,4 +2206,4 @@ void Node::DelegateHolder::EnsureSafeDelegateAccess() const {
 
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/system/invitation.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/invitation.h"
 
 #include <memory>
 #include <tuple>
@@ -11,20 +11,20 @@
 #include "base/numerics/safe_conversions.h"
 #include "base/strings/string_view_util.h"
 #include "build/build_config.h"
-#include "mojo/core/embedder/embedder.h"
-#include "mojo/public/c/system/invitation.h"
-#include "mojo/public/c/system/platform_handle.h"
-#include "mojo/public/cpp/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/invitation.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/platform_handle.h"
 
 #if BUILDFLAG(IS_WIN)
 #include <windows.h>
 #endif
 
 #if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_IOS)
-#include "mojo/public/cpp/platform/platform_channel_server.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_server.h"
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 
 namespace {
 
@@ -47,7 +47,7 @@ void PlatformHandleToTransportEndpoint(
     MojoInvitationTransportEndpoint* endpoint) {
   PlatformHandle::ToMojoPlatformHandle(std::move(platform_handle),
                                        endpoint_handle);
-  CHECK_NE(endpoint_handle->type, MOJO_PLATFORM_HANDLE_TYPE_INVALID);
+  CHECK_NE(endpoint_handle->type, MOJO_LEGACY_PLATFORM_HANDLE_TYPE_INVALID);
 
   endpoint->struct_size = sizeof(*endpoint);
   endpoint->num_platform_handles = 1;
@@ -62,7 +62,7 @@ void RunErrorCallback(uintptr_t context,
     error_message =
         std::string(details->error_message, details->error_message_length);
     callback->Run(error_message);
-  } else if (details->flags & MOJO_PROCESS_ERROR_FLAG_DISCONNECTED) {
+  } else if (details->flags & MOJO_LEGACY_PROCESS_ERROR_FLAG_DISCONNECTED) {
     delete callback;
   }
 }
@@ -101,7 +101,7 @@ void SendInvitation(ScopedInvitationHandle invitation,
   MojoSendInvitationOptions options;
   options.struct_size = sizeof(options);
   options.flags = flags;
-  if (flags & MOJO_SEND_INVITATION_FLAG_ISOLATED) {
+  if (flags & MOJO_LEGACY_SEND_INVITATION_FLAG_ISOLATED) {
     options.isolated_connection_name = isolated_connection_name.data();
     options.isolated_connection_name_length =
         static_cast<uint32_t>(isolated_connection_name.size());
@@ -110,7 +110,7 @@ void SendInvitation(ScopedInvitationHandle invitation,
       invitation.get().value(), process_handle.get(), &endpoint, error_handler,
       error_handler_context, &options);
   // If successful, the invitation handle is already closed for us.
-  if (result == MOJO_RESULT_OK) {
+  if (result == MOJO_LEGACY_RESULT_OK) {
     std::ignore = invitation.release();
   }
 }
@@ -154,7 +154,7 @@ base::Process CloneProcessFromHandle(base::ProcessHandle handle) {
 OutgoingInvitation::OutgoingInvitation() {
   MojoHandle invitation_handle;
   MojoResult result = MojoCreateInvitation(nullptr, &invitation_handle);
-  DCHECK_EQ(result, MOJO_RESULT_OK);
+  DCHECK_EQ(result, MOJO_LEGACY_RESULT_OK);
 
   handle_.reset(InvitationHandle(invitation_handle));
 }
@@ -174,7 +174,7 @@ ScopedMessagePipeHandle OutgoingInvitation::AttachMessagePipe(
   MojoResult result = MojoAttachMessagePipeToInvitation(
       handle_.get().value(), name.data(), static_cast<uint32_t>(name.size()),
       nullptr, &message_pipe_handle);
-  DCHECK_EQ(MOJO_RESULT_OK, result);
+  DCHECK_EQ(MOJO_LEGACY_RESULT_OK, result);
   return ScopedMessagePipeHandle(MessagePipeHandle(message_pipe_handle));
 }
 
@@ -191,7 +191,7 @@ ScopedMessagePipeHandle OutgoingInvitation::ExtractMessagePipe(
   MojoResult result = MojoExtractMessagePipeFromInvitation(
       handle_.get().value(), name.data(), static_cast<uint32_t>(name.size()),
       nullptr, &message_pipe_handle);
-  DCHECK_EQ(MOJO_RESULT_OK, result);
+  DCHECK_EQ(MOJO_LEGACY_RESULT_OK, result);
   return ScopedMessagePipeHandle(MessagePipeHandle(message_pipe_handle));
 }
 
@@ -207,7 +207,7 @@ void OutgoingInvitation::Send(OutgoingInvitation invitation,
                               const ProcessErrorCallback& error_callback) {
   SendInvitation(std::move(invitation.handle_), target_process,
                  channel_endpoint.TakePlatformHandle(),
-                 MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL,
+                 MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL,
                  invitation.extra_flags_, error_callback, "");
 }
 
@@ -226,7 +226,7 @@ void OutgoingInvitation::Send(OutgoingInvitation invitation,
             SendInvitation(std::move(invitation.handle_),
                            target_process.Handle(),
                            endpoint.TakePlatformHandle(),
-                           MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL,
+                           MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL,
                            invitation.extra_flags_, error_callback, "");
           },
           std::move(invitation), CloneProcessFromHandle(target_process),
@@ -241,7 +241,7 @@ void OutgoingInvitation::SendAsync(OutgoingInvitation invitation,
                                    const ProcessErrorCallback& error_callback) {
   SendInvitation(std::move(invitation.handle_), target_process,
                  channel_endpoint.TakePlatformHandle(),
-                 MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC,
+                 MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC,
                  invitation.extra_flags_, error_callback, "");
 }
 
@@ -255,11 +255,12 @@ ScopedMessagePipeHandle OutgoingInvitation::SendIsolated(
   invitation.set_extra_flags(invitation_flags);
   ScopedMessagePipeHandle pipe =
       invitation.AttachMessagePipe(kIsolatedPipeName);
-  SendInvitation(std::move(invitation.handle_), target_process,
-                 channel_endpoint.TakePlatformHandle(),
-                 MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL,
-                 MOJO_SEND_INVITATION_FLAG_ISOLATED | invitation.extra_flags_,
-                 ProcessErrorCallback(), connection_name);
+  SendInvitation(
+      std::move(invitation.handle_), target_process,
+      channel_endpoint.TakePlatformHandle(),
+      MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL,
+      MOJO_LEGACY_SEND_INVITATION_FLAG_ISOLATED | invitation.extra_flags_,
+      ProcessErrorCallback(), connection_name);
   return pipe;
 }
 
@@ -280,12 +281,13 @@ ScopedMessagePipeHandle OutgoingInvitation::SendIsolated(
           [](OutgoingInvitation invitation, base::Process target_process,
              const std::string& connection_name,
              PlatformChannelEndpoint endpoint) {
-            SendInvitation(
-                std::move(invitation.handle_), target_process.Handle(),
-                endpoint.TakePlatformHandle(),
-                MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL,
-                MOJO_SEND_INVITATION_FLAG_ISOLATED | invitation.extra_flags_,
-                ProcessErrorCallback(), connection_name);
+            SendInvitation(std::move(invitation.handle_),
+                           target_process.Handle(),
+                           endpoint.TakePlatformHandle(),
+                           MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL,
+                           MOJO_LEGACY_SEND_INVITATION_FLAG_ISOLATED |
+                               invitation.extra_flags_,
+                           ProcessErrorCallback(), connection_name);
           },
           std::move(invitation), CloneProcessFromHandle(target_process),
           std::string(connection_name)));
@@ -312,11 +314,11 @@ IncomingInvitation IncomingInvitation::Accept(
   MojoPlatformHandle endpoint_handle;
   PlatformHandle::ToMojoPlatformHandle(channel_endpoint.TakePlatformHandle(),
                                        &endpoint_handle);
-  CHECK_NE(endpoint_handle.type, MOJO_PLATFORM_HANDLE_TYPE_INVALID);
+  CHECK_NE(endpoint_handle.type, MOJO_LEGACY_PLATFORM_HANDLE_TYPE_INVALID);
 
   MojoInvitationTransportEndpoint transport_endpoint;
   transport_endpoint.struct_size = sizeof(transport_endpoint);
-  transport_endpoint.type = MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL;
+  transport_endpoint.type = MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL;
   transport_endpoint.num_platform_handles = 1;
   transport_endpoint.platform_handles = &endpoint_handle;
 
@@ -327,7 +329,7 @@ IncomingInvitation IncomingInvitation::Accept(
   MojoHandle invitation_handle;
   MojoResult result =
       MojoAcceptInvitation(&transport_endpoint, &options, &invitation_handle);
-  if (result != MOJO_RESULT_OK) {
+  if (result != MOJO_LEGACY_RESULT_OK) {
     return IncomingInvitation();
   }
 
@@ -341,18 +343,18 @@ IncomingInvitation IncomingInvitation::AcceptAsync(
   MojoPlatformHandle endpoint_handle;
   PlatformHandle::ToMojoPlatformHandle(channel_endpoint.TakePlatformHandle(),
                                        &endpoint_handle);
-  CHECK_NE(endpoint_handle.type, MOJO_PLATFORM_HANDLE_TYPE_INVALID);
+  CHECK_NE(endpoint_handle.type, MOJO_LEGACY_PLATFORM_HANDLE_TYPE_INVALID);
 
   MojoInvitationTransportEndpoint transport_endpoint;
   transport_endpoint.struct_size = sizeof(transport_endpoint);
-  transport_endpoint.type = MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC;
+  transport_endpoint.type = MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC;
   transport_endpoint.num_platform_handles = 1;
   transport_endpoint.platform_handles = &endpoint_handle;
 
   MojoHandle invitation_handle;
   MojoResult result =
       MojoAcceptInvitation(&transport_endpoint, nullptr, &invitation_handle);
-  if (result != MOJO_RESULT_OK) {
+  if (result != MOJO_LEGACY_RESULT_OK) {
     return IncomingInvitation();
   }
 
@@ -366,22 +368,22 @@ ScopedMessagePipeHandle IncomingInvitation::AcceptIsolated(
   MojoPlatformHandle endpoint_handle;
   PlatformHandle::ToMojoPlatformHandle(channel_endpoint.TakePlatformHandle(),
                                        &endpoint_handle);
-  CHECK_NE(endpoint_handle.type, MOJO_PLATFORM_HANDLE_TYPE_INVALID);
+  CHECK_NE(endpoint_handle.type, MOJO_LEGACY_PLATFORM_HANDLE_TYPE_INVALID);
 
   MojoInvitationTransportEndpoint transport_endpoint;
   transport_endpoint.struct_size = sizeof(transport_endpoint);
-  transport_endpoint.type = MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL;
+  transport_endpoint.type = MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL;
   transport_endpoint.num_platform_handles = 1;
   transport_endpoint.platform_handles = &endpoint_handle;
 
   MojoAcceptInvitationOptions options;
   options.struct_size = sizeof(options);
-  options.flags = MOJO_ACCEPT_INVITATION_FLAG_ISOLATED;
+  options.flags = MOJO_LEGACY_ACCEPT_INVITATION_FLAG_ISOLATED;
 
   MojoHandle invitation_handle;
   MojoResult result =
       MojoAcceptInvitation(&transport_endpoint, &options, &invitation_handle);
-  if (result != MOJO_RESULT_OK) {
+  if (result != MOJO_LEGACY_RESULT_OK) {
     return ScopedMessagePipeHandle();
   }
 
@@ -399,7 +401,7 @@ ScopedMessagePipeHandle IncomingInvitation::ExtractMessagePipe(
   MojoResult result = MojoExtractMessagePipeFromInvitation(
       handle_.get().value(), name.data(), static_cast<uint32_t>(name.size()),
       nullptr, &message_pipe_handle);
-  DCHECK_EQ(MOJO_RESULT_OK, result);
+  DCHECK_EQ(MOJO_LEGACY_RESULT_OK, result);
   return ScopedMessagePipeHandle(MessagePipeHandle(message_pipe_handle));
 }
 
@@ -408,4 +410,4 @@ ScopedMessagePipeHandle IncomingInvitation::ExtractMessagePipe(uint64_t name) {
       base::as_string_view(base::byte_span_from_ref(name)));
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

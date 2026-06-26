@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
 
 #include <string.h>
 
@@ -23,29 +23,29 @@
 #include "base/trace_event/memory_dump_manager.h"
 #include "base/trace_event/trace_id_helper.h"
 #include "build/build_config.h"
-#include "mojo/buildflags.h"
-#include "mojo/core/channel.h"
-#include "mojo/core/configuration.h"
-#include "mojo/core/data_pipe_consumer_dispatcher.h"
-#include "mojo/core/data_pipe_producer_dispatcher.h"
-#include "mojo/core/embedder/process_error_callback.h"
-#include "mojo/core/handle_signals_state.h"
-#include "mojo/core/invitation_dispatcher.h"
-#include "mojo/core/message_pipe_dispatcher.h"
-#include "mojo/core/platform_handle_dispatcher.h"
-#include "mojo/core/platform_handle_utils.h"
-#include "mojo/core/platform_shared_memory_mapping.h"
-#include "mojo/core/ports/event.h"
-#include "mojo/core/ports/name.h"
-#include "mojo/core/ports/node.h"
-#include "mojo/core/request_context.h"
-#include "mojo/core/shared_buffer_dispatcher.h"
-#include "mojo/core/user_message_impl.h"
-#include "mojo/core/watcher_dispatcher.h"
-#include "mojo/public/cpp/bindings/mojo_buildflags.h"
-#include "mojo/public/cpp/platform/platform_handle_internal.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/configuration.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/data_pipe_consumer_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/data_pipe_producer_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/process_error_callback.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/handle_signals_state.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/invitation_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/message_pipe_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_utils.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_shared_memory_mapping.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/name.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/node.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/request_context.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/shared_buffer_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/user_message_impl.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/watcher_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/bindings/mojo_buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle_internal.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace {
@@ -95,7 +95,7 @@ class ProcessDisconnectHandler {
 
   ~ProcessDisconnectHandler() {
     InvokeProcessErrorCallback(handler_, context_, std::string(),
-                               MOJO_PROCESS_ERROR_FLAG_DISCONNECTED);
+                               MOJO_LEGACY_PROCESS_ERROR_FLAG_DISCONNECTED);
   }
 
  private:
@@ -108,7 +108,7 @@ void RunMojoProcessErrorHandler(ProcessDisconnectHandler* disconnect_handler,
                                 uintptr_t context,
                                 const std::string& error) {
   InvokeProcessErrorCallback(handler, context, error,
-                             MOJO_PROCESS_ERROR_FLAG_NONE);
+                             MOJO_LEGACY_PROCESS_ERROR_FLAG_NONE);
 }
 
 uint64_t MakePipeId() {
@@ -227,7 +227,7 @@ MojoResult Core::AcquireDispatchersForTransit(
     std::vector<Dispatcher::DispatcherInTransit>* dispatchers) {
   base::AutoLock lock(handles_->GetLock());
   MojoResult rv = handles_->BeginTransit(handles, num_handles, dispatchers);
-  if (rv != MOJO_RESULT_OK) {
+  if (rv != MOJO_LEGACY_RESULT_OK) {
     handles_->CancelTransit(*dispatchers);
   }
   return rv;
@@ -268,12 +268,12 @@ MojoResult Core::Close(MojoHandle handle) {
   {
     base::AutoLock lock(handles_->GetLock());
     MojoResult rv = handles_->GetAndRemoveDispatcher(handle, &dispatcher);
-    if (rv != MOJO_RESULT_OK) {
+    if (rv != MOJO_LEGACY_RESULT_OK) {
       return rv;
     }
   }
   dispatcher->Close();
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::QueryHandleSignalsState(
@@ -282,28 +282,28 @@ MojoResult Core::QueryHandleSignalsState(
   RequestContext request_context;
   scoped_refptr<Dispatcher> dispatcher = GetDispatcher(handle);
   if (!dispatcher || !signals_state) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   *signals_state = dispatcher->GetHandleSignalsState();
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::CreateTrap(MojoTrapEventHandler handler,
                             const MojoCreateTrapOptions* options,
                             MojoHandle* trap_handle) {
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   RequestContext request_context;
   if (!trap_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   *trap_handle = AddDispatcher(new WatcherDispatcher(handler));
-  if (*trap_handle == MOJO_HANDLE_INVALID) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+  if (*trap_handle == MOJO_LEGACY_HANDLE_INVALID) {
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::AddTrigger(MojoHandle trap_handle,
@@ -313,18 +313,18 @@ MojoResult Core::AddTrigger(MojoHandle trap_handle,
                             uintptr_t context,
                             const MojoAddTriggerOptions* options) {
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   RequestContext request_context;
   scoped_refptr<Dispatcher> watcher = GetDispatcher(trap_handle);
   if (!watcher || watcher->GetType() != Dispatcher::Type::WATCHER) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   scoped_refptr<Dispatcher> dispatcher = GetDispatcher(handle);
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   return watcher->WatchDispatcher(std::move(dispatcher), signals, condition,
@@ -335,13 +335,13 @@ MojoResult Core::RemoveTrigger(MojoHandle trap_handle,
                                uintptr_t context,
                                const MojoRemoveTriggerOptions* options) {
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   RequestContext request_context;
   scoped_refptr<Dispatcher> watcher = GetDispatcher(trap_handle);
   if (!watcher || watcher->GetType() != Dispatcher::Type::WATCHER) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   return watcher->CancelWatch(context);
 }
@@ -351,13 +351,13 @@ MojoResult Core::ArmTrap(MojoHandle trap_handle,
                          uint32_t* num_blocking_events,
                          MojoTrapEvent* blocking_events) {
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   RequestContext request_context;
   scoped_refptr<Dispatcher> watcher = GetDispatcher(trap_handle);
   if (!watcher || watcher->GetType() != Dispatcher::Type::WATCHER) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   return watcher->Arm(num_blocking_events, blocking_events);
 }
@@ -365,35 +365,35 @@ MojoResult Core::ArmTrap(MojoHandle trap_handle,
 MojoResult Core::CreateMessage(const MojoCreateMessageOptions* options,
                                MojoMessageHandle* message_handle) {
   if (!message_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   const MojoCreateMessageFlags flags =
-      options ? options->flags : MOJO_CREATE_MESSAGE_FLAG_NONE;
+      options ? options->flags : MOJO_LEGACY_CREATE_MESSAGE_FLAG_NONE;
   *message_handle = reinterpret_cast<MojoMessageHandle>(
       UserMessageImpl::CreateEventForNewMessage(flags).release());
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::DestroyMessage(MojoMessageHandle message_handle) {
   if (!message_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   RequestContext request_context;
   delete reinterpret_cast<ports::UserMessageEvent*>(message_handle);
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::SerializeMessage(MojoMessageHandle message_handle,
                                   const MojoSerializeMessageOptions* options) {
   if (!message_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   RequestContext request_context;
   return reinterpret_cast<ports::UserMessageEvent*>(message_handle)
@@ -405,14 +405,14 @@ MojoResult Core::ReserveMessageCapacity(MojoMessageHandle message_handle,
                                         uint32_t payload_buffer_size,
                                         uint32_t* buffer_size) {
   if (!message_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   RequestContext request_context;
   auto* message = reinterpret_cast<ports::UserMessageEvent*>(message_handle)
                       ->GetMessage<UserMessageImpl>();
   MojoResult rv = message->ReserveCapacity(payload_buffer_size);
-  if (rv != MOJO_RESULT_OK) {
+  if (rv != MOJO_LEGACY_RESULT_OK) {
     return rv;
   }
 
@@ -420,7 +420,7 @@ MojoResult Core::ReserveMessageCapacity(MojoMessageHandle message_handle,
     *buffer_size =
         base::checked_cast<uint32_t>(message->user_payload_capacity());
   }
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::AppendMessageData(MojoMessageHandle message_handle,
@@ -431,10 +431,10 @@ MojoResult Core::AppendMessageData(MojoMessageHandle message_handle,
                                    void** buffer,
                                    uint32_t* buffer_size) {
   if (!message_handle || (num_handles && !handles)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   RequestContext request_context;
@@ -442,11 +442,12 @@ MojoResult Core::AppendMessageData(MojoMessageHandle message_handle,
                       ->GetMessage<UserMessageImpl>();
   MojoResult rv =
       message->AppendData(additional_payload_size, handles, num_handles);
-  if (rv != MOJO_RESULT_OK) {
+  if (rv != MOJO_LEGACY_RESULT_OK) {
     return rv;
   }
 
-  if (options && (options->flags & MOJO_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE)) {
+  if (options &&
+      (options->flags & MOJO_LEGACY_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE)) {
     message->CommitSize();
   }
 
@@ -457,7 +458,7 @@ MojoResult Core::AppendMessageData(MojoMessageHandle message_handle,
     *buffer_size =
         base::checked_cast<uint32_t>(message->user_payload_capacity());
   }
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::GetMessageData(MojoMessageHandle message_handle,
@@ -467,16 +468,16 @@ MojoResult Core::GetMessageData(MojoMessageHandle message_handle,
                                 MojoHandle* handles,
                                 uint32_t* num_handles) {
   if (!message_handle || (num_handles && *num_handles && !handles)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   auto* message = reinterpret_cast<ports::UserMessageEvent*>(message_handle)
                       ->GetMessage<UserMessageImpl>();
   if (!message->IsSerialized() || !message->IsTransmittable()) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
   if (num_bytes) {
@@ -486,7 +487,7 @@ MojoResult Core::GetMessageData(MojoMessageHandle message_handle,
 
   if (message->user_payload_size() > 0) {
     if (!num_bytes || !buffer) {
-      return MOJO_RESULT_RESOURCE_EXHAUSTED;
+      return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
     }
 
     *buffer = message->user_payload();
@@ -494,8 +495,9 @@ MojoResult Core::GetMessageData(MojoMessageHandle message_handle,
     *buffer = nullptr;
   }
 
-  if (options && (options->flags & MOJO_GET_MESSAGE_DATA_FLAG_IGNORE_HANDLES)) {
-    return MOJO_RESULT_OK;
+  if (options &&
+      (options->flags & MOJO_LEGACY_GET_MESSAGE_DATA_FLAG_IGNORE_HANDLES)) {
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   uint32_t max_num_handles = 0;
@@ -506,7 +508,7 @@ MojoResult Core::GetMessageData(MojoMessageHandle message_handle,
 
   if (message->num_handles() > max_num_handles ||
       message->num_handles() > kMaxHandlesPerMessage) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
   RequestContext request_context;
@@ -524,10 +526,10 @@ MojoResult Core::SetMessageContext(
     MojoMessageContextDestructor destructor,
     const MojoSetMessageContextOptions* options) {
   if (!message_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   auto* message = reinterpret_cast<ports::UserMessageEvent*>(message_handle)
                       ->GetMessage<UserMessageImpl>();
@@ -538,20 +540,20 @@ MojoResult Core::GetMessageContext(MojoMessageHandle message_handle,
                                    const MojoGetMessageContextOptions* options,
                                    uintptr_t* context) {
   if (!message_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   auto* message = reinterpret_cast<ports::UserMessageEvent*>(message_handle)
                       ->GetMessage<UserMessageImpl>();
   if (!message->HasContext()) {
-    return MOJO_RESULT_NOT_FOUND;
+    return MOJO_LEGACY_RESULT_NOT_FOUND;
   }
 
   *context = message->context();
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::CreateMessagePipe(const MojoCreateMessagePipeOptions* options,
@@ -568,23 +570,23 @@ MojoResult Core::CreateMessagePipe(const MojoCreateMessagePipeOptions* options,
 
   *message_pipe_handle0 = AddDispatcher(new MessagePipeDispatcher(
       GetNodeController(), port0, pipe_id, /*endpoint=*/0));
-  if (*message_pipe_handle0 == MOJO_HANDLE_INVALID) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+  if (*message_pipe_handle0 == MOJO_LEGACY_HANDLE_INVALID) {
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
   *message_pipe_handle1 = AddDispatcher(new MessagePipeDispatcher(
       GetNodeController(), port1, pipe_id, /*endpoint=*/1));
-  if (*message_pipe_handle1 == MOJO_HANDLE_INVALID) {
+  if (*message_pipe_handle1 == MOJO_LEGACY_HANDLE_INVALID) {
     scoped_refptr<Dispatcher> dispatcher0;
     {
       base::AutoLock lock(handles_->GetLock());
       handles_->GetAndRemoveDispatcher(*message_pipe_handle0, &dispatcher0);
     }
     dispatcher0->Close();
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::WriteMessage(MojoHandle message_pipe_handle,
@@ -592,17 +594,17 @@ MojoResult Core::WriteMessage(MojoHandle message_pipe_handle,
                               const MojoWriteMessageOptions* options) {
   RequestContext request_context;
   if (!message_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   auto message_event = base::WrapUnique(
       reinterpret_cast<ports::UserMessageEvent*>(message_handle));
   auto* message = message_event->GetMessage<UserMessageImpl>();
   if (!message || !message->IsTransmittable()) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   auto dispatcher = GetDispatcher(message_pipe_handle);
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   return dispatcher->WriteMessage(std::move(message_event));
 }
@@ -613,18 +615,18 @@ MojoResult Core::ReadMessage(MojoHandle message_pipe_handle,
   RequestContext request_context;
   auto dispatcher = GetDispatcher(message_pipe_handle);
   if (!dispatcher || !message_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   std::unique_ptr<ports::UserMessageEvent> message_event;
   MojoResult rv = dispatcher->ReadMessage(&message_event);
-  if (rv != MOJO_RESULT_OK) {
+  if (rv != MOJO_LEGACY_RESULT_OK) {
     return rv;
   }
 
   *message_handle =
       reinterpret_cast<MojoMessageHandle>(message_event.release());
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::FuseMessagePipes(MojoHandle handle0,
@@ -641,7 +643,7 @@ MojoResult Core::FuseMessagePipes(MojoHandle handle0,
         handles_->GetAndRemoveDispatcher(handle0, &dispatcher0);
     MojoResult result1 =
         handles_->GetAndRemoveDispatcher(handle1, &dispatcher1);
-    if (result0 != MOJO_RESULT_OK || result1 != MOJO_RESULT_OK ||
+    if (result0 != MOJO_LEGACY_RESULT_OK || result1 != MOJO_LEGACY_RESULT_OK ||
         dispatcher0->GetType() != Dispatcher::Type::MESSAGE_PIPE ||
         dispatcher1->GetType() != Dispatcher::Type::MESSAGE_PIPE) {
       valid_handles = false;
@@ -655,7 +657,7 @@ MojoResult Core::FuseMessagePipes(MojoHandle handle0,
     if (dispatcher1) {
       dispatcher1->Close();
     }
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   MessagePipeDispatcher* mpd0 =
@@ -664,10 +666,10 @@ MojoResult Core::FuseMessagePipes(MojoHandle handle0,
       static_cast<MessagePipeDispatcher*>(dispatcher1.get());
 
   if (!mpd0->Fuse(mpd1)) {
-    return MOJO_RESULT_FAILED_PRECONDITION;
+    return MOJO_LEGACY_RESULT_FAILED_PRECONDITION;
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::NotifyBadMessage(MojoMessageHandle message_handle,
@@ -675,7 +677,7 @@ MojoResult Core::NotifyBadMessage(MojoMessageHandle message_handle,
                                   size_t error_num_bytes,
                                   const MojoNotifyBadMessageOptions* options) {
   if (!message_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   auto* message_event =
@@ -690,13 +692,13 @@ MojoResult Core::NotifyBadMessage(MojoMessageHandle message_handle,
     if (!default_process_error_callback_.is_null()) {
       default_process_error_callback_.Run(std::string(error, error_num_bytes));
     }
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   node_controller->NotifyBadMessageFrom(message->source_node(),
                                         std::string(error, error_num_bytes));
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::CreateDataPipe(const MojoCreateDataPipeOptions* options,
@@ -704,7 +706,7 @@ MojoResult Core::CreateDataPipe(const MojoCreateDataPipeOptions* options,
                                 MojoHandle* data_pipe_consumer_handle) {
   RequestContext request_context;
   if (options && options->struct_size < sizeof(MojoCreateDataPipeOptions)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   MojoCreateDataPipeOptions create_options;
@@ -717,7 +719,7 @@ MojoResult Core::CreateDataPipe(const MojoCreateDataPipeOptions* options,
                                           : 64 * 1024;
   if (!create_options.element_num_bytes || !create_options.capacity_num_bytes ||
       create_options.capacity_num_bytes < create_options.element_num_bytes) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   base::subtle::PlatformSharedMemoryRegion ring_buffer_region =
@@ -743,7 +745,7 @@ MojoResult Core::CreateDataPipe(const MojoCreateDataPipeOptions* options,
               base::subtle::PlatformSharedMemoryRegion::Mode::kUnsafe,
               create_options.capacity_num_bytes, ring_buffer_region.GetGUID()));
   if (!producer_region.IsValid()) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
   ports::PortRef port0, port1;
@@ -758,7 +760,7 @@ MojoResult Core::CreateDataPipe(const MojoCreateDataPipeOptions* options,
       GetNodeController(), port0, std::move(producer_region), create_options,
       pipe_id);
   if (!producer) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
   scoped_refptr<Dispatcher> consumer = DataPipeConsumerDispatcher::Create(
@@ -766,24 +768,24 @@ MojoResult Core::CreateDataPipe(const MojoCreateDataPipeOptions* options,
       pipe_id);
   if (!consumer) {
     producer->Close();
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
   *data_pipe_producer_handle = AddDispatcher(producer);
   *data_pipe_consumer_handle = AddDispatcher(consumer);
-  if (*data_pipe_producer_handle == MOJO_HANDLE_INVALID ||
-      *data_pipe_consumer_handle == MOJO_HANDLE_INVALID) {
-    if (*data_pipe_producer_handle != MOJO_HANDLE_INVALID) {
+  if (*data_pipe_producer_handle == MOJO_LEGACY_HANDLE_INVALID ||
+      *data_pipe_consumer_handle == MOJO_LEGACY_HANDLE_INVALID) {
+    if (*data_pipe_producer_handle != MOJO_LEGACY_HANDLE_INVALID) {
       scoped_refptr<Dispatcher> unused;
       base::AutoLock lock(handles_->GetLock());
       handles_->GetAndRemoveDispatcher(*data_pipe_producer_handle, &unused);
     }
     producer->Close();
     consumer->Close();
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::WriteData(MojoHandle data_pipe_producer_handle,
@@ -794,23 +796,24 @@ MojoResult Core::WriteData(MojoHandle data_pipe_producer_handle,
   scoped_refptr<Dispatcher> dispatcher(
       GetDispatcher(data_pipe_producer_handle));
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   MojoWriteDataOptions validated_options;
   if (options) {
     if (options->struct_size < sizeof(*options)) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
 
     constexpr MojoWriteDataFlags kSupportedFlags =
-        MOJO_WRITE_DATA_FLAG_NONE | MOJO_WRITE_DATA_FLAG_ALL_OR_NONE;
+        MOJO_LEGACY_WRITE_DATA_FLAG_NONE |
+        MOJO_LEGACY_WRITE_DATA_FLAG_ALL_OR_NONE;
     if (options->flags & ~kSupportedFlags) {
-      return MOJO_RESULT_UNIMPLEMENTED;
+      return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
     }
     validated_options.flags = options->flags;
   } else {
-    validated_options.flags = MOJO_WRITE_DATA_FLAG_NONE;
+    validated_options.flags = MOJO_LEGACY_WRITE_DATA_FLAG_NONE;
   }
   return dispatcher->WriteData(elements, num_bytes, validated_options);
 }
@@ -823,12 +826,12 @@ MojoResult Core::BeginWriteData(MojoHandle data_pipe_producer_handle,
   scoped_refptr<Dispatcher> dispatcher(
       GetDispatcher(data_pipe_producer_handle));
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
-  MojoBeginWriteDataFlags flags = MOJO_BEGIN_WRITE_DATA_FLAG_NONE;
+  MojoBeginWriteDataFlags flags = MOJO_LEGACY_BEGIN_WRITE_DATA_FLAG_NONE;
   if (options) {
     if (options->struct_size < sizeof(*options)) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
     flags = options->flags;
   }
@@ -842,14 +845,14 @@ MojoResult Core::EndWriteData(MojoHandle data_pipe_producer_handle,
   scoped_refptr<Dispatcher> dispatcher(
       GetDispatcher(data_pipe_producer_handle));
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (options) {
     if (options->struct_size < sizeof(*options)) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
-    if (options->flags != MOJO_END_WRITE_DATA_FLAG_NONE) {
-      return MOJO_RESULT_UNIMPLEMENTED;
+    if (options->flags != MOJO_LEGACY_END_WRITE_DATA_FLAG_NONE) {
+      return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
     }
   }
   return dispatcher->EndWriteData(num_bytes_written);
@@ -863,25 +866,26 @@ MojoResult Core::ReadData(MojoHandle data_pipe_consumer_handle,
   scoped_refptr<Dispatcher> dispatcher(
       GetDispatcher(data_pipe_consumer_handle));
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   MojoReadDataOptions validated_options;
   if (options) {
     if (options->struct_size < sizeof(*options)) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
 
     constexpr MojoReadDataFlags kSupportedFlags =
-        MOJO_READ_DATA_FLAG_NONE | MOJO_READ_DATA_FLAG_ALL_OR_NONE |
-        MOJO_READ_DATA_FLAG_DISCARD | MOJO_READ_DATA_FLAG_QUERY |
-        MOJO_READ_DATA_FLAG_PEEK;
+        MOJO_LEGACY_READ_DATA_FLAG_NONE |
+        MOJO_LEGACY_READ_DATA_FLAG_ALL_OR_NONE |
+        MOJO_LEGACY_READ_DATA_FLAG_DISCARD | MOJO_LEGACY_READ_DATA_FLAG_QUERY |
+        MOJO_LEGACY_READ_DATA_FLAG_PEEK;
     if (options->flags & ~kSupportedFlags) {
-      return MOJO_RESULT_UNIMPLEMENTED;
+      return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
     }
     validated_options.flags = options->flags;
   } else {
-    validated_options.flags = MOJO_WRITE_DATA_FLAG_NONE;
+    validated_options.flags = MOJO_LEGACY_WRITE_DATA_FLAG_NONE;
   }
   return dispatcher->ReadData(validated_options, elements, num_bytes);
 }
@@ -894,15 +898,15 @@ MojoResult Core::BeginReadData(MojoHandle data_pipe_consumer_handle,
   scoped_refptr<Dispatcher> dispatcher(
       GetDispatcher(data_pipe_consumer_handle));
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   if (options) {
     if (options->struct_size < sizeof(*options)) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
-    if (options->flags != MOJO_BEGIN_READ_DATA_FLAG_NONE) {
-      return MOJO_RESULT_UNIMPLEMENTED;
+    if (options->flags != MOJO_LEGACY_BEGIN_READ_DATA_FLAG_NONE) {
+      return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
     }
   }
   return dispatcher->BeginReadData(buffer, buffer_num_bytes);
@@ -915,14 +919,14 @@ MojoResult Core::EndReadData(MojoHandle data_pipe_consumer_handle,
   scoped_refptr<Dispatcher> dispatcher(
       GetDispatcher(data_pipe_consumer_handle));
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (options) {
     if (options->struct_size < sizeof(*options)) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
-    if (options->flags != MOJO_END_READ_DATA_FLAG_NONE) {
-      return MOJO_RESULT_UNIMPLEMENTED;
+    if (options->flags != MOJO_LEGACY_END_READ_DATA_FLAG_NONE) {
+      return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
     }
   }
   return dispatcher->EndReadData(num_bytes_read);
@@ -936,26 +940,26 @@ MojoResult Core::CreateSharedBuffer(
   MojoCreateSharedBufferOptions validated_options = {};
   MojoResult result = SharedBufferDispatcher::ValidateCreateOptions(
       options, &validated_options);
-  if (result != MOJO_RESULT_OK) {
+  if (result != MOJO_LEGACY_RESULT_OK) {
     return result;
   }
 
   scoped_refptr<SharedBufferDispatcher> dispatcher;
   result = SharedBufferDispatcher::Create(
       validated_options, GetNodeController(), num_bytes, &dispatcher);
-  if (result != MOJO_RESULT_OK) {
+  if (result != MOJO_LEGACY_RESULT_OK) {
     DCHECK(!dispatcher);
     return result;
   }
 
   *shared_buffer_handle = AddDispatcher(dispatcher);
-  if (*shared_buffer_handle == MOJO_HANDLE_INVALID) {
+  if (*shared_buffer_handle == MOJO_LEGACY_HANDLE_INVALID) {
     LOG(ERROR) << "Handle table full";
     dispatcher->Close();
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::DuplicateBufferHandle(
@@ -965,25 +969,25 @@ MojoResult Core::DuplicateBufferHandle(
   RequestContext request_context;
   scoped_refptr<Dispatcher> dispatcher(GetDispatcher(buffer_handle));
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   // Don't verify |options| here; that's the dispatcher's job.
   scoped_refptr<Dispatcher> new_dispatcher;
   MojoResult result =
       dispatcher->DuplicateBufferHandle(options, &new_dispatcher);
-  if (result != MOJO_RESULT_OK) {
+  if (result != MOJO_LEGACY_RESULT_OK) {
     return result;
   }
 
   *new_buffer_handle = AddDispatcher(new_dispatcher);
-  if (*new_buffer_handle == MOJO_HANDLE_INVALID) {
+  if (*new_buffer_handle == MOJO_LEGACY_HANDLE_INVALID) {
     LOG(ERROR) << "Handle table full";
     new_dispatcher->Close();
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::MapBuffer(MojoHandle buffer_handle,
@@ -993,20 +997,20 @@ MojoResult Core::MapBuffer(MojoHandle buffer_handle,
                            void** buffer) {
   scoped_refptr<Dispatcher> dispatcher(GetDispatcher(buffer_handle));
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (options) {
     if (options->struct_size < sizeof(*options)) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
-    if (options->flags != MOJO_MAP_BUFFER_FLAG_NONE) {
-      return MOJO_RESULT_UNIMPLEMENTED;
+    if (options->flags != MOJO_LEGACY_MAP_BUFFER_FLAG_NONE) {
+      return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
     }
   }
 
   std::unique_ptr<PlatformSharedMemoryMapping> mapping;
   MojoResult result = dispatcher->MapBuffer(offset, num_bytes, &mapping);
-  if (result != MOJO_RESULT_OK) {
+  if (result != MOJO_LEGACY_RESULT_OK) {
     return result;
   }
 
@@ -1015,14 +1019,14 @@ MojoResult Core::MapBuffer(MojoHandle buffer_handle,
   {
     base::AutoLock locker(mapping_table_lock_);
     if (mapping_table_.size() >= GetConfiguration().max_mapping_table_size) {
-      return MOJO_RESULT_RESOURCE_EXHAUSTED;
+      return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
     }
     auto emplace_result = mapping_table_.emplace(address, std::move(mapping));
     DCHECK(emplace_result.second);
   }
 
   *buffer = address;
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::UnmapBuffer(void* buffer) {
@@ -1032,14 +1036,14 @@ MojoResult Core::UnmapBuffer(void* buffer) {
     base::AutoLock lock(mapping_table_lock_);
     auto iter = mapping_table_.find(buffer);
     if (iter == mapping_table_.end()) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
 
     // Grab a reference so that it gets unmapped outside of this lock.
     mapping = std::move(iter->second);
     mapping_table_.erase(iter);
   }
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::GetBufferInfo(MojoHandle buffer_handle,
@@ -1047,19 +1051,19 @@ MojoResult Core::GetBufferInfo(MojoHandle buffer_handle,
                                MojoSharedBufferInfo* info) {
   if (options) {
     if (options->struct_size < sizeof(*options)) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
-    if (options->flags != MOJO_GET_BUFFER_INFO_FLAG_NONE) {
-      return MOJO_RESULT_UNIMPLEMENTED;
+    if (options->flags != MOJO_LEGACY_GET_BUFFER_INFO_FLAG_NONE) {
+      return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
     }
   }
   if (!info || info->struct_size < sizeof(MojoSharedBufferInfo)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   scoped_refptr<Dispatcher> dispatcher(GetDispatcher(buffer_handle));
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   return dispatcher->GetBufferInfo(info);
@@ -1071,18 +1075,18 @@ MojoResult Core::WrapPlatformHandle(
     MojoHandle* mojo_handle) {
   if (!platform_handle ||
       platform_handle->struct_size < sizeof(*platform_handle)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   auto handle = PlatformHandle::FromMojoPlatformHandle(platform_handle);
   MojoHandle h =
       AddDispatcher(PlatformHandleDispatcher::Create(std::move(handle)));
-  if (h == MOJO_HANDLE_INVALID) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+  if (h == MOJO_LEGACY_HANDLE_INVALID) {
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
   *mojo_handle = h;
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::UnwrapPlatformHandle(
@@ -1091,7 +1095,7 @@ MojoResult Core::UnwrapPlatformHandle(
     MojoPlatformHandle* platform_handle) {
   if (!platform_handle ||
       platform_handle->struct_size < sizeof(*platform_handle)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   scoped_refptr<Dispatcher> dispatcher;
@@ -1100,12 +1104,12 @@ MojoResult Core::UnwrapPlatformHandle(
     dispatcher = handles_->GetDispatcher(mojo_handle);
     if (!dispatcher ||
         dispatcher->GetType() != Dispatcher::Type::PLATFORM_HANDLE) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
 
     MojoResult result =
         handles_->GetAndRemoveDispatcher(mojo_handle, &dispatcher);
-    if (result != MOJO_RESULT_OK) {
+    if (result != MOJO_LEGACY_RESULT_OK) {
       return result;
     }
   }
@@ -1116,7 +1120,7 @@ MojoResult Core::UnwrapPlatformHandle(
   phd->Close();
 
   PlatformHandle::ToMojoPlatformHandle(std::move(handle), platform_handle);
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::WrapPlatformSharedMemoryRegion(
@@ -1130,15 +1134,16 @@ MojoResult Core::WrapPlatformSharedMemoryRegion(
   DCHECK(size);
 
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && \
-    !BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
-  if (access_mode == MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE) {
+    !BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
+  if (access_mode ==
+      MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE) {
     if (num_platform_handles != 2) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
   }
 #else
   if (num_platform_handles != 1) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 #endif
 
@@ -1152,28 +1157,29 @@ MojoResult Core::WrapPlatformSharedMemoryRegion(
     }
   }
   if (!handles_ok) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   std::optional<base::UnguessableToken> token =
-      mojo::internal::PlatformHandleInternal::UnmarshalUnguessableToken(guid);
+      mojo_legacy::internal::PlatformHandleInternal::UnmarshalUnguessableToken(
+          guid);
   if (!token.has_value()) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   base::subtle::PlatformSharedMemoryRegion::Mode mode;
   switch (access_mode) {
-    case MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_READ_ONLY:
+    case MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_READ_ONLY:
       mode = base::subtle::PlatformSharedMemoryRegion::Mode::kReadOnly;
       break;
-    case MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE:
+    case MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE:
       mode = base::subtle::PlatformSharedMemoryRegion::Mode::kWritable;
       break;
-    case MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE:
+    case MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE:
       mode = base::subtle::PlatformSharedMemoryRegion::Mode::kUnsafe;
       break;
     default:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   base::subtle::PlatformSharedMemoryRegion region =
@@ -1182,25 +1188,25 @@ MojoResult Core::WrapPlatformSharedMemoryRegion(
               std::move(handles[0]), std::move(handles[1])),
           mode, size, token.value());
   if (!region.IsValid()) {
-    return MOJO_RESULT_UNKNOWN;
+    return MOJO_LEGACY_RESULT_UNKNOWN;
   }
 
   scoped_refptr<SharedBufferDispatcher> dispatcher;
   MojoResult result =
       SharedBufferDispatcher::CreateFromPlatformSharedMemoryRegion(
           std::move(region), &dispatcher);
-  if (result != MOJO_RESULT_OK) {
+  if (result != MOJO_LEGACY_RESULT_OK) {
     return result;
   }
 
   MojoHandle h = AddDispatcher(dispatcher);
-  if (h == MOJO_HANDLE_INVALID) {
+  if (h == MOJO_LEGACY_HANDLE_INVALID) {
     dispatcher->Close();
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
   *mojo_handle = h;
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::UnwrapPlatformSharedMemoryRegion(
@@ -1212,18 +1218,18 @@ MojoResult Core::UnwrapPlatformSharedMemoryRegion(
     MojoSharedBufferGuid* guid,
     MojoPlatformSharedMemoryRegionAccessMode* access_mode) {
   scoped_refptr<Dispatcher> dispatcher;
-  MojoResult result = MOJO_RESULT_OK;
+  MojoResult result = MOJO_LEGACY_RESULT_OK;
   {
     base::AutoLock lock(handles_->GetLock());
     result = handles_->GetAndRemoveDispatcher(mojo_handle, &dispatcher);
-    if (result != MOJO_RESULT_OK) {
+    if (result != MOJO_LEGACY_RESULT_OK) {
       return result;
     }
   }
 
   if (dispatcher->GetType() != Dispatcher::Type::SHARED_BUFFER) {
     dispatcher->Close();
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   SharedBufferDispatcher* shm_dispatcher =
@@ -1234,22 +1240,26 @@ MojoResult Core::UnwrapPlatformSharedMemoryRegion(
   DCHECK(size);
   *size = region.GetSize();
 
-  *guid = mojo::internal::PlatformHandleInternal::MarshalUnguessableToken(
-      region.GetGUID());
+  *guid =
+      mojo_legacy::internal::PlatformHandleInternal::MarshalUnguessableToken(
+          region.GetGUID());
 
   DCHECK(access_mode);
   switch (region.GetMode()) {
     case base::subtle::PlatformSharedMemoryRegion::Mode::kReadOnly:
-      *access_mode = MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_READ_ONLY;
+      *access_mode =
+          MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_READ_ONLY;
       break;
     case base::subtle::PlatformSharedMemoryRegion::Mode::kWritable:
-      *access_mode = MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE;
+      *access_mode =
+          MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_WRITABLE;
       break;
     case base::subtle::PlatformSharedMemoryRegion::Mode::kUnsafe:
-      *access_mode = MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE;
+      *access_mode =
+          MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE;
       break;
     default:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   PlatformHandle handle;
@@ -1259,49 +1269,49 @@ MojoResult Core::UnwrapPlatformSharedMemoryRegion(
 
   const uint32_t available_handle_storage_slots = *num_platform_handles;
   if (available_handle_storage_slots < 1) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
   *num_platform_handles = 1;
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && \
-    !BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+    !BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   if (region.GetMode() ==
       base::subtle::PlatformSharedMemoryRegion::Mode::kWritable) {
     if (available_handle_storage_slots < 2) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
     PlatformHandle::ToMojoPlatformHandle(std::move(read_only_handle),
                                          UNSAFE_TODO(&platform_handles[1]));
     if (UNSAFE_TODO(platform_handles[1]).type ==
-        MOJO_PLATFORM_HANDLE_TYPE_INVALID) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+        MOJO_LEGACY_PLATFORM_HANDLE_TYPE_INVALID) {
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
     *num_platform_handles = 2;
   }
 #endif
 
   PlatformHandle::ToMojoPlatformHandle(std::move(handle), &platform_handles[0]);
-  if (platform_handles[0].type == MOJO_PLATFORM_HANDLE_TYPE_INVALID) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+  if (platform_handles[0].type == MOJO_LEGACY_PLATFORM_HANDLE_TYPE_INVALID) {
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::CreateInvitation(const MojoCreateInvitationOptions* options,
                                   MojoHandle* invitation_handle) {
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (!invitation_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   *invitation_handle = AddDispatcher(new InvitationDispatcher);
-  if (*invitation_handle == MOJO_HANDLE_INVALID) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+  if (*invitation_handle == MOJO_LEGACY_HANDLE_INVALID) {
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::AttachMessagePipeToInvitation(
@@ -1311,18 +1321,18 @@ MojoResult Core::AttachMessagePipeToInvitation(
     const MojoAttachMessagePipeToInvitationOptions* options,
     MojoHandle* message_pipe_handle) {
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (!message_pipe_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (name_num_bytes == 0) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   scoped_refptr<Dispatcher> dispatcher = GetDispatcher(invitation_handle);
   if (!dispatcher || dispatcher->GetType() != Dispatcher::Type::INVITATION) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   auto* invitation_dispatcher =
       static_cast<InvitationDispatcher*>(dispatcher.get());
@@ -1331,20 +1341,20 @@ MojoResult Core::AttachMessagePipeToInvitation(
 
   ports::PortRef remote_peer_port;
   MojoHandle local_handle = CreatePartialMessagePipe(&remote_peer_port);
-  if (local_handle == MOJO_HANDLE_INVALID) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+  if (local_handle == MOJO_LEGACY_HANDLE_INVALID) {
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
   MojoResult result = invitation_dispatcher->AttachMessagePipe(
       std::string_view(static_cast<const char*>(name), name_num_bytes),
       std::move(remote_peer_port));
-  if (result != MOJO_RESULT_OK) {
+  if (result != MOJO_LEGACY_RESULT_OK) {
     Close(local_handle);
     return result;
   }
 
   *message_pipe_handle = local_handle;
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::ExtractMessagePipeFromInvitation(
@@ -1354,13 +1364,13 @@ MojoResult Core::ExtractMessagePipeFromInvitation(
     const MojoExtractMessagePipeFromInvitationOptions* options,
     MojoHandle* message_pipe_handle) {
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (!message_pipe_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (name_num_bytes == 0) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   RequestContext request_context;
@@ -1368,7 +1378,7 @@ MojoResult Core::ExtractMessagePipeFromInvitation(
   std::string_view name_string(static_cast<const char*>(name), name_num_bytes);
   scoped_refptr<Dispatcher> dispatcher = GetDispatcher(invitation_handle);
   if (!dispatcher || dispatcher->GetType() != Dispatcher::Type::INVITATION) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   auto* invitation_dispatcher =
       static_cast<InvitationDispatcher*>(dispatcher.get());
@@ -1377,17 +1387,17 @@ MojoResult Core::ExtractMessagePipeFromInvitation(
   // isolated invitation.
   MojoResult extract_result = invitation_dispatcher->ExtractMessagePipe(
       name_string, message_pipe_handle);
-  if (extract_result == MOJO_RESULT_OK ||
-      extract_result == MOJO_RESULT_RESOURCE_EXHAUSTED) {
+  if (extract_result == MOJO_LEGACY_RESULT_OK ||
+      extract_result == MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED) {
     return extract_result;
   }
 
   *message_pipe_handle =
       ExtractMessagePipeFromInvitation(std::string(name_string));
-  if (*message_pipe_handle == MOJO_HANDLE_INVALID) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+  if (*message_pipe_handle == MOJO_LEGACY_HANDLE_INVALID) {
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::SendInvitation(
@@ -1398,14 +1408,14 @@ MojoResult Core::SendInvitation(
     uintptr_t error_handler_context,
     const MojoSendInvitationOptions* options) {
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   base::Process target_process;
   if (process_handle) {
     MojoResult result =
         UnwrapAndClonePlatformProcessHandle(process_handle, target_process);
-    if (result != MOJO_RESULT_OK) {
+    if (result != MOJO_LEGACY_RESULT_OK) {
       return result;
     }
   }
@@ -1422,26 +1432,27 @@ MojoResult Core::SendInvitation(
   }
 
   if (!transport_endpoint) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (transport_endpoint->struct_size < sizeof(*transport_endpoint)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (transport_endpoint->num_platform_handles == 0) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (!transport_endpoint->platform_handles) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
-  if (transport_endpoint->type != MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL &&
+  if (transport_endpoint->type !=
+          MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL &&
       transport_endpoint->type !=
-          MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC) {
-    return MOJO_RESULT_UNIMPLEMENTED;
+          MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC) {
+    return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
   }
 
   scoped_refptr<Dispatcher> dispatcher = GetDispatcher(invitation_handle);
   if (!dispatcher || dispatcher->GetType() != Dispatcher::Type::INVITATION) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   auto* invitation_dispatcher =
       static_cast<InvitationDispatcher*>(dispatcher.get());
@@ -1449,7 +1460,7 @@ MojoResult Core::SendInvitation(
   auto endpoint = PlatformHandle::FromMojoPlatformHandle(
       &transport_endpoint->platform_handles[0]);
   if (!endpoint.is_valid()) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   ConnectionParams connection_params(
@@ -1462,7 +1473,7 @@ MojoResult Core::SendInvitation(
     scoped_refptr<Dispatcher> removed_dispatcher;
     MojoResult result = handles_->GetAndRemoveDispatcher(invitation_handle,
                                                          &removed_dispatcher);
-    if (result != MOJO_RESULT_OK) {
+    if (result != MOJO_LEGACY_RESULT_OK) {
       // Release ownership of the endpoint platform handle, per the API
       // contract. The caller retains ownership on failure.
       connection_params.TakeEndpoint().TakePlatformHandle().release();
@@ -1481,10 +1492,10 @@ MojoResult Core::SendInvitation(
 
   connection_params.set_is_untrusted_process(
       options &&
-      (options->flags & MOJO_SEND_INVITATION_FLAG_UNTRUSTED_PROCESS));
+      (options->flags & MOJO_LEGACY_SEND_INVITATION_FLAG_UNTRUSTED_PROCESS));
 
   bool is_isolated =
-      options && (options->flags & MOJO_SEND_INVITATION_FLAG_ISOLATED);
+      options && (options->flags & MOJO_LEGACY_SEND_INVITATION_FLAG_ISOLATED);
   RequestContext request_context;
   if (is_isolated) {
     DCHECK_EQ(attached_ports.size(), 1u);
@@ -1496,7 +1507,7 @@ MojoResult Core::SendInvitation(
                                          connection_name);
   } else {
     if (transport_endpoint->type ==
-        MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC) {
+        MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC) {
       connection_params.set_is_async(true);
     }
     GetNodeController()->SendBrokerClientInvitation(
@@ -1504,7 +1515,7 @@ MojoResult Core::SendInvitation(
         process_error_callback);
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::AcceptInvitation(
@@ -1512,53 +1523,55 @@ MojoResult Core::AcceptInvitation(
     const MojoAcceptInvitationOptions* options,
     MojoHandle* invitation_handle) {
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   if (!transport_endpoint) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (transport_endpoint->struct_size < sizeof(*transport_endpoint)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (transport_endpoint->num_platform_handles == 0) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   if (!transport_endpoint->platform_handles) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
-  if (transport_endpoint->type != MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL &&
+  if (transport_endpoint->type !=
+          MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL &&
       transport_endpoint->type !=
-          MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC) {
-    return MOJO_RESULT_UNIMPLEMENTED;
+          MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC) {
+    return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
   }
 
   if (!invitation_handle) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   auto dispatcher = base::MakeRefCounted<InvitationDispatcher>();
   *invitation_handle = AddDispatcher(dispatcher);
-  if (*invitation_handle == MOJO_HANDLE_INVALID) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+  if (*invitation_handle == MOJO_LEGACY_HANDLE_INVALID) {
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
 
   auto endpoint = PlatformHandle::FromMojoPlatformHandle(
       &transport_endpoint->platform_handles[0]);
   if (!endpoint.is_valid()) {
     Close(*invitation_handle);
-    *invitation_handle = MOJO_HANDLE_INVALID;
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    *invitation_handle = MOJO_LEGACY_HANDLE_INVALID;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   ConnectionParams connection_params(
       PlatformChannelEndpoint(std::move(endpoint)));
   if (options &&
-      options->flags & MOJO_ACCEPT_INVITATION_FLAG_LEAK_TRANSPORT_ENDPOINT) {
+      options->flags &
+          MOJO_LEGACY_ACCEPT_INVITATION_FLAG_LEAK_TRANSPORT_ENDPOINT) {
     connection_params.set_leak_endpoint(true);
   }
 
   bool is_isolated =
-      options && (options->flags & MOJO_ACCEPT_INVITATION_FLAG_ISOLATED);
+      options && (options->flags & MOJO_LEGACY_ACCEPT_INVITATION_FLAG_ISOLATED);
   NodeController* const node_controller = GetNodeController();
   RequestContext request_context;
   if (is_isolated) {
@@ -1572,16 +1585,16 @@ MojoResult Core::AcceptInvitation(
                                      std::string_view());
     MojoResult result =
         dispatcher->AttachMessagePipe(kIsolatedInvitationPipeName, local_port);
-    DCHECK_EQ(MOJO_RESULT_OK, result);
+    DCHECK_EQ(MOJO_LEGACY_RESULT_OK, result);
   } else {
     if (transport_endpoint->type ==
-        MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC) {
+        MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL_ASYNC) {
       connection_params.set_is_async(true);
     }
     node_controller->AcceptBrokerClientInvitation(std::move(connection_params));
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult Core::SetQuota(MojoHandle handle,
@@ -1590,11 +1603,11 @@ MojoResult Core::SetQuota(MojoHandle handle,
                           const MojoSetQuotaOptions* options) {
   RequestContext request_context;
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   auto dispatcher = GetDispatcher(handle);
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
   return dispatcher->SetQuota(type, limit);
@@ -1607,11 +1620,11 @@ MojoResult Core::QueryQuota(MojoHandle handle,
                             uint64_t* usage) {
   RequestContext request_context;
   if (options && options->struct_size < sizeof(*options)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   auto dispatcher = GetDispatcher(handle);
   if (!dispatcher) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
   return dispatcher->QueryQuota(type, limit, usage);
 }
@@ -1620,12 +1633,12 @@ MojoResult Core::SetDefaultProcessErrorHandler(
     MojoDefaultProcessErrorHandler handler,
     const MojoSetDefaultProcessErrorHandlerOptions* options) {
   if (default_process_error_callback_ && handler) {
-    return MOJO_RESULT_ALREADY_EXISTS;
+    return MOJO_LEGACY_RESULT_ALREADY_EXISTS;
   }
 
   if (!handler) {
     default_process_error_callback_.Reset();
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   default_process_error_callback_ = base::BindRepeating(
@@ -1637,7 +1650,7 @@ MojoResult Core::SetDefaultProcessErrorHandler(
         handler(&details);
       },
       handler);
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 void Core::GetActiveHandlesForTest(std::vector<MojoHandle>* handles) {
@@ -1656,4 +1669,4 @@ void Core::PassNodeControllerToIOThread(
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

@@ -2,21 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_PORTS_PORT_REF_H_
-#define MOJO_CORE_PORTS_PORT_REF_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_PORT_REF_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_PORT_REF_H_
 
 #include "base/component_export.h"
 #include "base/memory/scoped_refptr.h"
-#include "mojo/core/ports/name.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/name.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 
 class Port;
 class PortLocker;
 
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) PortRef {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) PortRef {
  public:
   ~PortRef();
   PortRef();
@@ -43,6 +43,6 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) PortRef {
 
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_PORTS_PORT_REF_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_PORT_REF_H_

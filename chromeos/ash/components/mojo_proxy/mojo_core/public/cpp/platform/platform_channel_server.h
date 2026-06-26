@@ -2,30 +2,30 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_H_
-#define MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_H_
 
 #include <memory>
 
 #include "base/component_export.h"
 #include "base/functional/callback.h"
 #include "base/task/single_thread_task_runner.h"
-#include "mojo/public/cpp/platform/platform_channel_endpoint.h"
-#include "mojo/public/cpp/platform/platform_channel_server_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_server_endpoint.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // PlatformChannelServer takes ownership of a PlatformChannelServerEndpoint
 // and listens for a single incoming client connection.
 //
 // This class is not thread-safe and must be used on a thread which runs an I/O
 // MessagePump.
-class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformChannelServer {
+class COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM) PlatformChannelServer {
  public:
   using ConnectionCallback = base::OnceCallback<void(PlatformChannelEndpoint)>;
 
   // Implemented for each supported platform.
-  class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) Listener {
+  class COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM) Listener {
    public:
     virtual ~Listener() = default;
 
@@ -84,6 +84,6 @@ class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformChannelServer {
   std::unique_ptr<Listener> listener_;
 };
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_H_

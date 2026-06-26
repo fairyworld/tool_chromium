@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/platform/platform_channel_server.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_server.h"
 
 #include <memory>
 #include <utility>
 
-namespace mojo {
+namespace mojo_legacy {
 
 PlatformChannelServer::PlatformChannelServer() = default;
 
@@ -49,4 +49,4 @@ void PlatformChannelServer::Stop() {
   listener_.reset();
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

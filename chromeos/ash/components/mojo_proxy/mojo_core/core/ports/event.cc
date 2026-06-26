@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -12,9 +12,9 @@
 #include "base/logging.h"
 #include "base/memory/ptr_util.h"
 #include "base/numerics/safe_math.h"
-#include "mojo/core/ports/user_message.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/user_message.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 
@@ -28,7 +28,7 @@ struct SerializedHeader {
   Event::Type type;
   uint32_t padding;
   PortName port_name;
-#ifndef MOJO_BACKWARDS_COMPAT
+#ifndef MOJO_LEGACY_BACKWARDS_COMPAT
   PortName from_port;
   uint64_t control_sequence_num;
 #endif
@@ -123,7 +123,7 @@ ScopedEvent Event::Deserialize(const void* buffer, size_t num_bytes) {
 
   const auto* header = static_cast<const SerializedHeader*>(buffer);
   const PortName& port_name = header->port_name;
-#ifndef MOJO_BACKWARDS_COMPAT
+#ifndef MOJO_LEGACY_BACKWARDS_COMPAT
   const PortName& from_port = header->from_port;
   const uint64_t control_sequence_num = header->control_sequence_num;
 #else
@@ -193,7 +193,7 @@ void Event::Serialize(void* buffer) const {
   header->type = type_;
   header->padding = 0;
   header->port_name = port_name_;
-#ifndef MOJO_BACKWARDS_COMPAT
+#ifndef MOJO_LEGACY_BACKWARDS_COMPAT
   header->from_port = from_port_;
   header->control_sequence_num = control_sequence_num_;
 #endif
@@ -604,4 +604,4 @@ void UpdatePreviousPeerEvent::SerializeData(void* buffer) const {
 
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

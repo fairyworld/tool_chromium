@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/message_pipe.h"
 
 #include <algorithm>
 #include <cstring>
@@ -10,7 +10,7 @@
 #include "base/compiler_specific.h"
 #include "base/numerics/safe_math.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 MojoResult WriteMessageRaw(MessagePipeHandle message_pipe,
                            const void* bytes,
@@ -19,20 +19,21 @@ MojoResult WriteMessageRaw(MessagePipeHandle message_pipe,
                            size_t num_handles,
                            MojoWriteMessageFlags flags) {
   ScopedMessageHandle message_handle;
-  MojoResult rv = CreateMessage(&message_handle, MOJO_CREATE_MESSAGE_FLAG_NONE);
-  DCHECK_EQ(MOJO_RESULT_OK, rv);
+  MojoResult rv =
+      CreateMessage(&message_handle, MOJO_LEGACY_CREATE_MESSAGE_FLAG_NONE);
+  DCHECK_EQ(MOJO_LEGACY_RESULT_OK, rv);
 
   MojoAppendMessageDataOptions append_options;
   append_options.struct_size = sizeof(append_options);
-  append_options.flags = MOJO_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE;
+  append_options.flags = MOJO_LEGACY_APPEND_MESSAGE_DATA_FLAG_COMMIT_SIZE;
   void* buffer;
   uint32_t buffer_size;
   rv = MojoAppendMessageData(message_handle->value(),
                              base::checked_cast<uint32_t>(num_bytes), handles,
                              base::checked_cast<uint32_t>(num_handles),
                              &append_options, &buffer, &buffer_size);
-  if (rv != MOJO_RESULT_OK) {
-    return MOJO_RESULT_ABORTED;
+  if (rv != MOJO_LEGACY_RESULT_OK) {
+    return MOJO_LEGACY_RESULT_ABORTED;
   }
 
   DCHECK(buffer);
@@ -54,13 +55,14 @@ MojoResult ReadMessageRaw(MessagePipeHandle message_pipe,
                           MojoReadMessageFlags flags) {
   ScopedMessageHandle message_handle;
   MojoResult rv = ReadMessageNew(message_pipe, &message_handle, flags);
-  if (rv != MOJO_RESULT_OK) {
+  if (rv != MOJO_LEGACY_RESULT_OK) {
     return rv;
   }
 
   rv = MojoSerializeMessage(message_handle->value(), nullptr);
-  if (rv != MOJO_RESULT_OK && rv != MOJO_RESULT_FAILED_PRECONDITION) {
-    return MOJO_RESULT_ABORTED;
+  if (rv != MOJO_LEGACY_RESULT_OK &&
+      rv != MOJO_LEGACY_RESULT_FAILED_PRECONDITION) {
+    return MOJO_LEGACY_RESULT_ABORTED;
   }
 
   void* buffer = nullptr;
@@ -68,7 +70,7 @@ MojoResult ReadMessageRaw(MessagePipeHandle message_pipe,
   uint32_t num_handles = 0;
   rv = MojoGetMessageData(message_handle->value(), nullptr, &buffer, &num_bytes,
                           nullptr, &num_handles);
-  if (rv == MOJO_RESULT_RESOURCE_EXHAUSTED) {
+  if (rv == MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED) {
     DCHECK(handles);
     handles->resize(num_handles);
     rv = MojoGetMessageData(
@@ -90,11 +92,11 @@ MojoResult ReadMessageRaw(MessagePipeHandle message_pipe,
     handles->clear();
   }
 
-  if (rv != MOJO_RESULT_OK) {
-    return MOJO_RESULT_ABORTED;
+  if (rv != MOJO_LEGACY_RESULT_OK) {
+    return MOJO_LEGACY_RESULT_ABORTED;
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

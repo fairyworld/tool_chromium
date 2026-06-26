@@ -6,19 +6,19 @@
 //
 // Note: This header should be compilable as C.
 
-#ifndef MOJO_PUBLIC_C_SYSTEM_CORE_H_
-#define MOJO_PUBLIC_C_SYSTEM_CORE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_CORE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_CORE_H_
 
-#include "mojo/public/c/system/buffer.h"
-#include "mojo/public/c/system/data_pipe.h"
-#include "mojo/public/c/system/functions.h"
-#include "mojo/public/c/system/invitation.h"
-#include "mojo/public/c/system/macros.h"
-#include "mojo/public/c/system/message_pipe.h"
-#include "mojo/public/c/system/platform_handle.h"
-#include "mojo/public/c/system/quota.h"
-#include "mojo/public/c/system/system_export.h"
-#include "mojo/public/c/system/trap.h"
-#include "mojo/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/buffer.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/data_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/functions.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/invitation.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/macros.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/quota.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/trap.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
 
-#endif  // MOJO_PUBLIC_C_SYSTEM_CORE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_CORE_H_

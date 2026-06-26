@@ -2,20 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_ENDPOINT_H_
-#define MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_ENDPOINT_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_ENDPOINT_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_ENDPOINT_H_
 
 #include "base/component_export.h"
-#include "mojo/public/cpp/platform/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // A PlatformHandle with a little extra type information to convey that it's
 // a channel server endpoint, i.e. a handle that should be used with
 // PlatformChannelServer to wait for a new connection and ultimately provide
 // a connected PlatformChannelEndpoint suitable for use with the Mojo
 // invitations API.
-class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformChannelServerEndpoint {
+class COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM) PlatformChannelServerEndpoint {
  public:
   PlatformChannelServerEndpoint();
   PlatformChannelServerEndpoint(PlatformChannelServerEndpoint&& other);
@@ -44,6 +44,6 @@ class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformChannelServerEndpoint {
   PlatformHandle handle_;
 };
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_ENDPOINT_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_SERVER_ENDPOINT_H_

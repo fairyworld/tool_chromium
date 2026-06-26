@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -27,23 +27,23 @@
 #include "base/synchronization/waitable_event.h"
 #include "base/test/test_timeouts.h"
 #include "build/build_config.h"
-#include "mojo/buildflags.h"
-#include "mojo/core/embedder/embedder.h"
-#include "mojo/core/ipcz_driver/shared_buffer.h"
-#include "mojo/core/test/mojo_test_base.h"
-#include "mojo/public/c/system/core.h"
-#include "mojo/public/cpp/system/handle.h"
-#include "mojo/public/cpp/system/message_pipe.h"
-#include "mojo/public/cpp/system/platform_handle.h"
-#include "mojo/public/cpp/system/wait.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ipcz_driver/shared_buffer.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/mojo_test_base.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/wait.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
-#include "mojo/core/core.h"
-#include "mojo/core/shared_buffer_dispatcher.h"
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/shared_buffer_dispatcher.h"
 #endif
 
-namespace mojo::core {
+namespace mojo_legacy::core {
 namespace {
 
 template <typename T>
@@ -51,20 +51,20 @@ MojoResult CreateSharedBufferFromRegion(T&& region, MojoHandle* handle) {
   if (IsMojoIpczEnabled()) {
     *handle = ipcz_driver::SharedBuffer::Box(
         ipcz_driver::SharedBuffer::MakeForRegion(std::move(region)));
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
   scoped_refptr<SharedBufferDispatcher> buffer;
   MojoResult result =
       SharedBufferDispatcher::CreateFromPlatformSharedMemoryRegion(
           T::TakeHandleForSerialization(std::forward<T>(region)), &buffer);
-  if (result != MOJO_RESULT_OK) {
+  if (result != MOJO_LEGACY_RESULT_OK) {
     return result;
   }
 
   *handle = Core::Get()->AddDispatcher(std::move(buffer));
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 #else
   NOTREACHED();
 #endif
@@ -77,12 +77,12 @@ MojoResult ExtractRegionFromSharedBuffer(MojoHandle handle, T* region) {
     platform_region =
         std::move(ipcz_driver::SharedBuffer::Unbox(handle)->region());
   } else {
-#if BUILDFLAG(MOJO_SUPPORT_LEGACY_CORE)
+#if BUILDFLAG(MOJO_LEGACY_SUPPORT_LEGACY_CORE)
     scoped_refptr<Dispatcher> dispatcher =
         Core::Get()->GetAndRemoveDispatcher(handle);
     if (!dispatcher ||
         dispatcher->GetType() != Dispatcher::Type::SHARED_BUFFER) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
 
     auto* buffer = static_cast<SharedBufferDispatcher*>(dispatcher.get());
@@ -93,7 +93,7 @@ MojoResult ExtractRegionFromSharedBuffer(MojoHandle handle, T* region) {
   }
 
   *region = T::Deserialize(std::move(platform_region));
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 // The multiprocess tests that use these don't compile on iOS.
@@ -114,8 +114,8 @@ TEST_F(EmbedderTest, ChannelBasic) {
   WriteMessage(server_mp, kHello);
   EXPECT_EQ(kHello, ReadMessage(client_mp));
 
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(server_mp));
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(client_mp));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(server_mp));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(client_mp));
 }
 
 // Verifies that a MP with pending messages to be written can be sent and the
@@ -134,28 +134,28 @@ TEST_F(EmbedderTest, SendMessagePipeWithWriteQueue) {
 
   // Now send client2.
   WriteMessageWithHandles(server_mp, "hey", &client_mp2, 1);
-  client_mp2 = MOJO_HANDLE_INVALID;
+  client_mp2 = MOJO_LEGACY_HANDLE_INVALID;
 
   // Read client2 just so we can close it later.
   EXPECT_EQ("hey", ReadMessageWithHandles(client_mp, &client_mp2, 1));
-  EXPECT_NE(MOJO_HANDLE_INVALID, client_mp2);
+  EXPECT_NE(MOJO_LEGACY_HANDLE_INVALID, client_mp2);
 
   // Now verify that all the messages that were written were sent correctly.
   for (size_t i = 1; i <= kNumMessages; i++) {
     ASSERT_EQ(std::string(i, 'A' + (i % 26)), ReadMessage(server_mp2));
   }
 
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(server_mp2));
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(client_mp2));
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(server_mp));
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(client_mp));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(server_mp2));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(client_mp2));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(server_mp));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(client_mp));
 }
 
 TEST_F(EmbedderTest, ChannelsHandlePassing) {
   MojoHandle server_mp, client_mp;
   CreateMessagePipe(&server_mp, &client_mp);
-  EXPECT_NE(server_mp, MOJO_HANDLE_INVALID);
-  EXPECT_NE(client_mp, MOJO_HANDLE_INVALID);
+  EXPECT_NE(server_mp, MOJO_LEGACY_HANDLE_INVALID);
+  EXPECT_NE(client_mp, MOJO_LEGACY_HANDLE_INVALID);
 
   MojoHandle h0, h1;
   CreateMessagePipe(&h0, &h1);
@@ -167,7 +167,7 @@ TEST_F(EmbedderTest, ChannelsHandlePassing) {
   // Write one message to |server_mp|, attaching |h1|.
   const std::string kWorld = "world!!!";
   WriteMessageWithHandles(server_mp, kWorld, &h1, 1);
-  h1 = MOJO_HANDLE_INVALID;
+  h1 = MOJO_LEGACY_HANDLE_INVALID;
 
   // Write another message to |h0|.
   const std::string kFoo = "foo";
@@ -175,7 +175,7 @@ TEST_F(EmbedderTest, ChannelsHandlePassing) {
 
   // Wait for |client_mp| to become readable and read a message from it.
   EXPECT_EQ(kWorld, ReadMessageWithHandles(client_mp, &h1, 1));
-  EXPECT_NE(h1, MOJO_HANDLE_INVALID);
+  EXPECT_NE(h1, MOJO_LEGACY_HANDLE_INVALID);
 
   // Wait for |h1| to become readable and read a message from it.
   EXPECT_EQ(kHello, ReadMessage(h1));
@@ -190,10 +190,10 @@ TEST_F(EmbedderTest, ChannelsHandlePassing) {
   // Wait for |h0| to become readable and read a message from it.
   EXPECT_EQ(kBarBaz, ReadMessage(h0));
 
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(server_mp));
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(client_mp));
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(h0));
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(h1));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(server_mp));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(client_mp));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h0));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h1));
 }
 
 // The sequence of messages sent is:
@@ -230,30 +230,32 @@ TEST_F(EmbedderTest, MultiprocessChannels) {
 
     // 5. Write a message to |server_mp|, attaching |mp1|.
     WriteMessageWithHandles(server_mp, "Bar", &mp1, 1);
-    mp1 = MOJO_HANDLE_INVALID;
+    mp1 = MOJO_LEGACY_HANDLE_INVALID;
 
     // 6. Read a message from |mp0|, which should have |mp2| attached.
-    MojoHandle mp2 = MOJO_HANDLE_INVALID;
+    MojoHandle mp2 = MOJO_LEGACY_HANDLE_INVALID;
     EXPECT_EQ("quux", ReadMessageWithHandles(mp0, &mp2, 1));
 
     // 7. Read a message from |mp2|.
     EXPECT_EQ("baz", ReadMessage(mp2));
 
     // 8. Close |mp0|.
-    ASSERT_EQ(MOJO_RESULT_OK, MojoClose(mp0));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(mp0));
 
     // 9. Tell the client to quit.
     WriteMessage(server_mp, "quit");
 
     // 10. Wait on |mp2| (which should eventually fail) and then close it.
     MojoHandleSignalsState state;
-    ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
-              WaitForSignals(mp2, MOJO_HANDLE_SIGNAL_READABLE, &state));
-    ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, state.satisfied_signals);
-    ASSERT_FALSE(state.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE);
-    ASSERT_FALSE(state.satisfiable_signals & MOJO_HANDLE_SIGNAL_WRITABLE);
+    ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+              WaitForSignals(mp2, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &state));
+    ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, state.satisfied_signals);
+    ASSERT_FALSE(state.satisfiable_signals &
+                 MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+    ASSERT_FALSE(state.satisfiable_signals &
+                 MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
 
-    ASSERT_EQ(MOJO_RESULT_OK, MojoClose(mp2));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(mp2));
   });
 }
 
@@ -278,11 +280,11 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MultiprocessChannelsClient,
   WriteMessage(mp3, "baz");
 
   // 7. Close |mp3|.
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(mp3));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(mp3));
 
   // 8. Write a message to |mp1|, attaching |mp2|.
   WriteMessageWithHandles(mp1, "quux", &mp2, 1);
-  mp2 = MOJO_HANDLE_INVALID;
+  mp2 = MOJO_LEGACY_HANDLE_INVALID;
 
   // 9. Read a message from |mp1|.
   EXPECT_EQ("FOO", ReadMessage(mp1));
@@ -291,13 +293,13 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MultiprocessChannelsClient,
 
   // 10. Wait on |mp1| (which should eventually fail) and then close it.
   MojoHandleSignalsState state;
-  ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
-            WaitForSignals(mp1, MOJO_HANDLE_SIGNAL_READABLE, &state));
-  ASSERT_EQ(MOJO_HANDLE_SIGNAL_PEER_CLOSED, state.satisfied_signals);
-  ASSERT_FALSE(state.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  ASSERT_FALSE(state.satisfiable_signals & MOJO_HANDLE_SIGNAL_WRITABLE);
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(mp1));
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(client_mp));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+            WaitForSignals(mp1, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &state));
+  ASSERT_EQ(MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED, state.satisfied_signals);
+  ASSERT_FALSE(state.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  ASSERT_FALSE(state.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(mp1));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(client_mp));
 }
 
 TEST_F(EmbedderTest, MultiprocessBaseSharedMemory) {
@@ -306,20 +308,22 @@ TEST_F(EmbedderTest, MultiprocessBaseSharedMemory) {
     auto shared_memory = base::UnsafeSharedMemoryRegion::Create(123);
     ASSERT_TRUE(shared_memory.IsValid());
     MojoHandle sb1;
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               CreateSharedBufferFromRegion(shared_memory.Duplicate(), &sb1));
 
     // 2. Map |sb1| and write something into it.
     char* buffer = nullptr;
-    ASSERT_EQ(MOJO_RESULT_OK, MojoMapBuffer(sb1, 0, 123, nullptr,
-                                            reinterpret_cast<void**>(&buffer)));
+    ASSERT_EQ(
+        MOJO_LEGACY_RESULT_OK,
+        MojoMapBuffer(sb1, 0, 123, nullptr, reinterpret_cast<void**>(&buffer)));
     ASSERT_TRUE(buffer);
     UNSAFE_TODO(memcpy(buffer, kHelloWorld, sizeof(kHelloWorld)));
 
     // 3. Duplicate |sb1| into |sb2| and pass to |server_mp|.
-    MojoHandle sb2 = MOJO_HANDLE_INVALID;
-    EXPECT_EQ(MOJO_RESULT_OK, MojoDuplicateBufferHandle(sb1, nullptr, &sb2));
-    EXPECT_NE(MOJO_HANDLE_INVALID, sb2);
+    MojoHandle sb2 = MOJO_LEGACY_HANDLE_INVALID;
+    EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+              MojoDuplicateBufferHandle(sb1, nullptr, &sb2));
+    EXPECT_NE(MOJO_LEGACY_HANDLE_INVALID, sb2);
     WriteMessageWithHandles(server_mp, "hello", &sb2, 1);
 
     // 4. Read a message from |server_mp|.
@@ -334,7 +338,7 @@ TEST_F(EmbedderTest, MultiprocessBaseSharedMemory) {
     ASSERT_TRUE(mapping.IsValid());
     EXPECT_EQ(kByeWorld, std::string(static_cast<char*>(mapping.memory())));
 
-    ASSERT_EQ(MOJO_RESULT_OK, MojoClose(sb1));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(sb1));
 
     // Tell the child it's safe to shut down.
     WriteMessage(server_mp, "bye");
@@ -351,8 +355,9 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MultiprocessSharedMemoryClient,
 
   // 2. Map |sb1|.
   char* buffer = nullptr;
-  ASSERT_EQ(MOJO_RESULT_OK, MojoMapBuffer(sb1, 0, 123, nullptr,
-                                          reinterpret_cast<void**>(&buffer)));
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      MojoMapBuffer(sb1, 0, 123, nullptr, reinterpret_cast<void**>(&buffer)));
   ASSERT_TRUE(buffer);
 
   // 3. Ensure |buffer| contains the values we expect.
@@ -365,7 +370,8 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MultiprocessSharedMemoryClient,
   // 5. Extract the shared memory handle and ensure we can map it and read the
   // contents.
   base::UnsafeSharedMemoryRegion shared_memory;
-  ASSERT_EQ(MOJO_RESULT_OK, ExtractRegionFromSharedBuffer(sb1, &shared_memory));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            ExtractRegionFromSharedBuffer(sb1, &shared_memory));
   auto mapping = shared_memory.Map();
   ASSERT_TRUE(mapping.IsValid());
   EXPECT_NE(buffer, mapping.memory());
@@ -373,7 +379,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MultiprocessSharedMemoryClient,
 
   EXPECT_EQ("bye", ReadMessage(client_mp));
 
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(client_mp));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(client_mp));
 }
 
 #if BUILDFLAG(IS_MAC)
@@ -454,7 +460,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MultiprocessMixMachAndFdsClient,
 
   // 3. Say bye!
   WriteMessage(client_mp, "bye");
-  ASSERT_EQ(MOJO_RESULT_OK, MojoClose(client_mp));
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(client_mp));
 }
 
 #endif  // BUILDFLAG(IS_MAC)
@@ -462,4 +468,4 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MultiprocessMixMachAndFdsClient,
 #endif  // !BUILDFLAG(IS_IOS)
 
 }  // namespace
-}  // namespace mojo::core
+}  // namespace mojo_legacy::core

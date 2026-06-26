@@ -2,19 +2,19 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_SYSTEM_HANDLE_H_
-#define MOJO_PUBLIC_CPP_SYSTEM_HANDLE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_HANDLE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_HANDLE_H_
 
 #include <stdint.h>
 
 #include <limits>
 
 #include "base/check_op.h"
-#include "mojo/public/c/system/functions.h"
-#include "mojo/public/c/system/types.h"
-#include "mojo/public/cpp/system/handle_signals_state.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/functions.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/handle_signals_state.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // OVERVIEW
 //
@@ -40,7 +40,7 @@ namespace mojo {
 // wrapper for a |T*|). It provides lifetime management, closing its owned
 // handle on destruction. It also provides move semantics, again along the lines
 // of C++11's |unique_ptr|. A moved-from |ScopedHandleBase<HandleType>| sets its
-// handle value to MOJO_HANDLE_INVALID.
+// handle value to MOJO_LEGACY_HANDLE_INVALID.
 //
 // |ScopedHandle| is just (a typedef of) a |ScopedHandleBase<Handle>|.
 // Similarly, |ScopedMessagePipeHandle| is just a
@@ -151,7 +151,7 @@ inline ScopedHandleBase<HandleType> MakeScopedHandle(HandleType handle) {
 
 // Handle ----------------------------------------------------------------------
 
-const MojoHandle kInvalidHandleValue = MOJO_HANDLE_INVALID;
+const MojoHandle kInvalidHandleValue = MOJO_LEGACY_HANDLE_INVALID;
 
 // Wrapper base class for |MojoHandle|.
 class Handle {
@@ -177,14 +177,14 @@ class Handle {
   void Close() {
     DCHECK(is_valid());
     [[maybe_unused]] MojoResult result = MojoClose(value_);
-    DCHECK_EQ(MOJO_RESULT_OK, result);
+    DCHECK_EQ(MOJO_LEGACY_RESULT_OK, result);
   }
 
   HandleSignalsState QuerySignalsState() const {
     HandleSignalsState signals_state;
     [[maybe_unused]] MojoResult result = MojoQueryHandleSignalsState(
         value_, static_cast<MojoHandleSignalsState*>(&signals_state));
-    DCHECK_EQ(MOJO_RESULT_OK, result);
+    DCHECK_EQ(MOJO_LEGACY_RESULT_OK, result);
     return signals_state;
   }
 
@@ -223,6 +223,6 @@ inline bool operator==(const Handle a, const Handle b) {
   return a.value() == b.value();
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_SYSTEM_HANDLE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_HANDLE_H_

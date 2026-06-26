@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/test/test_support_impl.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/test_support_impl.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -23,7 +23,7 @@
 #include "base/strings/stringprintf.h"
 #include "base/test/perf_log.h"
 
-namespace mojo::core::test {
+namespace mojo_legacy::core::test {
 namespace {
 
 base::FilePath ResolveSourceRootRelativePath(const char* relative_path) {
@@ -92,4 +92,4 @@ char** TestSupportImpl::EnumerateSourceRootRelativeDirectory(
   return rv;
 }
 
-}  // namespace mojo::core::test
+}  // namespace mojo_legacy::core::test

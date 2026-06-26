@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/watcher_set.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/watcher_set.h"
 
 #include <utility>
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 WatcherSet::WatcherSet(Dispatcher* owner) : owner_(owner) {}
@@ -42,7 +42,7 @@ MojoResult WatcherSet::Add(const scoped_refptr<WatcherDispatcher>& watcher,
   }
 
   if (!it->second.contexts.insert(context).second) {
-    return MOJO_RESULT_ALREADY_EXISTS;
+    return MOJO_LEGACY_RESULT_ALREADY_EXISTS;
   }
 
   if (last_known_state_.has_value() &&
@@ -54,19 +54,19 @@ MojoResult WatcherSet::Add(const scoped_refptr<WatcherDispatcher>& watcher,
     // Otherwise only notify the newly added Watcher.
     watcher->NotifyHandleState(owner_, current_state);
   }
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult WatcherSet::Remove(WatcherDispatcher* watcher, uintptr_t context) {
   auto it = watchers_.find(watcher);
   if (it == watchers_.end()) {
-    return MOJO_RESULT_NOT_FOUND;
+    return MOJO_LEGACY_RESULT_NOT_FOUND;
   }
 
   ContextSet& contexts = it->second.contexts;
   auto context_it = contexts.find(context);
   if (context_it == contexts.end()) {
-    return MOJO_RESULT_NOT_FOUND;
+    return MOJO_LEGACY_RESULT_NOT_FOUND;
   }
 
   contexts.erase(context_it);
@@ -74,7 +74,7 @@ MojoResult WatcherSet::Remove(WatcherDispatcher* watcher, uintptr_t context) {
     watchers_.erase(it);
   }
 
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 WatcherSet::Entry::Entry(const scoped_refptr<WatcherDispatcher>& dispatcher)
@@ -87,4 +87,4 @@ WatcherSet::Entry::~Entry() = default;
 WatcherSet::Entry& WatcherSet::Entry::operator=(Entry&& other) = default;
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

@@ -9,8 +9,8 @@
 // Please see "mojo/public/c/system/message_pipe.h" for complete documentation
 // of the API.
 
-#ifndef MOJO_PUBLIC_CPP_SYSTEM_MESSAGE_PIPE_H_
-#define MOJO_PUBLIC_CPP_SYSTEM_MESSAGE_PIPE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_MESSAGE_PIPE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_MESSAGE_PIPE_H_
 
 #include <stdint.h>
 
@@ -18,12 +18,12 @@
 
 #include "base/check_op.h"
 #include "base/compiler_specific.h"
-#include "mojo/public/c/system/message_pipe.h"
-#include "mojo/public/cpp/system/handle.h"
-#include "mojo/public/cpp/system/message.h"
-#include "mojo/public/cpp/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/message.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/system_export.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // A strongly-typed representation of a |MojoHandle| to one end of a message
 // pipe.
@@ -65,7 +65,7 @@ inline MojoResult CreateMessagePipe(const MojoCreateMessagePipeOptions* options,
 // it does incur an extra copy of the message payload.
 //
 // See documentation for MojoWriteMessage for return code details.
-MOJO_CPP_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_CPP_SYSTEM_EXPORT MojoResult
 WriteMessageRaw(MessagePipeHandle message_pipe,
                 const void* bytes,
                 size_t num_bytes,
@@ -78,9 +78,9 @@ WriteMessageRaw(MessagePipeHandle message_pipe,
 // it does incur an extra copy of the message payload.
 //
 // See documentation for MojoReadMessage for return code details. In addition to
-// those return codes, this may return |MOJO_RESULT_ABORTED| if the message was
-// unable to be serialized into the provided containers.
-MOJO_CPP_SYSTEM_EXPORT MojoResult
+// those return codes, this may return |MOJO_LEGACY_RESULT_ABORTED| if the
+// message was unable to be serialized into the provided containers.
+MOJO_LEGACY_CPP_SYSTEM_EXPORT MojoResult
 ReadMessageRaw(MessagePipeHandle message_pipe,
                std::vector<uint8_t>* payload,
                std::vector<ScopedHandle>* handles,
@@ -108,12 +108,12 @@ inline MojoResult ReadMessageNew(MessagePipeHandle message_pipe,
   options.flags = flags;
   MojoMessageHandle raw_message;
   MojoResult rv = MojoReadMessage(message_pipe.value(), &options, &raw_message);
-  if (rv != MOJO_RESULT_OK) {
+  if (rv != MOJO_LEGACY_RESULT_OK) {
     return rv;
   }
 
   message->reset(MessageHandle(raw_message));
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 // Fuses two message pipes together at the given handles. See
@@ -139,7 +139,7 @@ class MessagePipe {
 inline MessagePipe::MessagePipe() {
   [[maybe_unused]] MojoResult result =
       CreateMessagePipe(nullptr, &handle0, &handle1);
-  DCHECK_EQ(MOJO_RESULT_OK, result);
+  DCHECK_EQ(MOJO_LEGACY_RESULT_OK, result);
   DCHECK(handle0.is_valid());
   DCHECK(handle1.is_valid());
 }
@@ -147,13 +147,13 @@ inline MessagePipe::MessagePipe() {
 inline MessagePipe::MessagePipe(const MojoCreateMessagePipeOptions& options) {
   [[maybe_unused]] MojoResult result =
       CreateMessagePipe(&options, &handle0, &handle1);
-  DCHECK_EQ(MOJO_RESULT_OK, result);
+  DCHECK_EQ(MOJO_LEGACY_RESULT_OK, result);
   DCHECK(handle0.is_valid());
   DCHECK(handle1.is_valid());
 }
 
 inline MessagePipe::~MessagePipe() {}
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_SYSTEM_MESSAGE_PIPE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_MESSAGE_PIPE_H_

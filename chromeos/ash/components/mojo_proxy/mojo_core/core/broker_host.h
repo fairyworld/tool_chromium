@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_BROKER_HOST_H_
-#define MOJO_CORE_BROKER_HOST_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_BROKER_HOST_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_BROKER_HOST_H_
 
 #include <stdint.h>
 
@@ -14,13 +14,13 @@
 #include "base/process/process_handle.h"
 #include "base/task/current_thread.h"
 #include "build/build_config.h"
-#include "mojo/core/channel.h"
-#include "mojo/core/connection_params.h"
-#include "mojo/core/embedder/process_error_callback.h"
-#include "mojo/core/platform_handle_in_transit.h"
-#include "mojo/public/cpp/platform/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/connection_params.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/process_error_callback.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_in_transit.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // The BrokerHost is a channel to a broker client process, servicing synchronous
@@ -70,6 +70,6 @@ class BrokerHost : public Channel::Delegate,
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_BROKER_HOST_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_BROKER_HOST_H_

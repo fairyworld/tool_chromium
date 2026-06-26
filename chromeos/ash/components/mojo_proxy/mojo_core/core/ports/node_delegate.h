@@ -2,16 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_PORTS_NODE_DELEGATE_H_
-#define MOJO_CORE_PORTS_NODE_DELEGATE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_NODE_DELEGATE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_NODE_DELEGATE_H_
 
 #include <stddef.h>
 
-#include "mojo/core/ports/event.h"
-#include "mojo/core/ports/name.h"
-#include "mojo/core/ports/port_ref.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/name.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/port_ref.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 
@@ -33,6 +33,6 @@ class NodeDelegate {
 
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_PORTS_NODE_DELEGATE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_NODE_DELEGATE_H_

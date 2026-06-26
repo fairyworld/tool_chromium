@@ -2,17 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_PORTS_PORT_LOCKER_H_
-#define MOJO_CORE_PORTS_PORT_LOCKER_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_PORT_LOCKER_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_PORT_LOCKER_H_
 
 #include <stdint.h>
 
 #include "base/auto_reset.h"
 #include "base/compiler_specific.h"
 #include "base/memory/stack_allocated.h"
-#include "mojo/core/ports/port_ref.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/port_ref.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 
@@ -77,7 +77,7 @@ class PortLocker {
 };
 
 // Convenience wrapper for a PortLocker that locks a single port.
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) SinglePortLocker {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) SinglePortLocker {
   STACK_ALLOCATED();
 
  public:
@@ -97,6 +97,6 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) SinglePortLocker {
 
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_PORTS_PORT_LOCKER_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_PORT_LOCKER_H_

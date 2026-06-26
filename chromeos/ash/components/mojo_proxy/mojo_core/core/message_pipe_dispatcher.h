@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_MESSAGE_PIPE_DISPATCHER_H_
-#define MOJO_CORE_MESSAGE_PIPE_DISPATCHER_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_MESSAGE_PIPE_DISPATCHER_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_MESSAGE_PIPE_DISPATCHER_H_
 
 #include <stdint.h>
 
@@ -11,12 +11,12 @@
 #include <optional>
 
 #include "base/memory/raw_ptr_exclusion.h"
-#include "mojo/core/atomic_flag.h"
-#include "mojo/core/dispatcher.h"
-#include "mojo/core/ports/port_ref.h"
-#include "mojo/core/watcher_set.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/atomic_flag.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/port_ref.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/watcher_set.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 class NodeController;
@@ -115,6 +115,6 @@ class MessagePipeDispatcher : public Dispatcher {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_MESSAGE_PIPE_DISPATCHER_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_MESSAGE_PIPE_DISPATCHER_H_

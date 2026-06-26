@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_PORTS_EVENT_H_
-#define MOJO_CORE_PORTS_EVENT_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_EVENT_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_EVENT_H_
 
 #include <stdint.h>
 
@@ -13,10 +13,10 @@
 #include "base/component_export.h"
 #include "base/containers/span.h"
 #include "base/memory/ptr_util.h"
-#include "mojo/core/ports/name.h"
-#include "mojo/core/ports/user_message.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/name.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/user_message.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 
@@ -26,7 +26,7 @@ using ScopedEvent = std::unique_ptr<Event>;
 
 // A Event is the fundamental unit of operation and communication within and
 // between Nodes.
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) Event {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) Event {
  public:
   enum Type : uint32_t {
     // A user message event contains arbitrary user-specified payload data
@@ -129,7 +129,7 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) Event {
   uint64_t control_sequence_num_;
 };
 
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) UserMessageEvent : public Event {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) UserMessageEvent : public Event {
  public:
   explicit UserMessageEvent(size_t num_ports);
 
@@ -188,7 +188,8 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) UserMessageEvent : public Event {
   std::unique_ptr<UserMessage> message_;
 };
 
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) PortAcceptedEvent : public Event {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) PortAcceptedEvent
+    : public Event {
  public:
   explicit PortAcceptedEvent(const PortName& port_name,
                              const PortName& from_port,
@@ -210,7 +211,8 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) PortAcceptedEvent : public Event {
   void SerializeData(void* buffer) const override;
 };
 
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) ObserveProxyEvent : public Event {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) ObserveProxyEvent
+    : public Event {
  public:
   ObserveProxyEvent(const PortName& port_name,
                     const PortName& from_port,
@@ -251,7 +253,8 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) ObserveProxyEvent : public Event {
   const PortName proxy_target_port_name_;
 };
 
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) ObserveProxyAckEvent : public Event {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) ObserveProxyAckEvent
+    : public Event {
  public:
   ObserveProxyAckEvent(const PortName& port_name,
                        const PortName& from_port,
@@ -278,7 +281,8 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) ObserveProxyAckEvent : public Event {
   const uint64_t last_sequence_num_;
 };
 
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) ObserveClosureEvent : public Event {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) ObserveClosureEvent
+    : public Event {
  public:
   ObserveClosureEvent(const PortName& port_name,
                       const PortName& from_port,
@@ -308,7 +312,7 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) ObserveClosureEvent : public Event {
   uint64_t last_sequence_num_;
 };
 
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) MergePortEvent : public Event {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) MergePortEvent : public Event {
  public:
   MergePortEvent(const PortName& port_name,
                  const PortName& from_port,
@@ -340,7 +344,7 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) MergePortEvent : public Event {
   const PortDescriptor new_port_descriptor_;
 };
 
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) UserMessageReadAckRequestEvent
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) UserMessageReadAckRequestEvent
     : public Event {
  public:
   UserMessageReadAckRequestEvent(const PortName& port_name,
@@ -366,7 +370,8 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) UserMessageReadAckRequestEvent
   uint64_t sequence_num_to_acknowledge_;
 };
 
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) UserMessageReadAckEvent : public Event {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) UserMessageReadAckEvent
+    : public Event {
  public:
   UserMessageReadAckEvent(const PortName& port_name,
                           const PortName& from_port,
@@ -391,7 +396,8 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) UserMessageReadAckEvent : public Event {
   uint64_t sequence_num_acknowledged_;
 };
 
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) UpdatePreviousPeerEvent : public Event {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) UpdatePreviousPeerEvent
+    : public Event {
  public:
   UpdatePreviousPeerEvent(const PortName& port_name,
                           const PortName& from_port,
@@ -420,6 +426,6 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) UpdatePreviousPeerEvent : public Event {
 
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_PORTS_EVENT_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_EVENT_H_

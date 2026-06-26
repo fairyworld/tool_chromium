@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_DATA_PIPE_PRODUCER_DISPATCHER_H_
-#define MOJO_CORE_DATA_PIPE_PRODUCER_DISPATCHER_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_DATA_PIPE_PRODUCER_DISPATCHER_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_DATA_PIPE_PRODUCER_DISPATCHER_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -13,13 +13,13 @@
 #include "base/memory/shared_memory_mapping.h"
 #include "base/memory/unsafe_shared_memory_region.h"
 #include "base/synchronization/lock.h"
-#include "mojo/core/dispatcher.h"
-#include "mojo/core/ports/port_ref.h"
-#include "mojo/core/system_impl_export.h"
-#include "mojo/core/watcher_set.h"
-#include "mojo/public/c/system/data_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/port_ref.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/watcher_set.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/data_pipe.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 class NodeController;
@@ -27,7 +27,7 @@ class NodeController;
 // This is the Dispatcher implementation for the producer handle for data
 // pipes created by the Mojo primitive MojoCreateDataPipe(). This class is
 // thread-safe.
-class MOJO_SYSTEM_IMPL_EXPORT DataPipeProducerDispatcher final
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT DataPipeProducerDispatcher final
     : public Dispatcher {
  public:
   static scoped_refptr<DataPipeProducerDispatcher> Create(
@@ -117,6 +117,6 @@ class MOJO_SYSTEM_IMPL_EXPORT DataPipeProducerDispatcher final
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_DATA_PIPE_PRODUCER_DISPATCHER_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_DATA_PIPE_PRODUCER_DISPATCHER_H_

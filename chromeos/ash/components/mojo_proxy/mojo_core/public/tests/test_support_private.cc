@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/tests/test_support_private.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/tests/test_support_private.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -10,7 +10,7 @@
 
 #include "base/compiler_specific.h"
 
-static mojo::test::TestSupport* g_test_support = NULL;
+static mojo_legacy::test::TestSupport* g_test_support = NULL;
 
 extern "C" {
 
@@ -55,7 +55,7 @@ char** MojoTestSupportEnumerateSourceRootRelativeDirectory(
 
 }  // extern "C"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace test {
 
 TestSupport::~TestSupport() {}
@@ -77,4 +77,4 @@ void TestSupport::Reset() {
 }
 
 }  // namespace test
-}  // namespace mojo
+}  // namespace mojo_legacy

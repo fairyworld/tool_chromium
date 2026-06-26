@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_CHANNEL_POSIX_H_
-#define MOJO_CORE_CHANNEL_POSIX_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CHANNEL_POSIX_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CHANNEL_POSIX_H_
 
 #include "base/containers/circular_deque.h"
 #include "base/memory/scoped_refptr.h"
@@ -13,9 +13,9 @@
 #include "base/task/single_thread_task_runner.h"
 #include "base/thread_annotations.h"
 #include "build/build_config.h"
-#include "mojo/core/channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 class MessageView;
@@ -124,6 +124,6 @@ class ChannelPosix : public Channel,
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_CHANNEL_POSIX_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CHANNEL_POSIX_H_

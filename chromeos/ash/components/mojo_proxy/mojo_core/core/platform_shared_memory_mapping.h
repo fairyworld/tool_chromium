@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_PLATFORM_SHARED_MEMORY_MAPPING_H_
-#define MOJO_CORE_PLATFORM_SHARED_MEMORY_MAPPING_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PLATFORM_SHARED_MEMORY_MAPPING_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PLATFORM_SHARED_MEMORY_MAPPING_H_
 
 #include <stddef.h>
 
@@ -11,9 +11,9 @@
 
 #include "base/memory/platform_shared_memory_region.h"
 #include "base/memory/shared_memory_mapping.h"
-#include "mojo/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // A mapping of a |base::subtle::PlatformSharedMemoryRegion|, created
@@ -25,7 +25,7 @@ namespace core {
 // This may represent either a |base::ReadOnlySharedMemoryMapping| OR a
 // |base::WritableSharedMemoryMapping|, and it supports non-page-aligned base
 // offsets for convenience.
-class MOJO_SYSTEM_IMPL_EXPORT PlatformSharedMemoryMapping {
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT PlatformSharedMemoryMapping {
  public:
   PlatformSharedMemoryMapping(base::subtle::PlatformSharedMemoryRegion* region,
                               size_t offset,
@@ -50,6 +50,6 @@ class MOJO_SYSTEM_IMPL_EXPORT PlatformSharedMemoryMapping {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_PLATFORM_SHARED_MEMORY_MAPPING_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PLATFORM_SHARED_MEMORY_MAPPING_H_

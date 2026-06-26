@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_TEST_MOCK_NODE_CHANNEL_DELEGATE_H_
-#define MOJO_CORE_TEST_MOCK_NODE_CHANNEL_DELEGATE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MOCK_NODE_CHANNEL_DELEGATE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MOCK_NODE_CHANNEL_DELEGATE_H_
 
 #include "build/build_config.h"
-#include "mojo/core/node_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_channel.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // A NodeChannel Delegate implementation which can be used by NodeChannel unit
@@ -111,6 +111,6 @@ class MockNodeChannelDelegate
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_TEST_MOCK_NODE_CHANNEL_DELEGATE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MOCK_NODE_CHANNEL_DELEGATE_H_

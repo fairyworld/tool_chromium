@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel.h"
 
 #include <stddef.h>
 #include <string.h>
@@ -27,17 +27,17 @@
 #include "base/time/time.h"
 #include "base/trace_event/typed_macros.h"
 #include "build/build_config.h"
-#include "mojo/core/configuration.h"
-#include "mojo/core/embedder/features.h"
-#include "mojo/core/ipcz_driver/envelope.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/configuration.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/features.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ipcz_driver/envelope.h"
 
-#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
 #include "base/apple/mach_logging.h"
 #elif BUILDFLAG(IS_WIN)
 #include "base/win/win_util.h"
 #endif
 
-namespace mojo::core {
+namespace mojo_legacy::core {
 
 namespace {
 
@@ -191,7 +191,7 @@ struct ComplexMessage final : public Channel::Message {
 #if BUILDFLAG(IS_WIN)
   // On Windows, handles are serialised into the extra header section.
   raw_ptr<HandleEntry, AllowPtrArithmetic> handles_ = nullptr;
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   // On OSX, handles are serialised into the extra header section.
   raw_ptr<MachPortsExtraHeader, AllowPtrArithmetic> mach_ports_header_ =
       nullptr;
@@ -401,7 +401,7 @@ Channel::MessagePtr Channel::Message::CreateMessage(size_t payload_size,
 Channel::MessagePtr Channel::Message::CreateMessage(size_t capacity,
                                                     size_t payload_size,
                                                     size_t max_handles) {
-#if defined(MOJO_CORE_LEGACY_PROTOCOL)
+#if defined(MOJO_LEGACY_CORE_LEGACY_PROTOCOL)
   return CreateMessage(capacity, payload_size, max_handles,
                        Message::MessageType::NORMAL_LEGACY);
 #else
@@ -502,7 +502,7 @@ Channel::MessagePtr Channel::Message::Deserialize(
   uint32_t max_handles = extra_header_size / sizeof(HandleEntry);
 #elif BUILDFLAG(IS_FUCHSIA)
   uint32_t max_handles = extra_header_size / sizeof(HandleInfoEntry);
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   if (extra_header_size > 0 &&
       extra_header_size < sizeof(MachPortsExtraHeader)) {
     DLOG(ERROR) << "Decoding invalid message: " << extra_header_size << " < "
@@ -695,7 +695,7 @@ ComplexMessage::ComplexMessage(size_t capacity,
 #elif BUILDFLAG(IS_FUCHSIA)
   // On Fuchsia we serialize handle types into the extra header space.
   extra_header_size = max_handles_ * sizeof(HandleInfoEntry);
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   // On OSX, some of the platform handles may be mach ports, which are
   // serialised into the message buffer. Since there could be a mix of fds and
   // mach ports, we store the mach ports as an <index, port> pair (of uint32_t),
@@ -748,7 +748,7 @@ ComplexMessage::ComplexMessage(size_t capacity,
       UNSAFE_TODO(handles_[i]).handle =
           base::win::HandleToUint32(INVALID_HANDLE_VALUE);
     }
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
     mach_ports_header_ =
         reinterpret_cast<MachPortsExtraHeader*>(mutable_extra_header());
     mach_ports_header_->num_ports = 0;
@@ -785,7 +785,7 @@ bool ComplexMessage::ExtendPayload(size_t new_payload_size) {
 // payload buffer has been relocated.
 #if BUILDFLAG(IS_WIN)
       handles_ = reinterpret_cast<HandleEntry*>(mutable_extra_header());
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
       mach_ports_header_ =
           reinterpret_cast<MachPortsExtraHeader*>(mutable_extra_header());
 #endif
@@ -839,7 +839,7 @@ void ComplexMessage::SetHandles(
   }
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   if (mach_ports_header_) {
     for (size_t i = 0; i < max_handles_; ++i) {
       UNSAFE_TODO(mach_ports_header_->entries[i]) = {0};
@@ -1319,11 +1319,11 @@ bool Channel::OnControlMessage(Message::MessageType message_type,
 // Currently only CrOs, Linux, and Android support upgrades.
 #if !(BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID))
 // static
-MOJO_SYSTEM_IMPL_EXPORT bool Channel::SupportsChannelUpgrade() {
+MOJO_LEGACY_SYSTEM_IMPL_EXPORT bool Channel::SupportsChannelUpgrade() {
   return false;
 }
 
-MOJO_SYSTEM_IMPL_EXPORT void Channel::OfferChannelUpgrade() {
+MOJO_LEGACY_SYSTEM_IMPL_EXPORT void Channel::OfferChannelUpgrade() {
   NOTREACHED();
 }
 #endif
@@ -1406,4 +1406,4 @@ void Channel::RecordSentMessageProcessType() {
       base::CurrentProcess::GetInstance().GetShortType({}));
 }
 
-}  // namespace mojo::core
+}  // namespace mojo_legacy::core

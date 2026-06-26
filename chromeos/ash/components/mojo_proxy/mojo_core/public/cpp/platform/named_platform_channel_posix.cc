@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/platform/named_platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/named_platform_channel.h"
 
 #include <errno.h>
 #include <string.h>
@@ -19,7 +19,7 @@
 #include "net/base/sockaddr_storage.h"
 #include "net/base/sockaddr_util_posix.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 namespace {
 
@@ -150,4 +150,4 @@ PlatformChannelEndpoint NamedPlatformChannel::CreateClientEndpoint(
   return PlatformChannelEndpoint(std::move(handle));
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

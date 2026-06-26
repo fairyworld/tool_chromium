@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/core_test_base.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core_test_base.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -12,12 +12,12 @@
 #include "base/check.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/ref_counted.h"
-#include "mojo/core/configuration.h"
-#include "mojo/core/core.h"
-#include "mojo/core/dispatcher.h"
-#include "mojo/core/user_message_impl.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/configuration.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/user_message_impl.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace test {
 
@@ -40,56 +40,56 @@ class MockDispatcher : public Dispatcher {
 
   MojoResult Close() override {
     info_->IncrementCloseCallCount();
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   MojoResult WriteMessage(
       std::unique_ptr<ports::UserMessageEvent> message_event) override {
     info_->IncrementWriteMessageCallCount();
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   MojoResult ReadMessage(
       std::unique_ptr<ports::UserMessageEvent>* message_event) override {
     info_->IncrementReadMessageCallCount();
-    return MOJO_RESULT_OK;
+    return MOJO_LEGACY_RESULT_OK;
   }
 
   MojoResult WriteData(const void* elements,
                        uint32_t* num_bytes,
                        const MojoWriteDataOptions& options) override {
     info_->IncrementWriteDataCallCount();
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
   }
 
   MojoResult BeginWriteData(void** buffer,
                             uint32_t* buffer_num_bytes,
                             MojoBeginWriteDataFlags flags) override {
     info_->IncrementBeginWriteDataCallCount();
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
   }
 
   MojoResult EndWriteData(uint32_t num_bytes_written) override {
     info_->IncrementEndWriteDataCallCount();
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
   }
 
   MojoResult ReadData(const MojoReadDataOptions& options,
                       void* elements,
                       uint32_t* num_bytes) override {
     info_->IncrementReadDataCallCount();
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
   }
 
   MojoResult BeginReadData(const void** buffer,
                            uint32_t* buffer_num_bytes) override {
     info_->IncrementBeginReadDataCallCount();
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
   }
 
   MojoResult EndReadData(uint32_t num_bytes_read) override {
     info_->IncrementEndReadDataCallCount();
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
   }
 
  private:
@@ -249,4 +249,4 @@ void CoreTestBase_MockHandleInfo::IncrementEndReadDataCallCount() {
 
 }  // namespace test
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

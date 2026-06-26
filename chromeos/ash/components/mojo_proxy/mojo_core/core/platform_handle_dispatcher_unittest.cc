@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/platform_handle_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_dispatcher.h"
 
 #include <stdio.h>
 
@@ -14,11 +14,11 @@
 #include "base/files/scoped_file.h"
 #include "base/files/scoped_temp_dir.h"
 #include "base/memory/ref_counted.h"
-#include "mojo/core/test/test_utils.h"
-#include "mojo/public/cpp/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/test_utils.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/platform_handle.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace {
 
@@ -61,7 +61,7 @@ TEST(PlatformHandleDispatcherTest, Basic) {
   auto internal_handle = dispatcher->TakePlatformHandle();
   EXPECT_FALSE(internal_handle.is_valid());
 
-  EXPECT_EQ(MOJO_RESULT_OK, dispatcher->Close());
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, dispatcher->Close());
 }
 
 TEST(PlatformHandleDispatcherTest, Serialization) {
@@ -100,7 +100,7 @@ TEST(PlatformHandleDispatcherTest, Serialization) {
   PlatformHandle handle = dispatcher->TakePlatformHandle();
   EXPECT_FALSE(handle.is_valid());
 
-  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT, dispatcher->Close());
+  EXPECT_EQ(MOJO_LEGACY_RESULT_INVALID_ARGUMENT, dispatcher->Close());
 
   dispatcher = static_cast<PlatformHandleDispatcher*>(
       Dispatcher::Deserialize(Dispatcher::Type::PLATFORM_HANDLE, nullptr,
@@ -120,9 +120,9 @@ TEST(PlatformHandleDispatcherTest, Serialization) {
                         fread(read_buffer, 1, sizeof(read_buffer), fp.get())));
   EXPECT_STREQ(kFooBar, read_buffer);
 
-  EXPECT_EQ(MOJO_RESULT_OK, dispatcher->Close());
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, dispatcher->Close());
 }
 
 }  // namespace
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

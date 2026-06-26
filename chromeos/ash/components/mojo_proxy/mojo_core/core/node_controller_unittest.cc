@@ -3,13 +3,13 @@
 // found in the LICENSE file.
 
 #include "base/logging.h"
-#include "mojo/core/core.h"
-#include "mojo/core/embedder/embedder.h"
-#include "mojo/core/test/mojo_test_base.h"
-#include "mojo/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/mojo_test_base.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace {
 
@@ -45,4 +45,4 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(SendInvalidAcceptInvitation,
 
 }  // namespace
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

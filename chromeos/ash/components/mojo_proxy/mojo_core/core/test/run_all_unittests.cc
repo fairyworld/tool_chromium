@@ -7,7 +7,7 @@
 #include "base/functional/bind.h"
 #include "base/test/launcher/unit_test_launcher.h"
 #include "build/build_config.h"
-#include "mojo/core/test/mojo_test_suite_base.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/mojo_test_suite_base.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 int main(int argc, char** argv) {
@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
   signal(SIGABRT, SIG_DFL);
 #endif
 
-  mojo::core::test::MojoTestSuiteBase test_suite(argc, argv);
+  mojo_legacy::core::test::MojoTestSuiteBase test_suite(argc, argv);
   return base::LaunchUnitTests(
       argc, argv,
       base::BindOnce(&base::TestSuite::Run, base::Unretained(&test_suite)));

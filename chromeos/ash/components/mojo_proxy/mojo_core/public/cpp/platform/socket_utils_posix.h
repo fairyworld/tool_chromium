@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_PLATFORM_SOCKET_UTILS_POSIX_H_
-#define MOJO_PUBLIC_CPP_PLATFORM_SOCKET_UTILS_POSIX_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_SOCKET_UTILS_POSIX_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_SOCKET_UTILS_POSIX_H_
 
 #include <stddef.h>
 #include <sys/types.h>
@@ -16,7 +16,7 @@
 
 struct iovec;  // Declared in <sys/uio.h>
 
-namespace mojo {
+namespace mojo_legacy {
 
 // There is an upper bound of number of handles on what is supported across
 // various OS implementations of sendmsg(). This value was chosen because it
@@ -29,7 +29,7 @@ constexpr size_t kMaxSendmsgHandles = 128;
 // src/base or something.
 
 // Like |write()| but handles |EINTR| and never raises |SIGPIPE|.
-COMPONENT_EXPORT(MOJO_CPP_PLATFORM)
+COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM)
 ssize_t SocketWrite(base::PlatformFile socket,
                     const void* bytes,
                     size_t num_bytes);
@@ -44,14 +44,14 @@ ssize_t SocketWrite(base::PlatformFile socket,
 //
 // Note that regardless of success or failure, descriptors in |descriptors| are
 // not closed.
-COMPONENT_EXPORT(MOJO_CPP_PLATFORM)
+COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM)
 ssize_t SendmsgWithHandles(base::PlatformFile socket,
                            struct iovec* iov,
                            size_t num_iov,
                            const std::vector<base::ScopedFD>& descriptors);
 
 // Like |recvmsg()|, but handles |EINTR|.
-COMPONENT_EXPORT(MOJO_CPP_PLATFORM)
+COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM)
 ssize_t SocketRecvmsg(base::PlatformFile socket,
                       void* buf,
                       size_t num_bytes,
@@ -69,11 +69,11 @@ ssize_t SocketRecvmsg(base::PlatformFile socket,
 //
 // Iff |check_peer_user| is |true|, connecting clients running as a different
 // user from the server (i.e. the calling process) will be rejected.
-COMPONENT_EXPORT(MOJO_CPP_PLATFORM)
+COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM)
 bool AcceptSocketConnection(base::PlatformFile server_fd,
                             base::ScopedFD* connection_fd,
                             bool check_peer_user = true);
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_PLATFORM_SOCKET_UTILS_POSIX_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_SOCKET_UTILS_POSIX_H_

@@ -2,16 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_TEST_TEST_UTILS_H_
-#define MOJO_CORE_TEST_TEST_UTILS_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_TEST_UTILS_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_TEST_UTILS_H_
 
 #include <stddef.h>
 #include <stdio.h>
 
 #include "base/files/scoped_file.h"
-#include "mojo/public/cpp/platform/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace test {
 
@@ -23,6 +23,6 @@ base::ScopedFILE FILEFromPlatformHandle(PlatformHandle h, const char* mode);
 
 }  // namespace test
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_TEST_TEST_UTILS_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_TEST_UTILS_H_

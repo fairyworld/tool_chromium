@@ -2,18 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_CONNECTION_PARAMS_H_
-#define MOJO_CORE_CONNECTION_PARAMS_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CONNECTION_PARAMS_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CONNECTION_PARAMS_H_
 
 #include "build/build_config.h"
-#include "mojo/core/system_impl_export.h"
-#include "mojo/public/cpp/platform/platform_channel_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_endpoint.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // A set of parameters used when establishing a connection to another process.
-class MOJO_SYSTEM_IMPL_EXPORT ConnectionParams {
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT ConnectionParams {
  public:
   ConnectionParams();
   explicit ConnectionParams(PlatformChannelEndpoint endpoint);
@@ -49,6 +49,6 @@ class MOJO_SYSTEM_IMPL_EXPORT ConnectionParams {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_CONNECTION_PARAMS_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CONNECTION_PARAMS_H_

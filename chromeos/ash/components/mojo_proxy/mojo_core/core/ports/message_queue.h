@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_PORTS_MESSAGE_QUEUE_H_
-#define MOJO_CORE_PORTS_MESSAGE_QUEUE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_MESSAGE_QUEUE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_MESSAGE_QUEUE_H_
 
 #include <stdint.h>
 
@@ -12,9 +12,9 @@
 #include <vector>
 
 #include "base/component_export.h"
-#include "mojo/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 
@@ -27,7 +27,7 @@ class MessageFilter;
 // known sequence number and can indicate whether the next sequential message is
 // available. Thus the queue enforces message ordering for the consumer without
 // enforcing it for the producer (see AcceptMessage() below.)
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) MessageQueue {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) MessageQueue {
  public:
   explicit MessageQueue();
   explicit MessageQueue(uint64_t next_sequence_num);
@@ -86,6 +86,6 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) MessageQueue {
 
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_PORTS_MESSAGE_QUEUE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_MESSAGE_QUEUE_H_

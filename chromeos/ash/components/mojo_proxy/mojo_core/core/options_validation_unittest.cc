@@ -2,16 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/options_validation.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/options_validation.h"
 
 #include <stddef.h>
 #include <stdint.h>
 
 #include "base/compiler_specific.h"
-#include "mojo/public/c/system/macros.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/macros.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace {
 
@@ -19,8 +19,8 @@ namespace {
 
 using TestOptionsFlags = uint32_t;
 
-static_assert(MOJO_ALIGNOF(int64_t) <= 8, "int64_t has weird alignment");
-struct MOJO_ALIGNAS(8) TestOptions {
+static_assert(MOJO_LEGACY_ALIGNOF(int64_t) <= 8, "int64_t has weird alignment");
+struct MOJO_LEGACY_ALIGNAS(8) TestOptions {
   uint32_t struct_size;
   TestOptionsFlags flags;
   uint32_t member1;
@@ -59,7 +59,7 @@ TEST(OptionsValidationTest, Valid) {
     EXPECT_FALSE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
   }
   {
-    MOJO_ALIGNAS(8) char buf[sizeof(TestOptions) + 100] = {};
+    MOJO_LEGACY_ALIGNAS(8) char buf[sizeof(TestOptions) + 100] = {};
     TestOptions* options = reinterpret_cast<TestOptions*>(buf);
     options->struct_size = kSizeOfTestOptions + 1;
     UserOptionsReader<TestOptions> reader(options);
@@ -69,7 +69,7 @@ TEST(OptionsValidationTest, Valid) {
     EXPECT_TRUE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
   }
   {
-    MOJO_ALIGNAS(8) char buf[sizeof(TestOptions) + 100] = {};
+    MOJO_LEGACY_ALIGNAS(8) char buf[sizeof(TestOptions) + 100] = {};
     TestOptions* options = reinterpret_cast<TestOptions*>(buf);
     options->struct_size = kSizeOfTestOptions + 4;
     UserOptionsReader<TestOptions> reader(options);
@@ -137,4 +137,4 @@ TEST(OptionsValidationTest, InvalidDeath) {
 
 }  // namespace
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

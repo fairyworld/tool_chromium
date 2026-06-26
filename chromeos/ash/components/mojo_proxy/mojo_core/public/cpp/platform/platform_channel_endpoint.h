@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_ENDPOINT_H_
-#define MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_ENDPOINT_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_ENDPOINT_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_ENDPOINT_H_
 
 #include <string_view>
 
@@ -11,16 +11,16 @@
 #include "base/component_export.h"
 #include "base/process/launch.h"
 #include "build/build_config.h"
-#include "mojo/buildflags.h"
-#include "mojo/public/cpp/platform/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // A PlatformHandle with a little extra type information to convey that it's
 // a channel endpoint, i.e. a handle that can be used to send or receive
-// invitations as |MOJO_INVITATION_TRANSPORT_TYPE_CHANNEL| to a remote
+// invitations as |MOJO_LEGACY_INVITATION_TRANSPORT_TYPE_CHANNEL| to a remote
 // PlatformChannelEndpoint.
-class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformChannelEndpoint {
+class COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM) PlatformChannelEndpoint {
  public:
 // Unfortunately base process support code has no unified handle-passing
 // data pipe, so we have this.
@@ -28,7 +28,7 @@ class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformChannelEndpoint {
   using HandlePassingInfo = base::HandlesToInheritVector;
 #elif BUILDFLAG(IS_FUCHSIA)
   using HandlePassingInfo = base::HandlesToTransferVector;
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   using HandlePassingInfo = base::MachPortsForRendezvous;
 #elif BUILDFLAG(IS_POSIX)
   using HandlePassingInfo = base::FileHandleMappingVector;
@@ -92,6 +92,6 @@ class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformChannelEndpoint {
   PlatformHandle handle_;
 };
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_ENDPOINT_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_PLATFORM_CHANNEL_ENDPOINT_H_

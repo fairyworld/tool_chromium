@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/platform/platform_channel_server_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_server_endpoint.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 PlatformChannelServerEndpoint::PlatformChannelServerEndpoint() = default;
 
@@ -28,4 +28,4 @@ PlatformChannelServerEndpoint PlatformChannelServerEndpoint::Clone() const {
   return PlatformChannelServerEndpoint(handle_.Clone());
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

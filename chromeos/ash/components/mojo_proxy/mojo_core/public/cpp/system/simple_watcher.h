@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_SYSTEM_SIMPLE_WATCHER_H_
-#define MOJO_PUBLIC_CPP_SYSTEM_SIMPLE_WATCHER_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_SIMPLE_WATCHER_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_SIMPLE_WATCHER_H_
 
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
@@ -12,16 +12,16 @@
 #include "base/memory/weak_ptr.h"
 #include "base/sequence_checker.h"
 #include "base/task/sequenced_task_runner.h"
-#include "mojo/public/c/system/types.h"
-#include "mojo/public/cpp/system/handle_signals_state.h"
-#include "mojo/public/cpp/system/system_export.h"
-#include "mojo/public/cpp/system/trap.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/handle_signals_state.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/trap.h"
 
 namespace base {
 class SequencedTaskRunner;
 }
 
-namespace mojo {
+namespace mojo_legacy {
 
 // This provides a convenient sequence-bound watcher implementation to safely
 // watch a single handle, dispatching state change notifications to an arbitrary
@@ -32,23 +32,27 @@ namespace mojo {
 // notification, and must then be rearmed before it will dispatch another. For
 // more details, see the documentation for ArmingPolicy and the Arm() and
 // ArmOrNotify() methods below.
-class MOJO_CPP_SYSTEM_EXPORT SimpleWatcher {
+class MOJO_LEGACY_CPP_SYSTEM_EXPORT SimpleWatcher {
  public:
   // A callback to be called any time a watched handle changes state in some
   // interesting way. The |result| argument indicates one of the following
   // conditions depending on its value:
   //
-  //   |MOJO_RESULT_OK|: One or more of the signals being watched is satisfied.
+  //   |MOJO_LEGACY_RESULT_OK|: One or more of the signals being watched is
+  //   satisfied.
   //
-  //   |MOJO_RESULT_FAILED_PRECONDITION|: None of the signals being watched can
+  //   |MOJO_LEGACY_RESULT_FAILED_PRECONDITION|: None of the signals being
+  //   watched can
   //       ever be satisfied again.
   //
-  //   |MOJO_RESULT_CANCELLED|: The watched handle has been closed. No further
+  //   |MOJO_LEGACY_RESULT_CANCELLED|: The watched handle has been closed. No
+  //   further
   //       notifications will be fired, as this equivalent to an implicit
   //       CancelWatch().
   //
   // Note that unlike the first two conditions, this callback may be invoked
-  // with |MOJO_RESULT_CANCELLED| even while the SimpleWatcher is disarmed.
+  // with |MOJO_LEGACY_RESULT_CANCELLED| even while the SimpleWatcher is
+  // disarmed.
   using ReadyCallback = base::RepeatingCallback<void(MojoResult result)>;
 
   // Like above but also receives the last known handle signal state at the time
@@ -105,20 +109,21 @@ class MOJO_CPP_SYSTEM_EXPORT SimpleWatcher {
   //
   // If |handle| is not a valid watchable (message or data pipe) handle or
   // |signals| is not a valid set of signals to watch, this returns
-  // |MOJO_RESULT_INVALID_ARGUMENT|.
+  // |MOJO_LEGACY_RESULT_INVALID_ARGUMENT|.
   //
-  // Otherwise |MOJO_RESULT_OK| is returned and the handle will be watched until
-  // either |handle| is closed, the SimpleWatcher is destroyed, or Cancel() is
-  // explicitly called.
+  // Otherwise |MOJO_LEGACY_RESULT_OK| is returned and the handle will be
+  // watched until either |handle| is closed, the SimpleWatcher is destroyed, or
+  // Cancel() is explicitly called.
   //
   // Once the watch is started, |callback| may be called at any time on the
   // current sequence until |Cancel()| is called or the handle is closed. Note
   // that |callback| can be called for results other than
-  // |MOJO_RESULT_CANCELLED| only if the SimpleWatcher is currently armed. Use
-  // ArmingPolicy to configure how a SimpleWatcher is armed.
+  // |MOJO_LEGACY_RESULT_CANCELLED| only if the SimpleWatcher is currently
+  // armed. Use ArmingPolicy to configure how a SimpleWatcher is armed.
   //
-  // |MOJO_RESULT_CANCELLED| may be dispatched even while the SimpleWatcher
-  // is disarmed, and no further notifications will be dispatched after that.
+  // |MOJO_LEGACY_RESULT_CANCELLED| may be dispatched even while the
+  // SimpleWatcher is disarmed, and no further notifications will be dispatched
+  // after that.
   //
   // Destroying the SimpleWatcher implicitly calls |Cancel()|.
   MojoResult Watch(Handle handle,
@@ -134,7 +139,7 @@ class MOJO_CPP_SYSTEM_EXPORT SimpleWatcher {
   MojoResult Watch(Handle handle,
                    MojoHandleSignals signals,
                    ReadyCallback callback) {
-    return Watch(handle, signals, MOJO_WATCH_CONDITION_SATISFIED,
+    return Watch(handle, signals, MOJO_LEGACY_WATCH_CONDITION_SATISFIED,
                  base::BindRepeating(&DiscardReadyState, std::move(callback)));
   }
 
@@ -142,7 +147,8 @@ class MOJO_CPP_SYSTEM_EXPORT SimpleWatcher {
   // passed to |Watch()| will never be called again for this SimpleWatcher.
   //
   // Note that when cancelled with an explicit call to |Cancel()| the
-  // ReadyCallback will not be invoked with a |MOJO_RESULT_CANCELLED| result.
+  // ReadyCallback will not be invoked with a |MOJO_LEGACY_RESULT_CANCELLED|
+  // result.
   void Cancel();
 
   // Manually arms the SimpleWatcher.
@@ -158,14 +164,14 @@ class MOJO_CPP_SYSTEM_EXPORT SimpleWatcher {
   // If the watched handle already meets the watched signaling conditions -
   // i.e., if it would have notified immediately once armed - the SimpleWatcher
   // is NOT armed, and this call fails with a return value of
-  // |MOJO_RESULT_FAILED_PRECONDITION|. In that case, what would have been the
-  // result code for that immediate notification is instead placed in
+  // |MOJO_LEGACY_RESULT_FAILED_PRECONDITION|. In that case, what would have
+  // been the result code for that immediate notification is instead placed in
   // |*ready_result| if |ready_result| is non-null, and the last known signaling
   // state of the handle is placed in |*ready_state| if |ready_state| is
   // non-null.
   //
   // If the watcher is successfully armed (or was already armed), this returns
-  // |MOJO_RESULT_OK| and |ready_result| and |ready_state| are ignored.
+  // |MOJO_LEGACY_RESULT_OK| and |ready_result| and |ready_state| are ignored.
   MojoResult Arm(MojoResult* ready_result = nullptr,
                  HandleSignalsState* ready_state = nullptr);
 
@@ -234,6 +240,6 @@ class MOJO_CPP_SYSTEM_EXPORT SimpleWatcher {
   base::WeakPtrFactory<SimpleWatcher> weak_factory_{this};
 };
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_SYSTEM_SIMPLE_WATCHER_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_SIMPLE_WATCHER_H_

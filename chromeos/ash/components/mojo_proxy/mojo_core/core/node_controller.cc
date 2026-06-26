@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/node_controller.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_controller.h"
 
 #include <algorithm>
 #include <limits>
@@ -17,22 +17,22 @@
 #include "base/task/current_thread.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "mojo/core/broker.h"
-#include "mojo/core/broker_host.h"
-#include "mojo/core/configuration.h"
-#include "mojo/core/ports/name.h"
-#include "mojo/core/ports/port_locker.h"
-#include "mojo/core/request_context.h"
-#include "mojo/core/user_message_impl.h"
-#include "mojo/public/cpp/platform/named_platform_channel.h"
-#include "mojo/public/cpp/platform/platform_channel.h"
-#include "mojo/public/cpp/platform/platform_channel_server.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/broker.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/broker_host.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/configuration.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/name.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/port_locker.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/request_context.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/user_message_impl.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/named_platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_server.h"
 
 #if BUILDFLAG(IS_WIN)
 #include <windows.h>
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace {
@@ -1539,4 +1539,4 @@ bool BoundedPeerSet::Contains(const ports::NodeName& name) {
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

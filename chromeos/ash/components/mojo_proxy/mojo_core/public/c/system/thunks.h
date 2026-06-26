@@ -4,15 +4,16 @@
 
 // Note: This header should be compilable as C.
 
-#ifndef MOJO_PUBLIC_C_SYSTEM_THUNKS_H_
-#define MOJO_PUBLIC_C_SYSTEM_THUNKS_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_THUNKS_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_THUNKS_H_
 
 #include <stddef.h>
 #include <stdint.h>
 
-#include "mojo/public/c/system/core.h"
-#include "mojo/public/c/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/system_export.h"
 
+namespace mojo_legacy {
 // This defines the *stable*, foward-compatible ABI for the Mojo Core C library.
 // As such, the following types of changes are DISALLOWED:
 //
@@ -450,19 +451,20 @@ struct MojoSystemThunks {
 typedef struct MojoSystemThunks MojoSystemThunks32;
 
 #ifdef __cplusplus
-extern "C" {
 #endif  // __cplusplus
 
-MOJO_SYSTEM_EXPORT const struct MojoSystemThunks2*
+MOJO_LEGACY_SYSTEM_EXPORT const struct MojoSystemThunks2*
 MojoEmbedderGetSystemThunks2();
 
-MOJO_SYSTEM_EXPORT const MojoSystemThunks32* MojoEmbedderGetSystemThunks32();
+MOJO_LEGACY_SYSTEM_EXPORT const MojoSystemThunks32*
+MojoEmbedderGetSystemThunks32();
 
-MOJO_SYSTEM_EXPORT void MojoEmbedderSetSystemThunks(
+MOJO_LEGACY_SYSTEM_EXPORT void MojoEmbedderSetSystemThunks(
     const struct MojoSystemThunks2* system_thunks);
 
 #ifdef __cplusplus
-}  // extern "C"
 #endif  // __cplusplus
 
-#endif  // MOJO_PUBLIC_C_SYSTEM_THUNKS_H_
+}  // namespace mojo_legacy
+
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_SYSTEM_THUNKS_H_

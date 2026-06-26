@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/node_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_channel.h"
 
 #include "base/compiler_specific.h"
 #include "base/containers/span.h"
@@ -13,13 +13,13 @@
 #include "base/message_loop/message_pump_type.h"
 #include "base/test/task_environment.h"
 #include "base/threading/thread.h"
-#include "mojo/core/embedder/embedder.h"
-#include "mojo/core/test/mock_node_channel_delegate.h"
-#include "mojo/public/cpp/platform/platform_channel.h"
-#include "mojo/public/cpp/platform/platform_channel_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/mock_node_channel_delegate.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_endpoint.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace {
 
@@ -133,4 +133,4 @@ TEST_F(NodeChannelTest, MessagesCannotBeSmallerThanOldestVersion) {
 
 }  // namespace
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

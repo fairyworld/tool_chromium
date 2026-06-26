@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/broker.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/broker.h"
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -13,13 +13,13 @@
 #include "base/logging.h"
 #include "base/memory/platform_shared_memory_region.h"
 #include "build/build_config.h"
-#include "mojo/buildflags.h"
-#include "mojo/core/broker_messages.h"
-#include "mojo/core/channel.h"
-#include "mojo/core/platform_handle_utils.h"
-#include "mojo/public/cpp/platform/socket_utils_posix.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/broker_messages.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_utils.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/socket_utils_posix.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace {
@@ -120,7 +120,7 @@ base::WritableSharedMemoryRegion Broker::GetWritableSharedMemoryRegion(
   }
 
 #if !BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+    BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   // Non-POSIX systems, as well as Android and Mac, only use a single handle to
   // represent a writable region.
   constexpr size_t kNumExpectedHandles = 1;
@@ -157,4 +157,4 @@ base::WritableSharedMemoryRegion Broker::GetWritableSharedMemoryRegion(
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

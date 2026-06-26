@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/broker_host.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/broker_host.h"
 
 #include <algorithm>
 #include <array>
@@ -15,16 +15,16 @@
 #include "base/memory/ref_counted.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "mojo/buildflags.h"
-#include "mojo/core/broker_messages.h"
-#include "mojo/core/ipcz_driver/envelope.h"
-#include "mojo/core/platform_handle_utils.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/broker_messages.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ipcz_driver/envelope.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_utils.h"
 
 #if BUILDFLAG(IS_WIN)
 #include <windows.h>
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 BrokerHost::BrokerHost(base::Process client_process,
@@ -132,7 +132,7 @@ void BrokerHost::OnBufferRequest(uint32_t num_bytes) {
         region.PassPlatformHandle(), &h[0], &h[1]);
     handles.emplace_back(std::move(h[0]));
 #if !BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+    BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
     // Non-POSIX systems, as well as Android and Mac, only use a single handle
     // to represent a writable region.
     DCHECK(!h[1].is_valid());
@@ -200,4 +200,4 @@ void BrokerHost::WillDestroyCurrentMessageLoop() {
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

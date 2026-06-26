@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_PORTS_USER_MESSAGE_H_
-#define MOJO_CORE_PORTS_USER_MESSAGE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_USER_MESSAGE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_USER_MESSAGE_H_
 
 #include <stddef.h>
 
 #include "base/component_export.h"
 #include "base/memory/raw_ptr_exclusion.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 
@@ -24,7 +24,7 @@ namespace ports {
 // |kUserMessageTypeInfo| and pass its address down to the UserMessage
 // constructor. The type of a UserMessage can then be dynamically inspected by
 // comparing |type_info()| to any subclass's |&kUserMessageTypeInfo|.
-class COMPONENT_EXPORT(MOJO_CORE_PORTS) UserMessage {
+class COMPONENT_EXPORT(MOJO_LEGACY_CORE_PORTS) UserMessage {
  public:
   struct TypeInfo {};
 
@@ -57,6 +57,6 @@ class COMPONENT_EXPORT(MOJO_CORE_PORTS) UserMessage {
 
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_PORTS_USER_MESSAGE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_PORTS_USER_MESSAGE_H_

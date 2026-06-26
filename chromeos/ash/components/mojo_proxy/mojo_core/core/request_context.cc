@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/request_context.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/request_context.h"
 
 #include "base/check.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace {
@@ -33,9 +33,9 @@ RequestContext::~RequestContext() {
     // since we're starting over at the bottom of the stack.
     current_context = nullptr;
 
-    MojoTrapEventFlags flags = MOJO_TRAP_EVENT_FLAG_NONE;
+    MojoTrapEventFlags flags = MOJO_LEGACY_TRAP_EVENT_FLAG_NONE;
     if (source_ == Source::LOCAL_API_CALL) {
-      flags |= MOJO_TRAP_EVENT_FLAG_WITHIN_API_CALL;
+      flags |= MOJO_LEGACY_TRAP_EVENT_FLAG_WITHIN_API_CALL;
     }
 
     // We send all cancellation notifications first. This is necessary because
@@ -46,8 +46,8 @@ RequestContext::~RequestContext() {
     // notification is received, and dispatching the cancellation notification
     // updates some internal Watch state to ensure no further notifications
     // fire. Because notifications on a single Watch are mutually exclusive,
-    // this is sufficient to guarantee that MOJO_RESULT_CANCELLED is the last
-    // notification received; which is the guarantee the API makes.
+    // this is sufficient to guarantee that MOJO_LEGACY_RESULT_CANCELLED is the
+    // last notification received; which is the guarantee the API makes.
     for (const scoped_refptr<Watch>& watch : watch_cancel_finalizers_) {
       static const HandleSignalsState closed_state = {0, 0};
 
@@ -60,7 +60,7 @@ RequestContext::~RequestContext() {
       // treating all nested trap events as if they originated from a local API
       // call even if this is a system RequestContext.
       RequestContext inner_context(Source::LOCAL_API_CALL);
-      watch->InvokeCallback(MOJO_RESULT_CANCELLED, closed_state, flags);
+      watch->InvokeCallback(MOJO_LEGACY_RESULT_CANCELLED, closed_state, flags);
     }
 
     for (const WatchNotifyFinalizer& watch : watch_notify_finalizers_) {
@@ -109,4 +109,4 @@ RequestContext::WatchNotifyFinalizer::WatchNotifyFinalizer(
 RequestContext::WatchNotifyFinalizer::~WatchNotifyFinalizer() = default;
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

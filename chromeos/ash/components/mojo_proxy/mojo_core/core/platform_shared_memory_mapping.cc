@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/platform_shared_memory_mapping.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_shared_memory_mapping.h"
 
 #include <type_traits>
 #include <utility>
@@ -15,7 +15,7 @@
 #include "base/notreached.h"
 #include "build/build_config.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 PlatformSharedMemoryMapping::PlatformSharedMemoryMapping(
@@ -93,4 +93,4 @@ size_t PlatformSharedMemoryMapping::GetLength() const {
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

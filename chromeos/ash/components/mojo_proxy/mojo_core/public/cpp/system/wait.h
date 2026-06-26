@@ -2,17 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_SYSTEM_WAIT_H_
-#define MOJO_PUBLIC_CPP_SYSTEM_WAIT_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_WAIT_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_WAIT_H_
 
 #include <stddef.h>
 
-#include "mojo/public/c/system/trap.h"
-#include "mojo/public/c/system/types.h"
-#include "mojo/public/cpp/system/handle.h"
-#include "mojo/public/cpp/system/system_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/trap.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/system_export.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 // Blocks the calling sequence, waiting for one or more signals in |signals| to
 // be become satisfied, not-satisfied, or permanently unsatisfiable on the
@@ -23,28 +23,32 @@ namespace mojo {
 // written to |*signals_state| before returning.
 //
 // Return values:
-//   |MOJO_RESULT_OK| if one or more signals in |signals| has been raised on
-//       |handle| with |condition| set to  |MOJO_WATCH_CONDITION_SATISFIED|, or
-//       one or more signals in |signals| has been lowered on |handle| with
-//       |condition| set to |MOJO_WATCH_CONDITION_NOT_SATISFIED|.
-//   |MOJO_RESULT_FAILED_PRECONDITION| if the state of |handle| changes such
+//   |MOJO_LEGACY_RESULT_OK| if one or more signals in |signals| has been raised
+//   on
+//       |handle| with |condition| set to
+//       |MOJO_LEGACY_WATCH_CONDITION_SATISFIED|, or one or more signals in
+//       |signals| has been lowered on |handle| with |condition| set to
+//       |MOJO_LEGACY_WATCH_CONDITION_NOT_SATISFIED|.
+//   |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| if the state of |handle| changes
+//   such
 //       that no signals in |signals| can ever be raised again and |condition|
-//       is |MOJO_WATCH_CONDITION_SATISFIED|.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if |handle| is not a valid handle.
-//   |MOJO_RESULT_CANCELLED| if the wait was cancelled because |handle| was
+//       is |MOJO_LEGACY_WATCH_CONDITION_SATISFIED|.
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if |handle| is not a valid handle.
+//   |MOJO_LEGACY_RESULT_CANCELLED| if the wait was cancelled because |handle|
+//   was
 //       closed by some other sequence while waiting.
-MOJO_CPP_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_CPP_SYSTEM_EXPORT MojoResult
 Wait(Handle handle,
      MojoHandleSignals signals,
      MojoTriggerCondition condition,
      MojoHandleSignalsState* signals_state = nullptr);
 
 // A pseudonym for the above Wait() which always waits on
-// |MOJO_TRIGGER_CONDITION_SIGNALS_SATISFIED|.
+// |MOJO_LEGACY_TRIGGER_CONDITION_SIGNALS_SATISFIED|.
 inline MojoResult Wait(Handle handle,
                        MojoHandleSignals signals,
                        MojoHandleSignalsState* signals_state = nullptr) {
-  return Wait(handle, signals, MOJO_TRIGGER_CONDITION_SIGNALS_SATISFIED,
+  return Wait(handle, signals, MOJO_LEGACY_TRIGGER_CONDITION_SIGNALS_SATISFIED,
               signals_state);
 }
 
@@ -64,26 +68,29 @@ inline MojoResult Wait(Handle handle,
 // |signals_states[i]| before returning.
 //
 // Returns values:
-//   |MOJO_RESULT_OK| if one of the Handles in |handles| had one or more of its
+//   |MOJO_LEGACY_RESULT_OK| if one of the Handles in |handles| had one or more
+//   of its
 //       correpsonding signals satisfied. |*result_index| contains the index
 //       of the Handle in question if |result_index| is non-null.
-//   |MOJO_RESULT_FAILED_PRECONDITION| if one of the Handles in |handles|
+//   |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| if one of the Handles in |handles|
 //       changes state such that its corresponding signals become permanently
 //       unsatisfiable. |*result_index| contains the index of the handle in
 //       question if |result_index| is non-null.
-//   |MOJO_RESULT_INVALID_ARGUMENT| if any Handle in |handles| is invalid,
+//   |MOJO_LEGACY_RESULT_INVALID_ARGUMENT| if any Handle in |handles| is
+//   invalid,
 //       or if either |handles| or |signals| is null.
-//   |MOJO_RESULT_CANCELLED| if the wait was cancelled because a handle in
+//   |MOJO_LEGACY_RESULT_CANCELLED| if the wait was cancelled because a handle
+//   in
 //       |handles| was closed by some other sequence while waiting.
 //       |*result_index| contains the index of the closed Handle if
 //       |result_index| is non-null.
-MOJO_CPP_SYSTEM_EXPORT MojoResult
+MOJO_LEGACY_CPP_SYSTEM_EXPORT MojoResult
 WaitMany(const Handle* handles,
          const MojoHandleSignals* signals,
          size_t num_handles,
          size_t* result_index = nullptr,
          MojoHandleSignalsState* signals_states = nullptr);
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_SYSTEM_WAIT_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_SYSTEM_WAIT_H_

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_TEST_MULTIPROCESS_TEST_HELPER_H_
-#define MOJO_CORE_TEST_MULTIPROCESS_TEST_HELPER_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MULTIPROCESS_TEST_HELPER_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MULTIPROCESS_TEST_HELPER_H_
 
 #include <string>
 
@@ -12,11 +12,11 @@
 #include "base/test/multiprocess_test.h"
 #include "base/test/test_timeouts.h"
 #include "build/build_config.h"
-#include "mojo/core/embedder/embedder.h"
-#include "mojo/public/cpp/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/message_pipe.h"
 #include "testing/multiprocess_func_list.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 class IsolatedConnection;
 
@@ -60,8 +60,8 @@ class MultiprocessTestHelper {
   static void InitForMultiprocessTest();
 
   // Start a child process and run the "main" function "named" |test_child_name|
-  // declared using |MOJO_MULTIPROCESS_TEST_CHILD_MAIN()| or
-  // |MOJO_MULTIPROCESS_TEST_CHILD_TEST()| (below).
+  // declared using |MOJO_LEGACY_MULTIPROCESS_TEST_CHILD_MAIN()| or
+  // |MOJO_LEGACY_MULTIPROCESS_TEST_CHILD_TEST()| (below).
   ScopedMessagePipeHandle StartChild(
       const std::string& test_child_name,
       LaunchType launch_type = LaunchType::CHILD);
@@ -98,7 +98,7 @@ class MultiprocessTestHelper {
   static int RunClientTestMain(base::OnceCallback<void(MojoHandle)> main);
 
   // For use (and only valid) in the child process:
-  static mojo::ScopedMessagePipeHandle primordial_pipe;
+  static mojo_legacy::ScopedMessagePipeHandle primordial_pipe;
 
  private:
   // Valid after |StartChild()| and before |WaitForChildShutdown()|.
@@ -109,6 +109,6 @@ class MultiprocessTestHelper {
 
 }  // namespace test
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_TEST_MULTIPROCESS_TEST_HELPER_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MULTIPROCESS_TEST_HELPER_H_

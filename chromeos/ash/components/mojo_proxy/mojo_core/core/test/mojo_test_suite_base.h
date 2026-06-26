@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_TEST_MOJO_TEST_SUITE_BASE_H_
-#define MOJO_CORE_TEST_MOJO_TEST_SUITE_BASE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MOJO_TEST_SUITE_BASE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MOJO_TEST_SUITE_BASE_H_
 
 #include <memory>
 
@@ -14,7 +14,7 @@ namespace base::test {
 class ScopedFeatureList;
 }
 
-namespace mojo::core::test {
+namespace mojo_legacy::core::test {
 
 class ScopedMojoSupport;
 
@@ -45,6 +45,6 @@ class MojoTestSuiteBase : public base::TestSuite {
   std::unique_ptr<ScopedMojoSupport> child_mojo_support_;
 };
 
-}  // namespace mojo::core::test
+}  // namespace mojo_legacy::core::test
 
-#endif  // MOJO_CORE_TEST_MOJO_TEST_SUITE_BASE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_TEST_MOJO_TEST_SUITE_BASE_H_

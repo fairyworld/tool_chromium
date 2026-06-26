@@ -2,24 +2,24 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/entrypoints.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/entrypoints.h"
 
 #include <stdint.h>
 
 #include "base/no_destructor.h"
-#include "mojo/core/core.h"
-#include "mojo/public/c/system/buffer.h"
-#include "mojo/public/c/system/data_pipe.h"
-#include "mojo/public/c/system/functions.h"
-#include "mojo/public/c/system/message_pipe.h"
-#include "mojo/public/c/system/platform_handle.h"
-#include "mojo/public/c/system/quota.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/buffer.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/data_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/functions.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/quota.h"
+
+namespace mojo_legacy {
 
 namespace {
 
-mojo::core::Core* g_core;
-
-extern "C" {
+mojo_legacy::core::Core* g_core;
 
 MojoResult MojoInitializeImpl(const struct MojoInitializeOptions* options) {
   NOTREACHED() << "Do not call MojoInitialize() as a Mojo Core embedder!";
@@ -362,7 +362,6 @@ MojoResult MojoSetDefaultProcessErrorHandlerImpl(
   return g_core->SetDefaultProcessErrorHandler(handler, options);
 }
 
-}  // extern "C"
 
 MojoSystemThunks2 g_thunks = {sizeof(g_thunks),
                               MojoInitializeImpl,
@@ -414,7 +413,9 @@ MojoSystemThunks2 g_thunks = {sizeof(g_thunks),
 
 }  // namespace
 
-namespace mojo {
+}  // namespace mojo_legacy
+
+namespace mojo_legacy {
 namespace core {
 
 // static
@@ -435,4 +436,4 @@ const MojoSystemThunks2& GetSystemThunks() {
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

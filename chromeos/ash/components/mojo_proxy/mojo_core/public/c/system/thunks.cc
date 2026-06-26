@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/c/system/thunks.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/thunks.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -18,12 +18,13 @@
 #include "base/no_destructor.h"
 #include "base/notreached.h"
 #include "build/build_config.h"
-#include "mojo/public/c/system/core.h"
-#include "mojo/public/c/system/data_pipe.h"
-#include "mojo/public/c/system/invitation.h"
-#include "mojo/public/c/system/macros.h"
-#include "mojo/public/c/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/data_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/invitation.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/macros.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/message_pipe.h"
 
+namespace mojo_legacy {
 namespace {
 
 typedef void (*MojoGetSystemThunksFunction)(MojoSystemThunks2* thunks);
@@ -34,11 +35,11 @@ MojoResult NotImplemented(const char* name) {
   if (g_thunks.size > 0) {
     DLOG(ERROR) << "Function 'Mojo" << name
                 << "()' not supported in this version of Mojo Core.";
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
   }
 
   LOG(FATAL) << "Mojo has not been initialized in this process. You must call "
-             << "mojo::core::Init() as an embedder.";
+             << "mojo_legacy::core::Init() as an embedder.";
 }
 
 }  // namespace
@@ -48,10 +49,9 @@ MojoResult NotImplemented(const char* name) {
       ? g_thunks.name(__VA_ARGS__)                  \
       : NotImplemented(#name)
 
-extern "C" {
 
 MojoResult MojoInitialize(const struct MojoInitializeOptions* options) {
-  return MOJO_RESULT_UNIMPLEMENTED;
+  return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
 }
 
 MojoTimeTicks MojoGetTimeTicksNow() {
@@ -379,7 +379,7 @@ MojoResult MojoQueryQuota(MojoHandle handle,
 }
 
 MojoResult MojoShutdown(const MojoShutdownOptions* options) {
-  return MOJO_RESULT_UNIMPLEMENTED;
+  return MOJO_LEGACY_RESULT_UNIMPLEMENTED;
 }
 
 MojoResult MojoSetDefaultProcessErrorHandler(
@@ -573,7 +573,7 @@ MojoResult MojoGetMessageData32(MojoMessageHandle message,
   std::vector<MojoHandle> handles64(num_handles ? *num_handles : 0);
   MojoResult result = MojoGetMessageData(message, options, buffer, num_bytes,
                                          handles64.data(), num_handles);
-  if (result == MOJO_RESULT_OK && num_handles) {
+  if (result == MOJO_LEGACY_RESULT_OK && num_handles) {
     for (size_t i = 0; i < *num_handles; ++i) {
       UNSAFE_TODO(handles[i]) = static_cast<MojoHandle32>(handles64[i]);
     }
@@ -772,4 +772,4 @@ void MojoEmbedderSetSystemThunks(const MojoSystemThunks2* thunks) {
   g_thunks = *thunks;
 }
 
-}  // extern "C"
+}  // namespace mojo_legacy

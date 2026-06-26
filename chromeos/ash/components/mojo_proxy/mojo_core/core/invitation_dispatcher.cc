@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/invitation_dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/invitation_dispatcher.h"
 
-#include "mojo/core/core.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/core.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 InvitationDispatcher::InvitationDispatcher() = default;
@@ -20,7 +20,7 @@ MojoResult InvitationDispatcher::Close() {
   {
     base::AutoLock lock(lock_);
     if (is_closed_) {
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
     }
     is_closed_ = true;
     std::swap(attached_ports, attached_ports_);
@@ -28,7 +28,7 @@ MojoResult InvitationDispatcher::Close() {
   for (auto& entry : attached_ports) {
     Core::Get()->GetNodeController()->ClosePort(entry.second);
   }
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult InvitationDispatcher::AttachMessagePipe(
@@ -38,9 +38,9 @@ MojoResult InvitationDispatcher::AttachMessagePipe(
   auto result = attached_ports_.emplace(std::string(name), remote_peer_port);
   if (!result.second) {
     Core::Get()->GetNodeController()->ClosePort(remote_peer_port);
-    return MOJO_RESULT_ALREADY_EXISTS;
+    return MOJO_LEGACY_RESULT_ALREADY_EXISTS;
   }
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult InvitationDispatcher::ExtractMessagePipe(
@@ -51,7 +51,7 @@ MojoResult InvitationDispatcher::ExtractMessagePipe(
     base::AutoLock lock(lock_);
     auto it = attached_ports_.find(std::string(name));
     if (it == attached_ports_.end()) {
-      return MOJO_RESULT_NOT_FOUND;
+      return MOJO_LEGACY_RESULT_NOT_FOUND;
     }
     remote_peer_port = std::move(it->second);
     attached_ports_.erase(it);
@@ -59,10 +59,10 @@ MojoResult InvitationDispatcher::ExtractMessagePipe(
 
   *message_pipe_handle =
       Core::Get()->CreatePartialMessagePipe(remote_peer_port);
-  if (*message_pipe_handle == MOJO_HANDLE_INVALID) {
-    return MOJO_RESULT_RESOURCE_EXHAUSTED;
+  if (*message_pipe_handle == MOJO_LEGACY_HANDLE_INVALID) {
+    return MOJO_LEGACY_RESULT_RESOURCE_EXHAUSTED;
   }
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 InvitationDispatcher::PortMapping InvitationDispatcher::TakeAttachedPorts() {
@@ -79,4 +79,4 @@ InvitationDispatcher::~InvitationDispatcher() {
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

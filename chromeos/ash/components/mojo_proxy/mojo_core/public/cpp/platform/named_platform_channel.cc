@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/platform/named_platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/named_platform_channel.h"
 
 #include "base/check.h"
 #include "base/strings/utf_string_conversions.h"
 #include "build/build_config.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 const char NamedPlatformChannel::kNamedHandleSwitch[] =
     "mojo-named-platform-channel-pipe";
@@ -70,4 +70,4 @@ PlatformChannelEndpoint NamedPlatformChannel::ConnectToServer(
   return ConnectToServer(name);
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

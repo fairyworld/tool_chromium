@@ -17,9 +17,9 @@
 #include "base/memory/unsafe_shared_memory_region.h"
 #include "base/process/process_handle.h"
 #include "build/build_config.h"
-#include "mojo/core/test/mojo_test_base.h"
-#include "mojo/public/c/system/platform_handle.h"
-#include "mojo/public/cpp/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/mojo_test_base.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/message_pipe.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 #if BUILDFLAG(IS_WIN)
@@ -31,16 +31,19 @@
 #endif
 
 #if BUILDFLAG(IS_WIN)
-#define SIMPLE_PLATFORM_HANDLE_TYPE MOJO_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE
+#define SIMPLE_PLATFORM_HANDLE_TYPE \
+  MOJO_LEGACY_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE
 #elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
-#define SIMPLE_PLATFORM_HANDLE_TYPE MOJO_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR
+#define SIMPLE_PLATFORM_HANDLE_TYPE \
+  MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR
 #endif
 
 #if BUILDFLAG(IS_FUCHSIA)
 #define SHARED_BUFFER_PLATFORM_HANDLE_TYPE \
-  MOJO_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE
+  MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE
 #elif BUILDFLAG(IS_APPLE)
-#define SHARED_BUFFER_PLATFORM_HANDLE_TYPE MOJO_PLATFORM_HANDLE_TYPE_MACH_PORT
+#define SHARED_BUFFER_PLATFORM_HANDLE_TYPE \
+  MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_PORT
 #elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
 #define SHARED_BUFFER_PLATFORM_HANDLE_TYPE SIMPLE_PLATFORM_HANDLE_TYPE
 #endif
@@ -61,7 +64,7 @@ base::PlatformFile PlatformFileFromPlatformHandleValue(uint64_t value) {
 #endif
 }
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace {
 
@@ -93,7 +96,7 @@ TEST_F(PlatformWrapperTest, MAYBE_WrapPlatformHandle) {
     os_file.type = SIMPLE_PLATFORM_HANDLE_TYPE;
     os_file.value =
         PlatformHandleValueFromPlatformFile(file.TakePlatformFile());
-    EXPECT_EQ(MOJO_RESULT_OK,
+    EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
               MojoWrapPlatformHandle(&os_file, nullptr, &wrapped_handle));
 
     WriteMessageWithHandles(h, kMessage, &wrapped_handle, 1);
@@ -109,8 +112,9 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReadPlatformFile, PlatformWrapperTest, h) {
 
   MojoPlatformHandle platform_handle;
   platform_handle.struct_size = sizeof(MojoPlatformHandle);
-  ASSERT_EQ(MOJO_RESULT_OK, MojoUnwrapPlatformHandle(wrapped_handle, nullptr,
-                                                     &platform_handle));
+  ASSERT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      MojoUnwrapPlatformHandle(wrapped_handle, nullptr, &platform_handle));
   EXPECT_EQ(SIMPLE_PLATFORM_HANDLE_TYPE, platform_handle.type);
   base::File file(PlatformFileFromPlatformHandleValue(platform_handle.value));
 
@@ -118,7 +122,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReadPlatformFile, PlatformWrapperTest, h) {
   std::vector<char> data(message.size());
   EXPECT_TRUE(file.ReadAtCurrentPosAndCheck(base::as_writable_byte_span(data)));
   EXPECT_TRUE(std::ranges::equal(message, data));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
 }
 
 #if BUILDFLAG(IS_IOS)
@@ -164,10 +168,10 @@ TEST_F(PlatformWrapperTest, MAYBE_WrapPlatformSharedMemoryRegion) {
     mojo_guid.low = guid.GetLowForSerialization();
 
     MojoHandle wrapped_handle;
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               MojoWrapPlatformSharedMemoryRegion(
                   &os_buffer, 1, kMessage.size(), &mojo_guid,
-                  MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE,
+                  MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE,
                   nullptr, &wrapped_handle));
     WriteMessageWithHandles(h, kMessage, &wrapped_handle, 1);
 
@@ -175,7 +179,7 @@ TEST_F(PlatformWrapperTest, MAYBE_WrapPlatformSharedMemoryRegion) {
     // verify that the deserialized buffer handle holds the same GUID on the
     // receiving end.
     WriteMessageRaw(MessagePipeHandle(h), &mojo_guid, sizeof(mojo_guid),
-                    nullptr, 0, MOJO_WRITE_MESSAGE_FLAG_NONE);
+                    nullptr, 0, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE);
   });
 }
 
@@ -197,28 +201,30 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReadPlatformSharedBuffer,
   uint64_t size;
   MojoSharedBufferGuid mojo_guid;
   MojoPlatformSharedMemoryRegionAccessMode access_mode;
-  ASSERT_EQ(MOJO_RESULT_OK, MojoUnwrapPlatformSharedMemoryRegion(
-                                wrapped_handle, nullptr, &os_buffer,
-                                &num_handles, &size, &mojo_guid, &access_mode));
-  EXPECT_EQ(MOJO_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE, access_mode);
+  ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+            MojoUnwrapPlatformSharedMemoryRegion(
+                wrapped_handle, nullptr, &os_buffer, &num_handles, &size,
+                &mojo_guid, &access_mode));
+  EXPECT_EQ(MOJO_LEGACY_PLATFORM_SHARED_MEMORY_REGION_ACCESS_MODE_UNSAFE,
+            access_mode);
 
   auto mode = base::subtle::PlatformSharedMemoryRegion::Mode::kUnsafe;
   std::optional<base::UnguessableToken> guid =
       base::UnguessableToken::Deserialize(mojo_guid.high, mojo_guid.low);
   ASSERT_TRUE(guid.has_value());
 #if BUILDFLAG(IS_WIN)
-  ASSERT_EQ(MOJO_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE, os_buffer.type);
+  ASSERT_EQ(MOJO_LEGACY_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE, os_buffer.type);
   auto platform_handle =
       base::win::ScopedHandle(reinterpret_cast<HANDLE>(os_buffer.value));
 #elif BUILDFLAG(IS_FUCHSIA)
-  ASSERT_EQ(MOJO_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE, os_buffer.type);
+  ASSERT_EQ(MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE, os_buffer.type);
   auto platform_handle = zx::vmo(static_cast<zx_handle_t>(os_buffer.value));
 #elif BUILDFLAG(IS_APPLE)
-  ASSERT_EQ(MOJO_PLATFORM_HANDLE_TYPE_MACH_PORT, os_buffer.type);
+  ASSERT_EQ(MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_PORT, os_buffer.type);
   auto platform_handle = base::apple::ScopedMachSendRight(
       static_cast<mach_port_t>(os_buffer.value));
 #elif BUILDFLAG(IS_POSIX)
-  ASSERT_EQ(MOJO_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR, os_buffer.type);
+  ASSERT_EQ(MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR, os_buffer.type);
   auto platform_handle = base::ScopedFD(static_cast<int>(os_buffer.value));
 #endif
   base::subtle::PlatformSharedMemoryRegion platform_region =
@@ -232,17 +238,18 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReadPlatformSharedBuffer,
   EXPECT_EQ(base::as_byte_span(message), base::span(mapping));
 
   // Verify that the received buffer's internal GUID was preserved in transit.
-  EXPECT_EQ(MOJO_RESULT_OK, WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+            WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
   std::vector<uint8_t> guid_bytes;
-  EXPECT_EQ(MOJO_RESULT_OK,
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
             ReadMessageRaw(MessagePipeHandle(h), &guid_bytes, nullptr,
-                           MOJO_READ_MESSAGE_FLAG_NONE));
+                           MOJO_LEGACY_READ_MESSAGE_FLAG_NONE));
   EXPECT_EQ(sizeof(MojoSharedBufferGuid), guid_bytes.size());
   auto* expected_guid =
       UNSAFE_TODO(reinterpret_cast<MojoSharedBufferGuid*>(guid_bytes.data()));
   EXPECT_EQ(expected_guid->high, mojo_guid.high);
   EXPECT_EQ(expected_guid->low, mojo_guid.low);
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
 }
 
 TEST_F(PlatformWrapperTest, InvalidHandle) {
@@ -251,12 +258,12 @@ TEST_F(PlatformWrapperTest, InvalidHandle) {
   MojoHandle wrapped_handle;
   MojoPlatformHandle invalid_handle;
   invalid_handle.struct_size = sizeof(MojoPlatformHandle);
-  invalid_handle.type = MOJO_PLATFORM_HANDLE_TYPE_INVALID;
-  EXPECT_EQ(MOJO_RESULT_OK,
+  invalid_handle.type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_INVALID;
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
             MojoWrapPlatformHandle(&invalid_handle, nullptr, &wrapped_handle));
-  EXPECT_EQ(MOJO_RESULT_OK,
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
             MojoUnwrapPlatformHandle(wrapped_handle, nullptr, &invalid_handle));
-  EXPECT_EQ(MOJO_PLATFORM_HANDLE_TYPE_INVALID, invalid_handle.type);
+  EXPECT_EQ(MOJO_LEGACY_PLATFORM_HANDLE_TYPE_INVALID, invalid_handle.type);
 }
 
 TEST_F(PlatformWrapperTest, InvalidArgument) {
@@ -264,10 +271,10 @@ TEST_F(PlatformWrapperTest, InvalidArgument) {
   MojoHandle wrapped_handle;
   MojoPlatformHandle platform_handle;
   platform_handle.struct_size = 0;
-  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+  EXPECT_EQ(MOJO_LEGACY_RESULT_INVALID_ARGUMENT,
             MojoWrapPlatformHandle(&platform_handle, nullptr, &wrapped_handle));
 }
 
 }  // namespace
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

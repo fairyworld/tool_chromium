@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_DATA_PIPE_CONTROL_MESSAGE_H_
-#define MOJO_CORE_DATA_PIPE_CONTROL_MESSAGE_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_DATA_PIPE_CONTROL_MESSAGE_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_DATA_PIPE_CONTROL_MESSAGE_H_
 
 #include <stdint.h>
 
-#include "mojo/core/ports/port_ref.h"
-#include "mojo/public/c/system/macros.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/port_ref.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/macros.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 class NodeController;
@@ -24,7 +24,7 @@ enum DataPipeCommand : uint32_t {
 };
 
 // Message header for messages sent over a data pipe control port.
-struct MOJO_ALIGNAS(8) DataPipeControlMessage {
+struct MOJO_LEGACY_ALIGNAS(8) DataPipeControlMessage {
   DataPipeCommand command;
   uint32_t num_bytes;
 };
@@ -35,6 +35,6 @@ void SendDataPipeControlMessage(NodeController* node_controller,
                                 uint32_t num_bytes);
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_DATA_PIPE_CONTROL_MESSAGE_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_DATA_PIPE_CONTROL_MESSAGE_H_

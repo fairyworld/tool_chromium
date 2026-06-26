@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_REQUEST_CONTEXT_H_
-#define MOJO_CORE_REQUEST_CONTEXT_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_REQUEST_CONTEXT_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_REQUEST_CONTEXT_H_
 
-#include "mojo/core/handle_signals_state.h"
-#include "mojo/core/system_impl_export.h"
-#include "mojo/core/watch.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/handle_signals_state.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/watch.h"
 #include "third_party/abseil-cpp/absl/container/inlined_vector.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // A RequestContext is a thread-local object which exists for the duration of
@@ -23,7 +23,7 @@ namespace core {
 // for any reason. Therefore it is important to always use
 // |RequestContext::current()| rather than referring to any local instance
 // directly.
-class MOJO_SYSTEM_IMPL_EXPORT RequestContext {
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT RequestContext {
  public:
   // Identifies the source of the current stack frame's RequestContext.
   enum class Source {
@@ -94,6 +94,6 @@ class MOJO_SYSTEM_IMPL_EXPORT RequestContext {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_REQUEST_CONTEXT_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_REQUEST_CONTEXT_H_

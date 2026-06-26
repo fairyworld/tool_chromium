@@ -2,19 +2,19 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/ports/port_locker.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/port_locker.h"
 
 #include <algorithm>
 
 #include "base/compiler_specific.h"
 #include "base/dcheck_is_on.h"
-#include "mojo/core/ports/port.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/port.h"
 
 #if DCHECK_IS_ON()
 #include "base/check_op.h"
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 
@@ -69,4 +69,4 @@ SinglePortLocker::~SinglePortLocker() = default;
 
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

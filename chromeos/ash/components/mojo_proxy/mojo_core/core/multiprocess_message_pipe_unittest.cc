@@ -25,20 +25,20 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/test/task_environment.h"
 #include "build/build_config.h"
-#include "mojo/core/embedder/embedder.h"
-#include "mojo/core/handle_signals_state.h"
-#include "mojo/core/test/mojo_test_base.h"
-#include "mojo/core/test/test_utils.h"
-#include "mojo/public/c/system/buffer.h"
-#include "mojo/public/c/system/functions.h"
-#include "mojo/public/c/system/types.h"
-#include "mojo/public/cpp/system/message_pipe.h"
-#include "mojo/public/cpp/system/platform_handle.h"
-#include "mojo/public/cpp/system/simple_watcher.h"
-#include "mojo/public/cpp/system/wait.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/embedder/embedder.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/handle_signals_state.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/mojo_test_base.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/test/test_utils.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/buffer.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/functions.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/simple_watcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/system/wait.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace {
 
@@ -57,7 +57,7 @@ MojoResult MojoReadMessage(MojoHandle pipe,
   std::vector<ScopedHandle> handles;
   MojoResult rv =
       ReadMessageRaw(MessagePipeHandle(pipe), &bytes, &handles, flags);
-  if (rv != MOJO_RESULT_OK) {
+  if (rv != MOJO_LEGACY_RESULT_OK) {
     return rv;
   }
 
@@ -78,7 +78,7 @@ MojoResult MojoReadMessage(MojoHandle pipe,
       UNSAFE_TODO(out_handles[i]) = handles[i].release().value();
     }
   }
-  return MOJO_RESULT_OK;
+  return MOJO_LEGACY_RESULT_OK;
 }
 
 MojoResult MojoWriteMessage(MojoHandle pipe,
@@ -156,23 +156,24 @@ DEFINE_TEST_CLIENT_WITH_PIPE(EchoEcho, MultiprocessMessagePipeTest, h) {
   for (;; rv = (rv + 1) % 100) {
     // Wait for our end of the message pipe to be readable.
     HandleSignalsState hss;
-    MojoResult result = WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss);
-    if (result != MOJO_RESULT_OK) {
+    MojoResult result =
+        WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss);
+    if (result != MOJO_LEGACY_RESULT_OK) {
       // It was closed, probably.
-      CHECK_EQ(result, MOJO_RESULT_FAILED_PRECONDITION);
-      CHECK_EQ(hss.satisfied_signals, MOJO_HANDLE_SIGNAL_PEER_CLOSED);
-      CHECK_EQ(hss.satisfiable_signals, MOJO_HANDLE_SIGNAL_PEER_CLOSED);
+      CHECK_EQ(result, MOJO_LEGACY_RESULT_FAILED_PRECONDITION);
+      CHECK_EQ(hss.satisfied_signals, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED);
+      CHECK_EQ(hss.satisfiable_signals, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED);
       break;
     } else {
-      CHECK((hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE));
-      CHECK((hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE));
+      CHECK((hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
+      CHECK((hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
     }
 
     std::string read_buffer(1000, '\0');
     uint32_t read_buffer_size = static_cast<uint32_t>(read_buffer.size());
     CHECK_EQ(MojoReadMessage(h, &read_buffer[0], &read_buffer_size, nullptr, 0,
-                             MOJO_READ_MESSAGE_FLAG_NONE),
-             MOJO_RESULT_OK);
+                             MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+             MOJO_LEGACY_RESULT_OK);
     read_buffer.resize(read_buffer_size);
     VLOG(2) << "Child got: " << read_buffer;
 
@@ -184,8 +185,8 @@ DEFINE_TEST_CLIENT_WITH_PIPE(EchoEcho, MultiprocessMessagePipeTest, h) {
     std::string write_buffer = read_buffer + read_buffer;
     CHECK_EQ(MojoWriteMessage(h, write_buffer.data(),
                               static_cast<uint32_t>(write_buffer.size()),
-                              nullptr, 0u, MOJO_WRITE_MESSAGE_FLAG_NONE),
-             MOJO_RESULT_OK);
+                              nullptr, 0u, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE),
+             MOJO_LEGACY_RESULT_OK);
   }
 
   return rv;
@@ -195,24 +196,24 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport, Basic) {
   int exit_code = RunTestClientAndGetExitCode("EchoEcho", [&](MojoHandle h) {
     std::string hello("hello");
     ASSERT_EQ(
-        MOJO_RESULT_OK,
+        MOJO_LEGACY_RESULT_OK,
         MojoWriteMessage(h, hello.data(), static_cast<uint32_t>(hello.size()),
-                         nullptr, 0u, MOJO_WRITE_MESSAGE_FLAG_NONE));
+                         nullptr, 0u, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
 
     HandleSignalsState hss;
-    ASSERT_EQ(MOJO_RESULT_OK,
-              WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+              WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
     // The child may or may not have closed its end of the message pipe and died
     // (and we may or may not know it yet), so our end may or may not appear as
     // writable.
-    EXPECT_TRUE((hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE));
-    EXPECT_TRUE((hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE));
+    EXPECT_TRUE((hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
+    EXPECT_TRUE((hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
 
     std::string read_buffer(1000, '\0');
     uint32_t read_buffer_size = static_cast<uint32_t>(read_buffer.size());
     CHECK_EQ(MojoReadMessage(h, &read_buffer[0], &read_buffer_size, nullptr, 0,
-                             MOJO_READ_MESSAGE_FLAG_NONE),
-             MOJO_RESULT_OK);
+                             MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+             MOJO_LEGACY_RESULT_OK);
     read_buffer.resize(read_buffer_size);
     VLOG(2) << "Parent got: " << read_buffer;
     ASSERT_EQ(hello + hello, read_buffer);
@@ -220,8 +221,8 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport, Basic) {
     std::string quitquitquit("quitquitquit");
     CHECK_EQ(MojoWriteMessage(h, quitquitquit.data(),
                               static_cast<uint32_t>(quitquitquit.size()),
-                              nullptr, 0u, MOJO_WRITE_MESSAGE_FLAG_NONE),
-             MOJO_RESULT_OK);
+                              nullptr, 0u, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE),
+             MOJO_LEGACY_RESULT_OK);
   });
   EXPECT_EQ(1, exit_code);
 }
@@ -231,45 +232,48 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport, QueueMessages) {
   int exit_code = RunTestClientAndGetExitCode("EchoEcho", [&](MojoHandle h) {
     for (size_t i = 0; i < kNumMessages; i++) {
       std::string write_buffer(i, 'A' + (i % 26));
-      ASSERT_EQ(MOJO_RESULT_OK,
-                MojoWriteMessage(h, write_buffer.data(),
-                                 static_cast<uint32_t>(write_buffer.size()),
-                                 nullptr, 0u, MOJO_WRITE_MESSAGE_FLAG_NONE));
+      ASSERT_EQ(
+          MOJO_LEGACY_RESULT_OK,
+          MojoWriteMessage(h, write_buffer.data(),
+                           static_cast<uint32_t>(write_buffer.size()), nullptr,
+                           0u, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
     }
 
     for (size_t i = 0; i < kNumMessages; i++) {
       HandleSignalsState hss;
-      ASSERT_EQ(MOJO_RESULT_OK,
-                WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss));
+      ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+                WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
       // The child may or may not have closed its end of the message pipe and
       // died (and we may or may not know it yet), so our end may or may not
       // appear as writable.
-      ASSERT_TRUE((hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE));
-      ASSERT_TRUE((hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE));
+      ASSERT_TRUE((hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
+      ASSERT_TRUE(
+          (hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
 
       std::string read_buffer(kNumMessages * 2, '\0');
       uint32_t read_buffer_size = static_cast<uint32_t>(read_buffer.size());
       ASSERT_EQ(MojoReadMessage(h, &read_buffer[0], &read_buffer_size, nullptr,
-                                0, MOJO_READ_MESSAGE_FLAG_NONE),
-                MOJO_RESULT_OK);
+                                0, MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+                MOJO_LEGACY_RESULT_OK);
       read_buffer.resize(read_buffer_size);
 
       ASSERT_EQ(std::string(i * 2, 'A' + (i % 26)), read_buffer);
     }
 
     const std::string quitquitquit("quitquitquit");
-    ASSERT_EQ(MOJO_RESULT_OK,
-              MojoWriteMessage(h, quitquitquit.data(),
-                               static_cast<uint32_t>(quitquitquit.size()),
-                               nullptr, 0u, MOJO_WRITE_MESSAGE_FLAG_NONE));
+    ASSERT_EQ(
+        MOJO_LEGACY_RESULT_OK,
+        MojoWriteMessage(h, quitquitquit.data(),
+                         static_cast<uint32_t>(quitquitquit.size()), nullptr,
+                         0u, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
 
     // Wait for it to become readable, which should fail (since we sent
     // "quitquitquit").
     HandleSignalsState hss;
-    ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
-              WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-    ASSERT_FALSE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-    ASSERT_FALSE(hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE);
+    ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+              WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+    ASSERT_FALSE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+    ASSERT_FALSE(hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
   });
   EXPECT_EQ(static_cast<int>(kNumMessages % 100), exit_code);
 }
@@ -279,12 +283,12 @@ DEFINE_TEST_CLIENT_WITH_PIPE(CheckSharedBuffer,
                              h) {
   // Wait for the first message from our parent.
   HandleSignalsState hss;
-  CHECK_EQ(WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss),
-           MOJO_RESULT_OK);
+  CHECK_EQ(WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss),
+           MOJO_LEGACY_RESULT_OK);
   // In this test, the parent definitely doesn't close its end of the message
   // pipe before we do.
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_WRITABLE);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
 
   // It should have a shared buffer.
   std::string read_buffer(100, '\0');
@@ -292,15 +296,16 @@ DEFINE_TEST_CLIENT_WITH_PIPE(CheckSharedBuffer,
   MojoHandle handles[10];
   uint32_t num_handlers = std::size(handles);  // Maximum number to receive
   CHECK_EQ(MojoReadMessage(h, &read_buffer[0], &num_bytes, &handles[0],
-                           &num_handlers, MOJO_READ_MESSAGE_FLAG_NONE),
-           MOJO_RESULT_OK);
+                           &num_handlers, MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+           MOJO_LEGACY_RESULT_OK);
   read_buffer.resize(num_bytes);
   CHECK_EQ(read_buffer, std::string("go 1"));
   CHECK_EQ(num_handlers, 1u);
 
   // Make a mapping.
   void* buffer;
-  CHECK_EQ(MojoMapBuffer(handles[0], 0, 100, nullptr, &buffer), MOJO_RESULT_OK);
+  CHECK_EQ(MojoMapBuffer(handles[0], 0, 100, nullptr, &buffer),
+           MOJO_LEGACY_RESULT_OK);
 
   // Write some stuff to the shared buffer.
   static const char kHello[] = "hello";
@@ -312,21 +317,21 @@ DEFINE_TEST_CLIENT_WITH_PIPE(CheckSharedBuffer,
   // And send a message to signal that we've written stuff.
   const std::string go2("go 2");
   CHECK_EQ(MojoWriteMessage(h, go2.data(), static_cast<uint32_t>(go2.size()),
-                            nullptr, 0u, MOJO_WRITE_MESSAGE_FLAG_NONE),
-           MOJO_RESULT_OK);
+                            nullptr, 0u, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE),
+           MOJO_LEGACY_RESULT_OK);
 
   // Now wait for our parent to send us a message.
   hss = HandleSignalsState();
-  CHECK_EQ(WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss),
-           MOJO_RESULT_OK);
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_WRITABLE);
+  CHECK_EQ(WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss),
+           MOJO_LEGACY_RESULT_OK);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
 
   read_buffer = std::string(100, '\0');
   num_bytes = static_cast<uint32_t>(read_buffer.size());
   CHECK_EQ(MojoReadMessage(h, &read_buffer[0], &num_bytes, nullptr, 0,
-                           MOJO_READ_MESSAGE_FLAG_NONE),
-           MOJO_RESULT_OK);
+                           MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+           MOJO_LEGACY_RESULT_OK);
   read_buffer.resize(num_bytes);
   CHECK_EQ(read_buffer, std::string("go 3"));
 
@@ -344,14 +349,14 @@ TEST_F(MultiprocessMessagePipeTest, SharedBufferPassing) {
     // Make a shared buffer.
     MojoCreateSharedBufferOptions options;
     options.struct_size = sizeof(options);
-    options.flags = MOJO_CREATE_SHARED_BUFFER_FLAG_NONE;
+    options.flags = MOJO_LEGACY_CREATE_SHARED_BUFFER_FLAG_NONE;
 
     MojoHandle shared_buffer;
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               MojoCreateSharedBuffer(100, &options, &shared_buffer));
     MojoSharedBufferInfo buffer_info;
     buffer_info.struct_size = sizeof(buffer_info);
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               MojoGetBufferInfo(shared_buffer, nullptr, &buffer_info));
     EXPECT_GE(buffer_info.size, 100U);
 
@@ -359,32 +364,32 @@ TEST_F(MultiprocessMessagePipeTest, SharedBufferPassing) {
     const std::string go1("go 1");
 
     MojoHandle duplicated_shared_buffer;
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               MojoDuplicateBufferHandle(shared_buffer, nullptr,
                                         &duplicated_shared_buffer));
     buffer_info.size = 0;
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               MojoGetBufferInfo(shared_buffer, nullptr, &buffer_info));
     EXPECT_GE(buffer_info.size, 100U);
     MojoHandle handles[1];
     handles[0] = duplicated_shared_buffer;
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               MojoWriteMessage(h, &go1[0], static_cast<uint32_t>(go1.size()),
                                &handles[0], std::size(handles),
-                               MOJO_WRITE_MESSAGE_FLAG_NONE));
+                               MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
 
     // Wait for a message from the child.
     HandleSignalsState hss;
-    ASSERT_EQ(MOJO_RESULT_OK,
-              WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-    EXPECT_TRUE((hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE));
-    EXPECT_TRUE((hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+              WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+    EXPECT_TRUE((hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
+    EXPECT_TRUE((hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
 
     std::string read_buffer(100, '\0');
     uint32_t num_bytes = static_cast<uint32_t>(read_buffer.size());
-    ASSERT_EQ(MOJO_RESULT_OK,
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
               MojoReadMessage(h, &read_buffer[0], &num_bytes, nullptr, 0,
-                              MOJO_READ_MESSAGE_FLAG_NONE));
+                              MOJO_LEGACY_READ_MESSAGE_FLAG_NONE));
     read_buffer.resize(num_bytes);
     ASSERT_EQ(std::string("go 2"), read_buffer);
 
@@ -393,7 +398,7 @@ TEST_F(MultiprocessMessagePipeTest, SharedBufferPassing) {
     static const char kHello[] = "hello";
     void* buffer;
     CHECK_EQ(MojoMapBuffer(shared_buffer, 0, 100, nullptr, &buffer),
-             MOJO_RESULT_OK);
+             MOJO_LEGACY_RESULT_OK);
     UNSAFE_TODO(ASSERT_EQ(0, memcmp(buffer, kHello, sizeof(kHello))));
 
     // Now we'll write some stuff to the shared buffer.
@@ -402,17 +407,18 @@ TEST_F(MultiprocessMessagePipeTest, SharedBufferPassing) {
 
     // And send a message to signal that we've written stuff.
     const std::string go3("go 3");
-    ASSERT_EQ(MOJO_RESULT_OK,
-              MojoWriteMessage(h, &go3[0], static_cast<uint32_t>(go3.size()),
-                               nullptr, 0u, MOJO_WRITE_MESSAGE_FLAG_NONE));
+    ASSERT_EQ(
+        MOJO_LEGACY_RESULT_OK,
+        MojoWriteMessage(h, &go3[0], static_cast<uint32_t>(go3.size()), nullptr,
+                         0u, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
 
     // Wait for |h| to become readable, which should fail.
     hss = HandleSignalsState();
-    ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
-              WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-    ASSERT_FALSE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-    ASSERT_FALSE(hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE);
-    EXPECT_EQ(MOJO_RESULT_OK, MojoClose(shared_buffer));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+              WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+    ASSERT_FALSE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+    ASSERT_FALSE(hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+    EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(shared_buffer));
   });
 }
 
@@ -420,10 +426,10 @@ DEFINE_TEST_CLIENT_WITH_PIPE(CheckPlatformHandleFile,
                              MultiprocessMessagePipeTest,
                              h) {
   HandleSignalsState hss;
-  CHECK_EQ(WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss),
-           MOJO_RESULT_OK);
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_WRITABLE);
+  CHECK_EQ(WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss),
+           MOJO_LEGACY_RESULT_OK);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
 
   std::string read_buffer(100, '\0');
   uint32_t num_bytes = static_cast<uint32_t>(read_buffer.size());
@@ -431,8 +437,8 @@ DEFINE_TEST_CLIENT_WITH_PIPE(CheckPlatformHandleFile,
   uint32_t num_handlers = std::size(handles);
 
   CHECK_EQ(MojoReadMessage(h, &read_buffer[0], &num_bytes, &handles[0],
-                           &num_handlers, MOJO_READ_MESSAGE_FLAG_NONE),
-           MOJO_RESULT_OK);
+                           &num_handlers, MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+           MOJO_LEGACY_RESULT_OK);
 
   read_buffer.resize(num_bytes);
   char hello[32];
@@ -490,17 +496,17 @@ TEST_P(MultiprocessMessagePipeTestWithPipeCount, PlatformHandlePassing) {
     snprintf(message, sizeof(message), "hello %d",
              static_cast<int>(pipe_count));
     ASSERT_EQ(
-        MOJO_RESULT_OK,
+        MOJO_LEGACY_RESULT_OK,
         MojoWriteMessage(h, message, static_cast<uint32_t>(strlen(message)),
                          &handles[0], static_cast<uint32_t>(handles.size()),
-                         MOJO_WRITE_MESSAGE_FLAG_NONE));
+                         MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
 
     // Wait for it to become readable, which should fail.
     HandleSignalsState hss;
-    ASSERT_EQ(MOJO_RESULT_FAILED_PRECONDITION,
-              WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-    ASSERT_FALSE(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-    ASSERT_FALSE(hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE);
+    ASSERT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION,
+              WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+    ASSERT_FALSE(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+    ASSERT_FALSE(hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
   });
 }
 
@@ -517,32 +523,32 @@ INSTANTIATE_TEST_SUITE_P(PipeCount,
 DEFINE_TEST_CLIENT_WITH_PIPE(CheckMessagePipe, MultiprocessMessagePipeTest, h) {
   // Wait for the first message from our parent.
   HandleSignalsState hss;
-  CHECK_EQ(WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss),
-           MOJO_RESULT_OK);
+  CHECK_EQ(WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss),
+           MOJO_LEGACY_RESULT_OK);
   // In this test, the parent definitely doesn't close its end of the message
   // pipe before we do.
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_WRITABLE);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
 
   // It should have a message pipe.
   MojoHandle handles[10];
   uint32_t num_handlers = std::size(handles);
   CHECK_EQ(MojoReadMessage(h, nullptr, nullptr, &handles[0], &num_handlers,
-                           MOJO_READ_MESSAGE_FLAG_NONE),
-           MOJO_RESULT_OK);
+                           MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+           MOJO_LEGACY_RESULT_OK);
   CHECK_EQ(num_handlers, 1u);
 
   // Read data from the received message pipe.
-  CHECK_EQ(WaitForSignals(handles[0], MOJO_HANDLE_SIGNAL_READABLE, &hss),
-           MOJO_RESULT_OK);
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_WRITABLE);
+  CHECK_EQ(WaitForSignals(handles[0], MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss),
+           MOJO_LEGACY_RESULT_OK);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
 
   std::string read_buffer(100, '\0');
   uint32_t read_buffer_size = static_cast<uint32_t>(read_buffer.size());
   CHECK_EQ(MojoReadMessage(handles[0], &read_buffer[0], &read_buffer_size,
-                           nullptr, 0, MOJO_READ_MESSAGE_FLAG_NONE),
-           MOJO_RESULT_OK);
+                           nullptr, 0, MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+           MOJO_LEGACY_RESULT_OK);
   read_buffer.resize(read_buffer_size);
   CHECK_EQ(read_buffer, std::string("hello"));
 
@@ -550,8 +556,8 @@ DEFINE_TEST_CLIENT_WITH_PIPE(CheckMessagePipe, MultiprocessMessagePipeTest, h) {
   std::string write_buffer = "world";
   CHECK_EQ(MojoWriteMessage(handles[0], write_buffer.data(),
                             static_cast<uint32_t>(write_buffer.size()), nullptr,
-                            0u, MOJO_WRITE_MESSAGE_FLAG_NONE),
-           MOJO_RESULT_OK);
+                            0u, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE),
+           MOJO_LEGACY_RESULT_OK);
   MojoClose(handles[0]);
   return 0;
 }
@@ -560,33 +566,35 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport, MessagePipePassing) {
   RunTestClient("CheckMessagePipe", [&](MojoHandle h) {
     MojoCreateSharedBufferOptions options;
     options.struct_size = sizeof(options);
-    options.flags = MOJO_CREATE_SHARED_BUFFER_FLAG_NONE;
+    options.flags = MOJO_LEGACY_CREATE_SHARED_BUFFER_FLAG_NONE;
 
     MojoHandle mp1, mp2;
-    ASSERT_EQ(MOJO_RESULT_OK, MojoCreateMessagePipe(nullptr, &mp1, &mp2));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+              MojoCreateMessagePipe(nullptr, &mp1, &mp2));
 
     // Write a string into one end of the new message pipe and send the other
     // end.
     const std::string hello("hello");
     ASSERT_EQ(
-        MOJO_RESULT_OK,
+        MOJO_LEGACY_RESULT_OK,
         MojoWriteMessage(mp1, &hello[0], static_cast<uint32_t>(hello.size()),
-                         nullptr, 0, MOJO_WRITE_MESSAGE_FLAG_NONE));
-    ASSERT_EQ(MOJO_RESULT_OK, MojoWriteMessage(h, nullptr, 0, &mp2, 1,
-                                               MOJO_WRITE_MESSAGE_FLAG_NONE));
+                         nullptr, 0, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+              MojoWriteMessage(h, nullptr, 0, &mp2, 1,
+                               MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
 
     // Wait for a message from the child.
     HandleSignalsState hss;
-    ASSERT_EQ(MOJO_RESULT_OK,
-              WaitForSignals(mp1, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-    EXPECT_TRUE((hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE));
-    EXPECT_TRUE((hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+              WaitForSignals(mp1, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+    EXPECT_TRUE((hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
+    EXPECT_TRUE((hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
 
     std::string read_buffer(100, '\0');
     uint32_t read_buffer_size = static_cast<uint32_t>(read_buffer.size());
     CHECK_EQ(MojoReadMessage(mp1, &read_buffer[0], &read_buffer_size, nullptr,
-                             0, MOJO_READ_MESSAGE_FLAG_NONE),
-             MOJO_RESULT_OK);
+                             0, MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+             MOJO_LEGACY_RESULT_OK);
     read_buffer.resize(read_buffer_size);
     CHECK_EQ(read_buffer, std::string("world"));
 
@@ -597,30 +605,32 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport, MessagePipePassing) {
 TEST_P(MultiprocessMessagePipeTestWithPeerSupport, MessagePipeTwoPassing) {
   RunTestClient("CheckMessagePipe", [&](MojoHandle h) {
     MojoHandle mp1, mp2;
-    ASSERT_EQ(MOJO_RESULT_OK, MojoCreateMessagePipe(nullptr, &mp2, &mp1));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+              MojoCreateMessagePipe(nullptr, &mp2, &mp1));
 
     // Write a string into one end of the new message pipe and send the other
     // end.
     const std::string hello("hello");
     ASSERT_EQ(
-        MOJO_RESULT_OK,
+        MOJO_LEGACY_RESULT_OK,
         MojoWriteMessage(mp1, &hello[0], static_cast<uint32_t>(hello.size()),
-                         nullptr, 0u, MOJO_WRITE_MESSAGE_FLAG_NONE));
-    ASSERT_EQ(MOJO_RESULT_OK, MojoWriteMessage(h, nullptr, 0u, &mp2, 1u,
-                                               MOJO_WRITE_MESSAGE_FLAG_NONE));
+                         nullptr, 0u, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+              MojoWriteMessage(h, nullptr, 0u, &mp2, 1u,
+                               MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
 
     // Wait for a message from the child.
     HandleSignalsState hss;
-    ASSERT_EQ(MOJO_RESULT_OK,
-              WaitForSignals(mp1, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-    EXPECT_TRUE((hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE));
-    EXPECT_TRUE((hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+              WaitForSignals(mp1, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+    EXPECT_TRUE((hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
+    EXPECT_TRUE((hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
 
     std::string read_buffer(100, '\0');
     uint32_t read_buffer_size = static_cast<uint32_t>(read_buffer.size());
     CHECK_EQ(MojoReadMessage(mp1, &read_buffer[0], &read_buffer_size, nullptr,
-                             0, MOJO_READ_MESSAGE_FLAG_NONE),
-             MOJO_RESULT_OK);
+                             0, MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+             MOJO_LEGACY_RESULT_OK);
     read_buffer.resize(read_buffer_size);
     CHECK_EQ(read_buffer, std::string("world"));
     MojoClose(mp1);
@@ -630,40 +640,44 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport, MessagePipeTwoPassing) {
 DEFINE_TEST_CLIENT_WITH_PIPE(DataPipeConsumer, MultiprocessMessagePipeTest, h) {
   // Wait for the first message from our parent.
   HandleSignalsState hss;
-  CHECK_EQ(WaitForSignals(h, MOJO_HANDLE_SIGNAL_READABLE, &hss),
-           MOJO_RESULT_OK);
+  CHECK_EQ(WaitForSignals(h, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss),
+           MOJO_LEGACY_RESULT_OK);
   // In this test, the parent definitely doesn't close its end of the message
   // pipe before we do.
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_WRITABLE);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
   CHECK_EQ(hss.satisfiable_signals,
-           MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_WRITABLE |
-               MOJO_HANDLE_SIGNAL_PEER_CLOSED | MOJO_HANDLE_SIGNAL_PEER_REMOTE |
-               MOJO_HANDLE_SIGNAL_QUOTA_EXCEEDED);
+           MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+               MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE |
+               MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+               MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE |
+               MOJO_LEGACY_HANDLE_SIGNAL_QUOTA_EXCEEDED);
 
   // It should have a message pipe.
   MojoHandle handles[10];
   uint32_t num_handlers = std::size(handles);
   CHECK_EQ(MojoReadMessage(h, nullptr, nullptr, &handles[0], &num_handlers,
-                           MOJO_READ_MESSAGE_FLAG_NONE),
-           MOJO_RESULT_OK);
+                           MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+           MOJO_LEGACY_RESULT_OK);
   CHECK_EQ(num_handlers, 1u);
 
   // Read data from the received message pipe.
-  CHECK_EQ(WaitForSignals(handles[0], MOJO_HANDLE_SIGNAL_READABLE, &hss),
-           MOJO_RESULT_OK);
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE);
-  CHECK(hss.satisfied_signals & MOJO_HANDLE_SIGNAL_WRITABLE);
+  CHECK_EQ(WaitForSignals(handles[0], MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss),
+           MOJO_LEGACY_RESULT_OK);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
+  CHECK(hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE);
   CHECK_EQ(hss.satisfiable_signals,
-           MOJO_HANDLE_SIGNAL_READABLE | MOJO_HANDLE_SIGNAL_WRITABLE |
-               MOJO_HANDLE_SIGNAL_PEER_CLOSED | MOJO_HANDLE_SIGNAL_PEER_REMOTE |
-               MOJO_HANDLE_SIGNAL_QUOTA_EXCEEDED);
+           MOJO_LEGACY_HANDLE_SIGNAL_READABLE |
+               MOJO_LEGACY_HANDLE_SIGNAL_WRITABLE |
+               MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED |
+               MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE |
+               MOJO_LEGACY_HANDLE_SIGNAL_QUOTA_EXCEEDED);
 
   std::string read_buffer(100, '\0');
   uint32_t read_buffer_size = static_cast<uint32_t>(read_buffer.size());
   CHECK_EQ(MojoReadMessage(handles[0], &read_buffer[0], &read_buffer_size,
-                           nullptr, 0, MOJO_READ_MESSAGE_FLAG_NONE),
-           MOJO_RESULT_OK);
+                           nullptr, 0, MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+           MOJO_LEGACY_RESULT_OK);
   read_buffer.resize(read_buffer_size);
   CHECK_EQ(read_buffer, std::string("hello"));
 
@@ -671,8 +685,8 @@ DEFINE_TEST_CLIENT_WITH_PIPE(DataPipeConsumer, MultiprocessMessagePipeTest, h) {
   std::string write_buffer = "world";
   CHECK_EQ(MojoWriteMessage(handles[0], write_buffer.data(),
                             static_cast<uint32_t>(write_buffer.size()), nullptr,
-                            0u, MOJO_WRITE_MESSAGE_FLAG_NONE),
-           MOJO_RESULT_OK);
+                            0u, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE),
+           MOJO_LEGACY_RESULT_OK);
   MojoClose(handles[0]);
   return 0;
 }
@@ -681,33 +695,35 @@ TEST_F(MultiprocessMessagePipeTest, DataPipeConsumer) {
   RunTestClient("DataPipeConsumer", [&](MojoHandle h) {
     MojoCreateSharedBufferOptions options;
     options.struct_size = sizeof(options);
-    options.flags = MOJO_CREATE_SHARED_BUFFER_FLAG_NONE;
+    options.flags = MOJO_LEGACY_CREATE_SHARED_BUFFER_FLAG_NONE;
 
     MojoHandle mp1, mp2;
-    ASSERT_EQ(MOJO_RESULT_OK, MojoCreateMessagePipe(nullptr, &mp2, &mp1));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+              MojoCreateMessagePipe(nullptr, &mp2, &mp1));
 
     // Write a string into one end of the new message pipe and send the other
     // end.
     const std::string hello("hello");
     ASSERT_EQ(
-        MOJO_RESULT_OK,
+        MOJO_LEGACY_RESULT_OK,
         MojoWriteMessage(mp1, &hello[0], static_cast<uint32_t>(hello.size()),
-                         nullptr, 0u, MOJO_WRITE_MESSAGE_FLAG_NONE));
-    ASSERT_EQ(MOJO_RESULT_OK, MojoWriteMessage(h, nullptr, 0, &mp2, 1u,
-                                               MOJO_WRITE_MESSAGE_FLAG_NONE));
+                         nullptr, 0u, MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+              MojoWriteMessage(h, nullptr, 0, &mp2, 1u,
+                               MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE));
 
     // Wait for a message from the child.
     HandleSignalsState hss;
-    ASSERT_EQ(MOJO_RESULT_OK,
-              WaitForSignals(mp1, MOJO_HANDLE_SIGNAL_READABLE, &hss));
-    EXPECT_TRUE((hss.satisfied_signals & MOJO_HANDLE_SIGNAL_READABLE));
-    EXPECT_TRUE((hss.satisfiable_signals & MOJO_HANDLE_SIGNAL_READABLE));
+    ASSERT_EQ(MOJO_LEGACY_RESULT_OK,
+              WaitForSignals(mp1, MOJO_LEGACY_HANDLE_SIGNAL_READABLE, &hss));
+    EXPECT_TRUE((hss.satisfied_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
+    EXPECT_TRUE((hss.satisfiable_signals & MOJO_LEGACY_HANDLE_SIGNAL_READABLE));
 
     std::string read_buffer(100, '\0');
     uint32_t read_buffer_size = static_cast<uint32_t>(read_buffer.size());
     CHECK_EQ(MojoReadMessage(mp1, &read_buffer[0], &read_buffer_size, nullptr,
-                             0, MOJO_READ_MESSAGE_FLAG_NONE),
-             MOJO_RESULT_OK);
+                             0, MOJO_LEGACY_READ_MESSAGE_FLAG_NONE),
+             MOJO_LEGACY_RESULT_OK);
     read_buffer.resize(read_buffer_size);
     CHECK_EQ(read_buffer, std::string("world"));
 
@@ -823,12 +839,12 @@ DEFINE_TEST_CLIENT_WITH_PIPE(EchoServiceFactoryClient,
   std::vector<Handle> handles(2);
   handles[0] = Handle(h);
   handles[1] = Handle(p);
-  std::vector<MojoHandleSignals> signals(2, MOJO_HANDLE_SIGNAL_READABLE);
+  std::vector<MojoHandleSignals> signals(2, MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
   for (;;) {
     size_t index;
-    CHECK_EQ(
-        mojo::WaitMany(handles.data(), signals.data(), handles.size(), &index),
-        MOJO_RESULT_OK);
+    CHECK_EQ(mojo_legacy::WaitMany(handles.data(), signals.data(),
+                                   handles.size(), &index),
+             MOJO_LEGACY_RESULT_OK);
     DCHECK_LE(index, handles.size());
     if (index == 0) {
       // If data is available on the first pipe, it should be an exit command.
@@ -839,7 +855,7 @@ DEFINE_TEST_CLIENT_WITH_PIPE(EchoServiceFactoryClient,
       MojoHandle echo_request;
       ReadMessageWithHandles(p, &echo_request, 1);
       handles.push_back(Handle(echo_request));
-      signals.push_back(MOJO_HANDLE_SIGNAL_READABLE);
+      signals.push_back(MOJO_LEGACY_HANDLE_SIGNAL_READABLE);
     } else {
       // Otherwise it was one of our established echo pipes. Echo!
       WriteMessage(handles[index].value(), ReadMessage(handles[index].value()));
@@ -957,7 +973,8 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport, PingPongPipe) {
   });
 
   // We should still be able to observe peer closure from the other end.
-  EXPECT_EQ(MOJO_RESULT_OK, WaitForSignals(p0, MOJO_HANDLE_SIGNAL_PEER_CLOSED));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+            WaitForSignals(p0, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED));
   MojoClose(p0);
 }
 
@@ -975,54 +992,54 @@ DEFINE_TEST_CLIENT_WITH_PIPE(CommandDrivenClient,
     if (command == "take") {
       // Take a pipe.
       CHECK_EQ(parts.size(), 2u);
-      CHECK_NE(p, MOJO_HANDLE_INVALID);
+      CHECK_NE(p, MOJO_LEGACY_HANDLE_INVALID);
       named_pipes[parts[1]] = p;
       WriteMessage(h, "ok");
     } else if (command == "return") {
       // Return a pipe.
       CHECK_EQ(parts.size(), 2u);
-      CHECK_EQ(p, MOJO_HANDLE_INVALID);
+      CHECK_EQ(p, MOJO_LEGACY_HANDLE_INVALID);
       p = named_pipes[parts[1]];
-      CHECK_NE(p, MOJO_HANDLE_INVALID);
+      CHECK_NE(p, MOJO_LEGACY_HANDLE_INVALID);
       named_pipes.erase(parts[1]);
       WriteMessageWithHandles(h, "ok", &p, 1);
     } else if (command == "say") {
       // Say something to a named pipe.
       CHECK_EQ(parts.size(), 3u);
-      CHECK_EQ(p, MOJO_HANDLE_INVALID);
+      CHECK_EQ(p, MOJO_LEGACY_HANDLE_INVALID);
       p = named_pipes[parts[1]];
-      CHECK_NE(p, MOJO_HANDLE_INVALID);
+      CHECK_NE(p, MOJO_LEGACY_HANDLE_INVALID);
       CHECK(!parts[2].empty());
       WriteMessage(p, parts[2]);
       WriteMessage(h, "ok");
     } else if (command == "hear") {
       // Expect to read something from a named pipe.
       CHECK_EQ(parts.size(), 3u);
-      CHECK_EQ(p, MOJO_HANDLE_INVALID);
+      CHECK_EQ(p, MOJO_LEGACY_HANDLE_INVALID);
       p = named_pipes[parts[1]];
-      CHECK_NE(p, MOJO_HANDLE_INVALID);
+      CHECK_NE(p, MOJO_LEGACY_HANDLE_INVALID);
       CHECK(!parts[2].empty());
       CHECK_EQ(parts[2], ReadMessage(p));
       WriteMessage(h, "ok");
     } else if (command == "pass") {
       // Pass one named pipe over another named pipe.
       CHECK_EQ(parts.size(), 3u);
-      CHECK_EQ(p, MOJO_HANDLE_INVALID);
+      CHECK_EQ(p, MOJO_LEGACY_HANDLE_INVALID);
       p = named_pipes[parts[1]];
       MojoHandle carrier = named_pipes[parts[2]];
-      CHECK_NE(p, MOJO_HANDLE_INVALID);
-      CHECK_NE(carrier, MOJO_HANDLE_INVALID);
+      CHECK_NE(p, MOJO_LEGACY_HANDLE_INVALID);
+      CHECK_NE(carrier, MOJO_LEGACY_HANDLE_INVALID);
       named_pipes.erase(parts[1]);
       WriteMessageWithHandles(carrier, "got a pipe for ya", &p, 1);
       WriteMessage(h, "ok");
     } else if (command == "catch") {
       // Expect to receive one named pipe from another named pipe.
       CHECK_EQ(parts.size(), 3u);
-      CHECK_EQ(p, MOJO_HANDLE_INVALID);
+      CHECK_EQ(p, MOJO_LEGACY_HANDLE_INVALID);
       MojoHandle carrier = named_pipes[parts[2]];
-      CHECK_NE(carrier, MOJO_HANDLE_INVALID);
+      CHECK_NE(carrier, MOJO_LEGACY_HANDLE_INVALID);
       ReadMessageWithHandles(carrier, &p, 1);
-      CHECK_NE(p, MOJO_HANDLE_INVALID);
+      CHECK_NE(p, MOJO_LEGACY_HANDLE_INVALID);
       named_pipes[parts[1]] = p;
       WriteMessage(h, "ok");
     } else if (command == "exit") {
@@ -1145,7 +1162,8 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReceivePipeWithClosedPeer,
                                   h) {
   MojoHandle p;
   EXPECT_EQ("foo", ReadMessageWithHandles(h, &p, 1));
-  EXPECT_EQ(MOJO_RESULT_OK, WaitForSignals(p, MOJO_HANDLE_SIGNAL_PEER_CLOSED));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+            WaitForSignals(p, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED));
   MojoClose(p);
   MojoClose(h);
 }
@@ -1176,12 +1194,12 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(SendOtherChildPipeWithClosedPeer,
   WriteMessageWithHandles(application_proxy, "c2s lol", &service_request, 1);
 
   // Immediately close the service proxy. The "application" should detect this.
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(service_proxy));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(service_proxy));
 
   // Wait for quit.
   EXPECT_EQ("quit", ReadMessage(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(application_proxy));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(application_proxy));
 }
 
 DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReceivePipeWithClosedPeerFromOtherChild,
@@ -1197,12 +1215,13 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReceivePipeWithClosedPeerFromOtherChild,
             ReadMessageWithHandles(application_client, &service_client, 1));
 
   // Wait for the service client to signal closure.
-  EXPECT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(service_client, MOJO_HANDLE_SIGNAL_PEER_CLOSED));
+  EXPECT_EQ(
+      MOJO_LEGACY_RESULT_OK,
+      WaitForSignals(service_client, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED));
 
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(service_client));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(application_client));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(service_client));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(application_client));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(h));
 }
 
 #if BUILDFLAG(IS_ANDROID)
@@ -1243,10 +1262,11 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport, SendClosePeerSend) {
   EXPECT_EQ("foo", ReadMessageWithHandles(d, &a, 1));
   WriteMessageWithHandles(d, "bar", &a, 1);
   EXPECT_EQ("bar", ReadMessageWithHandles(c, &a, 1));
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(b));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(b));
 
   // We should be able to detect peer closure on |a|.
-  EXPECT_EQ(MOJO_RESULT_OK, WaitForSignals(a, MOJO_HANDLE_SIGNAL_PEER_CLOSED));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+            WaitForSignals(a, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED));
   MojoClose(a);
   MojoClose(c);
   MojoClose(d);
@@ -1261,7 +1281,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(WriteCloseSendPeerClient,
   // Write some messages to the first endpoint and then close it.
   WriteMessage(pipe[0], "baz");
   WriteMessage(pipe[0], "qux");
-  EXPECT_EQ(MOJO_RESULT_OK, MojoClose(pipe[0]));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(pipe[0]));
 
   MojoHandle c, d;
   CreateMessagePipe(&c, &d);
@@ -1296,8 +1316,8 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport, WriteCloseSendPeer) {
     EXPECT_EQ("qux", ReadMessage(p));
 
     // Expect to have peer closure signaled.
-    EXPECT_EQ(MOJO_RESULT_OK,
-              WaitForSignals(p, MOJO_HANDLE_SIGNAL_PEER_CLOSED));
+    EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+              WaitForSignals(p, MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED));
 
     WriteMessage(h, "quit");
     MojoClose(p);
@@ -1312,8 +1332,8 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MessagePipeStatusChangeInTransitClient,
   MojoHandle handles[4];
   EXPECT_EQ("o_O", ReadMessageWithHandles(parent, handles, 4));
 
-  EXPECT_EQ(MOJO_RESULT_OK,
-            WaitForSignals(handles[0], MOJO_HANDLE_SIGNAL_PEER_CLOSED));
+  EXPECT_EQ(MOJO_LEGACY_RESULT_OK,
+            WaitForSignals(handles[0], MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED));
 
   base::test::SingleThreadTaskEnvironment task_environment;
 
@@ -1322,10 +1342,10 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MessagePipeStatusChangeInTransitClient,
     base::RunLoop run_loop;
     SimpleWatcher watcher(FROM_HERE, SimpleWatcher::ArmingPolicy::AUTOMATIC,
                           base::SequencedTaskRunner::GetCurrentDefault());
-    watcher.Watch(Handle(handles[1]), MOJO_HANDLE_SIGNAL_PEER_CLOSED,
+    watcher.Watch(Handle(handles[1]), MOJO_LEGACY_HANDLE_SIGNAL_PEER_CLOSED,
                   base::BindRepeating(
                       [](base::RunLoop* loop, MojoResult result) {
-                        EXPECT_EQ(MOJO_RESULT_OK, result);
+                        EXPECT_EQ(MOJO_LEGACY_RESULT_OK, result);
                         loop->Quit();
                       },
                       &run_loop));
@@ -1336,16 +1356,16 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(MessagePipeStatusChangeInTransitClient,
   MojoResult result;
   do {
     result = MojoReadMessage(handles[2], nullptr, nullptr, nullptr, nullptr,
-                             MOJO_READ_MESSAGE_FLAG_NONE);
-  } while (result == MOJO_RESULT_SHOULD_WAIT);
-  EXPECT_EQ(MOJO_RESULT_FAILED_PRECONDITION, result);
+                             MOJO_LEGACY_READ_MESSAGE_FLAG_NONE);
+  } while (result == MOJO_LEGACY_RESULT_SHOULD_WAIT);
+  EXPECT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION, result);
 
   // Wait on handle 3 by polling with MojoWriteMessage.
   do {
     result = MojoWriteMessage(handles[3], nullptr, 0, nullptr, 0,
-                              MOJO_WRITE_MESSAGE_FLAG_NONE);
-  } while (result == MOJO_RESULT_OK);
-  EXPECT_EQ(MOJO_RESULT_FAILED_PRECONDITION, result);
+                              MOJO_LEGACY_WRITE_MESSAGE_FLAG_NONE);
+  } while (result == MOJO_LEGACY_RESULT_OK);
+  EXPECT_EQ(MOJO_LEGACY_RESULT_FAILED_PRECONDITION, result);
 
   for (size_t i = 0; i < 4; ++i) {
     CloseHandle(UNSAFE_TODO(handles[i]));
@@ -1363,7 +1383,7 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport,
     VerifyEcho(child, "!");
     EXPECT_EQ("receiver", ReadMessageWithHandles(child, &receiver, 1));
     EXPECT_EQ("ok", ReadMessage(receiver));
-    EXPECT_EQ(MOJO_RESULT_OK, MojoClose(receiver));
+    EXPECT_EQ(MOJO_LEGACY_RESULT_OK, MojoClose(receiver));
   });
 }
 
@@ -1382,7 +1402,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(SpotaneouslyDyingProcess,
     // possible for message transmission to be deferred to the IO thread, and
     // sudden termination might preempt that work. Note that this is unnecessary
     // (and PEER_REMOTE signals are unsupported anyway) with MojoIpcz.
-    WaitForSignals(sender, MOJO_HANDLE_SIGNAL_PEER_REMOTE);
+    WaitForSignals(sender, MOJO_LEGACY_HANDLE_SIGNAL_PEER_REMOTE);
   }
 
   WriteMessage(sender, "ok");
@@ -1436,4 +1456,4 @@ INSTANTIATE_TEST_SUITE_P(
                     ));
 }  // namespace
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

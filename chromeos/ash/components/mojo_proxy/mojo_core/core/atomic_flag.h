@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_ATOMIC_FLAG_H_
-#define MOJO_CORE_ATOMIC_FLAG_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_ATOMIC_FLAG_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_ATOMIC_FLAG_H_
 
 #include <atomic>
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // AtomicFlag is a boolean flag that can be set and tested atomically. It is
@@ -48,6 +48,6 @@ class AtomicFlag {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_ATOMIC_FLAG_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_ATOMIC_FLAG_H_

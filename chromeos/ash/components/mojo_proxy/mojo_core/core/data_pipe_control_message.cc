@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/data_pipe_control_message.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/data_pipe_control_message.h"
 
 #include "base/logging.h"
-#include "mojo/core/node_controller.h"
-#include "mojo/core/ports/event.h"
-#include "mojo/core/user_message_impl.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/node_controller.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/user_message_impl.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 void SendDataPipeControlMessage(NodeController* node_controller,
@@ -19,7 +19,7 @@ void SendDataPipeControlMessage(NodeController* node_controller,
   std::unique_ptr<ports::UserMessageEvent> event;
   MojoResult result = UserMessageImpl::CreateEventForNewSerializedMessage(
       sizeof(DataPipeControlMessage), nullptr, 0, &event);
-  DCHECK_EQ(MOJO_RESULT_OK, result);
+  DCHECK_EQ(MOJO_LEGACY_RESULT_OK, result);
   DCHECK(event);
 
   DataPipeControlMessage* data = static_cast<DataPipeControlMessage*>(
@@ -35,4 +35,4 @@ void SendDataPipeControlMessage(NodeController* node_controller,
 }
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

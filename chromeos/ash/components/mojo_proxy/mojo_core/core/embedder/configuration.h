@@ -2,18 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_EMBEDDER_CONFIGURATION_H_
-#define MOJO_CORE_EMBEDDER_CONFIGURATION_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_EMBEDDER_CONFIGURATION_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_EMBEDDER_CONFIGURATION_H_
 
 #include <stddef.h>
 #include <stdint.h>
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // A set of configuration parameters that the Mojo system uses internally. The
 // configuration used can be overridden from the default by passing a
-// Configuration into |mojo::core::Init()|. See embedder.h.
+// Configuration into |mojo_legacy::core::Init()|. See embedder.h.
 //
 // NOTE: Please ensure that this type remains a simple aggregate of POD fields.
 struct Configuration {
@@ -52,6 +52,6 @@ struct Configuration {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_EMBEDDER_CONFIGURATION_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_EMBEDDER_CONFIGURATION_H_

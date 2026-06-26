@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_C_TEST_SUPPORT_TEST_SUPPORT_H_
-#define MOJO_PUBLIC_C_TEST_SUPPORT_TEST_SUPPORT_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_TEST_SUPPORT_TEST_SUPPORT_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_TEST_SUPPORT_TEST_SUPPORT_H_
 
 // Note: This header should be compilable as C.
 
@@ -48,4 +48,4 @@ char** MojoTestSupportEnumerateSourceRootRelativeDirectory(
 }  // extern "C"
 #endif
 
-#endif  // MOJO_PUBLIC_C_TEST_SUPPORT_TEST_SUPPORT_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_C_TEST_SUPPORT_TEST_SUPPORT_H_

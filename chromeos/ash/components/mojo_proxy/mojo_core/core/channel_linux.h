@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_CHANNEL_LINUX_H_
-#define MOJO_CORE_CHANNEL_LINUX_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CHANNEL_LINUX_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CHANNEL_LINUX_H_
 
 #include <atomic>
 #include <memory>
@@ -11,9 +11,9 @@
 
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "mojo/core/channel_posix.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel_posix.h"
 
-namespace mojo::core {
+namespace mojo_legacy::core {
 
 class DataAvailableNotifier;
 
@@ -22,7 +22,7 @@ class DataAvailableNotifier;
 // every channel will be of type ChannelLinux which can be upgraded at runtime
 // to take advantage of shared memory when all required kernel features are
 // present.
-class MOJO_SYSTEM_IMPL_EXPORT ChannelLinux : public ChannelPosix {
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT ChannelLinux : public ChannelPosix {
  public:
   ChannelLinux(Delegate* delegate,
                ConnectionParams connection_params,
@@ -92,6 +92,6 @@ class MOJO_SYSTEM_IMPL_EXPORT ChannelLinux : public ChannelPosix {
   std::vector<uint8_t> read_buf_;
 };
 
-}  // namespace mojo::core
+}  // namespace mojo_legacy::core
 
-#endif  // MOJO_CORE_CHANNEL_LINUX_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CHANNEL_LINUX_H_

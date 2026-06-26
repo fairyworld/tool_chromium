@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/platform/socket_utils_posix.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/socket_utils_posix.h"
 
 #include <stddef.h>
 #include <sys/socket.h>
@@ -16,7 +16,7 @@
 #include "base/posix/eintr_wrapper.h"
 #include "build/build_config.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 namespace {
 
@@ -161,4 +161,4 @@ bool AcceptSocketConnection(base::PlatformFile server_fd,
   return true;
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

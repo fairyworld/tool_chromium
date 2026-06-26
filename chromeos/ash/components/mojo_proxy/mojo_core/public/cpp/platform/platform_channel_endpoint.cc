@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/public/cpp/platform/platform_channel_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_endpoint.h"
 
 #include <string>
 #include <string_view>
@@ -14,9 +14,9 @@
 #include "base/rand_util.h"
 #include "base/strings/string_number_conversions.h"
 #include "build/build_config.h"
-#include "mojo/public/cpp/platform/platform_channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel.h"
 
-#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
 #include <mach/port.h>
 
 #include "base/apple/mach_port_rendezvous.h"
@@ -32,7 +32,7 @@
 #include "base/win/scoped_handle.h"
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 
 namespace {
 
@@ -42,7 +42,7 @@ namespace {
 // generate a key when setting the file descriptor.
 constexpr int kAndroidClientHandleDescriptor =
     base::GlobalDescriptors::kBaseDescriptor + 10000;
-#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
 bool IsTargetDescriptorUsed(const base::FileHandleMappingVector& mapping,
                             int target_fd) {
   for (auto& [i, fd] : mapping) {
@@ -102,7 +102,7 @@ void PlatformChannelEndpoint::PrepareToPass(HandlePassingInfo& info,
   int mapped_fd = kAndroidClientHandleDescriptor + info.size();
   info.emplace_back(fd, mapped_fd);
   value = base::NumberToString(mapped_fd);
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   DCHECK(platform_handle().is_mach_receive());
   base::apple::ScopedMachReceiveRight receive_right =
       TakePlatformHandle().TakeMachReceiveRight();
@@ -146,7 +146,7 @@ std::string PlatformChannelEndpoint::PrepareToPass(
   PrepareToPass(options.handles_to_inherit, value);
 #elif BUILDFLAG(IS_FUCHSIA)
   PrepareToPass(options.handles_to_transfer, value);
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   PrepareToPass(options.mach_ports_for_rendezvous, value);
 #elif BUILDFLAG(IS_POSIX)
   PrepareToPass(options.fds_to_remap, value);
@@ -195,7 +195,7 @@ PlatformChannelEndpoint PlatformChannelEndpoint::RecoverFromString(
   }
   return PlatformChannelEndpoint(PlatformHandle(
       base::ScopedFD(base::GlobalDescriptors::GetInstance()->Get(key))));
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   auto* client = base::MachPortRendezvousClient::GetInstance();
   if (!client) {
     DLOG(ERROR) << "Mach rendezvous failed.";
@@ -223,4 +223,4 @@ PlatformChannelEndpoint PlatformChannelEndpoint::RecoverFromString(
 #endif
 }
 
-}  // namespace mojo
+}  // namespace mojo_legacy

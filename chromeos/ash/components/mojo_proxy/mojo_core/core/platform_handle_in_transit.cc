@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/platform_handle_in_transit.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_in_transit.h"
 
 #include <utility>
 
@@ -19,10 +19,10 @@
 #include "base/win/nt_status.h"
 #include "base/win/scoped_handle.h"
 #include "base/win/win_util.h"
-#include "mojo/public/cpp/platform/platform_handle_security_util_win.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle_security_util_win.h"
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 namespace {
@@ -180,4 +180,4 @@ PlatformHandle PlatformHandleInTransit::TakeIncomingRemoteHandle(
 #endif
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

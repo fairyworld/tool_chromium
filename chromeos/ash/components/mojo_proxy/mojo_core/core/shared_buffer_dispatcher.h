@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_SHARED_BUFFER_DISPATCHER_H_
-#define MOJO_CORE_SHARED_BUFFER_DISPATCHER_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_SHARED_BUFFER_DISPATCHER_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_SHARED_BUFFER_DISPATCHER_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -11,18 +11,19 @@
 #include <utility>
 
 #include "base/memory/platform_shared_memory_region.h"
-#include "mojo/core/dispatcher.h"
-#include "mojo/core/system_impl_export.h"
-#include "mojo/public/c/system/buffer.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/buffer.h"
 
-namespace mojo {
+namespace mojo_legacy {
 
 namespace core {
 
 class NodeController;
 class PlatformSharedMemoryMapping;
 
-class MOJO_SYSTEM_IMPL_EXPORT SharedBufferDispatcher final : public Dispatcher {
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT SharedBufferDispatcher final
+    : public Dispatcher {
  public:
   // The default options to use for |MojoCreateSharedBuffer()|. (Real uses
   // should obtain this via |ValidateCreateOptions()| with a null |in_options|;
@@ -120,6 +121,6 @@ class MOJO_SYSTEM_IMPL_EXPORT SharedBufferDispatcher final : public Dispatcher {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_SHARED_BUFFER_DISPATCHER_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_SHARED_BUFFER_DISPATCHER_H_

@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/core/ports/name.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/name.h"
 
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 namespace ports {
 namespace test {
@@ -72,4 +72,4 @@ TEST(NameTest, NodeNameChecks) {
 }  // namespace test
 }  // namespace ports
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy

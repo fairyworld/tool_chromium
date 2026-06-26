@@ -2,25 +2,25 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_USER_MESSAGE_IMPL_H_
-#define MOJO_CORE_USER_MESSAGE_IMPL_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_USER_MESSAGE_IMPL_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_USER_MESSAGE_IMPL_H_
 
 #include <memory>
 #include <utility>
 #include <vector>
 
 #include "base/memory/raw_ptr_exclusion.h"
-#include "mojo/core/channel.h"
-#include "mojo/core/dispatcher.h"
-#include "mojo/core/ports/event.h"
-#include "mojo/core/ports/name.h"
-#include "mojo/core/ports/port_ref.h"
-#include "mojo/core/ports/user_message.h"
-#include "mojo/core/system_impl_export.h"
-#include "mojo/public/c/system/message_pipe.h"
-#include "mojo/public/c/system/types.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/channel.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/dispatcher.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/event.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/name.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/port_ref.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/ports/user_message.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/system_impl_export.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/message_pipe.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/c/system/types.h"
 
-namespace mojo {
+namespace mojo_legacy {
 namespace core {
 
 // The minimum amount of memory to allocate for a new serialized message buffer.
@@ -34,7 +34,8 @@ inline constexpr uint32_t kMinimumPayloadBufferSize = 128;
 // A UserMessageImpl may be either serialized or unserialized. Unserialized
 // instances are serialized lazily only when necessary, i.e., if and when
 // Serialize() is called to obtain a serialized message for wire transfer.
-class MOJO_SYSTEM_IMPL_EXPORT UserMessageImpl : public ports::UserMessage {
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT UserMessageImpl
+    : public ports::UserMessage {
  public:
   static const TypeInfo kUserMessageTypeInfo;
 
@@ -63,8 +64,8 @@ class MOJO_SYSTEM_IMPL_EXPORT UserMessageImpl : public ports::UserMessage {
   // UserMessageImpl. May fail iff one or more |dispatchers| fails to serialize
   // (e.g. due to it being in an invalid state.)
   //
-  // Upon success, MOJO_RESULT_OK is returned and the new UserMessageEvent is
-  // stored in |*out_event|.
+  // Upon success, MOJO_LEGACY_RESULT_OK is returned and the new
+  // UserMessageEvent is stored in |*out_event|.
   static MojoResult CreateEventForNewSerializedMessage(
       uint32_t num_bytes,
       const Dispatcher::DispatcherInTransit* dispatchers,
@@ -139,11 +140,11 @@ class MOJO_SYSTEM_IMPL_EXPORT UserMessageImpl : public ports::UserMessage {
 
   // Extracts handles from this (serialized) message.
   //
-  // Returns |MOJO_RESULT_OK|
-  // if sucessful, |MOJO_RESULT_FAILED_PRECONDITION| if this isn't a serialized
-  // message, |MOJO_RESULT_NOT_FOUND| if all serialized handles have already
-  // been extracted, or |MOJO_RESULT_ABORTED| if one or more handles failed
-  // extraction.
+  // Returns |MOJO_LEGACY_RESULT_OK|
+  // if sucessful, |MOJO_LEGACY_RESULT_FAILED_PRECONDITION| if this isn't a
+  // serialized message, |MOJO_LEGACY_RESULT_NOT_FOUND| if all serialized
+  // handles have already been extracted, or |MOJO_LEGACY_RESULT_ABORTED| if one
+  // or more handles failed extraction.
   //
   // On success, |handles| is populated with |num_handles()| extracted handles,
   // whose ownership is thereby transferred to the caller.
@@ -231,6 +232,6 @@ class MOJO_SYSTEM_IMPL_EXPORT UserMessageImpl : public ports::UserMessage {
 };
 
 }  // namespace core
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_CORE_USER_MESSAGE_IMPL_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_USER_MESSAGE_IMPL_H_

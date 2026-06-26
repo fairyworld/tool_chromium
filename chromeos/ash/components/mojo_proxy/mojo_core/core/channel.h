@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_CORE_CHANNEL_H_
-#define MOJO_CORE_CHANNEL_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CHANNEL_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CHANNEL_H_
 
 #include <cstdint>
 #include <memory>
@@ -22,14 +22,14 @@
 #include "base/synchronization/lock.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "mojo/buildflags.h"
-#include "mojo/core/connection_params.h"
-#include "mojo/core/platform_handle_in_transit.h"
-#include "mojo/public/cpp/platform/platform_channel_endpoint.h"
-#include "mojo/public/cpp/platform/platform_handle.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/buildflags.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/connection_params.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/core/platform_handle_in_transit.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_handle.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 
-namespace mojo::core {
+namespace mojo_legacy::core {
 
 namespace ipcz_driver {
 class Envelope;
@@ -47,7 +47,7 @@ constexpr bool IsAlignedForChannelMessage(size_t n) {
 //
 // This class (and its subclasses) is generally not thread-safe. However, it
 // allows concurrent calls to Write().
-class MOJO_SYSTEM_IMPL_EXPORT Channel
+class MOJO_LEGACY_SYSTEM_IMPL_EXPORT Channel
     : public base::RefCountedThreadSafe<Channel> {
  public:
   static constexpr double kMetricSubsamplingProbability = 0.001;
@@ -79,7 +79,7 @@ class MOJO_SYSTEM_IMPL_EXPORT Channel
   using AlignedBuffer = base::HeapArray<char>;
 
   // A message to be written to a channel.
-  struct MOJO_SYSTEM_IMPL_EXPORT Message {
+  struct MOJO_LEGACY_SYSTEM_IMPL_EXPORT Message {
     Message(const Message&) = delete;
     Message& operator=(const Message&) = delete;
 
@@ -223,7 +223,7 @@ class MOJO_SYSTEM_IMPL_EXPORT Channel
     // and rejecting channel upgrades.
     static bool IsExperimentalControlMessage(const IpczHeader& header);
 
-#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
     struct MachPortsEntry {
       // The PlatformHandle::Type.
       uint8_t type;
@@ -370,7 +370,7 @@ class MOJO_SYSTEM_IMPL_EXPORT Channel
 
   // Delegate methods are called from the I/O task runner with which the Channel
   // was created (see Channel::Create).
-  class MOJO_SYSTEM_IMPL_EXPORT Delegate {
+  class MOJO_LEGACY_SYSTEM_IMPL_EXPORT Delegate {
    public:
     virtual ~Delegate() = default;
 
@@ -657,6 +657,6 @@ class MOJO_SYSTEM_IMPL_EXPORT Channel
   FRIEND_TEST_ALL_PREFIXES(ChannelTest, TryDispatchMessageWithEnvelope);
 };
 
-}  // namespace mojo::core
+}  // namespace mojo_legacy::core
 
-#endif  // MOJO_CORE_CHANNEL_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_CORE_CHANNEL_H_

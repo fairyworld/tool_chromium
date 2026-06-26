@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PUBLIC_CPP_PLATFORM_NAMED_PLATFORM_CHANNEL_H_
-#define MOJO_PUBLIC_CPP_PLATFORM_NAMED_PLATFORM_CHANNEL_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_NAMED_PLATFORM_CHANNEL_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_NAMED_PLATFORM_CHANNEL_H_
 
 #include <string>
 #include <string_view>
@@ -11,14 +11,14 @@
 #include "base/command_line.h"
 #include "base/component_export.h"
 #include "build/build_config.h"
-#include "mojo/public/cpp/platform/platform_channel_endpoint.h"
-#include "mojo/public/cpp/platform/platform_channel_server_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_endpoint.h"
+#include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_server_endpoint.h"
 
 #if BUILDFLAG(IS_POSIX)
 #include "base/files/file_path.h"
 #endif
 
-namespace mojo {
+namespace mojo_legacy {
 
 // NamedPlatformChannel encapsulates a Mojo invitation transport channel which
 // can listen for inbound connections established by clients connecting to
@@ -29,7 +29,7 @@ namespace mojo {
 // This can be especially useful when the local process has no way to transfer
 // handles to the remote process, e.g. it does not control process launch or
 // have any pre-existing communication channel to the process.
-class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) NamedPlatformChannel {
+class COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM) NamedPlatformChannel {
  public:
   static const char kNamedHandleSwitch[];
 
@@ -39,7 +39,7 @@ class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) NamedPlatformChannel {
   using ServerName = std::string;
 #endif
 
-  struct COMPONENT_EXPORT(MOJO_CPP_PLATFORM) Options {
+  struct COMPONENT_EXPORT(MOJO_LEGACY_CPP_PLATFORM) Options {
     Options();
     ~Options();
 
@@ -150,6 +150,6 @@ class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) NamedPlatformChannel {
   PlatformChannelServerEndpoint server_endpoint_;
 };
 
-}  // namespace mojo
+}  // namespace mojo_legacy
 
-#endif  // MOJO_PUBLIC_CPP_PLATFORM_NAMED_PLATFORM_CHANNEL_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_MOJO_CORE_PUBLIC_CPP_PLATFORM_NAMED_PLATFORM_CHANNEL_H_
