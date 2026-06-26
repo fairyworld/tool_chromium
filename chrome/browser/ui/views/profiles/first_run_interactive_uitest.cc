@@ -1195,6 +1195,11 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTest, GoToSettings) {
 
   RunTestSequenceInContext(
       views::ElementTrackerViews::GetContextForView(view()),
+      If([this]() { return UseRevampedView(); },
+         Then(WaitForWebContentsNavigation(
+             kWebContentsId,
+             GURL(chrome::kChromeUIIntroURL)
+                 .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage)))),
       WaitForWebContentsNavigation(
           kWebContentsId,
           AppendSyncConfirmationQueryParams(GURL("chrome://sync-confirmation/"),
@@ -2011,17 +2016,11 @@ IN_PROC_BROWSER_TEST_P(FirstRunWithHatsInteractiveUiTestWithSyncService,
 
   RunTestSequenceInContext(
       views::ElementTrackerViews::GetContextForView(view()),
-      If(
-          [this]() {
-            return UseRevampedView() &&
-                   // TODO(crbug.com/500274413): Remove this condition once the
-                   // 'Sign-in celebration' is shown to sync users too.
-                   syncer::IsReplaceSyncPromosWithSignInPromosEnabled();
-          },
-          Then(WaitForWebContentsNavigation(
-              kWebContentsId,
-              GURL(chrome::kChromeUIIntroURL)
-                  .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage)))),
+      If([this]() { return UseRevampedView(); },
+         Then(WaitForWebContentsNavigation(
+             kWebContentsId,
+             GURL(chrome::kChromeUIIntroURL)
+                 .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage)))),
       DeclineHistorySync(),
       If([this]() { return IsFeatureShowcaseEligible(); },
          Then(Steps(
@@ -2158,17 +2157,11 @@ IN_PROC_BROWSER_TEST_P(FirstRunWithHatsAndUnrelatedFeatureSetInteractiveUiTest,
 
   RunTestSequenceInContext(
       views::ElementTrackerViews::GetContextForView(view()),
-      If(
-          [this]() {
-            return UseRevampedView() &&
-                   // TODO(crbug.com/500274413): Remove this condition once the
-                   // 'Sign-in celebration' is shown to sync users too.
-                   syncer::IsReplaceSyncPromosWithSignInPromosEnabled();
-          },
-          Then(WaitForWebContentsNavigation(
-              kWebContentsId,
-              GURL(chrome::kChromeUIIntroURL)
-                  .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage)))),
+      If([this]() { return UseRevampedView(); },
+         Then(WaitForWebContentsNavigation(
+             kWebContentsId,
+             GURL(chrome::kChromeUIIntroURL)
+                 .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage)))),
       DeclineHistorySync(),
       If([this]() { return IsFeatureShowcaseEligible(); },
          Then(Steps(
@@ -2514,6 +2507,12 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
 class FirstRunRevampPostSignInInteractiveUiTest
     : public FirstRunRevampInteractiveUiTest,
       public testing::WithParamInterface<bool> {
+ public:
+  FirstRunRevampPostSignInInteractiveUiTest()
+      : FirstRunRevampInteractiveUiTest(
+            /*fixture_enabled_features=*/{
+                {syncer::kReplaceSyncPromosWithSignInPromos, {}}}) {}
+
  protected:
   void SetUpOnMainThread() override {
     FirstRunRevampInteractiveUiTest::SetUpOnMainThread();
