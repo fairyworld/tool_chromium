@@ -19139,6 +19139,15 @@ Please help our engineers fix this problem. Tell us what happened right before y
       <message name="IDS_SPLIT_VIEW_UNDO_SPLIT_ACTION_BUTTON" desc="Text for the action button on a split view toast notification to undo creating the split view.">
         Undo
       </message>
+      <message name="IDS_TAB_STRIP_SWITCH_DELAYED_TO_HORIZONTAL_TOAST_BODY" desc="Text on a toast notification shown when the tab strip mode switch to horizontal is delayed because the browser is in immersive fullscreen.">
+        Exit full screen to show tabs horizontally
+      </message>
+      <message name="IDS_TAB_STRIP_SWITCH_DELAYED_TO_VERTICAL_TOAST_BODY" desc="Text on a toast notification shown when the tab strip mode switch to vertical is delayed because the browser is in immersive fullscreen.">
+        Exit full screen to show tabs vertically
+      </message>
+      <message name="IDS_TAB_STRIP_SWITCH_DELAYED_EXIT_FULLSCREEN_ACTION" desc="Action button on a toast notification that exits immersive fullscreen mode.">
+        Exit full screen
+      </message>
     </if>
 
     <if expr="is_android">

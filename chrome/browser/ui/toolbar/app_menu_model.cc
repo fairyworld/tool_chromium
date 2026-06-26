@@ -1089,35 +1089,30 @@ void ToolsMenuModel::Build(Browser* browser) {
       features::IsRoundedIconsEnabled() ? kWebAssetIcon : kNameWindowOldIcon);
 
   if (auto* controller = tabs::VerticalTabStripStateController::From(browser)) {
-    // TODO(crbug.com/475222200): When in immersive, swapping between tab
-    // strip types create duplicate tab strips. Until that is resolved,
-    // disable the ability to swap between tab strips while in immersive.
-    if (!ImmersiveModeController::From(browser)->IsEnabled()) {
-      if (controller->ShouldDisplayVerticalTabs()) {
-        AddItemWithStringIdAndVectorIcon(
-            this, IDC_TOGGLE_VERTICAL_TABS, IDS_SWITCH_TO_HORIZONTAL_TAB,
-            features::IsRoundedIconsEnabled() ? kToolbarIcon : kToolbarOldIcon);
-      } else {
-        AddItemWithStringIdAndVectorIcon(
-            this, IDC_TOGGLE_VERTICAL_TABS, IDS_SWITCH_TO_VERTICAL_TAB,
-            base::i18n::IsRTL() ? features::IsRoundedIconsEnabled()
-                                      ? kDockToLeftIcon
-                                      : kDockToRightOldIcon
-            : features::IsRoundedIconsEnabled() ? kDockToRightIcon
-                                                : kDockToLeftOldIcon);
-        const bool use_preview_badge =
-            base::FeatureList::IsEnabled(tabs::kVerticalTabsPreviewBadge);
-        const ui::NewBadgeType badge_type = use_preview_badge
-                                                ? ui::NewBadgeType::kPreview
-                                                : ui::NewBadgeType::kNew;
-        const user_education::DisplayNewBadge show_badge =
-            UserEducationService::MaybeShowNewBadge(
-                browser->GetProfile(), use_preview_badge
-                                           ? tabs::kVerticalTabsPreviewBadge
-                                           : tabs::kVerticalTabsNewBadge);
-        SetIsNewFeatureAt(GetIndexOfCommandId(IDC_TOGGLE_VERTICAL_TABS).value(),
-                          show_badge, badge_type);
-      }
+    if (controller->ShouldDisplayVerticalTabs()) {
+      AddItemWithStringIdAndVectorIcon(
+          this, IDC_TOGGLE_VERTICAL_TABS, IDS_SWITCH_TO_HORIZONTAL_TAB,
+          features::IsRoundedIconsEnabled() ? kToolbarIcon : kToolbarOldIcon);
+    } else {
+      AddItemWithStringIdAndVectorIcon(
+          this, IDC_TOGGLE_VERTICAL_TABS, IDS_SWITCH_TO_VERTICAL_TAB,
+          base::i18n::IsRTL() ? features::IsRoundedIconsEnabled()
+                                    ? kDockToLeftIcon
+                                    : kDockToRightOldIcon
+          : features::IsRoundedIconsEnabled() ? kDockToRightIcon
+                                              : kDockToLeftOldIcon);
+      const bool use_preview_badge =
+          base::FeatureList::IsEnabled(tabs::kVerticalTabsPreviewBadge);
+      const ui::NewBadgeType badge_type = use_preview_badge
+                                              ? ui::NewBadgeType::kPreview
+                                              : ui::NewBadgeType::kNew;
+      const user_education::DisplayNewBadge show_badge =
+          UserEducationService::MaybeShowNewBadge(
+              browser->GetProfile(), use_preview_badge
+                                         ? tabs::kVerticalTabsPreviewBadge
+                                         : tabs::kVerticalTabsNewBadge);
+      SetIsNewFeatureAt(GetIndexOfCommandId(IDC_TOGGLE_VERTICAL_TABS).value(),
+                        show_badge, badge_type);
     }
   }
 
