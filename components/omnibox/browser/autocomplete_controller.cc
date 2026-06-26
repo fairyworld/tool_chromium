@@ -2091,11 +2091,15 @@ void AutocompleteController::UpdateSearchboxStats(AutocompleteResult* result) {
       // suggestion type/subtype pairs to be delimited with commas instead.
       std::string value = experiment_stat_v2.string_value();
       std::replace(value.begin(), value.end(), ':', ',');
-      auto* reported_experiment_stats_v2 =
-          searchbox_stats.add_experiment_stats_v2();
-      reported_experiment_stats_v2->set_type_int(experiment_stat_v2.type_int());
-      reported_experiment_stats_v2->set_string_value(value);
+      omnibox::metrics::ChromeSearchboxStats::ExperimentStatsV2 stat =
+          experiment_stat_v2;
+      stat.set_string_value(value);
+      result->add_experiment_stat_v2_in_session(stat);
     }
+  }
+  for (const auto& experiment_stat_v2 :
+       result->experiment_stats_v2s_in_session()) {
+    *searchbox_stats.add_experiment_stats_v2() = experiment_stat_v2;
   }
 
   // Go over all matches and set searchbox stats if the match supports it.
