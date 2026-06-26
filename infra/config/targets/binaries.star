@@ -2547,6 +2547,13 @@ targets.binaries.windowed_test_launcher(
 )
 
 targets.binaries.windowed_test_launcher(
+    name = "gtk_unittests",
+    label = "//ui/gtk:gtk_unittests",
+    module_scheme = "gtest",
+    skip_usage_check = True,
+)
+
+targets.binaries.windowed_test_launcher(
     name = "viz_unittests",
     label = "//components/viz:viz_unittests",
     module_scheme = "gtest",

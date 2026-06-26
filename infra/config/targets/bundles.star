@@ -1509,9 +1509,15 @@ targets.bundle(
 targets.bundle(
     name = "chromium_gtests_for_linux_only",
     targets = [
+        "gtk_unittests",
         "ozone_unittests",
         "ozone_x11_unittests",
     ],
+    per_test_modifications = {
+        "gtk_unittests": targets.mixin(
+            experiment_percentage = 100,
+        ),
+    },
 )
 
 targets.bundle(
