@@ -120,6 +120,9 @@ enum class ActivationKind : uint8_t {
   kRelu = 1,
   kRelu6 = 2,
   kReluN1To1 = 3,
+  // clamp(0, +inf), which also maps to RELU but exercises the clamp
+  // code path instead of BuildRelu.
+  kReluViaClamp = 4,
 };
 
 // Tri-state for optional operands: not present, constant, or input.
@@ -153,6 +156,15 @@ struct BatchNormalizationParams {
   bool is_input_constant;
   bool is_mean_constant;
   bool is_variance_constant;
+};
+
+struct ClampParams {
+  OperandDataType data_type;
+  uint32_t rank;
+  std::array<uint32_t, 8> input_dims;
+  float min_value;
+  float max_value;
+  bool is_input_constant;
 };
 
 struct ConcatParams {
@@ -788,6 +800,24 @@ auto AnyBatchNormalizationParams() {
   );
 }
 
+auto AnyClampParams() {
+  const auto& limits = GetContextPropertiesForTesting().data_type_limits;
+  return fuzztest::StructOf<ClampParams>(
+      AnyOperandDataTypeFor(limits.clamp_input.data_types),
+      AnyTensorRankIncludeZero(),          // rank
+      fuzztest::ArrayOf<8>(AnyDimSize()),  // input_dims
+      // Bias toward the special min/max pairs that GetClampOperatorCode()
+      // recognizes (e.g. relu1, relu0To1, relu6, relu) so those code paths get
+      // exercised, while still allowing arbitrary floats.
+      fuzztest::OneOf(fuzztest::Just(-1.0f), fuzztest::Just(0.0f),
+                      fuzztest::Arbitrary<float>()),  // min_value
+      fuzztest::OneOf(fuzztest::Just(1.0f), fuzztest::Just(6.0f),
+                      fuzztest::Just(std::numeric_limits<float>::infinity()),
+                      fuzztest::Arbitrary<float>()),  // max_value
+      fuzztest::Arbitrary<bool>()                     // is_input_constant
+  );
+}
+
 auto AnyConcatParams() {
   const auto& limits = GetContextPropertiesForTesting().data_type_limits;
   return fuzztest::StructOf<ConcatParams>(
@@ -823,7 +853,8 @@ auto AnyConv2dParams() {
       fuzztest::Arbitrary<bool>(),    // is_depthwise
       fuzztest::ElementOf<ActivationKind>(
           {ActivationKind::kNone, ActivationKind::kRelu, ActivationKind::kRelu6,
-           ActivationKind::kReluN1To1})  // activation_kind
+           ActivationKind::kReluN1To1,
+           ActivationKind::kReluViaClamp})  // activation_kind
   );
 }
 
@@ -1467,6 +1498,32 @@ bool BuildQuantizeOutput(GraphInfoBuilder& builder,
   builder.BuildQuantizeLinear(op_output_id, output_scale_id, output_zero_id,
                               quantize_output_id);
   return true;
+}
+
+struct ClampDescriptors {
+  // The output of clamp has the same shape and data type as the input.
+  OperandDescriptor input_desc;
+  float min_value;
+  float max_value;
+};
+
+// Helper to set up ClampDescriptors. Returns nullopt if any validation fails.
+std::optional<ClampDescriptors> SetUpClampDescriptors(
+    const ContextProperties& context_properties,
+    const ClampParams& params) {
+  std::vector<uint32_t> input_dims(params.input_dims.begin(),
+                                   params.input_dims.begin() + params.rank);
+
+  ASSIGN_OR_RETURN_NULLOPT(
+      auto input_desc,
+      OperandDescriptor::Create(context_properties, params.data_type,
+                                input_dims, ""));
+
+  return ClampDescriptors{
+      .input_desc = std::move(input_desc),
+      .min_value = std::min(params.min_value, params.max_value),
+      .max_value = std::max(params.min_value, params.max_value),
+  };
 }
 
 struct ConcatDescriptors {
@@ -2458,6 +2515,7 @@ class WebNNGraphImplFuzzerImpl
  public:
   void BatchNormalization(BatchNormalizationParams params,
                           uint8_t seed_for_data);
+  void Clamp(ClampParams params, uint8_t seed_for_data);
   void Concat(ConcatParams params, uint8_t seed_for_data);
   void Conv2d(Conv2dParams params, uint8_t seed_for_data);
   void DequantizeLinear(DequantizeLinearParams params,
@@ -2489,6 +2547,12 @@ class WebNNGraphImplFuzzerImpl
   void Split(SplitParams params, uint8_t seed_for_data);
   void Transpose(TransposeParams params, uint8_t seed_for_data);
   void Triangular(TriangularParams params, uint8_t seed_for_data);
+  void DQClampQ(ClampParams clamp_params,
+                QuantizationParams quantization_params,
+                uint32_t channel_axis,
+                uint8_t seed_for_input,
+                float seed_for_scale,
+                uint8_t seed_for_zero_point);
   void DQConcatQ(ConcatParams concat_params,
                  OperandDataType quantized_type,
                  uint8_t seed_for_input,
@@ -2656,6 +2720,40 @@ void WebNNGraphImplFuzzerImpl<BaseFixture>::BatchNormalization(
 }
 
 template <typename BaseFixture>
+void WebNNGraphImplFuzzerImpl<BaseFixture>::Clamp(ClampParams params,
+                                                  uint8_t seed_for_data) {
+  ASSIGN_OR_RETURN_VOID(
+      auto clamp_descs,
+      SetUpClampDescriptors(this->context_properties(), params));
+
+  mojo::Remote<mojom::WebNNGraphBuilder> remote =
+      this->BindNewGraphBuilderRemote();
+  GraphInfoBuilder builder(remote);
+
+  base::flat_map<std::string, base::span<const uint8_t>> named_inputs;
+  std::vector<std::vector<uint8_t>> data_buffers;
+  OperandId input_id = BuildInputOrConstant(
+      builder, params.is_input_constant, "input", clamp_descs.input_desc,
+      seed_for_data, data_buffers, named_inputs);
+
+  // The output of clamp has the same shape and data type as the input.
+  OperandId output_id =
+      builder.BuildOutput("output", clamp_descs.input_desc.shape(),
+                          clamp_descs.input_desc.data_type());
+
+  builder.BuildClamp(input_id, output_id, clamp_descs.min_value,
+                     clamp_descs.max_value);
+
+  if (!builder.IsValidGraphForTesting(this->context_properties())) {
+    return;
+  }
+  BuildAndCompute(this->context_, std::move(remote), builder.TakeGraphInfo(),
+                  std::move(named_inputs));
+
+  GetGlobalFuzzEnvironment().GetWebNNTestEnvironment().RunUntilIdle();
+}
+
+template <typename BaseFixture>
 void WebNNGraphImplFuzzerImpl<BaseFixture>::Concat(ConcatParams params,
                                                    uint8_t seed_for_data) {
   ASSIGN_OR_RETURN_VOID(
@@ -2749,6 +2847,11 @@ void WebNNGraphImplFuzzerImpl<BaseFixture>::Conv2d(Conv2dParams params,
       case ActivationKind::kReluN1To1:
         builder.BuildClamp(conv2d_output_id, output_id, /*min_value=*/-1.0f,
                            /*max_value=*/1.0f);
+        break;
+      case ActivationKind::kReluViaClamp:
+        builder.BuildClamp(
+            conv2d_output_id, output_id, /*min_value=*/0.0f,
+            /*max_value=*/std::numeric_limits<float>::infinity());
         break;
     }
   } else {
@@ -4079,6 +4182,68 @@ void WebNNGraphImplFuzzerImpl<BaseFixture>::Triangular(TriangularParams params,
 }
 
 template <typename BaseFixture>
+void WebNNGraphImplFuzzerImpl<BaseFixture>::DQClampQ(
+    ClampParams clamp_params,
+    QuantizationParams quantization_params,
+    uint32_t channel_axis,
+    uint8_t seed_for_input,
+    float seed_for_scale,
+    uint8_t seed_for_zero_point) {
+  ASSIGN_OR_RETURN_VOID(
+      auto clamp_descs,
+      SetUpClampDescriptors(this->context_properties(), clamp_params));
+  const OperandDataType quantized_type = quantization_params.quantized_type;
+
+  // Use per-tensor quantization for the input when the input shape is empty
+  // (scalar), since per-channel/per-block quantization requires a non-empty
+  // shape. Otherwise, clamp `channel_axis` to be valid for the input
+  // shape.
+  if (clamp_descs.input_desc.shape().empty()) {
+    quantization_params.quantization_kind = QuantizationKind::kPerTensor;
+  } else {
+    channel_axis = channel_axis % clamp_descs.input_desc.shape().size();
+  }
+
+  mojo::Remote<mojom::WebNNGraphBuilder> remote =
+      this->BindNewGraphBuilderRemote();
+  GraphInfoBuilder builder(remote);
+
+  base::flat_map<std::string, base::span<const uint8_t>> named_inputs;
+  std::vector<std::vector<uint8_t>> data_buffers;
+
+  ASSIGN_OPTIONAL_OR_RETURN_VOID(
+      auto clamp_input_id,
+      BuildDequantizeInput(
+          builder, this->context_properties(), clamp_params.is_input_constant,
+          "input", clamp_descs.input_desc, quantized_type, quantization_params,
+          channel_axis, seed_for_input, seed_for_scale, seed_for_zero_point,
+          data_buffers, named_inputs));
+
+  // The output of clamp has the same shape and data type as the input.
+  OperandId clamp_output_id = builder.BuildIntermediateOperand(
+      clamp_descs.input_desc.shape(), clamp_descs.input_desc.data_type());
+
+  builder.BuildClamp(clamp_input_id, clamp_output_id, clamp_descs.min_value,
+                     clamp_descs.max_value);
+
+  if (!BuildQuantizeOutput(builder, this->context_properties(), "output",
+                           clamp_descs.input_desc, quantized_type,
+                           quantization_params, channel_axis, clamp_output_id,
+                           seed_for_scale, seed_for_zero_point)) {
+    return;
+  }
+
+  if (!builder.IsValidGraphForTesting(this->context_properties())) {
+    return;
+  }
+
+  BuildAndCompute(this->context_, std::move(remote), builder.TakeGraphInfo(),
+                  std::move(named_inputs));
+
+  GetGlobalFuzzEnvironment().GetWebNNTestEnvironment().RunUntilIdle();
+}
+
+template <typename BaseFixture>
 void WebNNGraphImplFuzzerImpl<BaseFixture>::DQConcatQ(
     ConcatParams concat_params,
     OperandDataType quantized_type,
@@ -4245,6 +4410,12 @@ void WebNNGraphImplFuzzerImpl<BaseFixture>::DQConv2dQ(
       case ActivationKind::kReluN1To1:
         builder.BuildClamp(conv_output_id, activation_output_id,
                            /*min_value=*/-1.0f, /*max_value=*/1.0f);
+        break;
+      case ActivationKind::kReluViaClamp:
+        builder.BuildClamp(
+            conv_output_id, activation_output_id,
+            /*min_value=*/0.0f,
+            /*max_value=*/std::numeric_limits<float>::infinity());
         break;
     }
     quantize_input_id = activation_output_id;
@@ -5027,6 +5198,18 @@ WEBNN_FUZZ_TEST_F(
                      },
                      /*seed_for_data=*/1}}));
 
+WEBNN_FUZZ_TEST_F(Clamp,
+                  .WithDomains(AnyClampParams(), fuzztest::Arbitrary<uint8_t>())
+                      .WithSeeds({{ClampParams{
+                                       /*data_type=*/OperandDataType::kFloat32,
+                                       /*rank=*/4,
+                                       /*input_dims=*/{1, 3, 4, 4, 1, 1, 1, 1},
+                                       /*min_value=*/-1.0f,
+                                       /*max_value=*/1.0f,
+                                       /*is_input_constant=*/false,
+                                   },
+                                   /*seed_for_data=*/4}}));
+
 WEBNN_FUZZ_TEST_F(Concat,
                   .WithDomains(AnyConcatParams(),
                                fuzztest::Arbitrary<uint8_t>())
@@ -5426,6 +5609,33 @@ WEBNN_FUZZ_TEST_F(Triangular,
                                        /*is_input_constant=*/false,
                                    },
                                    /*seed_for_data=*/5}}));
+
+WEBNN_FUZZ_TEST_F(
+    DQClampQ,
+    .WithDomains(AnyClampParams(),
+                 AnyQuantizationParams(),
+                 /*channel_axis=*/fuzztest::InRange<uint32_t>(0, 7),
+                 /*seed_for_input=*/fuzztest::Arbitrary<uint8_t>(),
+                 /*seed_for_scale=*/
+                 fuzztest::ElementOf({0.125f, 0.25f, 0.5f, 1.0f, 2.0f}),
+                 /*seed_for_zero_point=*/fuzztest::Arbitrary<uint8_t>())
+        .WithSeeds({{ClampParams{
+                         /*data_type=*/OperandDataType::kFloat32,
+                         /*rank=*/4,
+                         /*input_dims=*/{1, 3, 4, 4, 1, 1, 1, 1},
+                         /*min_value=*/-1.0f,
+                         /*max_value=*/1.0f,
+                         /*is_input_constant=*/false,
+                     },
+                     QuantizationParams{
+                         /*quantized_type=*/OperandDataType::kUint8,
+                         QuantizationKind::kPerTensor,
+                         // This is unused for per tensor quantization.
+                         /*channel_block_size=*/1},
+                     /*channel_axis=*/2,
+                     /*seed_for_input=*/4,
+                     /*seed_for_scale=*/0.25f,
+                     /*seed_for_zero_point=*/0}}));
 
 WEBNN_FUZZ_TEST_F(
     DQConcatQ,
