@@ -267,10 +267,10 @@ public class PdfCoordinator
     /** The class responsible for rendering pdf document. */
     public static class ChromePdfViewerFragment extends EditablePdfViewerFragment {
 
-        private static final String KEY_VIEW_TAG = "view_tag";
-        private static final String KEY_SAVED_PAGE_INDEX = "saved_page_index";
-        private static final String KEY_SAVED_ZOOM = "saved_zoom";
-        private static final String KEY_RESTORE_POSITION_PENDING = "restore_position_pending";
+        static final String KEY_VIEW_TAG = "view_tag";
+        static final String KEY_SAVED_PAGE_INDEX = "saved_page_index";
+        static final String KEY_SAVED_ZOOM = "saved_zoom";
+        static final String KEY_RESTORE_POSITION_PENDING = "restore_position_pending";
         private @Nullable PdfActionsDelegate mDelegate;
         private @Nullable PdfView mPdfView;
 
@@ -350,18 +350,41 @@ public class PdfCoordinator
         }
 
         @Override
+        public void onAttach(Context context) {
+            ClassLoader classLoader = ChromePdfViewerFragment.class.getClassLoader();
+            Bundle arguments = getArguments();
+            if (arguments != null) {
+                arguments.setClassLoader(classLoader);
+            }
+            super.onAttach(context);
+        }
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            if (savedInstanceState != null) {
+                savedInstanceState.setClassLoader(ChromePdfViewerFragment.class.getClassLoader());
+            }
+            super.onCreate(savedInstanceState);
+        }
+
+        @Override
         public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
             Bundle state = savedInstanceState;
             if (state == null) {
                 state = getArguments();
             }
             if (state != null) {
-                mViewTag = state.getString(KEY_VIEW_TAG, null);
-                if (getView() != null) getView().setTag(mViewTag);
+                state.setClassLoader(ChromePdfViewerFragment.class.getClassLoader());
+                if (state.containsKey(KEY_VIEW_TAG)) {
+                    mViewTag = state.getString(KEY_VIEW_TAG, null);
+                }
                 mSavedPageIndex = state.getInt(KEY_SAVED_PAGE_INDEX, -1);
                 mSavedZoom = state.getFloat(KEY_SAVED_ZOOM, -1f);
                 mRestorePositionPending = state.getBoolean(KEY_RESTORE_POSITION_PENDING, false);
+            }
+            super.onViewCreated(view, savedInstanceState);
+            if (savedInstanceState != null) {
+                if (getView() != null) getView().setTag(mViewTag);
             }
             setUpToolBoxView(view);
         }

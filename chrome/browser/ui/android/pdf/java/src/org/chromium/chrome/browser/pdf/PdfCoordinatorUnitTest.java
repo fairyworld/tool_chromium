@@ -35,8 +35,8 @@ import androidx.pdf.PdfDocument.PageInfo;
 import androidx.pdf.PdfPoint;
 import androidx.pdf.PdfWriteHandle;
 import androidx.pdf.ink.EditablePdfViewerFragment;
-import androidx.pdf.viewer.fragment.PdfViewerFragment;
 import androidx.pdf.view.PdfView;
+import androidx.pdf.viewer.fragment.PdfViewerFragment;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
 import kotlin.coroutines.Continuation;
@@ -572,6 +572,108 @@ public class PdfCoordinatorUnitTest {
                 toolBoxView.getParent());
     }
 
+    @Test
+    @EnableFeatures(ChromeFeatureList.INLINE_PDF_V2)
+    public void testFragmentLifecycleSetsClassLoader() {
+        PdfCoordinator.ChromePdfViewerFragment fragment =
+                new PdfCoordinator.ChromePdfViewerFragment();
+
+        // Test onAttach
+        Bundle arguments = new Bundle();
+        fragment.setArguments(arguments);
+        try {
+            fragment.onAttach(mActivity);
+        } catch (Throwable t) {
+            // Ignore exceptions to test classloader setup.
+        }
+        assertEquals(
+                PdfCoordinator.ChromePdfViewerFragment.class.getClassLoader(),
+                fragment.getArguments().getClassLoader());
+
+        // Test onCreate
+        Bundle savedInstanceState = new Bundle();
+        try {
+            fragment.onCreate(savedInstanceState);
+        } catch (Throwable t) {
+            // Ignore exceptions to test classloader setup.
+        }
+        assertEquals(
+                PdfCoordinator.ChromePdfViewerFragment.class.getClassLoader(),
+                savedInstanceState.getClassLoader());
+
+        // Test onViewCreated
+        Bundle savedInstanceState2 = new Bundle();
+        View dummyView = new View(mActivity);
+        try {
+            fragment.onViewCreated(dummyView, savedInstanceState2);
+        } catch (Throwable t) {
+            // Ignore exceptions to test classloader setup.
+        }
+        assertEquals(
+                PdfCoordinator.ChromePdfViewerFragment.class.getClassLoader(),
+                savedInstanceState2.getClassLoader());
+    }
+
+    @Test
+    @EnableFeatures(ChromeFeatureList.INLINE_PDF_V2)
+    @Config(shadows = {ShadowPdfView.class})
+    public void testReloadRestoresPosition() throws Exception {
+        PdfCoordinator.skipLoadPdfForTesting(true);
+        createPdfCoordinator();
+
+        // Set position on the initial fragment's pdfView.
+        ShadowPdfView shadowPdfView = Shadow.extract(mPdfView);
+        shadowPdfView.mFirstVisiblePage = 5;
+        shadowPdfView.mZoom = 2.5f;
+
+        // Call reload. This should recreate the fragment and set arguments.
+        mPdfCoordinator.reload();
+
+        // Get the new fragment.
+        PdfCoordinator.ChromePdfViewerFragment newFragment =
+                mPdfCoordinator.mChromePdfViewerFragment;
+        assertNotNull(newFragment);
+
+        // Verify arguments were set on the new fragment.
+        Bundle args = newFragment.getArguments();
+        assertNotNull(args);
+        assertEquals(5, args.getInt(PdfCoordinator.ChromePdfViewerFragment.KEY_SAVED_PAGE_INDEX));
+        assertEquals(
+                2.5f, args.getFloat(PdfCoordinator.ChromePdfViewerFragment.KEY_SAVED_ZOOM), 0.001f);
+        assertTrue(
+                args.getBoolean(
+                        PdfCoordinator.ChromePdfViewerFragment.KEY_RESTORE_POSITION_PENDING));
+
+        // Now trigger onViewCreated manually on the new fragment and verify it restores the
+        // position.
+        View dummyView = new View(mActivity);
+        try {
+            newFragment.onViewCreated(dummyView, null);
+        } catch (Throwable t) {
+            // Ignore exceptions from super.onViewCreated.
+        }
+
+        // Verify new fragment has restored values using reflection.
+        java.lang.reflect.Field pageField =
+                PdfCoordinator.ChromePdfViewerFragment.class.getDeclaredField("mSavedPageIndex");
+        pageField.setAccessible(true);
+        int savedPageIndex = (int) pageField.get(newFragment);
+        assertEquals(5, savedPageIndex);
+
+        java.lang.reflect.Field zoomField =
+                PdfCoordinator.ChromePdfViewerFragment.class.getDeclaredField("mSavedZoom");
+        zoomField.setAccessible(true);
+        float savedZoom = (float) zoomField.get(newFragment);
+        assertEquals(2.5f, savedZoom, 0.001f);
+
+        java.lang.reflect.Field pendingField =
+                PdfCoordinator.ChromePdfViewerFragment.class.getDeclaredField(
+                        "mRestorePositionPending");
+        pendingField.setAccessible(true);
+        boolean restorePositionPending = (boolean) pendingField.get(newFragment);
+        assertTrue(restorePositionPending);
+    }
+
     public static class TestModalDialogActivity extends org.chromium.ui.base.TestActivity
             implements org.chromium.ui.modaldialog.ModalDialogManagerHolder {
         private org.chromium.ui.modaldialog.ModalDialogManager mModalDialogManager;
@@ -1033,8 +1135,14 @@ public class PdfCoordinatorUnitTest {
         public float mZoom = 1.0f;
         public PdfDocument mPdfDocument;
         public int mPagesPerRow = 1;
+        public int mFirstVisiblePage;
 
         public ShadowPdfView() {}
+
+        @Implementation
+        public int getFirstVisiblePage() {
+            return mFirstVisiblePage;
+        }
 
         @Implementation
         public void scrollToPosition(PdfPoint pdfPoint) {
