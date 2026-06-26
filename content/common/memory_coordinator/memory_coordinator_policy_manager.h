@@ -121,23 +121,21 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyManager
 
   // Testing utilities ---------------------------------------------------------
 
-  // Adds a memory limit override for the consumer named `consumer_name`.
+  // Adds a memory limit override for the consumer with the given ID.
   // This override takes precedence over any limits calculated by policies.
   // Fails a CHECK if an override already exists for this consumer.
-  void AddMemoryLimitOverrideForTesting(std::string_view consumer_name,
-                                        int percentage);
+  void AddMemoryLimitOverrideForTesting(uint32_t consumer_id, int percentage);
 
-  // Updates an existing memory limit override for the consumer named
-  // `consumer_name`. Fails a CHECK if an override does not exist for this
-  // consumer.
-  void UpdateMemoryLimitOverrideForTesting(std::string_view consumer_name,
+  // Updates an existing memory limit override for the consumer with the given
+  // ID. Fails a CHECK if an override does not exist for this consumer.
+  void UpdateMemoryLimitOverrideForTesting(uint32_t consumer_id,
                                            int percentage);
 
-  // Clears the memory limit override for the consumer named `consumer_name`.
-  void ClearMemoryLimitOverrideForTesting(std::string_view consumer_name);
+  // Clears the memory limit override for the consumer with the given ID.
+  void ClearMemoryLimitOverrideForTesting(uint32_t consumer_id);
 
-  // Simulates a memory release request for the consumer named `consumer_name`.
-  void NotifyReleaseMemoryForTesting(std::string_view consumer_name);
+  // Simulates a memory release request for the consumer with the given ID.
+  void NotifyReleaseMemoryForTesting(uint32_t consumer_id);
 
  private:
   class GroupState {
@@ -196,9 +194,8 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyManager
                                  std::vector<MemoryConsumerUpdate> updates);
 
   // Applies the memory limit override to all registered consumers with the
-  // given name.
-  void ApplyMemoryLimitOverrideForTesting(std::string_view consumer_name,
-                                          int percentage);
+  // given ID.
+  void ApplyMemoryLimitOverrideForTesting(uint32_t consumer_id, int percentage);
 
 #if BUILDFLAG(ENABLE_MEMORY_COORDINATOR_INTERNALS)
   base::ObserverList<DiagnosticObserver> diagnostic_observers_;
@@ -211,8 +208,7 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyManager
 
   // Overrides for specific consumers. These take precedence over limits
   // calculated by policies.
-  base::flat_map<std::string /* consumer_name */, int, std::less<>>
-      memory_limit_overrides_;
+  base::flat_map<uint32_t /* consumer_id */, int> memory_limit_overrides_;
 };
 
 }  // namespace content

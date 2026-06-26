@@ -250,19 +250,19 @@ TEST_F(MemoryCoordinatorPolicyManagerTest, SetMemoryLimitOverride) {
   // Add override.
   EXPECT_CALL(host, UpdateConsumers(ElementsAre(
                         MemoryConsumerUpdate{kConsumerId, 42, false})));
-  policy_manager().AddMemoryLimitOverrideForTesting(kConsumerName, 42);
+  policy_manager().AddMemoryLimitOverrideForTesting(kConsumerId, 42);
   Mock::VerifyAndClearExpectations(&host);
 
   // Update override.
   EXPECT_CALL(host, UpdateConsumers(ElementsAre(
                         MemoryConsumerUpdate{kConsumerId, 24, false})));
-  policy_manager().UpdateMemoryLimitOverrideForTesting(kConsumerName, 24);
+  policy_manager().UpdateMemoryLimitOverrideForTesting(kConsumerId, 24);
   Mock::VerifyAndClearExpectations(&host);
 
   // Clear override. Reverts to default (100%).
   EXPECT_CALL(host, UpdateConsumers(ElementsAre(
                         MemoryConsumerUpdate{kConsumerId, 100, false})));
-  policy_manager().ClearMemoryLimitOverrideForTesting(kConsumerName);
+  policy_manager().ClearMemoryLimitOverrideForTesting(kConsumerId);
   Mock::VerifyAndClearExpectations(&host);
 
   // Clean up.
@@ -279,7 +279,7 @@ TEST_F(MemoryCoordinatorPolicyManagerTest, SetMemoryLimitOverride_Persistence) {
   const uint32_t kConsumerId = base::PersistentHash(kConsumerName);
 
   // Set override BEFORE adding consumer.
-  policy_manager().AddMemoryLimitOverrideForTesting(kConsumerName, 42);
+  policy_manager().AddMemoryLimitOverrideForTesting(kConsumerId, 42);
 
   // Adding consumer should immediately apply override.
   EXPECT_CALL(host, UpdateConsumers(ElementsAre(
@@ -290,7 +290,7 @@ TEST_F(MemoryCoordinatorPolicyManagerTest, SetMemoryLimitOverride_Persistence) {
   Mock::VerifyAndClearExpectations(&host);
 
   // Clean up.
-  policy_manager().ClearMemoryLimitOverrideForTesting(kConsumerName);
+  policy_manager().ClearMemoryLimitOverrideForTesting(kConsumerId);
   policy_manager().OnConsumerGroupRemoved(kConsumerId, kChildId);
   policy_manager().RemoveMemoryConsumerGroupHost(kChildId);
 }
@@ -309,7 +309,7 @@ TEST_F(MemoryCoordinatorPolicyManagerTest, NotifyReleaseMemory) {
 
   EXPECT_CALL(host, UpdateConsumers(ElementsAre(MemoryConsumerUpdate{
                         kConsumerId, std::nullopt, true})));
-  policy_manager().NotifyReleaseMemoryForTesting(kConsumerName);
+  policy_manager().NotifyReleaseMemoryForTesting(kConsumerId);
   Mock::VerifyAndClearExpectations(&host);
 
   // Clean up.
