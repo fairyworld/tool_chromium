@@ -230,7 +230,7 @@ public class VerticalTabListCoordinator {
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
-        recyclerView.setupCustomItemAnimator();
+        recyclerView.setupCustomItemAnimator(/* useClipAnimations= */ true);
         mSpineDecoration =
                 new VerticalTabGroupSpineDecoration(
                         activity, recyclerView::postInvalidate, mModelList, tabModelSelector);

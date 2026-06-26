@@ -11,8 +11,11 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.graphics.Outline;
 import android.util.Pair;
 import android.view.View;
+import android.view.ViewOutlineProvider;
 import android.view.animation.Interpolator;
 
 import androidx.annotation.VisibleForTesting;
@@ -21,6 +24,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import org.chromium.base.supplier.SettableNonNullObservableSupplier;
 import org.chromium.build.annotations.NullMarked;
+import org.chromium.chrome.tab_ui.R;
 import org.chromium.ui.interpolators.Interpolators;
 import org.chromium.ui.modelutil.SimpleRecyclerViewAdapter;
 
@@ -141,11 +145,21 @@ public class TabListItemAnimator extends SimpleItemAnimator {
     private final AnimatorHolder mMoves = new AnimatorHolder("Move");
     private final AnimatorHolder mRemovals = new AnimatorHolder("Removal");
     private final SettableNonNullObservableSupplier<Boolean> mIsAnimatorRunningSupplier;
+    private final boolean mUseClipAnimations;
 
-    TabListItemAnimator(SettableNonNullObservableSupplier<Boolean> isAnimatorRunningSupplier) {
+    TabListItemAnimator(
+            SettableNonNullObservableSupplier<Boolean> isAnimatorRunningSupplier,
+            boolean useClipAnimations) {
         setRemoveDuration(DEFAULT_REMOVE_DURATION);
-        setMoveDuration(DEFAULT_MOVE_DURATION);
         mIsAnimatorRunningSupplier = isAnimatorRunningSupplier;
+        mUseClipAnimations = useClipAnimations;
+        if (useClipAnimations) {
+            setMoveDuration(DEFAULT_REMOVE_DURATION);
+            setAddDuration(DEFAULT_REMOVE_DURATION);
+            setChangeDuration(DEFAULT_REMOVE_DURATION);
+        } else {
+            setMoveDuration(DEFAULT_MOVE_DURATION);
+        }
     }
 
     @Override
@@ -155,6 +169,14 @@ public class TabListItemAnimator extends SimpleItemAnimator {
         boolean hasChanges = !mChanges.isPendingEmpty();
         boolean hasAdds = !mAdds.isPendingEmpty();
         if (!hasRemovals && !hasMoves && !hasChanges && !hasAdds) {
+            return;
+        }
+        // In clip mode, run all animations concurrently.
+        if (mUseClipAnimations) {
+            mRemovals.runAllPendingAnimations();
+            mMoves.runAllPendingAnimations();
+            mChanges.runAllPendingAnimations();
+            mAdds.runAllPendingAnimations();
             return;
         }
 
@@ -226,25 +248,43 @@ public class TabListItemAnimator extends SimpleItemAnimator {
         View view = holder.itemView;
         view.setAlpha(0f);
         ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(view, View.ALPHA, 1f);
-        alphaAnimator.setDuration(getAddDuration());
-        alphaAnimator.setInterpolator(Interpolators.LINEAR_INTERPOLATOR);
-        alphaAnimator.addListener(
-                new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-                        dispatchAddStarting(holder);
-                        mIsAnimatorRunningSupplier.set(true);
-                    }
 
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        view.setAlpha(1f);
-                        dispatchAddFinished(holder);
-                        mAdds.remove(holder);
-                        dispatchFinishedWhenAllAnimationsDone();
-                    }
-                });
-        return alphaAnimator;
+        if (mUseClipAnimations) {
+            AnimatorSet animator = new AnimatorSet();
+            ValueAnimator clipAnimator = buildClipAnimator(view, /* expanding= */ true);
+            animator.playTogether(alphaAnimator, clipAnimator);
+            animator.setDuration(getAddDuration());
+            animator.setInterpolator(Interpolators.FAST_OUT_SLOW_IN_INTERPOLATOR);
+            animator.addListener(buildAddAnimatorListener(holder, view));
+            return animator;
+        } else {
+            alphaAnimator.setDuration(getAddDuration());
+            alphaAnimator.setInterpolator(Interpolators.LINEAR_INTERPOLATOR);
+            alphaAnimator.addListener(buildAddAnimatorListener(holder, view));
+            return alphaAnimator;
+        }
+    }
+
+    private AnimatorListenerAdapter buildAddAnimatorListener(ViewHolder holder, View view) {
+        return new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                dispatchAddStarting(holder);
+                mIsAnimatorRunningSupplier.set(true);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                view.setAlpha(1f);
+                if (mUseClipAnimations) {
+                    view.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+                    view.setClipToOutline(false);
+                }
+                dispatchAddFinished(holder);
+                mAdds.remove(holder);
+                dispatchFinishedWhenAllAnimationsDone();
+            }
+        };
     }
 
     @Override
@@ -260,7 +300,7 @@ public class TabListItemAnimator extends SimpleItemAnimator {
         float previousAlpha = oldView.getAlpha();
         endAnimation(oldHolder);
         if (newHolder != null) {
-            endAnimation(oldHolder);
+            endAnimation(newHolder);
         }
 
         Pair<Animator, Animator> animators =
@@ -531,6 +571,33 @@ public class TabListItemAnimator extends SimpleItemAnimator {
             dispatchAnimationsFinished();
             mIsAnimatorRunningSupplier.set(false);
         }
+    }
+
+    private ValueAnimator buildClipAnimator(View view, boolean expanding) {
+        int height = view.getHeight() > 0 ? view.getHeight() : view.getMeasuredHeight();
+        int width = view.getWidth() > 0 ? view.getWidth() : view.getMeasuredWidth();
+        final int cornerRadius =
+                view.getResources().getDimensionPixelSize(R.dimen.vertical_tab_item_corner_radius);
+        final int[] currentHeight = new int[] {expanding ? 0 : height};
+
+        view.setClipToOutline(true);
+        view.setOutlineProvider(
+                new ViewOutlineProvider() {
+                    @Override
+                    public void getOutline(View view, Outline outline) {
+                        outline.setRoundRect(0, 0, width, currentHeight[0], cornerRadius);
+                    }
+                });
+
+        ValueAnimator clipAnimator = ValueAnimator.ofFloat(0f, 1f);
+        clipAnimator.addUpdateListener(
+                animator -> {
+                    float fraction = animator.getAnimatedFraction();
+                    float scale = expanding ? fraction : 1f - fraction;
+                    currentHeight[0] = (int) (height * scale);
+                    view.invalidateOutline();
+                });
+        return clipAnimator;
     }
 
     private Interpolator getRearrangeInterpolator() {
