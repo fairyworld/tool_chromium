@@ -86,6 +86,8 @@ source_set("passwords_private") {
 source_set("test_support") {
   testonly = true
   sources = [
+    "mock_passwords_private_delegate.cc",
+    "mock_passwords_private_delegate.h",
     "mock_passwords_private_event_router.cc",
     "mock_passwords_private_event_router.h",
     "test_passwords_private_delegate.cc",
