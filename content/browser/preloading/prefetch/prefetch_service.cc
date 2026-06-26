@@ -947,9 +947,17 @@ void PrefetchService::CheckEligibilityOfPrefetch(
   // check for service workers and existing cookies.
   StoragePartition* default_storage_partition =
       browser_context_->GetDefaultStoragePartition();
-  if (default_storage_partition !=
-      browser_context_->GetStoragePartitionForUrl(params.url,
-                                                  /*can_create=*/false)) {
+  StoragePartition* initiator_storage_partition = default_storage_partition;
+  if (auto* renderer_info = params.request().GetRendererInitiatorInfo()) {
+    if (auto* rfh = renderer_info->GetRenderFrameHost()) {
+      initiator_storage_partition = rfh->GetStoragePartition();
+    }
+  }
+
+  if (initiator_storage_partition != default_storage_partition ||
+      default_storage_partition !=
+          browser_context_->GetStoragePartitionForUrl(params.url,
+                                                      /*can_create=*/false)) {
     std::move(params).Finish(
         PreloadingEligibility::kNonDefaultStoragePartition);
     return;
