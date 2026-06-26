@@ -3361,6 +3361,12 @@ To continue from your computer, switch to <ph name="OTHER_EMAIL">$2<ex>john.doe@
       <message name="IDS_IOS_GEMINI_LIVE_ACCESSIBILITY_LABEL" desc="Accessibility label for the Gemini Live entry point. [iOS only]">
         Gemini Live
       </message>
+      <message name="IDS_IOS_GEMINI_LIVE_BUTTON_ACCESSIBILITY_LABEL" desc="The accessibility label for the Gemini Live button.">
+        Go Live with Gemini in Chrome
+      </message>
+      <message name="IDS_IOS_GEMINI_LIVE_BUTTON_NEW_BADGE_ACCESSIBILITY_LABEL" desc="The accessibility label for the new badge next to the Gemini Live button.">
+        Live is a new feature on Gemini in Chrome
+      </message>
       <message name="IDS_IOS_GEMINI_LIVE_CONSENT_FIRST_BOX_BODY" desc="Body text for the first box of the Gemini Live Consent page.">
         Live will use your microphone. Tapping the Live button turns on the mic. To turn off the mic, tap the stop button or close Gemini.
       </message>
