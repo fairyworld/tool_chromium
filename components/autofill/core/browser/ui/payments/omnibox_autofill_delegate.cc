@@ -237,7 +237,7 @@ void OmniboxAutofillDelegate::OnAutofillManagerStateChanged(
     AutofillManager::LifecycleState current) {
   switch (previous) {
     case AutofillManager::LifecycleState::kActive:
-      client_->GetPaymentsAutofillClient()->HideOmniboxAutofillChip();
+      HideOmniboxAutofillChip();
       break;
     default:
       break;
@@ -254,7 +254,7 @@ void OmniboxAutofillDelegate::OnAfterFormsSeen(
   }
   for (const FormGlobalId& id : removed_forms) {
     if (id == trigger_form_global_id_) {
-      client_->GetPaymentsAutofillClient()->HideOmniboxAutofillChip();
+      HideOmniboxAutofillChip();
       return;
     }
   }
@@ -393,6 +393,17 @@ bool OmniboxAutofillDelegate::FieldIsInMainFrame(
     const AutofillField& field) const {
   return field.host_frame() == manager.driver().GetFrameToken() &&
          !manager.driver().GetParent();
+}
+
+void OmniboxAutofillDelegate::Reset() {
+  candidate_form_found_ = false;
+  trigger_form_global_id_ = FormGlobalId();
+  trigger_field_global_id_ = FieldGlobalId();
+}
+
+void OmniboxAutofillDelegate::HideOmniboxAutofillChip() {
+  client_->GetPaymentsAutofillClient()->HideOmniboxAutofillChip();
+  Reset();
 }
 
 }  // namespace autofill
