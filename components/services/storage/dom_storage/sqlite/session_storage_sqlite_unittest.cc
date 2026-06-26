@@ -132,7 +132,6 @@ void SessionStorageSqliteTest::InitializeMetadata(
     const DomStorageDatabase::Metadata& metadata) {
   // Write `metadata` to `database`.
   DomStorageDatabase::Metadata metadata_to_write;
-  metadata_to_write.next_map_id = metadata.next_map_id;
   metadata_to_write.map_metadata =
       CloneMapMetadataVector(metadata.map_metadata);
 
@@ -142,13 +141,6 @@ void SessionStorageSqliteTest::InitializeMetadata(
   // Read back the metadata from the database to verify persistence.
   ASSERT_OK_AND_ASSIGN(DomStorageDatabase::Metadata actual_metadata,
                        database.ReadAllMetadata());
-
-  // Verify `next_map_id`. `SessionStorageSqlite` uses 0 as the default value
-  // when `next_map_id` does not exist in the database.
-  int64_t expected_next_map_id =
-      metadata.next_map_id ? *metadata.next_map_id : 0;
-  EXPECT_EQ(actual_metadata.next_map_id, expected_next_map_id);
-
   ExpectEqualsMapMetadataSpan(actual_metadata.map_metadata,
                               metadata.map_metadata);
 }
@@ -191,44 +183,14 @@ TEST_F(SessionStorageSqliteTest, VersionTooNew) {
 }
 
 // Verifies that reading metadata from an empty database returns default values:
-// `next_map_id` should be 0 and `map_metadata` should be empty.
+// `map_metadata` should be empty.
 TEST_F(SessionStorageSqliteTest, ReadAllMetadataWithEmpty) {
   std::unique_ptr<SessionStorageSqlite> database;
   ASSERT_NO_FATAL_FAILURE(OpenInMemory(&database));
 
   ASSERT_OK_AND_ASSIGN(DomStorageDatabase::Metadata metadata,
                        database->ReadAllMetadata());
-
-  ASSERT_TRUE(metadata.next_map_id.has_value());
-  EXPECT_EQ(*metadata.next_map_id, 0);
   EXPECT_EQ(metadata.map_metadata.size(), 0u);
-}
-
-// Verifies that `PutMetadata()` correctly persists `next_map_id` and that
-// subsequent calls overwrite the previous value.
-TEST_F(SessionStorageSqliteTest, PutNextMapId) {
-  std::unique_ptr<SessionStorageSqlite> database;
-  ASSERT_NO_FATAL_FAILURE(OpenInMemory(&database));
-
-  // Write the first `next_map_id` value.
-  DomStorageDatabase::Metadata metadata;
-  metadata.next_map_id = 56;
-  ASSERT_NO_FATAL_FAILURE(InitializeMetadata(*database, metadata));
-
-  // Write a second `next_map_id` value to overwrite the first.
-  constexpr int64_t kSecondNextMapId = 57;
-  DomStorageDatabase::Metadata second_metadata_to_write;
-  second_metadata_to_write.next_map_id = kSecondNextMapId;
-
-  DbStatus status = database->PutMetadata(std::move(second_metadata_to_write));
-  EXPECT_TRUE(status.ok()) << status.ToString();
-
-  // Verify the second `next_map_id` replaced the first.
-  ASSERT_OK_AND_ASSIGN(DomStorageDatabase::Metadata read_metadata,
-                       database->ReadAllMetadata());
-  ASSERT_TRUE(read_metadata.next_map_id.has_value());
-  EXPECT_EQ(*read_metadata.next_map_id, kSecondNextMapId);
-  EXPECT_EQ(read_metadata.map_metadata.size(), 0u);
 }
 
 // Verifies that `PutMetadata()` correctly persists map metadata and that
@@ -262,8 +224,6 @@ TEST_F(SessionStorageSqliteTest, PutMapMetadata) {
 // Verifies that `PutMetadata()` correctly handles multiple sessions and storage
 // keys, including cloned maps that share the same `map_id` across sessions.
 TEST_F(SessionStorageSqliteTest, PutMapMetadataWithMultipleSessions) {
-  constexpr int64_t kNextMapId = kSecondMapId + 2;
-
   std::unique_ptr<SessionStorageSqlite> database;
   ASSERT_NO_FATAL_FAILURE(OpenInMemory(&database));
 
@@ -284,9 +244,8 @@ TEST_F(SessionStorageSqliteTest, PutMapMetadataWithMultipleSessions) {
   // `map_id`).
   expected_map_metadata[0].map_locator.AddSession(kThirdSessionId);
 
-  // Write metadata for all 3 maps along with the `next_map_id`.
+  // Write metadata for all 3 maps.
   DomStorageDatabase::Metadata metadata;
-  metadata.next_map_id = kNextMapId;
   metadata.map_metadata = CloneMapMetadataVector(expected_map_metadata);
 
   ASSERT_NO_FATAL_FAILURE(InitializeMetadata(*database, metadata));
@@ -295,8 +254,6 @@ TEST_F(SessionStorageSqliteTest, PutMapMetadataWithMultipleSessions) {
 // Verifies that metadata written to the database is persisted across opens and
 // that the in-memory representation is in sync with the database.
 TEST_F(SessionStorageSqliteTest, MetadataPersistence) {
-  constexpr int64_t kNextMapId = 100;
-
   std::vector<DomStorageDatabase::MapMetadata> expected_map_metadata;
   expected_map_metadata.push_back(
       {.map_locator{kFirstSessionId, kFirstStorageKey, kFirstMapId}});
@@ -309,7 +266,6 @@ TEST_F(SessionStorageSqliteTest, MetadataPersistence) {
     ASSERT_NO_FATAL_FAILURE(OpenOnDisk(&database));
 
     DomStorageDatabase::Metadata metadata;
-    metadata.next_map_id = kNextMapId;
     metadata.map_metadata = CloneMapMetadataVector(expected_map_metadata);
     ASSERT_NO_FATAL_FAILURE(InitializeMetadata(*database, metadata));
   }
@@ -321,9 +277,6 @@ TEST_F(SessionStorageSqliteTest, MetadataPersistence) {
 
     ASSERT_OK_AND_ASSIGN(DomStorageDatabase::Metadata read_metadata,
                          database->ReadAllMetadata());
-
-    ASSERT_TRUE(read_metadata.next_map_id.has_value());
-    EXPECT_EQ(*read_metadata.next_map_id, kNextMapId);
     ExpectEqualsMapMetadataSpan(read_metadata.map_metadata,
                                 expected_map_metadata);
   }
@@ -402,9 +355,6 @@ TEST_F(SessionStorageSqliteTest, UpdateMaps) {
   ASSERT_OK_AND_ASSIGN(DomStorageDatabase::Metadata metadata,
                        database->ReadAllMetadata());
   ExpectEqualsMapMetadataSpan(metadata.map_metadata, kExpectedMapMetadata);
-
-  // `SessionStorageSqlite::UpdateMaps()` must not update the `next_map_id`.
-  EXPECT_EQ(metadata.next_map_id, 0);
 }
 
 // Verifies that `CloneMap()` correctly copies all key/value pairs from the
@@ -458,9 +408,6 @@ TEST_F(SessionStorageSqliteTest, CloneMap) {
   ASSERT_OK_AND_ASSIGN(DomStorageDatabase::Metadata metadata,
                        database->ReadAllMetadata());
   ExpectEqualsMapMetadataSpan(metadata.map_metadata, kExpectedMapMetadata);
-
-  // `SessionStorageSqlite::UpdateMaps()` must not update the `next_map_id`.
-  EXPECT_EQ(metadata.next_map_id, 0);
 }
 
 // Verifies deleting a session removes its metadata from the database.

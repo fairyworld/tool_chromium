@@ -237,7 +237,6 @@ DbStatus SessionStorageLevelDB::CloneMap(MapLocator source_map,
 StatusOr<DomStorageDatabase::Metadata>
 SessionStorageLevelDB::ReadAllMetadata() {
   Metadata metadata;
-  ASSIGN_OR_RETURN(metadata.next_map_id, ReadNextMapId());
   ASSIGN_OR_RETURN(metadata.map_metadata, ReadAllMapMetadata());
   return metadata;
 }
@@ -245,12 +244,6 @@ SessionStorageLevelDB::ReadAllMetadata() {
 DbStatus SessionStorageLevelDB::PutMetadata(Metadata metadata) {
   std::unique_ptr<DomStorageBatchOperationLevelDB> batch =
       leveldb_->CreateBatchOperation();
-
-  // Write the next map ID when provided.
-  if (metadata.next_map_id) {
-    batch->Put(kNextMapIdKey,
-               base::as_byte_span(base::NumberToString(*metadata.next_map_id)));
-  }
 
   // Write the metadata for each map in `metadata.map_metadata`
   for (const MapMetadata& map_metadata : metadata.map_metadata) {
@@ -330,27 +323,6 @@ void SessionStorageLevelDB::SetDestructionCallbackForTesting(
 
 DomStorageDatabaseLevelDB& SessionStorageLevelDB::GetLevelDBForTesting() {
   return *leveldb_;
-}
-
-StatusOr<int64_t> SessionStorageLevelDB::ReadNextMapId() const {
-  StatusOr<Value> map_id_bytes = leveldb_->Get(kNextMapIdKey);
-  if (!map_id_bytes.has_value()) {
-    if (map_id_bytes.error().IsNotFound()) {
-      // Empty databases start with zero for the next map ID.
-      return 0;
-    }
-
-    // Failed to read the LevelDB.
-    return base::unexpected(std::move(map_id_bytes).error());
-  }
-
-  // Convert the integer text string to an `int64_t`.
-  int64_t next_map_id;
-  if (!base::StringToInt64(base::as_string_view(*map_id_bytes), &next_map_id)) {
-    return base::unexpected(
-        DbStatus::Corruption("next map id is not a number"));
-  }
-  return next_map_id;
 }
 
 StatusOr<std::vector<DomStorageDatabase::MapMetadata>>

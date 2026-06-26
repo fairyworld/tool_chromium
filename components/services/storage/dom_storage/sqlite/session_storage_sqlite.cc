@@ -26,8 +26,6 @@ constexpr sql::Database::Tag kSessionStorageTag = "SessionStorage";
 constexpr sql::Database::Tag kSessionStorageTagInMemory =
     "SessionStorageEphemeral";
 
-inline constexpr const char kNextMapIdKey[] = "next_map_id";
-
 DbStatus CreateSchema(sql::Database& database) {
   constexpr const char kCreateSessionMetadataTable[] =
       // clang-format off
@@ -157,7 +155,6 @@ StatusOr<DomStorageDatabase::Metadata> SessionStorageSqlite::ReadAllMetadata() {
   RETURN_UNEXPECTED_ON_ERROR(transaction.Begin());
 
   Metadata all_metadata;
-  all_metadata.next_map_id = ReadNextMapId();
   ASSIGN_OR_RETURN(all_metadata.map_metadata, ReadAllMapMetadata());
 
   RETURN_UNEXPECTED_ON_ERROR(transaction.Commit());
@@ -167,12 +164,6 @@ StatusOr<DomStorageDatabase::Metadata> SessionStorageSqlite::ReadAllMetadata() {
 DbStatus SessionStorageSqlite::PutMetadata(Metadata metadata) {
   sql::Transaction transaction(database_.get());
   RETURN_STATUS_ON_ERROR(transaction.Begin());
-
-  // Update the `next_map_id` in the meta table if provided.
-  if (metadata.next_map_id) {
-    RETURN_STATUS_ON_ERROR(
-        meta_table_->SetValue(kNextMapIdKey, *metadata.next_map_id));
-  }
 
   // Insert or replace rows in the `session_metadata` table for each map.
   for (const MapMetadata& map_metadata : metadata.map_metadata) {
@@ -283,14 +274,6 @@ DbStatus SessionStorageSqlite::PutVersionForTesting(int64_t version) {
   RETURN_STATUS_ON_ERROR(meta_table_->SetCompatibleVersionNumber(version));
   RETURN_STATUS_ON_ERROR(transaction.Commit());
   return DbStatus::OK();
-}
-
-int64_t SessionStorageSqlite::ReadNextMapId() const {
-  int64_t next_map_id;
-  if (!meta_table_->GetValue(kNextMapIdKey, &next_map_id)) {
-    return 0;
-  }
-  return next_map_id;
 }
 
 StatusOr<std::vector<DomStorageDatabase::MapMetadata>>
