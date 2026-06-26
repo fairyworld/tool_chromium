@@ -35,12 +35,14 @@
 #include "chrome/browser/contextual_tasks/entry_point_eligibility_manager.h"
 #include "chrome/browser/devtools/devtools_ui_bindings.h"
 #include "chrome/browser/devtools/devtools_window.h"
+#include "chrome/browser/feature_engagement/tracker_factory.h"
 #include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
+#include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/views/interaction/browser_elements_views.h"
 #include "chrome/browser/ui/webui/new_tab_page/composebox/variations/composebox_fieldtrial.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
@@ -53,6 +55,9 @@
 #include "components/contextual_tasks/public/contextual_task.h"
 #include "components/contextual_tasks/public/contextual_tasks_service.h"
 #include "components/contextual_tasks/public/features.h"
+#include "components/contextual_tasks/public/prefs.h"
+#include "components/feature_engagement/public/feature_constants.h"
+#include "components/feature_engagement/public/tracker.h"
 #include "components/lens/lens_overlay_dismissal_source.h"
 #include "components/permissions/permission_request_manager.h"
 #include "components/prefs/pref_service.h"
@@ -318,6 +323,24 @@ void ContextualTasksSidePanelCoordinator::Show(
         /*anchored_message_text=*/std::string(),
         glic::GlicNudgeActivity::kNudgeIgnoredOpenedContextualTasksSidePanel,
         base::DoNothing());
+  }
+
+  // Feature engagement session notice and IPH trigger checks.
+  feature_engagement::Tracker* tracker =
+      feature_engagement::TrackerFactory::GetForBrowserContext(
+          browser_window_->GetProfile());
+  if (tracker) {
+    tracker->NotifyEvent("contextual_tasks_session_started");
+
+    // Increment post-onboarding session count if it has been explicitly
+    // initialized (>= 0).
+    int post_onboarding_sessions =
+        pref_service_->GetInteger(kContextualTasksSessionCountPostOnboarding);
+    if (post_onboarding_sessions >= 0) {
+      post_onboarding_sessions++;
+      pref_service_->SetInteger(kContextualTasksSessionCountPostOnboarding,
+                                post_onboarding_sessions);
+    }
   }
 #endif  // !BUILDFLAG(IS_ANDROID)
 }
