@@ -64,6 +64,7 @@
 #include "components/autofill/core/browser/ui/payments/card_unmask_prompt_controller_impl.h"
 #include "components/autofill/core/browser/ui/payments/card_unmask_prompt_view.h"
 #include "components/autofill/core/browser/ui/payments/save_and_fill_dialog_controller_impl.h"
+#include "components/autofill/core/common/autofill_features.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/feature_engagement/public/feature_constants.h"
@@ -847,10 +848,21 @@ void ChromePaymentsAutofillClient::ShowMandatoryReauthOptInConfirmation() {
 }
 
 bool ChromePaymentsAutofillClient::IsAutofillPaymentMethodsEnabled() const {
-  return autofill_payment_methods_supported_ &&
-         prefs::IsAutofillPaymentMethodsEnabled(
-             Profile::FromBrowserContext(web_contents()->GetBrowserContext())
-                 ->GetPrefs());
+  if (!autofill_payment_methods_supported_ ||
+      !prefs::IsAutofillPaymentMethodsEnabled(
+          Profile::FromBrowserContext(web_contents()->GetBrowserContext())
+              ->GetPrefs())) {
+    return false;
+  }
+
+  if (base::FeatureList::IsEnabled(
+          features::kAutofillEnableAutofillSettingsEnterprisePolicy) &&
+      client_->IsAutofillTypeBlockedByPolicy(
+          client_->GetLastCommittedPrimaryMainFrameURL(),
+          AutofillClient::AutofillPolicyDataCategory::kPayments)) {
+    return false;
+  }
+  return true;
 }
 
 void ChromePaymentsAutofillClient::DisablePaymentsAutofill() {

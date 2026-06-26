@@ -12,6 +12,8 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/raw_ref.h"
 #include "base/test/scoped_feature_list.h"
+#include "base/test/values_test_util.h"
+#include "base/values.h"
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/autofill/at_memory_promo_tracker_factory.h"
@@ -53,6 +55,7 @@
 #include "components/autofill/core/browser/ui/mock_autofill_suggestion_delegate.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
+#include "components/autofill/core/common/autofill_prefs.h"
 #include "components/autofill/core/common/autofill_test_utils.h"
 #include "components/autofill/core/common/form_field_data.h"
 #include "components/feature_engagement/public/feature_constants.h"
@@ -1143,6 +1146,21 @@ TEST_F(ChromeAutofillClientTest, HideSuggestions_ProductFilter) {
                             FillingProduct::kAddress);
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
+
+TEST_F(ChromeAutofillClientTest, IsAutofillProfileEnabled_BlockedByPolicy) {
+  base::test::ScopedFeatureList feature_list(
+      features::kAutofillEnableAutofillSettingsEnterprisePolicy);
+  NavigateAndCommit(GURL("https://example.com"));
+
+  EXPECT_TRUE(client()->IsAutofillProfileEnabled());
+
+  profile()->GetPrefs()->Set(
+      prefs::kAutofillTypesBlocked,
+      base::test::ParseJson(
+          R"([{"url_pattern": "https://example.com", "blocked_types": ["contact_info"]}])"));
+
+  EXPECT_FALSE(client()->IsAutofillProfileEnabled());
+}
 
 }  // namespace
 }  // namespace autofill

@@ -1033,7 +1033,17 @@ bool ChromeAutofillClient::IsAutofillEnabled() const {
 }
 
 bool ChromeAutofillClient::IsAutofillProfileEnabled() const {
-  return prefs::IsAutofillProfileEnabled(GetPrefs());
+  if (!prefs::IsAutofillProfileEnabled(GetPrefs())) {
+    return false;
+  }
+
+  if (base::FeatureList::IsEnabled(
+          features::kAutofillEnableAutofillSettingsEnterprisePolicy) &&
+      IsAutofillTypeBlockedByPolicy(GetLastCommittedPrimaryMainFrameURL(),
+                                    AutofillPolicyDataCategory::kContactInfo)) {
+    return false;
+  }
+  return true;
 }
 
 bool ChromeAutofillClient::IsAutofillTypeBlockedByPolicy(
