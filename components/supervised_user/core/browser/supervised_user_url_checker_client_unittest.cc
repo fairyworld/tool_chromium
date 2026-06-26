@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/supervised_user/core/browser/kids_chrome_management_url_checker_client.h"
+#include "components/supervised_user/core/browser/supervised_user_url_checker_client.h"
 
 #include <memory>
 #include <string_view>
@@ -60,24 +60,24 @@ bool CredentialsRequired(CredentialsMode credentials_mode) {
 
 // By default, bootstraps client in "FamilyLink" mode, which implies at least
 // "best effort" credentials mode.
-class KidsChromeManagementURLCheckerClientTestBase
+class SupervisedUserUrlCheckerClientTestBase
     : public ::testing::TestWithParam<CredentialsMode> {
  protected:
-  explicit KidsChromeManagementURLCheckerClientTestBase(
+  explicit SupervisedUserUrlCheckerClientTestBase(
       CredentialsMode credentials_mode) {
     RegisterProfilePrefs(pref_service_.registry());
 
     switch (credentials_mode) {
       case CredentialsMode::kNoCredentials:
         url_classifier_ =
-            std::make_unique<KidsChromeManagementURLCheckerClient>(
+            std::make_unique<SupervisedUserUrlCheckerClient>(
                 test_url_loader_factory_.GetSafeWeakWrapper(), "us",
                 version_info::Channel::UNKNOWN);
         break;
       case CredentialsMode::kTryReadingCredentialsFromFamilyLink:
       case CredentialsMode::kRequireCredentialsFromFamilyLink:
         url_classifier_ =
-            std::make_unique<KidsChromeManagementURLCheckerClient>(
+            std::make_unique<SupervisedUserUrlCheckerClient>(
                 identity_test_env_.identity_manager(),
                 test_url_loader_factory_.GetSafeWeakWrapper(), pref_service_,
                 "us", version_info::Channel::UNKNOWN);
@@ -155,7 +155,7 @@ class KidsChromeManagementURLCheckerClientTestBase
     url_classifier_->CheckURL(
         GURL(url),
         base::BindOnce(
-            &KidsChromeManagementURLCheckerClientTestBase::OnCheckDone,
+            &SupervisedUserUrlCheckerClientTestBase::OnCheckDone,
             base::Unretained(this)));
   }
 
@@ -163,20 +163,20 @@ class KidsChromeManagementURLCheckerClientTestBase
   base::test::TaskEnvironment task_environment_;
   signin::IdentityTestEnvironment identity_test_env_;
   network::TestURLLoaderFactory test_url_loader_factory_;
-  std::unique_ptr<KidsChromeManagementURLCheckerClient> url_classifier_;
+  std::unique_ptr<SupervisedUserUrlCheckerClient> url_classifier_;
   TestingPrefServiceSimple pref_service_;
 };
 
-class KidsChromeManagementURLCheckerClientNoCredentialsTest
-    : public KidsChromeManagementURLCheckerClientTestBase {
+class SupervisedUserUrlCheckerClientNoCredentialsTest
+    : public SupervisedUserUrlCheckerClientTestBase {
  protected:
-  KidsChromeManagementURLCheckerClientNoCredentialsTest()
-      : KidsChromeManagementURLCheckerClientTestBase(
+  SupervisedUserUrlCheckerClientNoCredentialsTest()
+      : SupervisedUserUrlCheckerClientTestBase(
             CredentialsMode::kNoCredentials) {}
 };
 
 #if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
-TEST_F(KidsChromeManagementURLCheckerClientNoCredentialsTest,
+TEST_F(SupervisedUserUrlCheckerClientNoCredentialsTest,
        NoPrimaryAccount) {
   ASSERT_FALSE(identity_test_env_.identity_manager()->HasPrimaryAccount(
       signin::ConsentLevel::kSignin));
@@ -191,16 +191,16 @@ TEST_F(KidsChromeManagementURLCheckerClientNoCredentialsTest,
 }
 #endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_CHROMEOS)
 
-class KidsChromeManagementURLCheckerClientFamilyLinkEnabledTest
-    : public KidsChromeManagementURLCheckerClientTestBase {
+class SupervisedUserUrlCheckerClientFamilyLinkEnabledTest
+    : public SupervisedUserUrlCheckerClientTestBase {
  protected:
-  KidsChromeManagementURLCheckerClientFamilyLinkEnabledTest()
-      : KidsChromeManagementURLCheckerClientTestBase(
+  SupervisedUserUrlCheckerClientFamilyLinkEnabledTest()
+      : SupervisedUserUrlCheckerClientTestBase(
             CredentialsMode::kRequireCredentialsFromFamilyLink) {}
 };
 
 #if BUILDFLAG(IS_ANDROID)
-TEST_F(KidsChromeManagementURLCheckerClientFamilyLinkEnabledTest,
+TEST_F(SupervisedUserUrlCheckerClientFamilyLinkEnabledTest,
        NoPrimaryAccount) {
   ASSERT_FALSE(identity_test_env_.identity_manager()->HasPrimaryAccount(
       signin::ConsentLevel::kSignin));
@@ -211,7 +211,7 @@ TEST_F(KidsChromeManagementURLCheckerClientFamilyLinkEnabledTest,
 #endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_CHROMEOS)
-TEST_F(KidsChromeManagementURLCheckerClientFamilyLinkEnabledTest,
+TEST_F(SupervisedUserUrlCheckerClientFamilyLinkEnabledTest,
        NoPrimaryAccount) {
   ASSERT_FALSE(identity_test_env_.identity_manager()->HasPrimaryAccount(
       signin::ConsentLevel::kSignin));
@@ -226,14 +226,14 @@ TEST_F(KidsChromeManagementURLCheckerClientFamilyLinkEnabledTest,
 }
 #endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_CHROMEOS)
 
-class KidsChromeManagementURLCheckerClientTest
-    : public KidsChromeManagementURLCheckerClientTestBase {
+class SupervisedUserUrlCheckerClientTest
+    : public SupervisedUserUrlCheckerClientTestBase {
  protected:
-  KidsChromeManagementURLCheckerClientTest()
-      : KidsChromeManagementURLCheckerClientTestBase(GetParam()) {}
+  SupervisedUserUrlCheckerClientTest()
+      : SupervisedUserUrlCheckerClientTestBase(GetParam()) {}
 };
 
-TEST_P(KidsChromeManagementURLCheckerClientTest, UrlAllowed) {
+TEST_P(SupervisedUserUrlCheckerClientTest, UrlAllowed) {
   MakePrimaryAccountAvailable();
 
   EXPECT_CALL(*this,
@@ -244,7 +244,7 @@ TEST_P(KidsChromeManagementURLCheckerClientTest, UrlAllowed) {
   SimulateKidsApiResponse(kidsmanagement::ClassifyUrlResponse::ALLOWED);
 }
 
-TEST_P(KidsChromeManagementURLCheckerClientTest, HistogramsAreEmitted) {
+TEST_P(SupervisedUserUrlCheckerClientTest, HistogramsAreEmitted) {
   base::HistogramTester histogram_tester;
   MakePrimaryAccountAvailable();
 
@@ -267,7 +267,7 @@ TEST_P(KidsChromeManagementURLCheckerClientTest, HistogramsAreEmitted) {
   }
 }
 
-TEST_P(KidsChromeManagementURLCheckerClientTest, UrlRestricted) {
+TEST_P(SupervisedUserUrlCheckerClientTest, UrlRestricted) {
   MakePrimaryAccountAvailable();
 
   EXPECT_CALL(*this,
@@ -278,7 +278,7 @@ TEST_P(KidsChromeManagementURLCheckerClientTest, UrlRestricted) {
   SimulateKidsApiResponse(kidsmanagement::ClassifyUrlResponse::RESTRICTED);
 }
 
-TEST_P(KidsChromeManagementURLCheckerClientTest, AccessTokenError) {
+TEST_P(SupervisedUserUrlCheckerClientTest, AccessTokenError) {
   if (GetParam() != CredentialsMode::kRequireCredentialsFromFamilyLink) {
     GTEST_SKIP()
         << "Access token errors are only relevant for family link users.";
@@ -311,7 +311,7 @@ TEST_P(KidsChromeManagementURLCheckerClientTest, AccessTokenError) {
 #endif
 }
 
-TEST_P(KidsChromeManagementURLCheckerClientTest, NetworkError) {
+TEST_P(SupervisedUserUrlCheckerClientTest, NetworkError) {
   MakePrimaryAccountAvailable();
 
   EXPECT_CALL(*this,
@@ -322,7 +322,7 @@ TEST_P(KidsChromeManagementURLCheckerClientTest, NetworkError) {
   SimulateNetworkError(net::ERR_UNEXPECTED);
 }
 
-TEST_P(KidsChromeManagementURLCheckerClientTest, HttpError) {
+TEST_P(SupervisedUserUrlCheckerClientTest, HttpError) {
   MakePrimaryAccountAvailable();
 
   EXPECT_CALL(*this,
@@ -333,7 +333,7 @@ TEST_P(KidsChromeManagementURLCheckerClientTest, HttpError) {
   SimulateHttpError(net::HTTP_BAD_GATEWAY);
 }
 
-TEST_P(KidsChromeManagementURLCheckerClientTest, ServiceError) {
+TEST_P(SupervisedUserUrlCheckerClientTest, ServiceError) {
   MakePrimaryAccountAvailable();
 
   EXPECT_CALL(*this,
@@ -344,7 +344,7 @@ TEST_P(KidsChromeManagementURLCheckerClientTest, ServiceError) {
   SimulateMalformedResponse();
 }
 
-TEST_P(KidsChromeManagementURLCheckerClientTest,
+TEST_P(SupervisedUserUrlCheckerClientTest,
        PendingRequestsAreCanceledWhenClientIsDestroyed) {
   EXPECT_CALL(*this, OnCheckDone(_, _)).Times(0);
 
@@ -365,7 +365,7 @@ constexpr CredentialsMode kCredentialsModes[] = {
 
 INSTANTIATE_TEST_SUITE_P(
     ,
-    KidsChromeManagementURLCheckerClientTest,
+    SupervisedUserUrlCheckerClientTest,
     testing::ValuesIn(kCredentialsModes),
     [](const testing::TestParamInfo<CredentialsMode>& info) {
       switch (info.param) {

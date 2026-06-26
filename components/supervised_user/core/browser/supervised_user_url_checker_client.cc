@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/supervised_user/core/browser/kids_chrome_management_url_checker_client.h"
+#include "components/supervised_user/core/browser/supervised_user_url_checker_client.h"
 
 #include <memory>
 #include <string_view>
@@ -117,7 +117,7 @@ std::unique_ptr<ClassifyUrlFetcher> ClassifyURLWithoutCredentials(
 }
 }  // namespace
 
-KidsChromeManagementURLCheckerClient::KidsChromeManagementURLCheckerClient(
+SupervisedUserUrlCheckerClient::SupervisedUserUrlCheckerClient(
     signin::IdentityManager* identity_manager,
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
     const PrefService& pref_service_,
@@ -130,7 +130,7 @@ KidsChromeManagementURLCheckerClient::KidsChromeManagementURLCheckerClient(
                                          std::ref(pref_service_),
                                          channel)) {}
 
-KidsChromeManagementURLCheckerClient::KidsChromeManagementURLCheckerClient(
+SupervisedUserUrlCheckerClient::SupervisedUserUrlCheckerClient(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
     std::string_view country,
     version_info::Channel channel)
@@ -139,10 +139,9 @@ KidsChromeManagementURLCheckerClient::KidsChromeManagementURLCheckerClient(
                                          url_loader_factory,
                                          channel)) {}
 
-KidsChromeManagementURLCheckerClient::~KidsChromeManagementURLCheckerClient() =
-    default;
+SupervisedUserUrlCheckerClient::~SupervisedUserUrlCheckerClient() = default;
 
-void KidsChromeManagementURLCheckerClient::CheckURL(
+void SupervisedUserUrlCheckerClient::CheckURL(
     const GURL& url,
     safe_search_api::URLCheckerClient::ClientCheckCallback callback) {
   kidsmanagement::ClassifyUrlRequest request;

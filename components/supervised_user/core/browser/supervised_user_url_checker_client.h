@@ -26,13 +26,13 @@ namespace supervised_user {
 // This class uses the KidsChromeManagement::ClassifyUrl to check the
 // classification of the content on a given URL and returns the result
 // asynchronously via a callback.
-class KidsChromeManagementURLCheckerClient
+class SupervisedUserUrlCheckerClient
     : public safe_search_api::URLCheckerClient {
  public:
   // `country` should be a two-letter country code (ISO 3166-1 alpha-2), e.g.,
   // "us". `pref_service` is used to check if the caller is subject to Family
   // Link parental controls and should add end-user credentials to the request.
-  KidsChromeManagementURLCheckerClient(
+  SupervisedUserUrlCheckerClient(
       signin::IdentityManager* identity_manager,
       scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
       const PrefService& pref_service,
@@ -42,17 +42,17 @@ class KidsChromeManagementURLCheckerClient
   // Same as above, but never adds end-user credentials to the request. The
   // client will act as if `pref_service` had kSupervisedUserID unset for the
   // constructor above.
-  KidsChromeManagementURLCheckerClient(
+  SupervisedUserUrlCheckerClient(
       scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
       std::string_view country,
       version_info::Channel channel);
 
-  KidsChromeManagementURLCheckerClient(
-      const KidsChromeManagementURLCheckerClient&) = delete;
-  KidsChromeManagementURLCheckerClient& operator=(
-      const KidsChromeManagementURLCheckerClient&) = delete;
+  SupervisedUserUrlCheckerClient(
+      const SupervisedUserUrlCheckerClient&) = delete;
+  SupervisedUserUrlCheckerClient& operator=(
+      const SupervisedUserUrlCheckerClient&) = delete;
 
-  ~KidsChromeManagementURLCheckerClient() override;
+  ~SupervisedUserUrlCheckerClient() override;
 
   // Checks whether an `url` is restricted according to
   // KidsChromeManagement::ClassifyUrl RPC.
