@@ -432,6 +432,10 @@
 #include "chrome/browser/enterprise/client_certificates/certificate_store_factory.h"
 #endif
 
+#if BUILDFLAG(ENTERPRISE_PROXY) && BUILDFLAG(IS_ANDROID)
+#include "chrome/browser/enterprise/net/enterprise_proxy_service_factory.h"
+#endif
+
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
     BUILDFLAG(IS_WIN)
 #include "chrome/browser/enterprise/idle/idle_service_factory.h"
@@ -1008,6 +1012,9 @@ void ChromeBrowserMainExtraPartsProfiles::
     BUILDFLAG(IS_WIN)
   enterprise_idle::IdleServiceFactory::GetInstance();
   enterprise_signals::SignalsAggregatorFactory::GetInstance();
+#endif
+#if BUILDFLAG(ENTERPRISE_PROXY) && BUILDFLAG(IS_ANDROID)
+  EnterpriseProxyServiceFactory::GetInstance();
 #endif
 #if !BUILDFLAG(IS_CHROMEOS)
   enterprise_reporting::CloudProfileReportingServiceFactory::GetInstance();

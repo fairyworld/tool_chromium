@@ -92,6 +92,11 @@ source_set("enterprise") {
     "//url",
   ]
 
+  if (enterprise_proxy && is_android) {
+    public += [ "net/enterprise_proxy_service_factory.h" ]
+    public_deps += [ "//components/enterprise/net" ]
+  }
+
   if (!is_android) {
     public_deps += [
       "//chrome/browser/ui/browser_window",
@@ -704,6 +709,11 @@ source_set("impl") {
         "//net",
       ]
     }
+  }
+
+  if (enterprise_proxy && is_android) {
+    sources += [ "net/enterprise_proxy_service_factory.cc" ]
+    deps += [ "//components/enterprise/net" ]
   }
 
   if (is_linux || is_win || is_mac || is_chromeos || is_android) {
