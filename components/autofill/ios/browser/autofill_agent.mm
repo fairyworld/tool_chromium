@@ -644,6 +644,10 @@ bool HasGuid(const Suggestion::Payload& payload) {
         }
         break;
 
+      case SuggestionType::kFetchingAmbientData:
+        value = SysUTF16ToNSString(popup_suggestion.main_text.value);
+        break;
+
       case SuggestionType::kAddressEntryOnTyping:
       case SuggestionType::kDevtoolsTestAddresses:
       case SuggestionType::kLoyaltyCardEntry:
@@ -701,7 +705,6 @@ bool HasGuid(const Suggestion::Payload& payload) {
       case SuggestionType::kAtMemoryGenericError:
       case SuggestionType::kPersonalContextNotice:
       case SuggestionType::kAutofillAiOtherOrders:
-      case SuggestionType::kFetchingAmbientData:
       case SuggestionType::kMaximizeCreditCardBenefitsEntry:
         break;
     }
