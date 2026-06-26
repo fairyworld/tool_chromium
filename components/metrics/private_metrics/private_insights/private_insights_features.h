@@ -32,6 +32,9 @@ COMPONENT_EXPORT(PRIVATE_INSIGHTS)
 extern const base::FeatureParam<std::string> kFcpServerUri;
 
 COMPONENT_EXPORT(PRIVATE_INSIGHTS)
+extern const base::FeatureParam<std::string> kFcpPopulationNameContextualCues;
+
+COMPONENT_EXPORT(PRIVATE_INSIGHTS)
 extern const base::FeatureParam<base::TimeDelta> kFcpConditionPollingPeriod;
 
 COMPONENT_EXPORT(PRIVATE_INSIGHTS)

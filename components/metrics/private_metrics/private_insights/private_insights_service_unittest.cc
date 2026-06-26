@@ -7,6 +7,7 @@
 #include <atomic>
 
 #include "base/files/scoped_temp_dir.h"
+#include "base/no_destructor.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
@@ -27,6 +28,7 @@ class PrivateInsightsServiceTest : public testing::Test {
   void SetUp() override {
     ASSERT_TRUE(tmp_profile_dir_.CreateUniqueTempDir());
     mock_run_federated_computation_call_count_ = 0;
+    GetLastPopulationName() = "";
     PrivateInsightsService::SetRunFederatedComputationForTesting(
         &MockRunFederatedComputation);
     feature_list_.InitAndEnableFeatureWithParameters(
@@ -45,6 +47,7 @@ class PrivateInsightsServiceTest : public testing::Test {
   MockRunFederatedComputation(
       const PrivateInsightsService::FederatedComputationParams& params) {
     mock_run_federated_computation_call_count_++;
+    GetLastPopulationName() = params.population_name;
     return {
         .outcome =
             PrivateInsightsService::FederatedComputationOutcome::kSuccess,
@@ -53,6 +56,10 @@ class PrivateInsightsServiceTest : public testing::Test {
   }
 
   static inline std::atomic<int> mock_run_federated_computation_call_count_ = 0;
+  static std::string& GetLastPopulationName() {
+    static base::NoDestructor<std::string> last_population_name;
+    return *last_population_name;
+  }
 
   base::test::TaskEnvironment task_environment_{
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
@@ -191,9 +198,9 @@ TEST_F(PrivateInsightsServiceTest, MetricsChoiceRespectedOnStartup) {
 }
 
 TEST_F(PrivateInsightsServiceTest, UploadSkippedWhenServerUriEmpty) {
-  feature_list_.Reset();
-  feature_list_.InitAndEnableFeatureWithParameters(kPrivateInsightsFeature,
-                                                   {{"fcp_server_uri", ""}});
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeatureWithParameters(
+      kPrivateInsightsFeature, {{"fcp_server_uri", ""}});
 
   base::HistogramTester histogram_tester;
   TestingPrefServiceSimple local_state;
@@ -213,6 +220,24 @@ TEST_F(PrivateInsightsServiceTest, UploadSkippedWhenServerUriEmpty) {
       PrivateInsightsService::FederatedComputationOutcome::kErrorNoServerUri,
       1);
   histogram_tester.ExpectTotalCount(kContributedTaskCountHistogram, 0);
+}
+
+TEST_F(PrivateInsightsServiceTest, PopulationNameFinchParam) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeatureWithParameters(
+      kPrivateInsightsFeature,
+      {{"fcp_server_uri", "https://example.com/test"},
+       {"fcp_population_name_contextual_cues", "custom_population_name"}});
+
+  TestingPrefServiceSimple local_state;
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
+                                 test_shared_url_loader_factory_);
+
+  service.TriggerUpload();
+  ASSERT_TRUE(
+      base::test::RunUntil([&]() { return !service.is_upload_running_; }));
+  EXPECT_EQ(mock_run_federated_computation_call_count_, 1);
+  EXPECT_EQ(GetLastPopulationName(), "custom_population_name");
 }
 
 }  // namespace private_insights

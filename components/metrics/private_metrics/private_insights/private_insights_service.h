@@ -161,6 +161,8 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
                            MetricsChoiceRespectedOnStartup);
   FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
                            UploadSkippedWhenServerUriEmpty);
+  FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
+                           PopulationNameFinchParam);
 };
 
 }  // namespace private_insights

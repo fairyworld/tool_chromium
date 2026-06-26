@@ -34,9 +34,6 @@ namespace private_insights {
 
 namespace {
 
-inline constexpr char kContextualCuesPopulationName[] =
-    "private_insights/contextual_cues";
-
 PrivateInsightsService::FederatedComputationResult
 ParseFederatedComputationResult(
     const absl::StatusOr<fcp::client::FLRunnerResult>& result) {  // nocheck
@@ -229,7 +226,7 @@ PrivateInsightsService::UploadBlocking(
       .flags = &fcp_flags,
       .federated_service_uri = server_uri,
       .api_key = google_apis::GetAPIKey(),
-      .population_name = kContextualCuesPopulationName,
+      .population_name = kFcpPopulationNameContextualCues.Get(),
   };
 
   FederatedComputationResult result = run_federated_computation_func(params);
