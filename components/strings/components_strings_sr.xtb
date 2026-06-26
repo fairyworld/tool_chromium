@@ -4912,7 +4912,6 @@
 <translation id="8671519637524426245">Вредност <ph name="SECURE_DNS_SALT" /> не испуњава услове за величину.</translation>
 <translation id="867224526087042813">Потпис</translation>
 <translation id="8672535691554698269">Рачунарске мреже</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Прикажи детаље дељења картице. Дели се 1 картица са {WEBSITE_LIST_STR}}one{Прикажи детаље дељења картице. Дели се {NUM_TABS} картица са {WEBSITE_LIST_STR}}few{Прикажи детаље дељења картице. Деле се {NUM_TABS} картице са {WEBSITE_LIST_STR}}other{Прикажи детаље дељења картице. Дели се {NUM_TABS} картица са {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Фајлови се оптремају у <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">Без одлагања</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, одговор, <ph name="ANSWER" /></translation>

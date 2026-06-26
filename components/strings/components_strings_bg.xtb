@@ -477,6 +477,7 @@
 <translation id="173080396488393970">Този тип карта не се поддържа</translation>
 <translation id="1731563515262205847">ML-DSA-65</translation>
 <translation id="1732445923934584865">Вместо това попитайте лично</translation>
+<translation id="1732796940245838248">Актуализиране на номера за коригирани данни в Google Wallet</translation>
 <translation id="1733064249834771892">шрифтове</translation>
 <translation id="1733631169686303142">Звукова апаратура</translation>
 <translation id="1733762317901693627">Понякога дори сайтове, които обикновено са безопасни, са компрометирани от хакери. Посетете <ph name="BEGIN_LINK" />този опасен сайт<ph name="END_LINK" /> само ако наистина разбирате рисковете.</translation>
@@ -712,6 +713,7 @@
 <translation id="2122165854541876335">Потребителски ресурси</translation>
 <translation id="2122214041802369259">Цената е висока</translation>
 <translation id="2122719317867821810">Това правило работи нормално, но на друго място е зададена несъвместима стойност, която е заменена от него.</translation>
+<translation id="2124081665399116863">Актуализиране на превозното средство в Google Wallet</translation>
 <translation id="2126374524350484896">PDF файлът е създаден със:</translation>
 <translation id="2127090458081644412">Паролата е запазена на това устройство</translation>
 <translation id="2127747486437921899">Курсив</translation>
@@ -1549,6 +1551,7 @@
 <translation id="3422472998109090673">Понастоящем няма достъп до <ph name="HOST_NAME" />.</translation>
 <translation id="3422794267539320056">Докоснете динозавъра или натиснете клавиша за интервал, за да играете</translation>
 <translation id="3423742043356668186">Дефинирано от системата</translation>
+<translation id="3426672782316020729">Актуализиране на паспорта в Google Wallet</translation>
 <translation id="3427342743765426898">&amp;Възстановяване на редактирането</translation>
 <translation id="342781501876943858">Chromium препоръчва да зададете повторно паролата си, ако сте я използвали и на други сайтове.</translation>
 <translation id="3428151540071562330">Един или повече от URI адресите на шаблон за сървър в DnsOverHttpsTemplates са невалидни и няма да се използват.</translation>
@@ -2409,6 +2412,7 @@
 <translation id="4766713847338118463">Двуточково телбодиране в долната част</translation>
 <translation id="4768816584204270288">Когато плащате на вноски, се попълва еднократен номер на виртуалната карта. Можете да кликнете, за да копирате и поставите данните на картата за тази покупка.</translation>
 <translation id="4768864802656530630">Подробни системни регистрационни файлове. <ph name="BEGIN_LINK" />Научете повече<ph name="END_LINK" /></translation>
+<translation id="4770909831299304090">Актуализиране на номера на проверен пътник в Google Wallet</translation>
 <translation id="4771249073710170730">Радиоуправление и моделиране</translation>
 <translation id="4771973620359291008">Възникна неизвестна грешка.</translation>
 <translation id="4774055414220872623">Художествени и занаятчийски материали</translation>
@@ -4224,6 +4228,7 @@
 <translation id="7569490014721427265">Голф</translation>
 <translation id="7569952961197462199">Кредитната карта да се премахне ли от Chrome?</translation>
 <translation id="7569983096843329377">Черно</translation>
+<translation id="7570524564113479209">Актуализиране на личната карта в Google Wallet</translation>
 <translation id="7570862164055912832">Номера в програмата за обезщетения</translation>
 <translation id="7571813784389228510">Режим с AI на Google</translation>
 <translation id="7574998639136359461">Екипировка за зимни спортове</translation>
@@ -4745,6 +4750,7 @@
 <translation id="8389940864052787379">Персонализирани превозни средства и такива с подобрени технически характеристики</translation>
 <translation id="8390725133630534698">Споделянето от <ph name="ORIGIN_NAME" /> в(ъв) <ph name="VM_NAME" /> е блокирано от администраторски правила</translation>
 <translation id="8392783408127179588">Правилата се презареждат</translation>
+<translation id="8393948304336153065">Актуализиране на шофьорската книжка в Google Wallet</translation>
 <translation id="8396522675989118466">Това е <ph name="NUMBER_OF_DIGITS" />-цифреният код на <ph name="SIDE_OF_CARD" /></translation>
 <translation id="8398335999901363925">Списъкът с начини на плащане, които да бъдат попълнени при докосване, е отворен на пълната височина.</translation>
 <translation id="8398446215576328011">Връщане на приложените правила в предишното им състояние</translation>
@@ -4906,7 +4912,6 @@
 <translation id="8671519637524426245">Стойността на <ph name="SECURE_DNS_SALT" /> не отговаря на изискванията за размер.</translation>
 <translation id="867224526087042813">Подпис</translation>
 <translation id="8672535691554698269">Компютърни мрежи</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Показване на подробностите за споделянето на раздели. Споделя се 1 раздел от {WEBSITE_LIST_STR}}other{Показване на подробностите за споделянето на раздели. Споделят се {NUM_TABS} раздела от {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Файловете ви се качват в(ъв) <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">Без забавяне</translation>
 <translation id="8680536109547170164">„<ph name="QUERY" />“, отговор: „<ph name="ANSWER" />“</translation>

@@ -4907,7 +4907,6 @@ Sonra ödəmə seçimlərini gizlətmək üçün <ph name="BEGIN_LINK" />ödəni
 <translation id="8671519637524426245"><ph name="SECURE_DNS_SALT" /> dəyəri ölçü tələblərinə cavab vermir.</translation>
 <translation id="867224526087042813">İmza</translation>
 <translation id="8672535691554698269">Kompüter Şəbəkələri</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Tab paylaşımının təfərrüatları göstərilsin. {WEBSITE_LIST_STR} adlı siyahıdan 1 tab paylaşılır}other{Tab paylaşımının təfərrüatları göstərilsin. {WEBSITE_LIST_STR} adlı siyahıdan {NUM_TABS} tab paylaşılır}}</translation>
 <translation id="8675446170353411473">Fayllar bura yüklənir: <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">Gecikmə yoxdur</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, cavab, <ph name="ANSWER" /></translation>

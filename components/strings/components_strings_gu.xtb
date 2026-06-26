@@ -477,6 +477,7 @@
 <translation id="173080396488393970">આ પ્રકારનું કાર્ડ સમર્થિત નથી</translation>
 <translation id="1731563515262205847">ML-DSA-65</translation>
 <translation id="1732445923934584865">તેના બદલે રૂબરૂમાં પૂછો</translation>
+<translation id="1732796940245838248">Google Walletમાં નિવારણ નંબર અપડેટ કરો</translation>
 <translation id="1733064249834771892">ફૉન્ટ</translation>
 <translation id="1733631169686303142">ઑડિયોનું સાધન</translation>
 <translation id="1733762317901693627">ઘણી વાર સામાન્ય રીતે સુરક્ષિત ગણાતી સાઇટ પર પણ હુમલાખોરો દ્વારા ચેડાં કરવામાં આવી શકે છે. જો તમે ચોક્કસ હો કે તમે જોખમોને સમજી શકો છો, માત્ર તો જ <ph name="BEGIN_LINK" />આ અસુરક્ષિત સાઇટ<ph name="END_LINK" />ની મુલાકાત લો.</translation>
@@ -712,6 +713,7 @@
 <translation id="2122165854541876335">ગ્રાહક સંસાધનો</translation>
 <translation id="2122214041802369259">કિંમત વધુ છે</translation>
 <translation id="2122719317867821810">આ પૉલિસી હેતુ મુજબ કાર્ય કરી રહી છે, પરંતુ વિરોધાભાસ ધરાવતું મૂલ્ય બીજે ક્યાંક સેટ કરવામાં આવ્યું છે અને આ પૉલિસી તેને ઓવરરાઇડ કરે છે.</translation>
+<translation id="2124081665399116863">Google Walletમાં વાહનની માહિતી અપડેટ કરો</translation>
 <translation id="2126374524350484896">PDF નિર્માતા:</translation>
 <translation id="2127090458081644412">આ ડિવાઇસમાં પાસવર્ડ સચવાયો</translation>
 <translation id="2127747486437921899">ઇટાલિક</translation>
@@ -1549,6 +1551,7 @@
 <translation id="3422472998109090673"><ph name="HOST_NAME" /> હાલમાં પહોંચવા યોગ્ય નથી.</translation>
 <translation id="3422794267539320056">રમવા માટે, ડાયનાસોર પર ટૅપ કરો અથવા સ્પેસ બાર દબાવો</translation>
 <translation id="3423742043356668186">સિસ્ટમ દ્વારા ઉલ્લેખિત</translation>
+<translation id="3426672782316020729">Google Walletમાં પાસપોર્ટની માહિતી અપડેટ કરો</translation>
 <translation id="3427342743765426898">&amp;ફરી ફેરફાર કરો</translation>
 <translation id="342781501876943858">જો તમે અન્ય સાઇટ પર તમારા પાસવર્ડનો ફરી ઉપયોગ કર્યો હોય, તો Chromium તેને રીસેટ કરવાનો સુઝાવ આપે છે.</translation>
 <translation id="3428151540071562330">DnsOverHttpsTemplates સર્વરના નમૂનાની એક કે તેથી વધુ URI અમાન્ય છે અને તેનો ઉપયોગ કરવામાં આવશે નહીં.</translation>
@@ -2409,6 +2412,7 @@
 <translation id="4766713847338118463">નીચે બે સ્ટેપલ લગાવો</translation>
 <translation id="4768816584204270288">જ્યારે તમે સમય જતાં ચુકવણી કરો, ત્યારે એક વખતનો વર્ચ્યુઅલ કાર્ડ નંબર ભરવામાં આવે છે. તમે આ ખરીદી માટે કાર્ડની વિગતો કૉપિ પેસ્ટ કરવા માટે ક્લિક કરી શકો છો.</translation>
 <translation id="4768864802656530630">વિગતવાર સિસ્ટમ લૉગ. <ph name="BEGIN_LINK" />વધુ જાણો<ph name="END_LINK" /></translation>
+<translation id="4770909831299304090">Google Walletમાં KTN અપડેટ કરો</translation>
 <translation id="4771249073710170730">રેડિયો નિયંત્રણ અને મૉડલિંગ</translation>
 <translation id="4771973620359291008">કોઈ અજ્ઞાત ભૂલ આવી.</translation>
 <translation id="4774055414220872623">કલા અને હસ્તકલાના પુરવઠા</translation>
@@ -4224,6 +4228,7 @@
 <translation id="7569490014721427265">ગોલ્ફ</translation>
 <translation id="7569952961197462199">Chrome માંથી ક્રેડિટ કાર્ડ દૂર કરીએ?</translation>
 <translation id="7569983096843329377">શ્યામ</translation>
+<translation id="7570524564113479209">Google Walletમાં ID કાર્ડની માહિતી અપડેટ કરો</translation>
 <translation id="7570862164055912832">નિવારણ નંબર</translation>
 <translation id="7571813784389228510">Google AI મોડ</translation>
 <translation id="7574998639136359461">શિયાળુ રમતોનું સાધન</translation>
@@ -4745,6 +4750,7 @@
 <translation id="8389940864052787379">કસ્ટમાઇઝ કરેલા અને ખાસ પર્ફોર્મન્સવાળા વાહનો</translation>
 <translation id="8390725133630534698">વ્યવસ્થાપકની નીતિને કારણે <ph name="ORIGIN_NAME" />થી <ph name="VM_NAME" />માં પેસ્ટ કરવાની સુવિધા બ્લૉક કરવામાં આવી છે</translation>
 <translation id="8392783408127179588">પૉલિસીઓ ફરીથી લોડ કરી રહ્યાં છીએ</translation>
+<translation id="8393948304336153065">Google Walletમાં ડ્રાઇવિંગ લાઇસન્સની માહિતી અપડેટ કરો</translation>
 <translation id="8396522675989118466"><ph name="SIDE_OF_CARD" /> આવેલો આ <ph name="NUMBER_OF_DIGITS" />-અંકનો કોડ છે</translation>
 <translation id="8398335999901363925">ટચ કરીને ભરવાની ઉપલબ્ધ ચુકવણી પદ્ધતિઓની સૂચિ સંપૂર્ણ ઊંચાઈએ ખૂલી.</translation>
 <translation id="8398446215576328011">લાગુ પૉલિસીઓ પાછી ફેરવો</translation>
@@ -4906,7 +4912,6 @@
 <translation id="8671519637524426245"><ph name="SECURE_DNS_SALT" />નું મૂલ્ય કદની આવશ્યકતાઓ પૂરી કરતું નથી.</translation>
 <translation id="867224526087042813">સહી</translation>
 <translation id="8672535691554698269">કમ્પ્યૂટર નેટવર્ક</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{ટૅબ શેર કરવાની વિગતો બતાવો. {WEBSITE_LIST_STR}માંથી 1 ટૅબ શેર કરી રહ્યાં છીએ}one{ટૅબ શેર કરવાની વિગતો બતાવો. {WEBSITE_LIST_STR}માંથી {NUM_TABS} ટૅબ શેર કરી રહ્યાં છીએ}other{ટૅબ શેર કરવાની વિગતો બતાવો. {WEBSITE_LIST_STR}માંથી {NUM_TABS} ટૅબ શેર કરી રહ્યાં છીએ}}</translation>
 <translation id="8675446170353411473">તમારી ફાઇલો <ph name="CLOUD_PROVIDER" /> પર અપલોડ કરવામાં આવી રહી છે</translation>
 <translation id="8676424191133491403">કોઈ વિલંબ વિના</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, જવાબ, <ph name="ANSWER" /></translation>

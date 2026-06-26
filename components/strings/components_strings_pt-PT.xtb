@@ -3536,6 +3536,7 @@ Para ocultar as opções para pagar depois, aceda às <ph name="BEGIN_LINK" />de
 <translation id="6494750904506170417">pop-ups e redirecionamentos</translation>
 <translation id="6495664197699704593">Esta palavra-passe está guardada apenas neste dispositivo. Para usá-la nos seus outros dispositivos, <ph name="GOOGLE_PASSWORD_MANAGER" />.</translation>
 <translation id="649611364763911650">Para usar outro serviço de preenchimento automático no Chrome, escolha o seu fornecedor de preenchimento automático nas definições do Android</translation>
+<translation id="6496531801333278234">Encontrado pela Inteligência Personalizada. Pode gerir as suas informações nas definições.</translation>
 <translation id="6499038740797743453">Quer repor a palavra-passe?</translation>
 <translation id="6502510275417601303">O alerta acerca de uma nova definição de pagamento está fechado</translation>
 <translation id="6502991525169604759">Sem as suas alterações</translation>
@@ -4912,7 +4913,6 @@ Detalhes adicionais:
 <translation id="8671519637524426245">O valor de <ph name="SECURE_DNS_SALT" /> não cumpre os requisitos de tamanho.</translation>
 <translation id="867224526087042813">Assinatura</translation>
 <translation id="8672535691554698269">Redes de computadores</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Mostrar detalhes da partilha de separadores. A partilhar 1 separador de {WEBSITE_LIST_STR}}other{Mostrar detalhes da partilha de separadores. A partilhar {NUM_TABS} separadores de {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Os seus ficheiros estão a ser carregados para o <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">Sem atraso</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, resposta, <ph name="ANSWER" /></translation>

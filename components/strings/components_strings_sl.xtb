@@ -4912,7 +4912,6 @@ Dodatne podrobnosti:
 <translation id="8671519637524426245">Vrednost <ph name="SECURE_DNS_SALT" /> ne izpolnjuje zahtev glede velikosti.</translation>
 <translation id="867224526087042813">Podpis</translation>
 <translation id="8672535691554698269">Računalniška omrežja</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Prikaz podrobnosti o deljenju zavihka. Deljenje 1 zavihka s spletnega mesta {WEBSITE_LIST_STR}}one{Prikaz podrobnosti o deljenju zavihkov. Deljenje {NUM_TABS} zavihka s spletnih mest {WEBSITE_LIST_STR}}two{Prikaz podrobnosti o deljenju zavihkov. Deljenje {NUM_TABS} zavihkov s spletnih mest {WEBSITE_LIST_STR}}few{Prikaz podrobnosti o deljenju zavihkov. Deljenje {NUM_TABS} zavihkov s spletnih mest {WEBSITE_LIST_STR}}other{Prikaz podrobnosti o deljenju zavihkov. Deljenje {NUM_TABS} zavihkov s spletnih mest {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Datoteke se nalagajo v storitev <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">Brez zakasnitve</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, odgovor, <ph name="ANSWER" /></translation>

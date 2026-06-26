@@ -315,6 +315,7 @@
 <translation id="1463793142714244641">អចលនទ្រព្យ​វិស្សមកាល និង​អចលនទ្រព្យ​រួម</translation>
 <translation id="1465457928007067810">បានរក្សាទុក IBAN ទៅក្នុងគណនី Google របស់អ្នក</translation>
 <translation id="1467432559032391204">ឆ្វេង</translation>
+<translation id="1471514598850585811">កុំព្យូទ័រយួរដៃ</translation>
 <translation id="1472675084647422956">បង្ហាញ​ច្រើនទៀត</translation>
 <translation id="1473183651233018052">JIS B10</translation>
 <translation id="1473495410389165587">បញ្ចូល 3 ឬច្រើនពាក្យ ដើម្បីទទួលបានជំនួយក្នុងការសរសេរ</translation>
@@ -3540,6 +3541,7 @@
 <translation id="6494750904506170417">ផ្ទាំង​លោតឡើង និង​ការបញ្ជូនបន្ត</translation>
 <translation id="6495664197699704593">ពាក្យសម្ងាត់នេះត្រូវបានរក្សាទុកតែនៅក្នុងឧបករណ៍នេះប៉ុណ្ណោះ។ ដើម្បី​ប្រើវា​នៅលើ​ឧបករណ៍​ផ្សេងទៀត​របស់អ្នក សូម<ph name="GOOGLE_PASSWORD_MANAGER" />។</translation>
 <translation id="649611364763911650">ដើម្បីប្រើ​សេវាកម្ម​បំពេញ​ស្វ័យប្រវត្តិ​ផ្សេងទៀត​នៅក្នុង Chrome សូម​ជ្រើសរើស​ក្រុមហ៊ុន​ផ្ដល់សេវា​បំពេញ​ស្វ័យប្រវត្តិ​របស់អ្នក​នៅក្នុង​ការ​កំណត់</translation>
+<translation id="6496531801333278234">បានរកឃើញដោយបញ្ញាផ្ទាល់ខ្លួន។ អ្នកអាចគ្រប់គ្រង​ព័ត៌មាន​របស់អ្នកនៅក្នុងការកំណត់។</translation>
 <translation id="6499038740797743453">កំណត់​ពាក្យសម្ងាត់​ឡើងវិញ​?</translation>
 <translation id="6502510275417601303">ការជូនដំណឹង​អំពី​ការកំណត់ការបង់ប្រាក់​ថ្មី​ត្រូវបានបិទ</translation>
 <translation id="6502991525169604759">ដោយគ្មានការផ្លាស់ប្ដូររបស់អ្នក</translation>
@@ -4917,7 +4919,6 @@
 <translation id="8671519637524426245">តម្លៃ <ph name="SECURE_DNS_SALT" /> មិន​បំពេញ​តាម​លក្ខខណ្ឌ​តម្រូវទំហំ​ទេ។</translation>
 <translation id="867224526087042813">ហត្ថលេខា</translation>
 <translation id="8672535691554698269">បណ្ដាញ​កុំព្យូទ័រ</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{បង្ហាញ​ព័ត៌មានលម្អិត​អំពី​ការបង្ហាញ​ផ្ទាំង។ កំពុង​បង្ហាញ 1 ផ្ទាំងពី {WEBSITE_LIST_STR}}other{បង្ហាញ​ព័ត៌មានលម្អិត​អំពី​ការបង្ហាញ​ផ្ទាំង។ កំពុង​បង្ហាញ {NUM_TABS} ផ្ទាំង​ពី {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">ឯកសាររបស់​អ្នក​កំពុងត្រូវបាន​បង្ហោះ​ទៅ <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">គ្មាន​ការ​ពន្យារពេល</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, ចមើ្លយ៖ <ph name="ANSWER" /></translation>

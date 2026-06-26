@@ -1656,6 +1656,11 @@ Si se le asigna el valor 1, indica que no se pueden compartir grupos de pestaña
       Si se asigna el valor "false" a esta política, los usuarios no podrán elegir si enviar o no parte de la información del sistema y del contenido de las páginas a los servidores de Google. Si se le asigna el valor "true" o no se configura, los usuarios podrán enviar parte de la información del sistema y del contenido de las páginas a la función Navegación segura para que detecte aplicaciones y sitios web peligrosos.
 
       Consulta la página https://developers.google.com/safe-browsing para obtener más información acerca de Navegación segura.</translation>
+<translation id="2126895531607538755">Si se define esta política, se especificará el número de milisegundos de inactividad que deben transcurrir antes de que el dispositivo vuelva a aplicar la acción de suspensión durante un intervalo de <ph name="DEVICE_WEEKLY_SCHEDULED_SUSPEND_POLICY_NAME" />.
+
+Si un dispositivo se activa manualmente (por ejemplo, mediante una entrada de teclado) durante su periodo de suspensión programado, el dispositivo esperará este número de milisegundos antes de volver a suspenderse en la RAM. Cualquier actividad de usuario restablecerá el temporizador de reactivación siempre que se mantenga dentro del intervalo de suspensión.
+
+Si no se define esta política, el dispositivo no volverá a suspenderse automáticamente durante el intervalo después de activarse.</translation>
 <translation id="2127599828444728326">Permitir notificaciones en estos sitios</translation>
 <translation id="2131902621292742709">Retraso de atenuado de pantalla cuando el dispositivo funciona con la batería</translation>
 <translation id="2131915994539959070">Habilita la oclusión de ventana en <ph name="PRODUCT_NAME" />.
@@ -3287,6 +3292,7 @@ Si se inhabilita esta política o no se establece, no se recogerán ni se subir�
 El informe contiene datos sobre el estado y el uso del perfil, incluidos, entre otros, la versión del SO, la versión del navegador, las extensiones instaladas y las políticas aplicadas.
 
 Esta política solo se puede establecer como política de usuarios basada en la nube.</translation>
+<translation id="3060733249129331512">Preguntar siempre que un sitio quiera descargar varios archivos automáticamente</translation>
 <translation id="3062559845875011810">No permitir la función</translation>
 <translation id="3063302084011279315">Inhabilitar Grabación de pantalla</translation>
 <translation id="3063307261083019730">No permitir que las páginas con el encabezado <ph name="CACHE_CONTROL_NO_STORE_NAME" /> se almacenen en la caché de páginas completas.</translation>
@@ -4695,6 +4701,13 @@ Si se asigna el valor 2, no se permite la función.
 Si no se define esta política, su comportamiento lo determinará la política GenAiDefaultSettings.
 
 Para obtener más información sobre el tratamiento de datos en las funciones de IA generativa, consulta https://support.google.com/chrome/a?p=generative_ai_settings.</translation>
+<translation id="4049815236567245576">Permite definir una lista de patrones de URL donde se especifica qué sitios web pueden descargar varios archivos automáticamente.
+
+Para obtener información detallada sobre los patrones de URL válidos, consulta https://chromeenterprise.google/policies/url-patterns.
+
+Si una URL coincide con <ph name="AUTOMATIC_DOWNLOADS_ALLOWED_FOR_URLS_POLICY_NAME" /> y <ph name="AUTOMATIC_DOWNLOADS_BLOCKED_FOR_URLS_POLICY_NAME" />, AutomaticDownloadsBlockedForUrls tendrá prioridad.
+
+Si no se define esta política, se aplicará <ph name="DEFAULT_AUTOMATIC_DOWNLOADS_SETTING_POLICY_NAME" /> a todos los sitios, si se ha definido. Si no, se aplicará la configuración personal del usuario.</translation>
 <translation id="4051723201852944592">Habilitar la oclusión de ventana</translation>
 <translation id="4052529125939620019">Cargar la extensión del componente CryptoToken al iniciar el navegador</translation>
 <translation id="4053157306171963473">Inhabilitar los informes sobre el tiempo de actividad del dispositivo</translation>
@@ -4791,6 +4804,9 @@ La disponibilidad de las extensiones seguirá estando controlada por otras polí
 
       Nota: La actualización dinámica de esta política solo se admite en la versión 123 y posteriores de <ph name="PRODUCT_NAME" />. Si inhabilitas "autofill", también se inhabilitará "payments". "typedUrls" hace referencia a todo el historial de navegación.</translation>
 <translation id="4115501011761259824">Habilita Conjuntos propios para todos los usuarios afectados</translation>
+<translation id="4119598167427266156">Si se le asigna el valor 1 a esta política, los sitios web podrán descargar varios archivos automáticamente. Si se le asigna el valor 2, se denegará este permiso. Puedes configurar esta política para que pregunte siempre que un sitio web quiera descargar varios archivos automáticamente.
+
+Si no se establece, se aplicará la política AskAutomaticDownloads, pero los usuarios podrán cambiar esta opción.</translation>
 <translation id="4120401094617902941">Intervalo en el que se muestrean y se recogen los contadores de tiempo de ejecución. El valor mínimo permitido es de 1 día.
 
 Si no se establece esta política, se aplicará el intervalo predeterminado de 1 día.</translation>
@@ -6293,6 +6309,7 @@ Si se le asigna el valor <ph name="POLICY_ENUM_RESTOREONSTARTUP_RESTOREONSTARTUP
 En <ph name="MS_WIN_NAME" />, esta política solo está disponible en instancias que estén vinculadas a un dominio de <ph name="MS_AD_NAME" /> o a <ph name="MS_AAD_NAME" />, o que se hayan registrado en <ph name="CHROME_ENTERPRISE_CORE_NAME" />.
 
 En <ph name="MAC_OS_NAME" />, esta política solo está disponible en instancias que se gestionen mediante MDM, que estén vinculadas a un dominio a través de MCX o que se hayan registrado en <ph name="CHROME_ENTERPRISE_CORE_NAME" />.</translation>
+<translation id="5036662165765606524">No permitir que ningún sitio descargue varios archivos automáticamente</translation>
 <translation id="5037749623252479780">Los ajustes de Re Pág y Av Pág están inhabilitados</translation>
 <translation id="5039110755072335605">Compatibilidad con encabezados de solicitud CORS sin comodín</translation>
 <translation id="5039804452771397117">Permitir</translation>
@@ -6792,6 +6809,7 @@ Las cuentas gestionadas no pueden unirse ni crear grupos familiares, por lo que 
 <translation id="5345892164332459671">Inhabilitar el SSO flotante y no mover las autenticaciones de los servicios web del usuario a un dispositivo nuevo</translation>
 <translation id="5345910753471481870">No mostrar el botón de Google Lens en el cuadro de búsqueda de la página Nueva pestaña</translation>
 <translation id="5346587320074666194">Bloquear el acceso a los sensores en estos sitios web</translation>
+<translation id="534702079563980696">Permitir descargas automáticas en estos sitios</translation>
 <translation id="5347735051291224683">Esta política controla si se fuerza que el contenido web en segundo plano se ejecute con prioridad de primer plano.
 
 De forma predeterminada, el navegador optimiza los recursos dando menos prioridad al contenido de las pestañas en segundo plano. Si se habilita esta política, se anulará ese comportamiento y las pestañas en segundo plano se programarán de la misma forma que la pestaña activa.
@@ -7221,6 +7239,7 @@ Si no se define esta política o se le asigna una lista vacía, se le mostrarán
 <translation id="5599461642204007579">Configuración de administración de <ph name="MS_AD_NAME" /></translation>
 <translation id="5601503069213153581">PIN</translation>
 <translation id="5605676983184673391">Permitir que las aplicaciones de Chrome se ejecuten en sesiones de kiosco.</translation>
+<translation id="5606477661985737162">Configuración de descargas automáticas</translation>
 <translation id="5607021831414604820">Habilitar los informes sobre el estado del almacenamiento del dispositivo</translation>
 <translation id="5607808178576647930">Permitir integraciones de Modo IA.</translation>
 <translation id="5608114828230655271">Comportamiento predeterminado del dispositivo</translation>
@@ -7318,6 +7337,7 @@ Esta política es una solución temporal. Esta política no está disponible a p
 <translation id="5660950553460381588">Crear llaves de acceso de forma predeterminada en el llavero de iCloud cuando sea posible</translation>
 <translation id="566569751231933416">Usar el comportamiento predeterminado.</translation>
 <translation id="5666457529647159548">Permite que los usuarios gestionen los certificados de cliente instalados.</translation>
+<translation id="566962283082154427">Retraso de la reactivación de los intervalos de suspensión programados semanalmente en milisegundos</translation>
 <translation id="5670249935663090320">Si se habilita esta política o no se establece, se activará <ph name="PRODUCT_NAME" />. Los usuarios pueden iniciarlo desde el menú de la aplicación, los menús contextuales de páginas, los controles multimedia de sitios web compatibles con Google Cast y, si aparece, con el icono de Cast en la barra de herramientas.
 
 Si se inhabilita esta política, se desactivará <ph name="PRODUCT_NAME" />.</translation>
@@ -7777,6 +7797,13 @@ A partir de la versión 147 de <ph name="PRODUCT_NAME" />, esta política dejar�
 <translation id="5965344524743236327">El ID o número del proyecto de <ph name="GOOGLE_CLOUD_PRODUCT_NAME" /> correspondiente a la instancia de <ph name="GEMINI_ENTERPRISE_PRODUCT_NAME" /> que se va a habilitar. Consulta más información sobre los IDs de proyecto en https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects.</translation>
 <translation id="5966615072639944554">Extensiones con permiso para utilizar la API de confirmación remota</translation>
 <translation id="596732417280023843">El nombre del perfil del certificado.</translation>
+<translation id="5972475504452039694">Permite definir una lista de patrones de URL donde se especifica qué sitios web no pueden descargar varios archivos automáticamente.
+
+Para obtener información detallada sobre los patrones de URL válidos, consulta https://chromeenterprise.google/policies/url-patterns.
+
+Si una URL coincide con <ph name="AUTOMATIC_DOWNLOADS_ALLOWED_FOR_URLS_POLICY_NAME" /> y <ph name="AUTOMATIC_DOWNLOADS_BLOCKED_FOR_URLS_POLICY_NAME" />, AutomaticDownloadsBlockedForUrls tendrá prioridad.
+
+Si no se define esta política, se aplicará <ph name="DEFAULT_AUTOMATIC_DOWNLOADS_SETTING_POLICY_NAME" /> a todos los sitios, si se ha definido. Si no, se aplicará la configuración personal del usuario.</translation>
 <translation id="5972538402066550344">Permitir los controles de informes granulares</translation>
 <translation id="5973437409890460481">Permitir conexiones de acceso remoto empresarial a este equipo</translation>
 <translation id="5975765799383881158">Si se habilita la política o no se establece, los usuarios podrán enviar comentarios a Google usando una combinación de teclas o mediante la opción que está en Menú &gt; Ayuda &gt; Notificar un problema.
@@ -8030,6 +8057,7 @@ El tiempo de espera de inactividad para que se inicie el salvapantallas y el int
 <translation id="6181783961196084973">El valor del interruptor de recogida de actividad en las aplicaciones. Si se le asigna el valor true, se enviará información de la actividad en las aplicaciones del usuario al servidor para mostrarse en la aplicación <ph name="PRODUCT_NAME" /> del niño/a y del padre o madre. Si se le asigna el valor false, la función "Límites de tiempo por aplicación" seguirá funcionando, pero no se enviarán datos al servidor ni se mostrarán en <ph name="PRODUCT_NAME" />.</translation>
 <translation id="6182206125906000651">Inhabilitar los cambios a HTTPS</translation>
 <translation id="6182563940865917569">Permitir que Chrome reproduzca automáticamente el contenido multimedia</translation>
+<translation id="618588573990666077">Configuración predeterminada de descargas automáticas</translation>
 <translation id="618635925649844912">Esta política controla si se muestra al usuario la pantalla de introducción de las funciones de IA dentro de la sesión durante el primer flujo de inicio de sesión.
 
       Si se inhabilita, no se mostrará la pantalla de introducción de IA.
@@ -8203,6 +8231,7 @@ Si esta política se habilita o no se establece, el navegador adoptará este nue
 Si esta política se inhabilita, el cambio se revertirá y los documentos sin encabezados Origin-Agent-Cluster se asignarán a clústeres de agentes con clave de sitio. Como consecuencia, el descriptor de acceso document.domain podrá establecerse de manera predeterminada. Esto coincide con el comportamiento anterior.
 
 Consulta https://developer.chrome.com/blog/immutable-document-domain/ para obtener más información.</translation>
+<translation id="626942726350419209">Permitir que los sitios descarguen varios archivos automáticamente</translation>
 <translation id="6270615143812355589">Habilitar entrada de audio</translation>
 <translation id="6270791075656665237">No permitir QUIC</translation>
 <translation id="6273015149273504999">
@@ -10396,6 +10425,7 @@ Si no se define esta política, no se permitirán excepciones de <ph name="FLOAT
 <translation id="759957074386651883">Configuración de Navegación segura</translation>
 <translation id="7602621823177962064">Inhabilitar los informes sobre la memoria del dispositivo</translation>
 <translation id="7604169113182304895">Las aplicaciones para Android pueden aceptar esta lista voluntariamente. No se les puede forzar a que lo hagan.</translation>
+<translation id="7607831126797434329">Bloquear descargas automáticas en estos sitios</translation>
 <translation id="7608186022704392724">La función de enviar PINs automáticamente cambia la forma en la que se introducen los PINs en <ph name="PRODUCT_OS_NAME" />.
           En lugar de mostrar el mismo campo de texto que se utiliza para introducir contraseñas, esta
           función muestra una interfaz donde el usuario puede ver claramente cuántos

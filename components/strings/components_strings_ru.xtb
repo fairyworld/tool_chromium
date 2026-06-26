@@ -4911,7 +4911,6 @@
 <translation id="8671519637524426245">Значение правила <ph name="SECURE_DNS_SALT" /> не соответствует требованиям по длине.</translation>
 <translation id="867224526087042813">Подпись</translation>
 <translation id="8672535691554698269">Компьютерные сети</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Показать сведения о доступе к вкладкам. Открыт доступ к 1 вкладке из {WEBSITE_LIST_STR}}one{Показать сведения о доступе к вкладкам. Открыт доступ к {NUM_TABS} вкладке из {WEBSITE_LIST_STR}}few{Показать сведения о доступе к вкладкам. Открыт доступ к {NUM_TABS} вкладкам из {WEBSITE_LIST_STR}}many{Показать сведения о доступе к вкладкам. Открыт доступ к {NUM_TABS} вкладкам из {WEBSITE_LIST_STR}}other{Показать сведения о доступе к вкладкам. Открыт доступ к {NUM_TABS} вкладки из {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Файлы загружаются в сервис "<ph name="CLOUD_PROVIDER" />"</translation>
 <translation id="8676424191133491403">Без задержки</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, ответ, <ph name="ANSWER" /></translation>

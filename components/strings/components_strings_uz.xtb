@@ -4905,7 +4905,6 @@ Batafsil axborot:
 <translation id="8671519637524426245"><ph name="SECURE_DNS_SALT" /> qiymati oʻlcham talablariga mos emas.</translation>
 <translation id="867224526087042813">Imzo</translation>
 <translation id="8672535691554698269">Kompyuter tarmoqlari</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Varaq ulashish tafsilotlarini chiqarish. {WEBSITE_LIST_STR} saytidan 1 ta varaq ulashilmoqda}other{Varaq ulashish tafsilotlarini chiqarish. {WEBSITE_LIST_STR} saytidan {NUM_TABS} ta varaq ulashilmoqda}}</translation>
 <translation id="8675446170353411473">Fayllar <ph name="CLOUD_PROVIDER" /> omboriga yuklanmoqda</translation>
 <translation id="8676424191133491403">Kechikishsiz</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, javob, <ph name="ANSWER" /></translation>

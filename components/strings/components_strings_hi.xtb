@@ -478,6 +478,7 @@
 <translation id="173080396488393970">इस तरह का कार्ड काम नहीं करता</translation>
 <translation id="1731563515262205847">ML-DSA-65</translation>
 <translation id="1732445923934584865">इसके बजाय, व्यक्तिगत तौर पर ऐक्सेस मांगें</translation>
+<translation id="1732796940245838248">Google Wallet में रीड्रेस नंबर अपडेट करें</translation>
 <translation id="1733064249834771892">फ़ॉन्ट</translation>
 <translation id="1733631169686303142">ऑडियो इक्विपमेंट</translation>
 <translation id="1733762317901693627">आम तौर पर, सुरक्षित रहने वाली साइटों के साथ भी, कभी-कभी हमलावर छेड़छाड़ कर देते हैं. <ph name="BEGIN_LINK" />इस असुरक्षित साइट<ph name="END_LINK" /> पर सिर्फ़ तब ही जाएं, जब आपने उससे होने वाले जोखिमों को पक्के तौर पर समझ लिया हो.</translation>
@@ -713,6 +714,7 @@
 <translation id="2122165854541876335">उपभोक्ता के संसाधन</translation>
 <translation id="2122214041802369259">कीमत ज़्यादा है</translation>
 <translation id="2122719317867821810">यह नीति उम्मीद के मुताबिक काम कर रही है. हालांकि, किसी दूसरी जगह ऐसा मान सेट किया गया है जो आपस में मेल नहीं खा रहा है और उसे इसे नीति से बदल दिया गया है.</translation>
+<translation id="2124081665399116863">Google Wallet में वाहन की जानकारी अपडेट करें</translation>
 <translation id="2126374524350484896">पीडीएफ़ प्रोड्यूसर:</translation>
 <translation id="2127090458081644412">इस डिवाइस में पासवर्ड सेव किया गया</translation>
 <translation id="2127747486437921899">इटैलिक</translation>
@@ -1549,6 +1551,7 @@
 <translation id="3422472998109090673"><ph name="HOST_NAME" /> वर्तमान में पहुंच योग्य नहीं है.</translation>
 <translation id="3422794267539320056">गेम खेलने के लिए, डायनो पर टैप करें या space दबाएं</translation>
 <translation id="3423742043356668186">दिए गए सिस्टम के लिए</translation>
+<translation id="3426672782316020729">Google Wallet में पासपोर्ट की जानकारी अपडेट करें</translation>
 <translation id="3427342743765426898">&amp;बदलाव को फिर से लागू करें</translation>
 <translation id="342781501876943858">अगर आपने अपने पासवर्ड का दूसरी साइटों पर दोबारा इस्तेमाल किया है, तो क्रोमियम आपको उसे रीसेट करने का सुझाव देता है.</translation>
 <translation id="3428151540071562330">DnsOverHttpsTemplates सर्वर टेम्प्लेट का एक या इससे ज़्यादा यूआरएल अमान्य है और इसका इस्तेमाल नहीं किया जाएगा.</translation>
@@ -2409,6 +2412,7 @@
 <translation id="4766713847338118463">नीचे की ओर ड्युएल स्टेपल</translation>
 <translation id="4768816584204270288">समय के साथ पेमेंट करने पर, एक-बार इस्तेमाल किया जा सकने वाला वर्चुअल कार्ड नंबर अपने-आप भर जाता है. इस खरीदारी के लिए, कार्ड की जानकारी कॉपी करके चिपकाने के लिए क्लिक करें.</translation>
 <translation id="4768864802656530630">सिस्टम लॉग की ज़्यादा जानकारी. <ph name="BEGIN_LINK" />ज़्यादा जानें<ph name="END_LINK" /></translation>
+<translation id="4770909831299304090">Google Wallet में केटीएन अपडेट करें</translation>
 <translation id="4771249073710170730">रेडियो कंट्रोल और मॉडलिंग</translation>
 <translation id="4771973620359291008">अज्ञात गड़बड़ी आई.</translation>
 <translation id="4774055414220872623">ऑर्ट और क्राफ़्ट का सामान</translation>
@@ -4224,6 +4228,7 @@
 <translation id="7569490014721427265">गोल्फ़</translation>
 <translation id="7569952961197462199">Chrome से क्रेडिट कार्ड निकालें?</translation>
 <translation id="7569983096843329377">काला</translation>
+<translation id="7570524564113479209">Google Wallet में आईडी कार्ड की जानकारी अपडेट करें</translation>
 <translation id="7570862164055912832">रिड्रेस नंबर</translation>
 <translation id="7571813784389228510">Google का एआई मोड</translation>
 <translation id="7574998639136359461">विंटर स्पोर्ट्स के इक्विपमेंट</translation>
@@ -4745,6 +4750,7 @@
 <translation id="8389940864052787379">कस्टमाइज़ किए गए और खास परफ़ॉर्मेंस वाले वाहन</translation>
 <translation id="8390725133630534698"><ph name="ORIGIN_NAME" /> से <ph name="VM_NAME" /> पर क्लिपबोर्ड डेटा शेयर करने की सुविधा को आपके एडमिन ने ब्लॉक कर दिया है</translation>
 <translation id="8392783408127179588">नीतियां फिर से लोड हो रही हैं</translation>
+<translation id="8393948304336153065">Google Wallet में ड्राइविंग लाइसेंस की जानकारी अपडेट करें</translation>
 <translation id="8396522675989118466">यह <ph name="SIDE_OF_CARD" /> मौजूद <ph name="NUMBER_OF_DIGITS" />-अंकों का कोड है</translation>
 <translation id="8398335999901363925">टच करके भरी जाने वाली पेमेंट के तरीकों की सूची, पूरी स्क्रीन पर खुली है.</translation>
 <translation id="8398446215576328011">लागू नीतियों को वापस लाएं</translation>
@@ -4907,7 +4913,6 @@
 <translation id="8671519637524426245"><ph name="SECURE_DNS_SALT" /> वैल्यू, साइज़ की ज़रूरी शर्तों को पूरा नहीं करती.</translation>
 <translation id="867224526087042813">हस्ताक्षर</translation>
 <translation id="8672535691554698269">कंप्यूटर नेटवर्क</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{टैब शेयर करने की जानकारी दिखाएं. {WEBSITE_LIST_STR} से 1 टैब शेयर किया जा रहा है}one{टैब शेयर करने की जानकारी दिखाएं. {WEBSITE_LIST_STR} से {NUM_TABS} टैब शेयर किया जा रहा है}other{टैब शेयर करने की जानकारी दिखाएं. {WEBSITE_LIST_STR} से {NUM_TABS} टैब शेयर किए जा रहे हैं}}</translation>
 <translation id="8675446170353411473">आपकी फ़ाइलें <ph name="CLOUD_PROVIDER" /> में अपलोड की जा रही हैं</translation>
 <translation id="8676424191133491403">बिना देरी के</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, उत्तर, <ph name="ANSWER" /></translation>

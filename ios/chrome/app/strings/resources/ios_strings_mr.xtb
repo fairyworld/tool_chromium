@@ -839,7 +839,6 @@
 <translation id="391904960191284041">उत्पादन पुनरावलोकने</translation>
 <translation id="3921585859122905677">अ‍ॅड्रेस बारचे स्थान</translation>
 <translation id="3922185497376658606">वेबपेज प्रीलोड करा</translation>
-<translation id="3922395466317605522">मेनू कस्टमाइझ करा</translation>
 <translation id="3926703470020109118">डाउनलोड रद्द केले आहे</translation>
 <translation id="3929457972718048006">पत्ते</translation>
 <translation id="3931215329146376310">{count,plural, =1{या साइटसाठी नवीन पासवर्ड}other{या साइटसाठी नवीन पासवर्ड}}</translation>
@@ -1697,7 +1696,6 @@
 <translation id="6674917187596384849">तुम्ही खात्यांदरम्यान सहजपणे स्विच करू शकता</translation>
 <translation id="6676349090816247042">साइन-इन पर्याय.</translation>
 <translation id="667999046851023355">दस्तऐवज</translation>
-<translation id="6680416467695217368">मेनू कस्टमाइझ करा</translation>
 <translation id="6681791404926413601">{count,plural, =1{तुमच्या कीबोर्डच्या वरती पेमेंट पद्धतीचा {count} पर्याय उपलब्ध आहे.}other{तुमच्या कीबोर्डच्या वरती पेमेंट पद्धतीचे {count} पर्याय उपलब्ध आहेत.}}</translation>
 <translation id="6682680306647339111">रिमाइंडर काढून टाकले</translation>
 <translation id="6684262542644248484">वेबसाइटमध्ये साइन इन करा</translation>
@@ -2244,6 +2242,7 @@
 <translation id="8534481786647257214">Google+ पोस्ट पूर्ण केले.</translation>
 <translation id="8535368836838588657">पासवर्ड दाखवा</translation>
 <translation id="8540426897269305488"><ph name="CELL_ACCESSIBILITY_LABEL" /> वापरून साइन इन करा</translation>
+<translation id="8542331710562073430">काहीतरी चूक झाली. पुन्हा Live जाण्याचा प्रयत्न करण्यासाठी Live बटणावर टॅप करा.</translation>
 <translation id="8545276357312221485">तुमची डीफॉल्ट ब्राउझर सेटिंग्ज तपासा</translation>
 <translation id="854938212724803178">तुमच्याकडे धोक्यात असलेला १ पासवर्ड आहे. सुरक्षित राहण्यासाठी त्याचे आता निराकरण करा.</translation>
 <translation id="8551311254462607218">अ‍ॅड्रेस बारमध्ये, Google Lens कॅमेरा आयकनवर टॅप करा</translation>

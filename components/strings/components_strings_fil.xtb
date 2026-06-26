@@ -314,6 +314,7 @@ Kung ayaw mo, iba-block ito ng iyong mga setting ng privacy. Papayagan nito ang 
 <translation id="1463793142714244641">Mga Timeshare at Bakasyunan</translation>
 <translation id="1465457928007067810">Na-save ang IBAN sa iyong Google Account</translation>
 <translation id="1467432559032391204">Kaliwa</translation>
+<translation id="1471514598850585811">Laptop</translation>
 <translation id="1472675084647422956">Magpakita ng higit pa</translation>
 <translation id="1473183651233018052">JIS B10</translation>
 <translation id="1473495410389165587">Maglagay ng 3 o higit pang salita para makatanggap ng tulong sa pagsusulat</translation>
@@ -4912,7 +4913,6 @@ Mga karagdagang detalye:
 <translation id="8671519637524426245">Hindi natutugunan ng value ng <ph name="SECURE_DNS_SALT" /> ang mga requirement sa laki.</translation>
 <translation id="867224526087042813">Lagda</translation>
 <translation id="8672535691554698269">Mga Computer Network</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Ipakita ang tab na nagse-share ng mga detalye. Nagse-share ng 1 tab mula sa {WEBSITE_LIST_STR}}one{Ipakita ang tab na nagse-share ng mga detalye. Nagse-share ng {NUM_TABS} tab mula sa {WEBSITE_LIST_STR}}other{Ipakita ang tab na nagse-share ng mga detalye. Nagse-share ng {NUM_TABS} na tab mula sa {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Ina-upload ang iyong mga file sa <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">Walang pagkaantala</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, sagot, <ph name="ANSWER" /></translation>

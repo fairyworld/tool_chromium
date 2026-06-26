@@ -477,6 +477,7 @@ Jinak to vaše nastavení ochrany soukromí bude blokovat. Povolením umožníte
 <translation id="173080396488393970">Tento typ karty není podporován</translation>
 <translation id="1731563515262205847">ML-DSA-65</translation>
 <translation id="1732445923934584865">Zeptat se osobně</translation>
+<translation id="1732796940245838248">Aktualizace nápravného čísla v Peněžence Google</translation>
 <translation id="1733064249834771892">písma</translation>
 <translation id="1733631169686303142">Zvukové vybavení</translation>
 <translation id="1733762317901693627">Někdy mohou útočníci číhat dokonce i na webech, které jsou běžně bezpečné. <ph name="BEGIN_LINK" />Tento nebezpečný web<ph name="END_LINK" /> navštivte pouze v případě, že si uvědomujete rizika.</translation>
@@ -712,6 +713,7 @@ Jinak to vaše nastavení ochrany soukromí bude blokovat. Povolením umožníte
 <translation id="2122165854541876335">Spotřebitelské zdroje</translation>
 <translation id="2122214041802369259">Cena je vysoká</translation>
 <translation id="2122719317867821810">Zásada funguje podle očekávání, ale jinde je nastavena konfliktní hodnota, kterou tato zásada přepisuje.</translation>
+<translation id="2124081665399116863">Aktualizace vozidla v Peněžence Google</translation>
 <translation id="2126374524350484896">Původ souboru PDF:</translation>
 <translation id="2127090458081644412">Heslo bylo uloženo do tohoto zařízení</translation>
 <translation id="2127747486437921899">Kurzíva</translation>
@@ -1546,6 +1548,7 @@ Pokud chcete možnosti uhrazení na splátky skrýt, přejděte na <ph name="BEG
 <translation id="3422472998109090673">Web <ph name="HOST_NAME" /> momentálně není dostupný.</translation>
 <translation id="3422794267539320056">Klepnutím na dinosaura nebo stisknutím mezerníku začnete hrát</translation>
 <translation id="3423742043356668186">Určeno systémem</translation>
+<translation id="3426672782316020729">Aktualizace pasu v Peněžence Google</translation>
 <translation id="3427342743765426898">&amp;Opakovat úpravy</translation>
 <translation id="342781501876943858">Pokud jste heslo použili na jiném webu, doporučujeme vám ho resetovat.</translation>
 <translation id="3428151540071562330">Některé identifikátory URI šablon serverů DnsOverHttpsTemplates jsou neplatné a nebudou použity.</translation>
@@ -2405,6 +2408,7 @@ Pokud chcete možnosti uhrazení na splátky skrýt, přejděte na <ph name="BEG
 <translation id="4766713847338118463">Dvě sponky dole</translation>
 <translation id="4768816584204270288">Při placení na splátky se vyplní jednorázové číslo virtuální karty. Podrobnosti o kartě pro tento nákup můžete zkopírovat a vložit kliknutím.</translation>
 <translation id="4768864802656530630">Podrobné systémové protokoly. <ph name="BEGIN_LINK" />Další informace<ph name="END_LINK" /></translation>
+<translation id="4770909831299304090">Aktualizace čísla KTN v Peněžence Google</translation>
 <translation id="4771249073710170730">Modelářství a modely na dálkové ovládání</translation>
 <translation id="4771973620359291008">Došlo k neznámé chybě.</translation>
 <translation id="4774055414220872623">Výtvarné potřeby a potřeby pro ruční práce</translation>
@@ -4218,6 +4222,7 @@ Kontaktujte administrátora systému.</translation>
 <translation id="7569490014721427265">Golf</translation>
 <translation id="7569952961197462199">Odstranit platební kartu z Chromu?</translation>
 <translation id="7569983096843329377">Černá</translation>
+<translation id="7570524564113479209">Aktualizace průkazu totožnosti v Peněžence Google</translation>
 <translation id="7570862164055912832">Nápravná čísla (redress numbers)</translation>
 <translation id="7571813784389228510">Režim Google AI</translation>
 <translation id="7574998639136359461">Vybavení pro zimní sporty</translation>
@@ -4739,6 +4744,7 @@ Kontaktujte administrátora systému.</translation>
 <translation id="8389940864052787379">Upravená a výkonná vozidla</translation>
 <translation id="8390725133630534698">Sdílení ze zdroje <ph name="ORIGIN_NAME" /> do umístění <ph name="VM_NAME" /> blokuje zásada administrátora</translation>
 <translation id="8392783408127179588">Opětovné načítání zásad</translation>
+<translation id="8393948304336153065">Aktualizace řidičského průkazu v Peněžence Google</translation>
 <translation id="8396522675989118466">Jedná se o <ph name="NUMBER_OF_DIGITS" />místný kód na: <ph name="SIDE_OF_CARD" /></translation>
 <translation id="8398335999901363925">Platební metody dostupné k vyplnění dotykem jsou otevřené na celou výšku.</translation>
 <translation id="8398446215576328011">Vrátit použité zásady zpět</translation>
@@ -4901,7 +4907,6 @@ Další podrobnosti:
 <translation id="8671519637524426245">Hodnota <ph name="SECURE_DNS_SALT" /> nesplňuje požadavky na velikost.</translation>
 <translation id="867224526087042813">Podpis</translation>
 <translation id="8672535691554698269">Počítačové sítě</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Zobrazit podrobnosti o sdílení karet. Sdílí se 1 karta webu {WEBSITE_LIST_STR}}few{Zobrazit podrobnosti o sdílení karet. Sdílí se {NUM_TABS} karty webů {WEBSITE_LIST_STR}}many{Zobrazit podrobnosti o sdílení karet. Sdílí se {NUM_TABS} karty webů {WEBSITE_LIST_STR}}other{Zobrazit podrobnosti o sdílení karet. Sdílí se {NUM_TABS} karet webů {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Vaše soubory se nahrávají do úložiště <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">Bez prodlevy</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, odpověď, <ph name="ANSWER" /></translation>

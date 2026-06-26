@@ -4911,7 +4911,6 @@ Manylion ychwanegol:
 <translation id="8671519637524426245">Nid yw'r gwerth <ph name="SECURE_DNS_SALT" /> yn bodloni'r gofynion maint.</translation>
 <translation id="867224526087042813">Llofnod</translation>
 <translation id="8672535691554698269">Rhwydweithiau Cyfrifiadurol</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Dangos manylion rhannu tabiau. Wrthi'n rhannu 1 tab o {WEBSITE_LIST_STR}}zero{Dangos manylion rhannu tabiau. Wrthi'n rhannu {NUM_TABS} tabiau o {WEBSITE_LIST_STR}}two{Dangos manylion rhannu tabiau. Wrthi'n rhannu {NUM_TABS} dab o {WEBSITE_LIST_STR}}few{Dangos manylion rhannu tabiau. Wrthi'n rhannu {NUM_TABS} tab o {WEBSITE_LIST_STR}}many{Dangos manylion rhannu tabiau. Wrthi'n rhannu {NUM_TABS} tab o {WEBSITE_LIST_STR}}other{Dangos manylion rhannu tabiau. Wrthi'n rhannu {NUM_TABS} tab o {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Mae eich ffeiliau'n cael eu huwchlwytho i <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">Dim oedi</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, ateb, <ph name="ANSWER" /></translation>

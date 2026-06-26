@@ -477,6 +477,7 @@ Nếu bạn từ chối, chế độ cài đặt quyền riêng tư của bạn 
 <translation id="173080396488393970">Loại thẻ này không được hỗ trợ</translation>
 <translation id="1731563515262205847">ML-DSA-65</translation>
 <translation id="1732445923934584865">Hỏi trực tiếp</translation>
+<translation id="1732796940245838248">Cập nhật mã số Redress Number trong Google Wallet</translation>
 <translation id="1733064249834771892">phông chữ</translation>
 <translation id="1733631169686303142">Thiết bị âm thanh</translation>
 <translation id="1733762317901693627">Ngay cả những trang web thường được coi là an toàn đôi khi vẫn bị kẻ tấn công xâm phạm. Bạn chỉ nên truy cập <ph name="BEGIN_LINK" />trang web không an toàn này<ph name="END_LINK" /> khi đã chắc chắn bạn hiểu rõ các rủi ro.</translation>
@@ -712,6 +713,7 @@ Nếu bạn từ chối, chế độ cài đặt quyền riêng tư của bạn 
 <translation id="2122165854541876335">Tài nguyên người tiêu dùng</translation>
 <translation id="2122214041802369259">Giá cao</translation>
 <translation id="2122719317867821810">Chính sách này đang hoạt động như dự kiến nhưng lại ghi đè một giá trị xung đột được đặt trong một nguồn khác.</translation>
+<translation id="2124081665399116863">Cập nhật thông tin xe trong Google Wallet</translation>
 <translation id="2126374524350484896">Trình tạo tệp PDF:</translation>
 <translation id="2127090458081644412">Đã lưu mật khẩu vào thiết bị này</translation>
 <translation id="2127747486437921899">In nghiêng</translation>
@@ -1549,6 +1551,7 @@ Nếu bạn từ chối, chế độ cài đặt quyền riêng tư của bạn 
 <translation id="3422472998109090673">Hiện không thể truy cập <ph name="HOST_NAME" />.</translation>
 <translation id="3422794267539320056">Nhấn vào hình khủng long hoặc nhấn phím cách để chơi</translation>
 <translation id="3423742043356668186">Do hệ thống chỉ định</translation>
+<translation id="3426672782316020729">Cập nhật thông tin hộ chiếu trong Google Wallet</translation>
 <translation id="3427342743765426898">&amp;Làm lại chỉnh sửa</translation>
 <translation id="342781501876943858">Chromium khuyên bạn nên đặt lại mật khẩu của mình nếu đã sử dụng lại mật khẩu này trên các trang web khác.</translation>
 <translation id="3428151540071562330">Một hoặc nhiều URI mẫu máy chủ DnsOverHttpsTemplates là không hợp lệ và sẽ không được dùng.</translation>
@@ -2409,6 +2412,7 @@ Nếu bạn từ chối, chế độ cài đặt quyền riêng tư của bạn 
 <translation id="4766713847338118463">Dập 2 ghim dưới cùng</translation>
 <translation id="4768816584204270288">Khi bạn thanh toán dần, chúng tôi sẽ điền số thẻ ảo dùng một lần. Bạn có thể nhấp để sao chép và dán chi tiết thẻ cho giao dịch mua này.</translation>
 <translation id="4768864802656530630">Nhật ký hệ thống chi tiết. <ph name="BEGIN_LINK" />Tìm hiểu thêm<ph name="END_LINK" /></translation>
+<translation id="4770909831299304090">Cập nhật KTN (Mã số hành khách đã biết) trong Google Wallet</translation>
 <translation id="4771249073710170730">Mô hình và đồ chơi điều khiển từ xa</translation>
 <translation id="4771973620359291008">Xảy ra lỗi chưa biết.</translation>
 <translation id="4774055414220872623">Đồ dùng làm thủ công và mỹ nghệ</translation>
@@ -4224,6 +4228,7 @@ Thông tin chi tiết bổ sung:
 <translation id="7569490014721427265">Gôn</translation>
 <translation id="7569952961197462199">Xóa thẻ tín dụng khỏi Chrome?</translation>
 <translation id="7569983096843329377">Đen</translation>
+<translation id="7570524564113479209">Cập nhật thông tin thẻ căn cước trong Google Wallet</translation>
 <translation id="7570862164055912832">Mã số xác nhận trùng tên</translation>
 <translation id="7571813784389228510">Chế độ AI của Google</translation>
 <translation id="7574998639136359461">Thiết bị dành cho thể thao mùa đông</translation>
@@ -4745,6 +4750,7 @@ Thông tin chi tiết bổ sung:
 <translation id="8389940864052787379">Xe độ và xe có hiệu suất cao</translation>
 <translation id="8390725133630534698">Chính sách của quản trị viên đã chặn thao tác chia sẻ từ <ph name="ORIGIN_NAME" /> với <ph name="VM_NAME" /></translation>
 <translation id="8392783408127179588">Đang tải lại các chính sách</translation>
+<translation id="8393948304336153065">Cập nhật thông tin giấy phép lái xe trong Google Wallet</translation>
 <translation id="8396522675989118466">Đây là mã gồm <ph name="NUMBER_OF_DIGITS" /> chữ số trên <ph name="SIDE_OF_CARD" /></translation>
 <translation id="8398335999901363925">Các phương thức thanh toán có thể điền bằng thao tác chạm đã mở trên toàn màn hình.</translation>
 <translation id="8398446215576328011">Huỷ bỏ chính sách đã áp dụng</translation>
@@ -4907,7 +4913,6 @@ Thông tin chi tiết bổ sung:
 <translation id="8671519637524426245">Giá trị <ph name="SECURE_DNS_SALT" /> không đáp ứng các yêu cầu về kích thước.</translation>
 <translation id="867224526087042813">Chữ ký</translation>
 <translation id="8672535691554698269">Mạng máy tính</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Hiển thị thông tin chi tiết về việc chia sẻ thẻ. Đang chia sẻ 1 thẻ từ {WEBSITE_LIST_STR}}other{Hiển thị thông tin chi tiết về việc chia sẻ thẻ. Đang chia sẻ {NUM_TABS} thẻ từ {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Đang tải các tệp của bạn lên <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">Không trì hoãn</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, câu trả lời, <ph name="ANSWER" /></translation>

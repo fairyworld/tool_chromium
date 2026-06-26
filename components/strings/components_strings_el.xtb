@@ -477,6 +477,7 @@
 <translation id="173080396488393970">Αυτός ο τύπος κάρτας δεν υποστηρίζεται</translation>
 <translation id="1731563515262205847">ML-DSA-65</translation>
 <translation id="1732445923934584865">Εναλλακτικά, κάνε την ερώτηση αυτοπροσώπως</translation>
+<translation id="1732796940245838248">Ενημέρωση αριθμού redress στο Πορτοφόλι Google</translation>
 <translation id="1733064249834771892">γραμματοσειρές</translation>
 <translation id="1733631169686303142">Εξοπλισμός ήχου</translation>
 <translation id="1733762317901693627">Ακόμη και ιστότοποι που είναι ασφαλείς υπό φυσιολογικές συνθήκες μερικές φορές παραβιάζονται από υπευθύνους επίθεσης. Επισκεφτείτε <ph name="BEGIN_LINK" />αυτόν τον μη ασφαλή ιστότοπο<ph name="END_LINK" /> μόνο αν είστε βέβαιοι ότι έχετε κατανοήσει τους κινδύνους.</translation>
@@ -712,6 +713,7 @@
 <translation id="2122165854541876335">Πόροι καταναλωτών</translation>
 <translation id="2122214041802369259">Η τιμή είναι υψηλή</translation>
 <translation id="2122719317867821810">Αυτή η πολιτική λειτουργεί με τον αναμενόμενο τρόπο αλλά μια τιμή σε διένεξη έχει οριστεί αλλού και παρακάμπτεται από αυτή την πολιτική.</translation>
+<translation id="2124081665399116863">Ενημέρωση οχήματος στο Πορτοφόλι Google</translation>
 <translation id="2126374524350484896">Εργαλείο παραγωγής PDF:</translation>
 <translation id="2127090458081644412">Ο κωδικός πρόσβασης αποθηκεύτηκε σε αυτή τη συσκευή</translation>
 <translation id="2127747486437921899">Πλάγια γραφή</translation>
@@ -1549,6 +1551,7 @@
 <translation id="3422472998109090673">Προς το παρόν, δεν είναι δυνατή η πρόσβαση στον κεντρικό υπολογιστή <ph name="HOST_NAME" />.</translation>
 <translation id="3422794267539320056">Πατήστε τον δεινόσαυρο ή το πλήκτρο διαστήματος για να παίξετε</translation>
 <translation id="3423742043356668186">Προσδιορισμός από το σύστημα</translation>
+<translation id="3426672782316020729">Ενημέρωση πληροφοριών διαβατηρίου στο Πορτοφόλι Google</translation>
 <translation id="3427342743765426898">&amp;Επανάληψη επεξεργασίας</translation>
 <translation id="342781501876943858">Το Chromium συνιστά την επαναφορά του κωδικού πρόσβασης, εάν τον έχετε χρησιμοποιήσει και σε άλλους ιστοτόπους.</translation>
 <translation id="3428151540071562330">Ένα ή περισσότερα από τα URI προτύπου διακομιστή DnsOverHttpsTemplates δεν είναι έγκυρα και δεν θα χρησιμοποιηθούν.</translation>
@@ -2410,6 +2413,7 @@
 <translation id="4766713847338118463">Διπλή συρραφή στο κάτω μέρος</translation>
 <translation id="4768816584204270288">Όταν πληρώνετε σε βάθος χρόνου, συμπληρώνεται ένας αριθμός εικονικής κάρτας μίας χρήσης. Μπορείτε να κάνετε κλικ, για να αντιγράψετε και να επικολλήσετε τα στοιχεία της κάρτας για αυτή την αγορά.</translation>
 <translation id="4768864802656530630">Λεπτομερή αρχεία καταγραφής συστήματος. <ph name="BEGIN_LINK" />Μάθετε περισσότερα<ph name="END_LINK" /></translation>
+<translation id="4770909831299304090">Ενημέρωση πληροφοριών KTN στο Πορτοφόλι Google</translation>
 <translation id="4771249073710170730">Τηλεχειρισμός και μοντελισμός</translation>
 <translation id="4771973620359291008">Παρουσιάστηκε άγνωστο σφάλμα.</translation>
 <translation id="4774055414220872623">Αναλώσιμα για είδη τέχνης και κατασκευές</translation>
@@ -4226,6 +4230,7 @@
 <translation id="7569490014721427265">Γκολφ</translation>
 <translation id="7569952961197462199">Κατάργηση πιστωτικής κάρτας από το Chrome;</translation>
 <translation id="7569983096843329377">Μαύρο</translation>
+<translation id="7570524564113479209">Ενημέρωση πληροφοριών ταυτότητας στο Πορτοφόλι Google</translation>
 <translation id="7570862164055912832">Αριθμοί επανεξέτασης</translation>
 <translation id="7571813784389228510">Λειτουργία AI της Google</translation>
 <translation id="7574998639136359461">Εξοπλισμός χειμερινών σπορ</translation>
@@ -4747,6 +4752,7 @@
 <translation id="8389940864052787379">Προσαρμοσμένα οχήματα και οχήματα επιδόσεων</translation>
 <translation id="8390725133630534698">Η κοινοποίηση από το <ph name="ORIGIN_NAME" /> στο <ph name="VM_NAME" /> έχει αποκλειστεί από την πολιτική του διαχειριστή.</translation>
 <translation id="8392783408127179588">Επανάληψη φόρτωσης πολιτικών</translation>
+<translation id="8393948304336153065">Ενημέρωση πληροφοριών διπλώματος οδήγησης στο Πορτοφόλι Google</translation>
 <translation id="8396522675989118466">Αυτός είναι ο <ph name="NUMBER_OF_DIGITS" />-ψήφιος κωδικός στην <ph name="SIDE_OF_CARD" /></translation>
 <translation id="8398335999901363925">Η λίστα των τρόπων πληρωμής που είναι διαθέσιμοι για συμπλήρωση μέσω αφής είναι ανοιχτή σε πλήρες ύψος.</translation>
 <translation id="8398446215576328011">Επαναφορά πολιτικών που ισχύουν</translation>
@@ -4909,7 +4915,6 @@
 <translation id="8671519637524426245">Η τιμή <ph name="SECURE_DNS_SALT" /> δεν πληροί τις απαιτήσεις μεγέθους.</translation>
 <translation id="867224526087042813">Υπογραφή</translation>
 <translation id="8672535691554698269">Δίκτυα υπολογιστών</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Εμφάνιση λεπτομερειών κοινής χρήσης καρτέλας. Κοινή χρήση 1 καρτέλας από {WEBSITE_LIST_STR}}other{Εμφάνιση λεπτομερειών κοινής χρήσης καρτελών. Κοινή χρήση {NUM_TABS} καρτελών από {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Τα αρχεία σας ανεβαίνουν στο <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">Χωρίς καθυστέρηση</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, απάντηση, <ph name="ANSWER" /></translation>

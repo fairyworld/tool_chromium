@@ -31,6 +31,7 @@
 <translation id="126567311906253476"><ph name="USER_EMAIL" /> वापरून Gmail किंवा YouTube सारख्या Google सेवांमध्ये साइन इन करताना, तुम्ही तेच खाते वापरून Chromium मध्ये आपोआप साइन इन करू शकता</translation>
 <translation id="1287534462498555020">तुमच्या फोनवर Chromium मिळवा</translation>
 <translation id="1290883685122687410">सेटअप एरर: <ph name="METAINSTALLER_EXIT_CODE" />. <ph name="WINDOWS_ERROR" /></translation>
+<translation id="1312200348844120300">तुम्ही उत्पादन शोधण्यासाठी इमेज शोध कसे वापरू शकता हे दाखवणारे इलस्ट्रेशन</translation>
 <translation id="1315551408014407711">तुमची नवीन Chromium प्रोफाइल सेट करा</translation>
 <translation id="132092532143527429">Chromium मधील Gemini वापरून पहा</translation>
 <translation id="1324107359134968521">ब्लूटूथ डिव्हाइस एक्सप्लोर करण्यासाठी Chromium ला 
@@ -93,6 +94,7 @@
 <translation id="1951406923938785464">फाइल प्रकार सामान्यतः डाउनलोड केला जात नसल्याने Chromium ने हे डाउनलोड ब्लॉक केले आहे आणि तो धोकादायक असू शकतो</translation>
 <translation id="1953553007165777902">डाउनलोड करत आहे... <ph name="MINUTE" /> मिनिट(मिनिटे) शिल्‍लक आहे(आहेत)</translation>
 <translation id="1966382378801805537">Chromium डीफॉल्ट ब्राउझर निर्धारित किंवा सेट करू शकत नाही</translation>
+<translation id="197326043290947695">इमेज शोध वापरून आणखी स्मार्ट पद्धतीने ब्राउझ करा</translation>
 <translation id="1990262977744080398">Chromium काही फाइल का ब्लॉक करते हे जाणून घ्या, नवीन टॅबमध्ये उघडते</translation>
 <translation id="1999715455684970349">तुमचे Chromium सॉफ्टवेअर अप टू डेट ठेवते. ही सेवा बंद केली गेल्यास किंवा थांबवली गेल्यास, तुमचे Chromium सॉफ्टवेअर अप टू डेट ठेवले जाणार नाही, म्हणजेच उद्भवू शकणाऱ्या धोक्यांचे निराकरण केले जाऊ शकणार नाही आणि वैशिष्ट्ये कदाचित काम करणार नाहीत. कोणतेही Chromium सॉफ्टवेअर ही सेवा वापरत नसल्यास, ती स्वतःला अनइंस्टॉल करते.</translation>
 <translation id="2008474315282236005">हे या डिव्‍हाइसमधून १ आयटम हटवेल. नंतर तुमचा डेटा पुनर्प्राप्त करण्‍यासाठी, Chromium मध्ये <ph name="USER_EMAIL" /> म्हणून साइन इन करा.</translation>
@@ -235,6 +237,7 @@
 <translation id="3387527074123400161">ChromiumOS</translation>
 <translation id="3406848076815591792">सध्याच्या Chromium प्रोफाइलवर स्विच करायचे आहे का?</translation>
 <translation id="3412460710772753638">या डिव्हाइसवरील पासवर्ड मॅनेजर मध्ये</translation>
+<translation id="3423442168617177595">तुम्हाला क्लिष्ट पासवर्ड तयार करण्यात, सेव्ह करण्यात आणि ऑटोफिल करण्यात मदत करण्यासाठी Chromium मध्येच समाविष्ट आहे. सहज अ‍ॅक्सेससाठी शॉर्टकट जोडा</translation>
 <translation id="3455907671758333080">तुमच्या फोनवर Chromium वापरून वर्धित सुरक्षित ब्राउझिंगचा विस्तार करा</translation>
 <translation id="3461644266919055473">Chromium ला तुमचे बनवत आहे...</translation>
 <translation id="3474745554856756813">हे या डिव्‍हाइसमधून <ph name="ITEMS_COUNT" /> आयटम हटवेल. नंतर तुमचा डेटा पुनर्प्राप्त करण्‍यासाठी, Chromium मध्ये <ph name="USER_EMAIL" /> म्हणून साइन इन करा.</translation>
@@ -284,6 +287,7 @@
 <translation id="3975724895399328945">&amp;Google Chrome for Testing विषयी</translation>
 <translation id="3997429360543082038">ChromiumOS बद्दल</translation>
 <translation id="4010059961270896984">तुम्ही साइटला भेट देता, तेव्हा Chromium तुमचा आयपी अ‍ॅड्रेस लपवणाऱ्या गोपनीयता सर्व्हरद्वारे <ph name="BEGIN_LINK" />Google सुरक्षित ब्राउझिंग<ph name="END_LINK" /> ला URL चा क्लिष्ट भाग पाठवते. साइटने काहीतरी संशयास्पद केल्यास, पूर्ण URLs आणि पेज आशयाचे भागदेखील पाठवले जातात.</translation>
+<translation id="4016217212818346953">Password Manager सह सुरक्षित रहा</translation>
 <translation id="4019629340646866719">ChromiumOS हे <ph name="BEGIN_LINK_LINUX_OSS" />Linux डेव्हलपमेंट पद्धत<ph name="END_LINK_LINUX_OSS" /> यासारखे अतिरिक्त <ph name="BEGIN_LINK_CROS_OSS" />मुक्त स्रोत सॉफ्टवेअर<ph name="END_LINK_CROS_OSS" /> याद्वारे तयार करण्यात आले आहे.</translation>
 <translation id="4022972681110646219">स्क्रीनचे भाषांतर करा</translation>
 <translation id="4023601594785368013">मूळ भाषा: <ph name="LANGUAGE" /></translation>
@@ -503,6 +507,7 @@
 <translation id="6400112897226594999">कॉंप्युटर स्क्रीनवरील Chromium लोगो.</translation>
 <translation id="6403826409255603130">Chromium हे एक वेबब्राउझर असून ते वेबपेज आणि अ‍ॅप्स अतिशय वेगात चालवते. हे वापरण्यास जलद, स्थिर आणि सोपे आहे. Chromium मध्ये तयार करण्यासाठी मालवेअर आणि फिशिंग संरक्षणासह वेब अधिक सुरक्षितपणे ब्राउझ करा.</translation>
 <translation id="6414624068245092115">तुम्ही तुमच्या Google खात्यामध्ये Chromium डेटा नेहमी वापरू आणि सेव्ह करू शकाल याची खात्री करण्यासाठी, ही व्यक्ती तुम्हीच आहात याची पडताळणी करा</translation>
+<translation id="6417332166651156371">Chromium मध्ये Password Manager चा एंट्री पॉइंट दाखवणारी सुलभ केलेली इमेज</translation>
 <translation id="642132557830635295">Chromium अधिक जलद रन होते आणि JavaScript वापरणारी वैशिष्ट्ये डिझाइन केल्यानुसार काम करतात</translation>
 <translation id="6436260184216827876">इमेज शोध उपलब्ध नाही. नंतर पुन्हा प्रयत्न करा.</translation>
 <translation id="6442900851116057561">ChromiumOS रीस्टार्ट करा</translation>
@@ -594,6 +599,7 @@
 <translation id="7196312274710523067">Chromium लाँच करता आले नाही. पुन्हा प्रयत्न करा.</translation>
 <translation id="7213008767289637091">Chromium कधीही झटपट मिळवण्यासाठी ते तुमच्या डॉक मध्ये ठेवा</translation>
 <translation id="7213407614656404070">तुम्ही मेसेज, दस्तऐवज आणि इतर अ‍ॅप्समधील लिंकवर क्लिक करता, तेव्हा Chromium कधीही वापरा</translation>
+<translation id="7216228761061470870">तुम्ही डेस्कटॉपवर इमेज शोध वापरता, तेव्हा PDFs सह पेजचे शीर्षक, URL आणि आशय सर्व्हरला पाठवला जातो</translation>
 <translation id="7223968959479464213">टास्क मॅनेजर- Chromium</translation>
 <translation id="7252276985725323153">ब्राउझ करणे तात्काळ सुरू करा: Windows सुरू होते, तेव्हा आता Chromium लाँच होऊ शकते.</translation>
 <translation id="7274695763216404502">पिन केले आहे! टूलबारमधून इमेज शोध पुन्हा वापरा</translation>

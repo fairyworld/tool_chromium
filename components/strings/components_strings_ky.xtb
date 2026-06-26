@@ -4910,7 +4910,6 @@
 <translation id="8671519637524426245"><ph name="SECURE_DNS_SALT" /> мааниси өлчөмгө коюлган талаптарга жооп бербейт.</translation>
 <translation id="867224526087042813">Колтамга</translation>
 <translation id="8672535691554698269">Компьютер тармактары</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Өтмөктү бөлүшүүгө байланыштуу маалыматты көрсөтүү. {WEBSITE_LIST_STR} түзмөгүндөгү 1 өтмөк бөлүшүлүүдө}other{Өтмөктү бөлүшүүгө байланыштуу маалыматты көрсөтүү. {WEBSITE_LIST_STR} түзмөгүндөгү {NUM_TABS} өтмөк бөлүшүлүүдө}}</translation>
 <translation id="8675446170353411473">Файлдарыңыз <ph name="CLOUD_PROVIDER" /> кызматына жүктөлүүдө</translation>
 <translation id="8676424191133491403">Дароо</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, жооп, <ph name="ANSWER" /></translation>

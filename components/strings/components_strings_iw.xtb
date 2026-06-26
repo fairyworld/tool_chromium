@@ -477,6 +477,7 @@
 <translation id="173080396488393970">אין תמיכה בכרטיס מסוג זה</translation>
 <translation id="1731563515262205847">ML-DSA-65</translation>
 <translation id="1732445923934584865">אני רוצה לבקש באופן אישי במקום זאת</translation>
+<translation id="1732796940245838248">‏עדכון מספר ה-Redress ב-Google Wallet</translation>
 <translation id="1733064249834771892">גופנים</translation>
 <translation id="1733631169686303142">ציוד אודיו</translation>
 <translation id="1733762317901693627">גם אתרים שבדרך כלל נחשבים לבטוחים נפרצים לפעמים על ידי תוקפים. אפשר לשקול את הכניסה <ph name="BEGIN_LINK" />לאתר הזה שאינו בטוח<ph name="END_LINK" /> רק אם הסיכונים ברורים לך.</translation>
@@ -712,6 +713,7 @@
 <translation id="2122165854541876335">שירותי צרכנות</translation>
 <translation id="2122214041802369259">המחיר גבוה</translation>
 <translation id="2122719317867821810">המדיניות הזו פועלת כמו שצריך אבל הוגדר ערך מתנגש במקום אחר שמבוטל על ידי המדיניות הזו.</translation>
+<translation id="2124081665399116863">‏עדכון פרטי הרכב ב-Google Wallet</translation>
 <translation id="2126374524350484896">‏האפליקציה שהמירה ל-PDF:</translation>
 <translation id="2127090458081644412">הסיסמה נשמרה במכשיר הזה</translation>
 <translation id="2127747486437921899">נטוי</translation>
@@ -1549,6 +1551,7 @@
 <translation id="3422472998109090673">לא ניתן לגשת כרגע אל <ph name="HOST_NAME" />.</translation>
 <translation id="3422794267539320056">צריך ללחוץ על הדינוזאור או להקיש על מקש הרווח כדי לשחק</translation>
 <translation id="3423742043356668186">צוין על-ידי המערכת</translation>
+<translation id="3426672782316020729">‏עדכון פרטי הדרכון ב-Google Wallet</translation>
 <translation id="3427342743765426898">&amp;ביצוע מחדש של עריכה</translation>
 <translation id="342781501876943858">‏אם הזנת את הסיסמה שלך באתרים אחרים, ההמלצה של Chromium היא לאפס אותה.</translation>
 <translation id="3428151540071562330">‏אחד או יותר ממזהי ה-URI של תבנית השרת DnsOverHttpsTemplates אינם חוקיים ולא ייעשה בהם שימוש.</translation>
@@ -2409,6 +2412,7 @@
 <translation id="4766713847338118463">שתי סיכות הידוק בחלק התחתון</translation>
 <translation id="4768816584204270288">כשמשלמים בתשלומים, מוזן מספר כרטיס וירטואלי חד-פעמי. אפשר ללחוץ כדי להעתיק ולהדביק את פרטי הכרטיס לרכישה הזו.</translation>
 <translation id="4768864802656530630">יומני מערכת מפורטים. <ph name="BEGIN_LINK" />מידע נוסף<ph name="END_LINK" /></translation>
+<translation id="4770909831299304090">‏עדכון פרטי ה-KTN ב-Google Wallet</translation>
 <translation id="4771249073710170730">דגמים בשלט רחוק</translation>
 <translation id="4771973620359291008">‏אירעה שגיאה לא מוכרת.
 
@@ -4229,6 +4233,7 @@ Del</translation>
 <translation id="7569490014721427265">גולף</translation>
 <translation id="7569952961197462199">‏האם להסיר את פרטי כרטיס האשראי מ-Chrome?</translation>
 <translation id="7569983096843329377">שחור</translation>
+<translation id="7570524564113479209">‏עדכון פרטי התעודה המזהה ב-Google Wallet</translation>
 <translation id="7570862164055912832">‏מספרי Redress</translation>
 <translation id="7571813784389228510">‏מצב Google AI</translation>
 <translation id="7574998639136359461">ציוד לספורט חורף</translation>
@@ -4750,6 +4755,7 @@ Del</translation>
 <translation id="8389940864052787379">כלי רכב משופרים ובהתאמה אישית</translation>
 <translation id="8390725133630534698">השיתוף מ-<ph name="ORIGIN_NAME" /> אל <ph name="VM_NAME" /> חסום בהתאם למדיניות של מנהל המערכת</translation>
 <translation id="8392783408127179588">כללי המדיניות נטענים מחדש</translation>
+<translation id="8393948304336153065">‏עדכון פרטי רישיון הנהיגה ב-Google Wallet</translation>
 <translation id="8396522675989118466">זהו הקוד בן <ph name="NUMBER_OF_DIGITS" /> הספרות שמופיע ב<ph name="SIDE_OF_CARD" /></translation>
 <translation id="8398335999901363925">רשימת אמצעי התשלום הזמינים למילוי במגע נפתחה בגובה המלא של המסך.</translation>
 <translation id="8398446215576328011">ביטול כללי המדיניות שהוחלו</translation>
@@ -4911,7 +4917,6 @@ Del</translation>
 <translation id="8671519637524426245">הערך של <ph name="SECURE_DNS_SALT" /> לא עומד בדרישות הגודל.</translation>
 <translation id="867224526087042813">חתימה</translation>
 <translation id="8672535691554698269">רשתות מחשבים</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{הצגת פרטי שיתוף הכרטיסייה. מתבצע שיתוף של כרטיסייה אחת מ-{WEBSITE_LIST_STR}}one{הצגת פרטי שיתוף הכרטיסיות. מתבצע שיתוף של {NUM_TABS} כרטיסיות מ-{WEBSITE_LIST_STR}}two{הצגת פרטי שיתוף הכרטיסיות. מתבצע שיתוף של {NUM_TABS} כרטיסיות מ-{WEBSITE_LIST_STR}}other{הצגת פרטי שיתוף הכרטיסיות. מתבצע שיתוף של {NUM_TABS} כרטיסיות מ-{WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">מתבצעת העלאת קבצים אל <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">ללא עיכוב</translation>
 <translation id="8680536109547170164"><ph name="QUERY" /> , תשובה, <ph name="ANSWER" /></translation>

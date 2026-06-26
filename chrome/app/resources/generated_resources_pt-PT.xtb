@@ -638,7 +638,6 @@ Verifique as suas palavras-passe em qualquer altura no <ph name="GOOGLE_PASSWORD
 <translation id="1472675084647422956">Mostrar mais</translation>
 <translation id="1473223074251193484">Definir configuração da ligação (à Internet) via telemóvel</translation>
 <translation id="1473616112002966036">&amp;Frame do vídeo</translation>
-<translation id="1474785664565228650">A alteração na definição do microfone requer que o Parallels Desktop seja reiniciado. Reinicie o Parallels Desktop para continuar.</translation>
 <translation id="1476088332184200792">Copiar para o dispositivo</translation>
 <translation id="1476607407192946488">&amp;Definições de idioma</translation>
 <translation id="1477654881618305065">A sua organização não lhe permite partilhar este conteúdo. Se precisar de ajuda, contacte o seu administrador.</translation>
@@ -674,7 +673,6 @@ Verifique as suas palavras-passe em qualquer altura no <ph name="GOOGLE_PASSWORD
 <translation id="1501480321619201731">Eliminar grupo</translation>
 <translation id="150411034776756821">Remover <ph name="SITE" /></translation>
 <translation id="1504253885059472207">Fixar vista dividida</translation>
-<translation id="1504551620756424144">As pastas partilhadas estão disponíveis no Windows em <ph name="BASE_DIR" />.</translation>
 <translation id="1505494256539862015">exportar palavras-passe</translation>
 <translation id="1505654899813338756">Pode agrupar separadores para manter as páginas relacionadas juntas e guardadas em todos os seus dispositivos</translation>
 <translation id="1506061864768559482">Motor de pesquisa</translation>
@@ -1207,6 +1205,7 @@ Verifique as suas palavras-passe em qualquer altura no <ph name="GOOGLE_PASSWORD
 <translation id="1897120393475391208">Usar palavra-passe forte</translation>
 <translation id="1897860317037652061">Falha ao analisar</translation>
 <translation id="1898804291554630487">Faça perguntas acerca desta página</translation>
+<translation id="1899172684246105747">Personalize o navegador com opções como temas e o modo escuro.</translation>
 <translation id="1900305421498694955">As aplicações do Google Play podem necessitar de acesso completo ao sistema de ficheiros para ler e gravar ficheiros em dispositivos de armazenamento externos. Os ficheiros e as pastas criados no dispositivo são visíveis para qualquer pessoa que utilize a unidade externa. <ph name="LINK_BEGIN" />Saber mais<ph name="LINK_END" /></translation>
 <translation id="1901213235765457754">Peça ao administrador para atualizar esta app</translation>
 <translation id="1901303067676059328">Seleccion&amp;ar tudo</translation>
@@ -3633,7 +3632,6 @@ Quer pará-lo?</translation>
 <translation id="3697716475445175867">último acesso</translation>
 <translation id="3698471669415859717">Revisão concluída</translation>
 <translation id="3699624789011381381">Endereço de email</translation>
-<translation id="3699755232086000535">Conceda ao Parallels Desktop controlo sobre dispositivos USB.</translation>
 <translation id="3699920817649120894">Desativar a sincronização e a personalização?</translation>
 <translation id="3700888195348409686">A apresentar (<ph name="PAGE_ORIGIN" />)…</translation>
 <translation id="3700993174159313525">Não permitir que os sites monitorizem a posição da sua câmara</translation>
@@ -3890,7 +3888,6 @@ Quer pará-lo?</translation>
 <translation id="3854348409770521214">Pintura a óleo</translation>
 <translation id="3854967233147778866">Proponha a tradução de Websites noutros idiomas</translation>
 <translation id="3854976556788175030">O tabuleiro de saída está cheio</translation>
-<translation id="3855324045699437362">O Gemini no Chrome está a expandir-se para diferentes localizações, mas não está disponível em todos os locais.</translation>
 <translation id="3855441664322950881">Comprimir extensão</translation>
 <translation id="3855676282923585394">Importar marcadores e definições...</translation>
 <translation id="3856023744577163821">Os separadores abertos a partir de um chat ou de um separador partilhado também são partilhados com o Gemini.</translation>
@@ -3910,6 +3907,7 @@ Quer pará-lo?</translation>
 <translation id="3865414814144988605">Resolução</translation>
 <translation id="3866142613641074814">Tem palavras-passe em risco</translation>
 <translation id="3866249974567520381">Descrição</translation>
+<translation id="3866863539038222107">Inspecionar</translation>
 <translation id="3867134342671430205">Arraste ou utilize as teclas de seta para mover um ecrã</translation>
 <translation id="3867831579565057323">Mapeie o ecrã tátil</translation>
 <translation id="3867944738977021751">Campos do certificado</translation>
@@ -4182,7 +4180,6 @@ Quer pará-lo?</translation>
 <translation id="4058720513957747556">AppSocket (TCP/IP)</translation>
 <translation id="4058793769387728514">Rever documento agora</translation>
 <translation id="4060997212318214773">Também pode remover estas extensões deste dispositivo:</translation>
-<translation id="4061374428807229313">Para partilhar, clique com o botão direito do rato numa pasta na app Files e selecione "Partilhar com o Parallels Desktop".</translation>
 <translation id="406213378265872299">Comportamentos personalizados</translation>
 <translation id="4065910654823040256">Fechar vista direita</translation>
 <translation id="4065931125325392744">Esta extensão pode deixar de ser suportada em breve</translation>
@@ -4936,7 +4933,6 @@ Quer pará-lo?</translation>
 <translation id="4650591383426000695">Desligue o telemóvel do dispositivo <ph name="DEVICE_TYPE" /></translation>
 <translation id="4651921906638302153">Não é possível iniciar sessão com esta conta</translation>
 <translation id="4652921642122345344">Velocidade da voz <ph name="RATE" />x</translation>
-<translation id="4652935475563630866">A alteração na definição da câmara requer que o Parallels Desktop seja reiniciado. Reinicie o Parallels Desktop para continuar.</translation>
 <translation id="4654236001025007561">Partilhe ficheiros com dispositivos Android e Chromebooks perto de si.</translation>
 <translation id="4654801841330730814">Todas</translation>
 <translation id="4657724094180965385">Não me interessa</translation>
@@ -8116,7 +8112,6 @@ Tem mais # palavras-passe comprometidas. O Gestor de Palavras-passe da Google re
 <translation id="705352103640172578">Cascata</translation>
 <translation id="7053983685419859001">Bloquear</translation>
 <translation id="7055152154916055070">Redirecionamento bloqueado:</translation>
-<translation id="7055451306017383754">Não foi possível cancelar a partilha porque uma aplicação está a utilizar esta pasta. Será cancelada a partilha da pasta quando o Parallels Desktop for encerrado.</translation>
 <translation id="7056418393177503237">{0,plural, =1{Navegação anónima}other{# janelas de navegação anónima abertas}}</translation>
 <translation id="7056526158851679338">&amp;Inspecionar dispositivos</translation>
 <translation id="7057567173736333354">Descreva a imagem</translation>
@@ -8416,6 +8411,7 @@ Tem mais # palavras-passe comprometidas. O Gestor de Palavras-passe da Google re
 <translation id="7289303553784750393">Se estiver online, mas este problema continuar a ocorrer, pode experimentar outras formas de continuar em <ph name="SITE_ETLD_PLUS_ONE" />.</translation>
 <translation id="7289386924227731009"><ph name="WINDOW_TITLE" /> – Autorização solicitada, prima F6 para responder</translation>
 <translation id="7290005709287747471">Desativar</translation>
+<translation id="7290139233643258082">Aplicar tema</translation>
 <translation id="7292067737327289208">O <ph name="BEGIN_LINK" />navegador é gerido<ph name="END_LINK" /> pela sua organização e o seu <ph name="BEGIN_LINK" />perfil é gerido<ph name="END_LINK" /> pelo domínio <ph name="PROFILE_DOMAIN" /></translation>
 <translation id="7292147651179697920">Pede aos teus pais para permitirem o acesso nas Definições</translation>
 <translation id="7292195267473691167"><ph name="LOCALE" /> (<ph name="VARIANT" />)</translation>

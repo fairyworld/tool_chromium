@@ -638,7 +638,6 @@
 <translation id="1472675084647422956">Показать больше</translation>
 <translation id="1473223074251193484">Настроить режим модема</translation>
 <translation id="1473616112002966036">&amp;Кадр видео</translation>
-<translation id="1474785664565228650">Изменено разрешение на доступ к микрофону. Чтобы продолжить, перезапустите Parallels Desktop.</translation>
 <translation id="1476088332184200792">Копировать на мое устройство</translation>
 <translation id="1476607407192946488">&amp;Язык</translation>
 <translation id="1477654881618305065">В вашей организации запрещено делиться этим контентом. Если вам нужна помощь, обратитесь к администратору.</translation>
@@ -674,7 +673,6 @@
 <translation id="1501480321619201731">Удалить группу</translation>
 <translation id="150411034776756821">Удалить <ph name="SITE" /></translation>
 <translation id="1504253885059472207">Закрепить параллельный просмотр</translation>
-<translation id="1504551620756424144">В Windows общие папки находятся здесь: <ph name="BASE_DIR" />.</translation>
 <translation id="1505494256539862015">экспортировать пароли</translation>
 <translation id="1505654899813338756">Вы можете объединять вкладки в группы, чтобы хранить связанные страницы вместе и синхронизировать их между устройствами.</translation>
 <translation id="1506061864768559482">Поисковая система</translation>
@@ -3632,7 +3630,6 @@
 <translation id="3697716475445175867">по дате использования</translation>
 <translation id="3698471669415859717">Проверка завершена</translation>
 <translation id="3699624789011381381">Адрес электронной почты</translation>
-<translation id="3699755232086000535">Разрешить Parallels Desktop управлять USB-устройствами</translation>
 <translation id="3699920817649120894">Отключить синхронизацию и персонализацию?</translation>
 <translation id="3700888195348409686">Показ на другом экране (<ph name="PAGE_ORIGIN" />)</translation>
 <translation id="3700993174159313525">Запретить сайтам отслеживать положение камеры</translation>
@@ -3889,7 +3886,6 @@
 <translation id="3854348409770521214">Масляная живопись</translation>
 <translation id="3854967233147778866">Предлагать перевести страницы на других языках</translation>
 <translation id="3854976556788175030">Выходной лоток заполнен</translation>
-<translation id="3855324045699437362">Gemini в Chrome становится доступен в новых регионах, но пока не везде.</translation>
 <translation id="3855441664322950881">Упаковать расширение</translation>
 <translation id="3855676282923585394">Импорт закладок и настроек...</translation>
 <translation id="3856023744577163821">Вкладки, которые вы открываете из чата или с вкладки, которой поделились, также доступны Gemini.</translation>
@@ -3909,6 +3905,7 @@
 <translation id="3865414814144988605">Разрешение</translation>
 <translation id="3866142613641074814">Некоторые пароли были раскрыты</translation>
 <translation id="3866249974567520381">Описание</translation>
+<translation id="3866863539038222107">Просмотр ресурсов</translation>
 <translation id="3867134342671430205">Чтобы переместить экран, используйте перетаскивание или клавиши со стрелками.</translation>
 <translation id="3867831579565057323">Разметить сенсорный экран</translation>
 <translation id="3867944738977021751">Поля сертификата</translation>
@@ -4181,7 +4178,6 @@
 <translation id="4058720513957747556">AppSocket (TCP/IP)</translation>
 <translation id="4058793769387728514">Проверить документ</translation>
 <translation id="4060997212318214773">Также вы можете удалить эти расширения с устройства:</translation>
-<translation id="4061374428807229313">Чтобы открыть доступ к папке, нажмите на нее правой кнопкой мыши в приложении "Файлы" и выберите "Предоставить доступ Parallels Desktop".</translation>
 <translation id="406213378265872299">Специальные настройки</translation>
 <translation id="4065910654823040256">Закрыть правую вкладку</translation>
 <translation id="4065931125325392744">Скоро мы можем прекратить поддержку этого расширения</translation>
@@ -4935,7 +4931,6 @@
 <translation id="4650591383426000695">Телефон будет отключен от устройства <ph name="DEVICE_TYPE" /></translation>
 <translation id="4651921906638302153">Не удалось войти в аккаунт</translation>
 <translation id="4652921642122345344">Скорость чтения: <ph name="RATE" />x</translation>
-<translation id="4652935475563630866">Изменено разрешение на доступ к камере. Чтобы продолжить, перезапустите Parallels Desktop.</translation>
 <translation id="4654236001025007561">Делитесь файлами с устройствами Chromebook и Android поблизости.</translation>
 <translation id="4654801841330730814">Все</translation>
 <translation id="4657724094180965385">Не интересует</translation>
@@ -8119,7 +8114,6 @@
 <translation id="705352103640172578">Водопад</translation>
 <translation id="7053983685419859001">Блокировать</translation>
 <translation id="7055152154916055070">Заблокирована попытка переадресации:</translation>
-<translation id="7055451306017383754">Папка используется приложением. Доступ к ней будет закрыт при следующем выключении Parallels Desktop.</translation>
 <translation id="7056418393177503237">{0,plural, =1{Окно в режиме инкогнито}one{# окно в режиме инкогнито}few{# окна в режиме инкогнито}many{# окон в режиме инкогнито}other{# окна в режиме инкогнито}}</translation>
 <translation id="7056526158851679338">&amp;Проверка устройств</translation>
 <translation id="7057567173736333354">Опишите изображение</translation>

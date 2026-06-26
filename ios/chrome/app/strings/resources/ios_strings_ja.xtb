@@ -839,7 +839,6 @@
 <translation id="391904960191284041">商品レビュー</translation>
 <translation id="3921585859122905677">アドレスバーの位置</translation>
 <translation id="3922185497376658606">ウェブページのプリロード</translation>
-<translation id="3922395466317605522">メニューのカスタマイズ</translation>
 <translation id="3926703470020109118">ダウンロード キャンセル</translation>
 <translation id="3929457972718048006">住所</translation>
 <translation id="3931215329146376310">{count,plural, =1{このサイトの新しいパスワード}other{このサイトの新しいパスワード}}</translation>
@@ -1273,6 +1272,7 @@
 <translation id="5336910966955551309">長押ししてお気に入りのサイトを固定できます</translation>
 <translation id="5338512273860059533">ログインを処理しています。</translation>
 <translation id="5343472494710226394">興味や関心に基づくニュース、スポーツ、コンテンツ。</translation>
+<translation id="5351613737248079168">Level Up を使用するにはログインが必要です</translation>
 <translation id="5352128922772839949">ファイルを保存</translation>
 <translation id="5355191726083956201">保護強化機能がオンになっています</translation>
 <translation id="536067926684072644">ブックマークを表示する</translation>
@@ -1695,7 +1695,6 @@
 <translation id="6674917187596384849">アカウントを簡単に切り替えられます</translation>
 <translation id="6676349090816247042">ログイン オプションです。</translation>
 <translation id="667999046851023355">ドキュメント</translation>
-<translation id="6680416467695217368">メニューをカスタマイズ</translation>
 <translation id="6681791404926413601">{count,plural, =1{キーボードの上部に利用可能なお支払い方法の候補が {count} 件表示されています。}other{キーボードの上部に利用可能なお支払い方法の候補が {count} 件表示されています。}}</translation>
 <translation id="6682680306647339111">リマインダーを削除しました</translation>
 <translation id="6684262542644248484">ウェブサイトにログインします</translation>

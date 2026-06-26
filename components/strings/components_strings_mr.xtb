@@ -314,6 +314,7 @@
 <translation id="1463793142714244641">टाइमशेअर आणि सुट्‍ट्यांसाठीच्या मालमत्ता</translation>
 <translation id="1465457928007067810">तुमच्या Google खाते वर IBAN सेव्ह केला गेला</translation>
 <translation id="1467432559032391204">डावे</translation>
+<translation id="1471514598850585811">लॅपटॉप</translation>
 <translation id="1472675084647422956">अधिक दर्शवा</translation>
 <translation id="1473183651233018052">JIS B10</translation>
 <translation id="1473495410389165587">लेखनाशी संबंधित मदत मिळवण्यासाठी ३ किंवा आणखी शब्द एंटर करा</translation>
@@ -4912,7 +4913,6 @@
 <translation id="8671519637524426245"><ph name="SECURE_DNS_SALT" /> मूल्य आकार आवश्यकता पूर्ण करत नाही.</translation>
 <translation id="867224526087042813">स्वाक्षरी</translation>
 <translation id="8672535691554698269">कॉंप्युटर नेटवर्क</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{टॅब शेअरिंगचे तपशील दाखवा. {WEBSITE_LIST_STR} वरून १ टॅब शेअर करत आहे}other{टॅब शेअरिंगचे तपशील दाखवा. {WEBSITE_LIST_STR} वरून {NUM_TABS} टॅब शेअर करत आहे}}</translation>
 <translation id="8675446170353411473">तुमच्या फाइल <ph name="CLOUD_PROVIDER" /> वर अपलोड केल्या जात आहेत</translation>
 <translation id="8676424191133491403">विलंब नाही</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, उत्तर, <ph name="ANSWER" /></translation>

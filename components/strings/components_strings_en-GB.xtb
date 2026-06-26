@@ -4912,7 +4912,6 @@ Additional details:
 <translation id="8671519637524426245">The <ph name="SECURE_DNS_SALT" /> value does not meet the size requirements.</translation>
 <translation id="867224526087042813">Signature</translation>
 <translation id="8672535691554698269">Computer networks</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Show tab sharing details. Sharing 1 tab from {WEBSITE_LIST_STR}}other{Show tab sharing details. Sharing {NUM_TABS} tabs from {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Your files are being uploaded to <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">No delay</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, answer, <ph name="ANSWER" /></translation>

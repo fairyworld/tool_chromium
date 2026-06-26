@@ -314,6 +314,7 @@
 <translation id="1463793142714244641">Имоти за размена и одмор</translation>
 <translation id="1465457928007067810">IBAN е зачуван во вашата сметка на Google</translation>
 <translation id="1467432559032391204">Лево</translation>
+<translation id="1471514598850585811">Лаптоп</translation>
 <translation id="1472675084647422956">Прикажи повеќе</translation>
 <translation id="1473183651233018052">JIS B10</translation>
 <translation id="1473495410389165587">Внесете 3 или повеќе збора за да добиете помош за пишување</translation>
@@ -4911,7 +4912,6 @@
 <translation id="8671519637524426245">Вредноста <ph name="SECURE_DNS_SALT" /> не ги исполнува барањата за големина.</translation>
 <translation id="867224526087042813">Потпис</translation>
 <translation id="8672535691554698269">Компјутерски мрежи</translation>
-<translation id="8673710317985154384">{NUM_TABS,plural, =1{Прикажи ги деталите за споделувањето картички. Се споделува 1 картичка од {WEBSITE_LIST_STR}}one{Прикажи ги деталите за споделувањето картички. Се споделуваат {NUM_TABS} картичка од {WEBSITE_LIST_STR}}other{Прикажи ги деталите за споделувањето картички. Се споделуваат {NUM_TABS} картички од {WEBSITE_LIST_STR}}}</translation>
 <translation id="8675446170353411473">Вашите датотеки се прикачуваат во <ph name="CLOUD_PROVIDER" /></translation>
 <translation id="8676424191133491403">Без одложување</translation>
 <translation id="8680536109547170164"><ph name="QUERY" />, одговор, <ph name="ANSWER" /></translation>

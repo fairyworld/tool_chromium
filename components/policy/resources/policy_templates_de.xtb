@@ -1653,6 +1653,11 @@ Ist die Richtlinie auf 1 gesetzt, lassen sich Tabgruppen nicht teilen.</translat
       Wenn diese Richtlinie auf "False" gesetzt ist, können Nutzer nicht mehr auswählen, ob sie ausgewählte Systeminformationen und Seiteninhalte an die Google-Server senden möchten. Ist die Richtlinie auf "True" gesetzt oder nicht konfiguriert, können Nutzer einige Systeminformationen und Seiteninhalte an Safe Browsing senden, um bei der Erfassung schädlicher Apps und Websites zu helfen.
 
       Weitere Informationen zu Safe Browsing findest du unter https://developers.google.com/safe-browsing.</translation>
+<translation id="2126895531607538755">Wenn diese Richtlinie konfiguriert ist, legt sie den Zeitraum der Inaktivität in Millisekunden fest, nach dem das Gerät die Aktion zum Versetzen in den Ruhemodus während eines <ph name="DEVICE_WEEKLY_SCHEDULED_SUSPEND_POLICY_NAME" />-Intervalls erneut anwendet.
+
+Wenn ein Gerät während des geplanten Ruhemodus manuell aktiviert wird (z. B. durch Tastatureingabe), wartet es so viele Millisekunden, bevor es wieder in den RAM-Ruhemodus wechselt. Jede Nutzeraktivität setzt den Timer für die Reaktivierung zurück, solange sie innerhalb des Sperrintervalls liegt.
+
+Wenn die Richtlinie nicht konfiguriert ist, wird das Gerät nach dem Aufwecken während des Intervalls nicht automatisch wieder in den Ruhemodus versetzt.</translation>
 <translation id="2127599828444728326">Benachrichtigungen auf diesen Websites zulassen</translation>
 <translation id="2131902621292742709">Verzögerung für die Bildschirmabdunkelung im Akkubetrieb</translation>
 <translation id="2131915994539959070">Aktiviert die Fenster-Okklusion in <ph name="PRODUCT_NAME" />.
@@ -3281,6 +3286,7 @@ Wenn diese Richtlinie deaktiviert oder nicht konfiguriert ist, werden keine Sich
 Der Bericht enthält Status- und Nutzungsinformationen zum Profil, darunter die Betriebssystemversion, die Browserversion, die installierten Erweiterungen und alle angewandten Richtlinien.
 
 Diese Richtlinie kann nur als Cloud-Nutzerrichtlinie konfiguriert werden.</translation>
+<translation id="3060733249129331512">Jedes Mal nachfragen, wenn eine Website mehrere Dateien automatisch herunterladen möchte</translation>
 <translation id="3062559845875011810">Funktion nicht zulassen</translation>
 <translation id="3063302084011279315">Screencast deaktivieren</translation>
 <translation id="3063307261083019730">Seiten mit dem Header „<ph name="CACHE_CONTROL_NO_STORE_NAME" />“ dürfen nicht im Back-Forward-Cache gespeichert werden.</translation>
@@ -4683,6 +4689,13 @@ Wenn diese Option aktiviert ist, kann ein Nutzer einen Prozess auslösen, bei de
 Wenn die Richtlinie nicht konfiguriert ist, wird das Verhalten der Funktion durch die Richtlinie „GenAiDefaultSettings“ bestimmt.
 
 Weitere Informationen zur Datenverarbeitung bei auf generativer KI basierenden Funktionen findest du unter https://support.google.com/chrome/a?p=generative_ai_settings.</translation>
+<translation id="4049815236567245576">Mit dieser Richtlinie kannst du eine Liste mit URL-Mustern festlegen und so angeben, welche Websites automatisch mehrere Dateien herunterladen dürfen.
+
+Ausführliche Informationen zu gültigen URL‑Mustern findest du unter https://chromeenterprise.google/policies/url-patterns.
+
+Wenn eine URL mit den Optionen „<ph name="AUTOMATIC_DOWNLOADS_ALLOWED_FOR_URLS_POLICY_NAME" />“ und „<ph name="AUTOMATIC_DOWNLOADS_BLOCKED_FOR_URLS_POLICY_NAME" />“ übereinstimmt, hat „AutomaticDownloadsBlockedForUrls“ Vorrang.
+
+Wenn diese Richtlinie nicht konfiguriert ist, gilt „<ph name="DEFAULT_AUTOMATIC_DOWNLOADS_SETTING_POLICY_NAME" />“ für alle Websites, sofern konfiguriert. Falls nicht, wird die persönliche Einstellung des Nutzers verwendet.</translation>
 <translation id="4051723201852944592">Fenster-Okklusion aktivieren</translation>
 <translation id="4052529125939620019">Komponentenerweiterung „CryptoToken“ beim Start laden</translation>
 <translation id="4053157306171963473">Melden der Aktivitätszeit auf Geräten deaktivieren</translation>
@@ -4777,6 +4790,9 @@ Die Verfügbarkeit von Erweiterungen wird weiterhin über andere Richtlinien fes
 
       Hinweis: Die dynamische Richtlinienaktualisierung wird nur in <ph name="PRODUCT_NAME" />-Version 123 oder höher unterstützt. Wenn du „autofill“ deaktivierst, wird auch „payments“ deaktiviert. „typedUrls“ bezieht sich auf den gesamten Browserverlauf.</translation>
 <translation id="4115501011761259824">„First-Party-Sets“ für alle betroffenen Nutzer aktivieren</translation>
+<translation id="4119598167427266156">Wenn die Richtlinie auf „1“ gesetzt ist, können Websites automatisch mehrere Dateien herunterladen. Wenn die Richtlinie auf „2“ gesetzt ist, wird diese Berechtigung verweigert. Du kannst festlegen, dass nachgefragt wird, wenn eine Website automatisch mehrere Dateien herunterladen möchte.
+
+Wenn die Richtlinie nicht konfiguriert ist, wird die Richtlinie „AskAutomaticDownloads“ angewandt, aber Nutzer können diese Einstellung ändern.</translation>
 <translation id="4120401094617902941">Häufigkeit, mit der Laufzeitzähler analysiert und erhoben werden. Die geringste zulässige Häufigkeit beträgt 1 Tag.
 
 Wenn die Richtlinie nicht konfiguriert ist, beträgt die Häufigkeit standardmäßig 1 Tag.</translation>
@@ -6265,6 +6281,7 @@ Wenn sie auf „<ph name="POLICY_ENUM_RESTOREONSTARTUP_RESTOREONSTARTUPISLASTSES
 Unter <ph name="MS_WIN_NAME" /> steht diese Richtlinie nur bei Instanzen zur Verfügung, die Teil einer <ph name="MS_AD_NAME" />-Domain oder von <ph name="MS_AAD_NAME" /> sind oder die in <ph name="CHROME_ENTERPRISE_CORE_NAME" /> angemeldet sind.
 
 Unter <ph name="MAC_OS_NAME" /> steht diese Richtlinie nur bei Instanzen zur Verfügung, die über die Mobilgeräteverwaltung verwaltet werden, die über MCX Teil einer Domain sind oder die in <ph name="CHROME_ENTERPRISE_CORE_NAME" /> angemeldet sind.</translation>
+<translation id="5036662165765606524">Keiner Website gestatten, automatisch mehrere Dateien herunterzuladen</translation>
 <translation id="5037749623252479780">Die Einstellungen für „Bild-auf“ und „Bild-ab“ sind deaktiviert</translation>
 <translation id="5039110755072335605">Unterstützung für CORS-Anfrageheader ohne Platzhalter</translation>
 <translation id="5039804452771397117">Zulassen</translation>
@@ -6762,6 +6779,7 @@ Verwaltete Konten können keiner Familiengruppe beitreten oder eine erstellen un
 <translation id="5345892164332459671">Floating-SSO deaktivieren und die Webdienst-Authentifizierungen des Nutzers nicht auf ein neues Gerät verschieben</translation>
 <translation id="5345910753471481870">Button „Google Lens“ nicht im Suchfeld auf der Seite „Neuer Tab“ anzeigen.</translation>
 <translation id="5346587320074666194">Den Zugriff auf Sensoren für diese Websites sperren</translation>
+<translation id="534702079563980696">Automatische Downloads auf diesen Websites zulassen</translation>
 <translation id="5347735051291224683">Mit dieser Richtlinie wird festgelegt, ob im Hintergrund ausgeführte Webinhalte mit Vordergrundpriorität ausgeführt werden müssen.
 
 Standardmäßig optimiert der Browser Ressourcen, indem er Inhalte von im Hintergrund ausgeführten Tabs weniger priorisiert. Wenn du diese Richtlinie aktivierst, wird dieses Verhalten überschrieben und Tabs im Hintergrund werden genauso geplant wie der aktive Tab.
@@ -7189,6 +7207,7 @@ Wenn die Richtlinie nicht konfiguriert oder auf eine leere Liste festgelegt ist,
 <translation id="5599461642204007579"><ph name="MS_AD_NAME" />-Verwaltungseinstellungen</translation>
 <translation id="5601503069213153581">PIN</translation>
 <translation id="5605676983184673391">Chrome-Apps dürfen in Kiosksitzungen ausgeführt werden.</translation>
+<translation id="5606477661985737162">Einstellungen für automatische Downloads</translation>
 <translation id="5607021831414604820">Melden des Speicherstatus auf Geräten aktivieren</translation>
 <translation id="5607808178576647930">KI‑Modus-Integrationen zulassen.</translation>
 <translation id="5608114828230655271">Standardverhalten des Geräts</translation>
@@ -7285,6 +7304,7 @@ Diese Richtlinie ist eine vorübergehende Behelfslösung. Sie wird ab Version M
 <translation id="5660950553460381588">Wenn möglich, Passkeys standardmäßig im iCloud-Schlüsselbund erstellen.</translation>
 <translation id="566569751231933416">Standardverhalten verwenden.</translation>
 <translation id="5666457529647159548">Nutzern erlauben, installierte Clientzertifikate zu verwalten.</translation>
+<translation id="566962283082154427">Verzögerung für erneutes Versetzen in den Ruhemodus bei wöchentlich geplanten Ruhemodus-Intervallen (in Millisekunden)</translation>
 <translation id="5670249935663090320">Wenn die Richtlinie aktiviert oder nicht konfiguriert ist, wird <ph name="PRODUCT_NAME" /> aktiviert und kann von Nutzern über das App-Menü, Kontextmenüs von Seiten, Mediensteuerelemente auf für Google Cast optimierten Websites und das Symbol von Cast in der Symbolleiste (falls angezeigt) gestartet werden.
 
 Ist die Richtlinie deaktiviert, wird <ph name="PRODUCT_NAME" /> deaktiviert.</translation>
@@ -7733,6 +7753,13 @@ Diese Richtlinie wird ab <ph name="PRODUCT_NAME" /> 147 nicht mehr unterstützt
 <translation id="5965344524743236327">Die ID oder Nummer des <ph name="GOOGLE_CLOUD_PRODUCT_NAME" />-Projekts, das der zu aktivierenden <ph name="GEMINI_ENTERPRISE_PRODUCT_NAME" />-Instanz entspricht. Weitere Informationen zu Projekt-IDs findest du unter https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects.</translation>
 <translation id="5966615072639944554">Erweiterungen, die die Remote Attestation API zur Bestätigung der Nutzeridentität verwenden dürfen</translation>
 <translation id="596732417280023843">Name des Zertifikatsprofils.</translation>
+<translation id="5972475504452039694">Mit dieser Richtlinie kannst du eine Liste mit URL-Mustern festlegen und so angeben, welche Websites nicht automatisch mehrere Dateien herunterladen dürfen.
+
+Ausführliche Informationen zu gültigen URL‑Mustern findest du unter https://chromeenterprise.google/policies/url-patterns.
+
+Wenn eine URL mit den Optionen „<ph name="AUTOMATIC_DOWNLOADS_ALLOWED_FOR_URLS_POLICY_NAME" />“ und „<ph name="AUTOMATIC_DOWNLOADS_BLOCKED_FOR_URLS_POLICY_NAME" />“ übereinstimmt, hat „AutomaticDownloadsBlockedForUrls“ Vorrang.
+
+Wenn diese Richtlinie nicht konfiguriert ist, gilt „<ph name="DEFAULT_AUTOMATIC_DOWNLOADS_SETTING_POLICY_NAME" />“ für alle Websites, sofern konfiguriert. Falls nicht, wird die persönliche Einstellung des Nutzers verwendet.</translation>
 <translation id="5972538402066550344">Steuerelemente für detailliertes Reporting zulassen</translation>
 <translation id="5973437409890460481">Verbindungen zu diesem Computer per Remote-Zugriff von Unternehmen erlauben</translation>
 <translation id="5975765799383881158">Wenn die Richtlinie aktiviert oder nicht konfiguriert ist, können Nutzer über das Menü &gt; „Hilfe“ &gt; „Problem melden“ oder die entsprechende Tastenkombination Feedback an Google senden.
@@ -7986,6 +8013,7 @@ Das Zeitlimit bei Inaktivität bis zum Start des Bildschirmschoners und das Inte
 <translation id="6181783961196084973">Wert des Buttons zum Umschalten der App-Aktivitätserfassung. Wenn diese Option auf „true“ gesetzt ist, werden die App-Aktivitäten von Nutzern an den Server gesendet, damit sie in der <ph name="PRODUCT_NAME" />-App des Kindes und des Elternteils angezeigt werden können. Ist sie auf „false“ gesetzt, funktionieren App-spezifische Zeitlimits zwar weiterhin, es werden jedoch keine Daten an den Server gesendet, sodass sie nicht in <ph name="PRODUCT_NAME" /> angezeigt werden können.</translation>
 <translation id="6182206125906000651">HTTPS-Upgrades deaktivieren.</translation>
 <translation id="6182563940865917569">Automatische Wiedergabe von Medien in Chrome zulassen</translation>
+<translation id="618588573990666077">Standardeinstellung für automatische Downloads</translation>
 <translation id="618635925649844912">Mit dieser Richtlinie wird festgelegt, ob dem Nutzer beim ersten Anmeldungsvorgang der Einführungsbildschirm für KI-Funktionen während der Sitzung angezeigt wird.
 
       Wenn die Richtlinie deaktiviert ist, wird der Einführungsbildschirm für künstliche Intelligenz nicht angezeigt.
@@ -8159,6 +8187,7 @@ Wenn diese Richtlinie aktiviert oder nicht konfiguriert ist, folgt der Browser a
 Wenn diese Richtlinie deaktiviert ist, wird die Änderung rückgängig gemacht und Dokumente ohne den Header „Origin-Agent-Cluster“ werden Agent-Clustern zugewiesen, die an Websites gebunden sind. Die Zugriffsfunktion „document.domain“ lässt sich dann standardmäßig konfigurieren. Dies entspricht dem Verhalten älterer Versionen.
 
 Weitere Informationen findest du unter https://developer.chrome.com/blog/immutable-document-domain/.</translation>
+<translation id="626942726350419209">Websites gestatten, automatisch mehrere Dateien herunterzuladen</translation>
 <translation id="6270615143812355589">Audioeingabe aktivieren</translation>
 <translation id="6270791075656665237">QUIC-Protokoll nicht zulassen</translation>
 <translation id="6273015149273504999">Hierdurch wird eine Liste von Apps und Erweiterungen festgelegt, die automatisch auf dem Anmeldebildschirm installiert werden, also ohne Interaktion des Nutzers, und die vom Nutzer weder deinstalliert noch deaktiviert werden können.
@@ -10331,6 +10360,7 @@ Wenn die Richtlinie leer bleibt, sind keine Ausnahmen zu „<ph name="FLOATING_S
 <translation id="759957074386651883">Safe Browsing-Einstellungen</translation>
 <translation id="7602621823177962064">Melden der Informationen zum Arbeitsspeicher auf Geräten deaktivieren</translation>
 <translation id="7604169113182304895">Diese Liste kann auf freiwilliger Basis für Android-Apps übernommen werden. Es ist nicht möglich, die Verwendung zu erzwingen.</translation>
+<translation id="7607831126797434329">Automatische Downloads auf diesen Websites blockieren</translation>
 <translation id="7608186022704392724">Durch die Funktion der automatischen PIN-Eingabe ändert sich die Eingabe von PINs unter <ph name="PRODUCT_OS_NAME" />.
           Statt das Textfeld anzuzeigen, das auch für die Eingabe des Passworts verwendet wird, zeigt diese Funktion eine spezielle UI, an der Nutzer erkennen, wie viele Ziffern für die PIN benötigt werden. In der Folge wird die Länge der jeweiligen PIN außerhalb der verschlüsselten Nutzerdaten gespeichert. Es werden nur PINs mit mindestens 6 und höchstens 12 Ziffern unterstützt.
 
