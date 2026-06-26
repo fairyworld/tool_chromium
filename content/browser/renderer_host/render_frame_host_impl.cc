@@ -7528,7 +7528,9 @@ float RenderFrameHostImpl::GetPageScaleFactor() const {
 }
 
 void RenderFrameHostImpl::ScaleFactorChanged(float scale) {
-  CHECK(!GetParent());
+  // TODO(526685428): CHECK-exclusion: Convert to a CHECK once we are confident
+  // it won't be triggered.
+  DCHECK(!GetParent());
   page_scale_factor_ = scale;
   delegate_->OnPageScaleFactorChanged(GetPage());
 }
