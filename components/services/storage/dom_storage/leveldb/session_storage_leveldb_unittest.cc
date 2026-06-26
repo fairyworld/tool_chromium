@@ -99,6 +99,23 @@ void CloneMapAndVerifyResults(
            source_entries),
       session_storage_leveldb.ReadMapKeyValues(source_map_locator.Clone()));
   EXPECT_EQ(source_entries, expected_entries);
+
+  // Verify `SessionStorageLevelDB::CloneMap()` updated the metadata for
+  // `target_map_locator`.
+  ASSERT_OK_AND_ASSIGN(DomStorageDatabase::Metadata metadata,
+                       session_storage_leveldb.ReadAllMetadata());
+
+  // Find `target_map_locator` in `metadata`.
+  std::optional<DomStorageDatabase::MapLocator> actual_target_map_locator;
+  for (const DomStorageDatabase::MapMetadata& map_metadata :
+       metadata.map_metadata) {
+    if (map_metadata.map_locator.map_id() == target_map_locator.map_id()) {
+      actual_target_map_locator = map_metadata.map_locator.Clone();
+      break;
+    }
+  }
+  ASSERT_TRUE(actual_target_map_locator.has_value());
+  ExpectEqualsMapLocator(*actual_target_map_locator, target_map_locator);
 }
 
 }  // namespace
@@ -1342,14 +1359,28 @@ TEST_F(SessionStorageLevelDBTest, UpdateMaps) {
   std::unique_ptr<SessionStorageLevelDB> session_storage_leveldb;
   ASSERT_NO_FATAL_FAILURE(OpenInMemory(&session_storage_leveldb));
 
-  DomStorageDatabase::MapLocator map1_locator{kFakeSessionId,
-                                              kFakeUrlStorageKey, kFakeMapId};
+  const DomStorageDatabase::MapMetadata kExpectedMapMetadata[] = {
+      {
+          .map_locator{kFakeSessionId, kFakeUrlStorageKey, kFakeMapId},
+      },
+      {
+          .map_locator{kFakeSessionId, kOtherFakeUrlStorageKey,
+                       kOtherFakeMapId},
+      },
+  };
 
-  DomStorageDatabase::MapLocator map2_locator{
-      kFakeSessionId, kFakeUrlStorageKey, kOtherFakeMapId};
+  ASSERT_NO_FATAL_FAILURE(TestUpdateMaps(*session_storage_leveldb,
+                                         kExpectedMapMetadata[0].map_locator,
+                                         kExpectedMapMetadata[1].map_locator));
 
-  ASSERT_NO_FATAL_FAILURE(
-      TestUpdateMaps(*session_storage_leveldb, map1_locator, map2_locator));
+  // `SessionStorageLevelDB::UpdateMaps()` must write metadata for each map
+  // updated.
+  ASSERT_OK_AND_ASSIGN(DomStorageDatabase::Metadata metadata,
+                       session_storage_leveldb->ReadAllMetadata());
+  ExpectEqualsMapMetadataSpan(metadata.map_metadata, kExpectedMapMetadata);
+
+  // `SessionStorageLevelDB::UpdateMaps()` must not update the `next_map_id`.
+  EXPECT_EQ(metadata.next_map_id, 0);
 }
 
 }  // namespace storage

@@ -146,6 +146,28 @@ DomStorageDatabase::Key GetMapPrefix(int64_t map_id) {
   return map_prefix;
 }
 
+namespace {
+
+//  Write metadata for each session's map usage.  Adds an entry to write in
+//  `batch` for each session in `map_locator`.  Each entry uses the format:
+//
+//  { "namespace-<session_id>-<storage_key>", "<map_id>" }.
+//
+// Multiple cloned sessions use the same map, but create separate metadata
+// entries in the database.
+void PutMapLocator(DomStorageBatchOperationLevelDB& batch,
+                   const DomStorageDatabase::MapLocator& map_locator) {
+  std::string map_id_value = base::NumberToString(map_locator.map_id().value());
+
+  for (const std::string& session_id : map_locator.session_ids()) {
+    DomStorageDatabase::Key key =
+        CreateMapMetadataKey(session_id, map_locator.storage_key());
+    batch.Put(std::move(key), base::as_byte_span(map_id_value));
+  }
+}
+
+}  // namespace
+
 SessionStorageLevelDB::SessionStorageLevelDB(PassKey, bool write_exp_tag)
     : write_exp_tag_(write_exp_tag) {}
 
@@ -182,7 +204,11 @@ DbStatus SessionStorageLevelDB::UpdateMaps(
     // Session storage must not record map usage metadata.
     CHECK(!map_update.map_usage.has_value());
 
+    // crbug.com/513822044: Always update the map's metadata to prevent orphaned
+    // key/value pairs if `PutMetadata()` failed.
     const MapLocator& map_locator = map_update.map_locator;
+    PutMapLocator(*leveldb_batch, map_locator);
+
     DomStorageDatabase::Key map_prefix =
         GetMapPrefix(map_locator.map_id().value());
 
@@ -196,6 +222,10 @@ DbStatus SessionStorageLevelDB::CloneMap(MapLocator source_map,
                                          MapLocator target_map) {
   std::unique_ptr<DomStorageBatchOperationLevelDB> batch =
       leveldb_->CreateBatchOperation();
+
+  // crbug.com/513822044: Always update the map's metadata to prevent orphaned
+  // key/value pairs if `PutMetadata()` failed.
+  PutMapLocator(*batch, target_map);
 
   // Copy the key/value pairs from `source_map` to `target_map`.
   DB_RETURN_IF_ERROR(
@@ -224,17 +254,7 @@ DbStatus SessionStorageLevelDB::PutMetadata(Metadata metadata) {
 
   // Write the metadata for each map in `metadata.map_metadata`
   for (const MapMetadata& map_metadata : metadata.map_metadata) {
-    const MapLocator& map_locator = map_metadata.map_locator;
-
-    std::string map_id_value =
-        base::NumberToString(map_locator.map_id().value());
-
-    // Write metadata for each session's map usage.  Multiple cloned sessions
-    // use the same map, but create separate metadata entries in the database.
-    for (const std::string& session_id : map_locator.session_ids()) {
-      Key key = CreateMapMetadataKey(session_id, map_locator.storage_key());
-      batch->Put(std::move(key), base::as_byte_span(map_id_value));
-    }
+    PutMapLocator(*batch, map_metadata.map_locator);
   }
   return batch->Commit();
 }
