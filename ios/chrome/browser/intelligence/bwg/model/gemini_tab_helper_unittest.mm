@@ -60,6 +60,10 @@
 #import "third_party/ocmock/gtest_support.h"
 #import "url/gurl.h"
 
+namespace ios::provider {
+void SetMockProtectedUrl(bool is_protected);
+}
+
 class GeminiTabHelperTest : public PlatformTest {
  protected:
   GeminiTabHelperTest()
@@ -112,6 +116,11 @@ class GeminiTabHelperTest : public PlatformTest {
         mock_location_bar_badge_handler_);
     mock_help_handler_ = OCMProtocolMock(@protocol(HelpCommands));
     tab_helper_->SetHelpCommandsHandler(mock_help_handler_);
+  }
+
+  void TearDown() override {
+    ios::provider::SetMockProtectedUrl(false);
+    PlatformTest::TearDown();
   }
 
   // Environment objects are declared first, so they are destroyed last.
@@ -792,6 +801,25 @@ TEST_F(GeminiTabHelperTest,
   GeminiTabHelper::CreateForWebState(web_state_.get());
   tab_helper_ = GeminiTabHelper::FromWebState(web_state_.get());
   EXPECT_FALSE(tab_helper_->IsGeminiAvailableForWebState());
+}
+
+// Tests that Gemini availability handles protected URLs.
+TEST_F(GeminiTabHelperTest, IsContextualEntryPointAllowed_ProtectedURL) {
+  web_state_->SetBrowserState(profile_.get());
+  web_state_->SetCurrentURL(GURL("https://example.com"));
+  web_state_->SetContentsMimeType("text/html");
+  GeminiTabHelper::CreateForWebState(web_state_.get());
+  tab_helper_ = GeminiTabHelper::FromWebState(web_state_.get());
+
+  // Contextual entry points are allowed on an unprotected URL.
+  ios::provider::SetMockProtectedUrl(false);
+  EXPECT_TRUE(tab_helper_->IsGeminiAvailableForWebState());
+  EXPECT_TRUE(tab_helper_->IsContextualEntryPointAllowed());
+
+  // Contextual entry points are blocked on a protected URL.
+  ios::provider::SetMockProtectedUrl(true);
+  EXPECT_TRUE(tab_helper_->IsGeminiAvailableForWebState());
+  EXPECT_FALSE(tab_helper_->IsContextualEntryPointAllowed());
 }
 
 // Tests that Gemini is not available for a web state when the URL is an AIM
