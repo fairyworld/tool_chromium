@@ -13257,6 +13257,12 @@ const FeatureEntry kFeatureEntries[] = {
          chromeos::features::kVidsAppExistingConsumerPreinstall)},
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
+#if BUILDFLAG(IS_ANDROID)
+    {"long-screenshots-no-memory-check",
+     flag_descriptions::kLongScreenshotsNoMemoryCheckName,
+     flag_descriptions::kLongScreenshotsNoMemoryCheckDescription, kOsAndroid,
+     FEATURE_VALUE_TYPE(chrome::android::kLongScreenshotsNoMemoryCheck)},
+#endif
     // Add new entries above this line.
     // NOTE: Adding a new flag requires adding a corresponding entry to enum
     // "LoginCustomFlags" in tools/metrics/histograms/enums.xml. See "Flag

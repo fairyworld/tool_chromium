@@ -12687,6 +12687,7 @@ from previous Chrome versions.
       label="OmniboxMostVisitedTilesFadingOnTablet:disabled"/>
   <int value="-574965003" label="LauncherLacrosIntegration:disabled"/>
   <int value="-574564494" label="AndroidHubSearchTabGroups:disabled"/>
+  <int value="-574447752" label="LongScreenshotsNoMemoryCheck:enabled"/>
   <int value="-574354898" label="PostQuantumCECPQ2:enabled"/>
   <int value="-574217217" label="kSignInProfileCreationEnterprise:enabled"/>
   <int value="-574177355"
@@ -14535,6 +14536,7 @@ from previous Chrome versions.
   <int value="20238651" label="DeprecatedExternalPickerFunction:enabled"/>
   <int value="20946908" label="CanvasOopRasterization:disabled"/>
   <int value="21055794" label="OpenXR:enabled"/>
+  <int value="21376808" label="LongScreenshotsNoMemoryCheck:disabled"/>
   <int value="21641175" label="OptimizeEarlyNavigation:disabled"/>
   <int value="22043520" label="GlicContextualCueBubble:disabled"/>
   <int value="22142588" label="OptimizationGuidePushNotifications:disabled"/>
