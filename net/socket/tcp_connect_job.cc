@@ -516,6 +516,9 @@ int TcpConnectJob::AdvanceConnectionState(ConnectionState& state,
       state.primary_connector &&
       state.primary_connector->current_address().has_value()) {
     base::TimeDelta fallback_time = kIPv6FallbackTime;
+    if (base::FeatureList::IsEnabled(features::kAdjustIPv6FallbackTime)) {
+      fallback_time = features::kIPv6FallbackTime.Get();
+    }
 
     // If the connector was promoted from stale_state_, it may have already
     // been running for some time. We reduce the fallback timer by the time

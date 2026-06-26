@@ -12,6 +12,7 @@
 #include "net/base/cronet_buildflags.h"
 #include "net/disk_cache/buildflags.h"
 #include "net/net_buildflags.h"
+#include "net/socket/tcp_connect_job.h"
 #include "net/third_party/quiche/src/quiche/quic/core/quic_constants.h"
 
 #if BUILDFLAG(IS_APPLE)
@@ -96,6 +97,14 @@ BASE_FEATURE(kUseHostResolverCache, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kHappyEyeballsV2, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kHappyEyeballsV3, base::FEATURE_DISABLED_BY_DEFAULT);
+
+BASE_FEATURE(kAdjustIPv6FallbackTime, base::FEATURE_DISABLED_BY_DEFAULT);
+
+BASE_FEATURE_PARAM(base::TimeDelta,
+                   kIPv6FallbackTime,
+                   &kAdjustIPv6FallbackTime,
+                   "fallback_time",
+                   TcpConnectJob::kIPv6FallbackTime);
 
 BASE_FEATURE(kHttpCacheZstdDecompression, base::FEATURE_DISABLED_BY_DEFAULT);
 
