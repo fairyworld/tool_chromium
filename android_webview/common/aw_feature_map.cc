@@ -39,6 +39,7 @@ const base::Feature* const kFeaturesExposedToJava[] = {
     &base::features::kShutdownPreNativeThreadPoolAfterStartup,
     &features::kStartupNonBlockingWebViewConstructor,
     &features::kWebViewAddQuicHints,
+    &features::kWebViewAwClassPreloader,
     &features::kWebViewBackForwardCache,
     &features::kWebViewBackgroundClassPreloading,
     &features::kWebViewBackgroundTracingInit,

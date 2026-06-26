@@ -16,6 +16,7 @@ namespace android_webview::features {
 
 // Alphabetical:
 BASE_DECLARE_FEATURE(kWebViewAddQuicHints);
+BASE_DECLARE_FEATURE(kWebViewAwClassPreloader);
 BASE_DECLARE_FEATURE(kWebViewBackForwardCache);
 BASE_DECLARE_FEATURE(kWebViewBackgroundClassPreloading);
 BASE_DECLARE_FEATURE(kWebViewBackgroundTracingInit);

@@ -15,6 +15,10 @@ namespace android_webview::features {
 // Kill switch for Profile.addQuicHints.
 BASE_FEATURE(kWebViewAddQuicHints, base::FEATURE_ENABLED_BY_DEFAULT);
 
+// Preloads expensive classes that will be used by WebView on a background
+// thread.
+BASE_FEATURE(kWebViewAwClassPreloader, base::FEATURE_ENABLED_BY_DEFAULT);
+
 // Enable back/forward cache support in WebView. Note that this will only take
 // effect iff both this feature flag and the content/public kBackForwardCache
 // flag is enabled.
