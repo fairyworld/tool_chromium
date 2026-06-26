@@ -56,6 +56,7 @@ class BookmarksServiceImpl : public BookmarksService,
 
  private:
   mojom::BookmarkNodePtr ConvertNode(const bookmarks::BookmarkNode* node);
+  mojom::RootNodePtr ConvertRootNode(const bookmarks::BookmarkNode* node);
 
   // BookmarkEventTranslator::Subscriber:
   void OnBookmarkEvents(

@@ -64,7 +64,7 @@ void BookmarksServiceImpl::Accept(
 mojom::BookmarksService::GetBookmarksResult
 BookmarksServiceImpl::GetBookmarks() {
   auto snapshot = mojom::BookmarksSnapshot::New();
-  snapshot->root = ConvertNode(bookmark_model_->root_node());
+  snapshot->root = ConvertRootNode(bookmark_model_->root_node());
 
   mojo::AssociatedRemote<mojom::BookmarksObserver> stream;
   auto pending_receiver = stream.BindNewEndpointAndPassReceiver();
@@ -86,6 +86,12 @@ mojom::BookmarkNodePtr BookmarksServiceImpl::ConvertNode(
     const bookmarks::BookmarkNode* node) {
   return BookmarkEventTranslator::ConvertNode(bookmark_model_,
                                               managed_bookmark_service_, node);
+}
+
+mojom::RootNodePtr BookmarksServiceImpl::ConvertRootNode(
+    const bookmarks::BookmarkNode* node) {
+  return BookmarkEventTranslator::ConvertRootNode(
+      bookmark_model_, managed_bookmark_service_, node);
 }
 
 mojom::BookmarksService::CreateBookmarkNodeResult

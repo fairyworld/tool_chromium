@@ -30,6 +30,47 @@ BookmarkEventTranslator::~BookmarkEventTranslator() {
 }
 
 // static
+mojom::RootNodePtr BookmarkEventTranslator::ConvertRootNode(
+    bookmarks::BookmarkModel* model,
+    bookmarks::ManagedBookmarkService* managed,
+    const bookmarks::BookmarkNode* node) {
+  auto root_node = mojom::RootNode::New();
+  root_node->id = node->uuid();
+  for (const auto& child : node->children()) {
+    root_node->children.push_back(
+        ConvertFolderNode(model, managed, child.get()));
+  }
+  return root_node;
+}
+
+// static
+mojom::FolderPtr BookmarkEventTranslator::ConvertFolderNode(
+    bookmarks::BookmarkModel* model,
+    bookmarks::ManagedBookmarkService* managed,
+    const bookmarks::BookmarkNode* node) {
+  auto folder_node = mojom::Folder::New();
+  folder_node->id = node->uuid();
+  folder_node->title = base::UTF16ToUTF8(node->GetTitle());
+  for (const auto& child : node->children()) {
+    folder_node->children.push_back(ConvertNode(model, managed, child.get()));
+  }
+  folder_node->is_synced = model && !model->IsLocalOnlyNode(*node);
+
+  if (node->type() == bookmarks::BookmarkNode::Type::BOOKMARK_BAR) {
+    folder_node->permanent_folder_type =
+        mojom::PermanentFolderType::kBookmarkBar;
+  } else if (node->type() == bookmarks::BookmarkNode::Type::OTHER_NODE) {
+    folder_node->permanent_folder_type = mojom::PermanentFolderType::kOther;
+  } else if (node->type() == bookmarks::BookmarkNode::Type::MOBILE) {
+    folder_node->permanent_folder_type = mojom::PermanentFolderType::kMobile;
+  } else if (managed && node == managed->managed_node()) {
+    folder_node->permanent_folder_type = mojom::PermanentFolderType::kManaged;
+  }
+
+  return folder_node;
+}
+
+// static
 mojom::BookmarkNodePtr BookmarkEventTranslator::ConvertNode(
     bookmarks::BookmarkModel* model,
     bookmarks::ManagedBookmarkService* managed,
@@ -50,29 +91,8 @@ mojom::BookmarkNodePtr BookmarkEventTranslator::ConvertNode(
     case bookmarks::BookmarkNode::BOOKMARK_BAR:
     case bookmarks::BookmarkNode::OTHER_NODE:
     case bookmarks::BookmarkNode::MOBILE: {
-      auto folder_node = mojom::Folder::New();
-      folder_node->id = node->uuid();
-      folder_node->title = base::UTF16ToUTF8(node->GetTitle());
-      for (const auto& child : node->children()) {
-        folder_node->children.push_back(
-            ConvertNode(model, managed, child.get()));
-      }
-      folder_node->is_synced = model && !model->IsLocalOnlyNode(*node);
-
-      if (node->type() == bookmarks::BookmarkNode::Type::BOOKMARK_BAR) {
-        folder_node->permanent_folder_type =
-            mojom::PermanentFolderType::kBookmarkBar;
-      } else if (node->type() == bookmarks::BookmarkNode::Type::OTHER_NODE) {
-        folder_node->permanent_folder_type = mojom::PermanentFolderType::kOther;
-      } else if (node->type() == bookmarks::BookmarkNode::Type::MOBILE) {
-        folder_node->permanent_folder_type =
-            mojom::PermanentFolderType::kMobile;
-      } else if (managed && node == managed->managed_node()) {
-        folder_node->permanent_folder_type =
-            mojom::PermanentFolderType::kManaged;
-      }
-
-      return mojom::BookmarkNode::NewFolder(std::move(folder_node));
+      return mojom::BookmarkNode::NewFolder(
+          ConvertFolderNode(model, managed, node));
     }
   }
 }

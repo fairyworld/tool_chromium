@@ -45,6 +45,16 @@ class BookmarkEventTranslator : public bookmarks::BookmarkModelObserver {
       bookmarks::ManagedBookmarkService* managed,
       const bookmarks::BookmarkNode* node);
 
+  static mojom::RootNodePtr ConvertRootNode(
+      bookmarks::BookmarkModel* model,
+      bookmarks::ManagedBookmarkService* managed,
+      const bookmarks::BookmarkNode* node);
+
+  static mojom::FolderPtr ConvertFolderNode(
+      bookmarks::BookmarkModel* model,
+      bookmarks::ManagedBookmarkService* managed,
+      const bookmarks::BookmarkNode* node);
+
   // bookmarks::BookmarkModelObserver:
   void BookmarkModelLoaded(bool ids_reassigned) override {}
   void BookmarkNodeMoved(const bookmarks::BookmarkNode* old_parent,

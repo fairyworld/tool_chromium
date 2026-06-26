@@ -4,6 +4,7 @@
 
 module bookmarks_api.mojom;
 
+
 import "mojo/public/mojom/base/empty.mojom";
 import "mojo/public/mojom/base/error.mojom";
 import "mojo/public/mojom/base/uuid.mojom";
@@ -17,6 +18,12 @@ enum PermanentFolderType {
   kOther,
   kMobile,
   kManaged,
+};
+
+// Represents the root node of the bookmarks hierarchy.
+struct RootNode {
+  mojo_base.mojom.Uuid id;
+  array<Folder> children;
 };
 
 // Represents a node in the bookmarks hierarchy.
@@ -50,7 +57,7 @@ struct Folder {
 };
 
 struct BookmarksSnapshot {
-  BookmarkNode root;
+  RootNode root;
   // Updates to bookmarks would be sent through this update stream. Clients may
   // subscribe to this stream to receive update events.
   // The interface is associated with the interface used to retrieve this
