@@ -64,6 +64,10 @@ public final class EventConstants {
     /** A generic event that any startup promo should notify when it is shown. */
     public static final String ANDROID_STARTUP_PROMO_SHOWN = "android_startup_promo_shown";
 
+    /** The user switched to Vertical Tabs. */
+    public static final String ANDROID_VERTICAL_TABS_PROMO_USED =
+            "android_vertical_tabs_promo_used";
+
     /** Read later related events. */
     public static final String APP_MENU_BOOKMARK_STAR_ICON_PRESSED =
             "app_menu_bookmark_star_icon_pressed";

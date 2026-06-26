@@ -2322,6 +2322,14 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
 
         ChromeSharedPreferences.getInstance()
                 .writeBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, shouldShowVerticalTabs);
+
+        if (shouldShowVerticalTabs) {
+            Profile profile = mProfileSupplier.get();
+            if (profile != null) {
+                TrackerFactory.getTrackerForProfile(profile)
+                        .notifyEvent(EventConstants.ANDROID_VERTICAL_TABS_PROMO_USED);
+            }
+        }
     }
 
     private void destroySideUi() {
