@@ -3124,6 +3124,17 @@ chromium-metrics-reviews@google.com.
   </token>
 </histogram>
 
+<histogram name="Tabs.TabSearch.WebUI.Action" enum="TabSearchWebUIAction"
+    expires_after="2027-06-24">
+  <owner>agale@chromium.org</owner>
+  <owner>top-chrome-desktop-ui@google.com</owner>
+  <summary>
+    Records actions performed by the user within the Tab Search WebUI. Emitted
+    when a user switches to a tab, closes a tab, or opens a recently closed
+    tab/group, from either the filtered (searched) or unfiltered list.
+  </summary>
+</histogram>
+
 <histogram name="Tabs.TabSearch.WebUI.IndexOf{Action}In{State}List"
     units="tabs" expires_after="2026-11-29">
   <owner>tluk@chromium.org</owner>
