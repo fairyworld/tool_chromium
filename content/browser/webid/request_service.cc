@@ -77,6 +77,18 @@ void RequestService::BindFederatedRequestService(
   receivers_.Add(this, std::move(receiver));
 }
 
+void RequestService::SetDelegatesForTesting(
+    FederatedIdentityApiPermissionContextDelegate* api_permission_delegate,
+    FederatedIdentityAutoReauthnPermissionContextDelegate*
+        auto_reauthn_permission_delegate,
+    FederatedIdentityPermissionContextDelegate* permission_delegate,
+    IdentityRegistry* identity_registry) {
+  api_permission_delegate_ = api_permission_delegate;
+  auto_reauthn_permission_delegate_ = auto_reauthn_permission_delegate;
+  permission_delegate_ = permission_delegate;
+  identity_registry_ = identity_registry;
+}
+
 Request& RequestService::CreateRequestForTesting(
     mojo::PendingReceiver<blink::mojom::FederatedAuthRequest> receiver,
     FederatedIdentityApiPermissionContextDelegate* api_permission_delegate,
@@ -98,12 +110,9 @@ Request& RequestService::CreateRequestForTesting(
 Request* RequestService::GetOrCreateActiveRequest() {
   if (!active_request_) {
     RenderFrameHost& rfh = render_frame_host();
-    BrowserContext* browser_context = rfh.GetBrowserContext();
     active_request_ = std::make_unique<Request>(
-        &rfh, *this,
-        browser_context->GetFederatedIdentityApiPermissionContext(),
-        browser_context->GetFederatedIdentityAutoReauthnPermissionContext(),
-        browser_context->GetFederatedIdentityPermissionContext());
+        &rfh, *this, api_permission_delegate_,
+        auto_reauthn_permission_delegate_, permission_delegate_);
   }
   return active_request_.get();
 }
@@ -119,11 +128,9 @@ void RequestService::StartTokenRequest(
     StartTokenRequestCallback callback) {
   // 1. Create the new request temporarily.
   RenderFrameHost& rfh = render_frame_host();
-  BrowserContext* browser_context = rfh.GetBrowserContext();
   auto new_request = std::make_unique<Request>(
-      &rfh, *this, browser_context->GetFederatedIdentityApiPermissionContext(),
-      browser_context->GetFederatedIdentityAutoReauthnPermissionContext(),
-      browser_context->GetFederatedIdentityPermissionContext());
+      &rfh, *this, api_permission_delegate_, auto_reauthn_permission_delegate_,
+      permission_delegate_);
   new_request->BindReceiver(std::move(request_receiver));
 
   auto wrapper_callback = base::BindOnce(
