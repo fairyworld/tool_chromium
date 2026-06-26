@@ -462,6 +462,52 @@ _mac_rebaseline_builder(
     cpu = cpu.ARM64,
 )
 
+_mac_rebaseline_builder(
+    name = "mac26-x64-blink-rel",
+    gn_args = gn_args.config(
+        configs = [
+            "release_builder",
+            "remoteexec",
+            "chrome_with_codecs",
+            "minimal_symbols",
+            "mac",
+            "x64",
+        ],
+    ),
+    targets = targets.bundle(
+        targets = [
+            "chromium_blink_isolated_scripts",
+        ],
+        mixins = [
+            "mac_26_x64",
+        ],
+    ),
+    cpu = cpu.ARM64,
+)
+
+_mac_rebaseline_builder(
+    name = "mac26-arm64-blink-rel",
+    gn_args = gn_args.config(
+        configs = [
+            "release_builder",
+            "remoteexec",
+            "chrome_with_codecs",
+            "minimal_symbols",
+            "mac",
+            "arm64",
+        ],
+    ),
+    targets = targets.bundle(
+        targets = [
+            "chromium_blink_isolated_scripts",
+        ],
+        mixins = [
+            "mac_26_arm64",
+        ],
+    ),
+    cpu = cpu.ARM64,
+)
+
 _rebaseline_builder(
     name = "android-15-chrome-blink-rel",
     builder_spec = builder_config.builder_spec(
