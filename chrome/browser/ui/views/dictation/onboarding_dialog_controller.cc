@@ -10,6 +10,7 @@
 #include "base/functional/callback_helpers.h"
 #include "chrome/browser/ui/tabs/public/tab_dialog_manager.h"
 #include "chrome/browser/ui/tabs/public/tab_features.h"
+#include "chrome/grit/branded_strings.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/tabs/public/tab_interface.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -68,16 +69,18 @@ std::unique_ptr<ui::DialogModel> OnboardingDialogController::CreateDialogModel(
   // TODO(crbug.com/525857719): Temporary placeholder strings.
   return ui::DialogModel::Builder()
       .SetInternalName(kOnboardingDialogName)
-      .SetTitle(u"Try Dictation")
+      .SetTitle(l10n_util::GetStringUTF16(IDS_DICTATION_ONBOARDING_TITLE))
       .SetElementIdentifier(kDictationOnboardingDialogElementId)
-      .AddParagraph(ui::DialogModelLabel(
-          u"Dictation uses your microphone to capture your voice."))
-      .AddParagraph(ui::DialogModelLabel(u"Second paragraph."))
+      .AddParagraph(ui::DialogModelLabel(l10n_util::GetStringUTF16(
+          IDS_DICTATION_ONBOARDING_BULLET_MICROPHONE)))
+      .AddParagraph(ui::DialogModelLabel(l10n_util::GetStringUTF16(
+          IDS_DICTATION_ONBOARDING_BULLET_DATA_SHARING)))
       .AddOkButton(base::BindOnce(&OnboardingDialogController::OnDialogAccepted,
                                   weak_ptr_factory_.GetWeakPtr(),
                                   std::move(complete_callback)),
                    ui::DialogModel::Button::Params()
-                       .SetLabel(u"Ok, got it")
+                       .SetLabel(l10n_util::GetStringUTF16(
+                           IDS_DICTATION_ONBOARDING_BUTTON_ACCEPT))
                        .SetId(kDictationOnboardingOkButtonElementId)
                        .SetStyle(ui::ButtonStyle::kProminent))
       .AddCancelButton(base::DoNothing(),

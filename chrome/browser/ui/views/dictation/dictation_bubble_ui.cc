@@ -8,6 +8,7 @@
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
 #include "chrome/browser/ui/views/chrome_typography.h"
 #include "chrome/browser/ui/views/interaction/browser_elements_views.h"
+#include "chrome/grit/branded_strings.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/vector_icons/vector_icons.h"
 #include "ui/base/interaction/element_identifier.h"
@@ -184,7 +185,8 @@ void DictationToastView::UpdateForState(DictationBubbleUi::State state) {
     switch (state) {
       case DictationBubbleUi::State::kInactive:
         // TODO(b/510738735): Finalize placeholder strings.
-        toggle_button_->SetText(u"Start");
+        toggle_button_->SetText(
+            l10n_util::GetStringUTF16(IDS_DICTATION_BUTTON_START));
         toggle_button_->SetEnabled(true);
         break;
       case DictationBubbleUi::State::kInitializing:
