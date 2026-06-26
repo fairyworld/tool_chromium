@@ -28,7 +28,7 @@ Polymer({
    * @suppress {checkTypes}
    * @override
    */
-  created() {
+  created: function() {
     ColorChangeUpdater.forDocument().start();
   },
 
