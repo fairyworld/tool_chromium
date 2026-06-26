@@ -54,7 +54,7 @@ class UserOptionsReader {
 
   // Checks that the given (variable-size) |options| passed to the constructor
   // (plausibly) has a member at the given offset with the given size. You
-  // probably want to use |OPTIONS_STRUCT_HAS_MEMBER()| instead.
+  // probably want to use |MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER()| instead.
   bool HasMember(size_t offset, size_t size) const {
     DCHECK(is_valid());
     // We assume that |offset| and |size| are reasonable, since they should come
@@ -90,7 +90,7 @@ class UserOptionsReader {
 // TODO(vtl): With C++11, use |sizeof(Options::member)| instead of (the
 // contortion below). We might also be able to pull out the type |Options| from
 // |reader| (using |decltype|) instead of requiring a parameter.
-#define OPTIONS_STRUCT_HAS_MEMBER(Options, member, reader) \
+#define MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(Options, member, reader) \
   reader.HasMember(offsetof(Options, member), sizeof(reader.options().member))
 
 }  // namespace core

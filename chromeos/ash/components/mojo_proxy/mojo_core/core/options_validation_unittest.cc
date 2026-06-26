@@ -35,18 +35,24 @@ TEST(OptionsValidationTest, Valid) {
     const TestOptions kOptions = {kSizeOfTestOptions};
     UserOptionsReader<TestOptions> reader(&kOptions);
     EXPECT_TRUE(reader.is_valid());
-    EXPECT_TRUE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, flags, reader));
-    EXPECT_TRUE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member1, reader));
-    EXPECT_TRUE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
+    EXPECT_TRUE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, flags, reader));
+    EXPECT_TRUE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member1, reader));
+    EXPECT_TRUE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
   }
   {
     const TestOptions kOptions = {static_cast<uint32_t>(
         offsetof(TestOptions, struct_size) + sizeof(uint32_t))};
     UserOptionsReader<TestOptions> reader(&kOptions);
     EXPECT_TRUE(reader.is_valid());
-    EXPECT_FALSE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, flags, reader));
-    EXPECT_FALSE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member1, reader));
-    EXPECT_FALSE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
+    EXPECT_FALSE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, flags, reader));
+    EXPECT_FALSE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member1, reader));
+    EXPECT_FALSE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
   }
 
   {
@@ -54,9 +60,12 @@ TEST(OptionsValidationTest, Valid) {
         static_cast<uint32_t>(offsetof(TestOptions, flags) + sizeof(uint32_t))};
     UserOptionsReader<TestOptions> reader(&kOptions);
     EXPECT_TRUE(reader.is_valid());
-    EXPECT_TRUE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, flags, reader));
-    EXPECT_FALSE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member1, reader));
-    EXPECT_FALSE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
+    EXPECT_TRUE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, flags, reader));
+    EXPECT_FALSE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member1, reader));
+    EXPECT_FALSE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
   }
   {
     MOJO_LEGACY_ALIGNAS(8) char buf[sizeof(TestOptions) + 100] = {};
@@ -64,9 +73,12 @@ TEST(OptionsValidationTest, Valid) {
     options->struct_size = kSizeOfTestOptions + 1;
     UserOptionsReader<TestOptions> reader(options);
     EXPECT_TRUE(reader.is_valid());
-    EXPECT_TRUE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, flags, reader));
-    EXPECT_TRUE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member1, reader));
-    EXPECT_TRUE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
+    EXPECT_TRUE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, flags, reader));
+    EXPECT_TRUE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member1, reader));
+    EXPECT_TRUE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
   }
   {
     MOJO_LEGACY_ALIGNAS(8) char buf[sizeof(TestOptions) + 100] = {};
@@ -74,9 +86,12 @@ TEST(OptionsValidationTest, Valid) {
     options->struct_size = kSizeOfTestOptions + 4;
     UserOptionsReader<TestOptions> reader(options);
     EXPECT_TRUE(reader.is_valid());
-    EXPECT_TRUE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, flags, reader));
-    EXPECT_TRUE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member1, reader));
-    EXPECT_TRUE(OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
+    EXPECT_TRUE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, flags, reader));
+    EXPECT_TRUE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member1, reader));
+    EXPECT_TRUE(
+        MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(TestOptions, member2, reader));
   }
 }
 

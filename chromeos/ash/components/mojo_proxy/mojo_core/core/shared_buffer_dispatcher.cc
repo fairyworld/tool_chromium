@@ -68,8 +68,8 @@ MojoResult SharedBufferDispatcher::ValidateCreateOptions(
     return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
-  if (!OPTIONS_STRUCT_HAS_MEMBER(MojoCreateSharedBufferOptions, flags,
-                                 reader)) {
+  if (!MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(MojoCreateSharedBufferOptions,
+                                             flags, reader)) {
     return MOJO_LEGACY_RESULT_OK;
   }
   if ((reader.options().flags & ~kKnownFlags)) {
@@ -468,8 +468,8 @@ MojoResult SharedBufferDispatcher::ValidateDuplicateOptions(
     return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
-  if (!OPTIONS_STRUCT_HAS_MEMBER(MojoDuplicateBufferHandleOptions, flags,
-                                 reader)) {
+  if (!MOJO_LEGACY_OPTIONS_STRUCT_HAS_MEMBER(MojoDuplicateBufferHandleOptions,
+                                             flags, reader)) {
     return MOJO_LEGACY_RESULT_OK;
   }
   if ((reader.options().flags & ~kKnownFlags)) {
