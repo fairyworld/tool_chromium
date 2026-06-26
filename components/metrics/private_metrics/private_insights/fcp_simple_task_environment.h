@@ -5,21 +5,24 @@
 #ifndef COMPONENTS_METRICS_PRIVATE_METRICS_PRIVATE_INSIGHTS_FCP_SIMPLE_TASK_ENVIRONMENT_H_
 #define COMPONENTS_METRICS_PRIVATE_METRICS_PRIVATE_INSIGHTS_FCP_SIMPLE_TASK_ENVIRONMENT_H_
 
+#include "base/memory/ref_counted.h"
 #include "third_party/federated_compute/src/fcp/client/attestation/attestation_verifier.h"
 #include "third_party/federated_compute/src/fcp/client/example_query_result.pb.h"
 #include "third_party/federated_compute/src/fcp/client/simple_task_environment.h"
 
 namespace private_insights {
 
-class FcpSimpleTaskEnvironment : public fcp::client::SimpleTaskEnvironment {
+class FcpSimpleTaskEnvironment
+    : public fcp::client::SimpleTaskEnvironment,
+      public base::RefCountedThreadSafe<FcpSimpleTaskEnvironment> {
  public:
-  FcpSimpleTaskEnvironment(std::string base_dir,
-                           std::string cache_dir,
-                           fcp::client::ExampleQueryResult result);
-  ~FcpSimpleTaskEnvironment() override;
+  FcpSimpleTaskEnvironment(std::string base_dir, std::string cache_dir);
 
   FcpSimpleTaskEnvironment(const FcpSimpleTaskEnvironment&) = delete;
   FcpSimpleTaskEnvironment& operator=(const FcpSimpleTaskEnvironment&) = delete;
+
+  fcp::client::ExampleQueryResult& result() { return result_; }
+  const fcp::client::ExampleQueryResult& result() const { return result_; }
 
   std::string GetBaseDir() override;
   std::string GetCacheDir() override;
@@ -37,6 +40,9 @@ class FcpSimpleTaskEnvironment : public fcp::client::SimpleTaskEnvironment {
   CreateAttestationVerifier() override;
 
  private:
+  friend class base::RefCountedThreadSafe<FcpSimpleTaskEnvironment>;
+  ~FcpSimpleTaskEnvironment() override;
+
   std::string base_dir_;
   std::string cache_dir_;
 

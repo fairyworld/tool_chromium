@@ -55,7 +55,10 @@ source_set("fcp_simple_task_environment") {
     "//third_party/federated_compute:client_proto",
     "//third_party/federated_compute:fl_runner",
   ]
-  deps = [ ":fcp_http_client" ]
+  deps = [
+    ":fcp_http_client",
+    "//base",
+  ]
 }
 
 source_set("fcp_http_client") {

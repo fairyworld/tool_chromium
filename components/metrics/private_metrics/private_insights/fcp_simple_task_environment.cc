@@ -32,13 +32,9 @@ class SingleExampleIterator : public fcp::client::ExampleIterator {
 
 }  // namespace
 
-FcpSimpleTaskEnvironment::FcpSimpleTaskEnvironment(
-    std::string base_dir,
-    std::string cache_dir,
-    fcp::client::ExampleQueryResult result)
-    : base_dir_(std::move(base_dir)),
-      cache_dir_(std::move(cache_dir)),
-      result_(std::move(result)) {}
+FcpSimpleTaskEnvironment::FcpSimpleTaskEnvironment(std::string base_dir,
+                                                   std::string cache_dir)
+    : base_dir_(std::move(base_dir)), cache_dir_(std::move(cache_dir)) {}
 
 FcpSimpleTaskEnvironment::~FcpSimpleTaskEnvironment() = default;
 

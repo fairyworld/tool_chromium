@@ -106,6 +106,13 @@ PrivateInsightsService::PrivateInsightsService(
     : local_state_(local_state), profile_dir_(profile_dir) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   CHECK(local_state_);
+
+  base::FilePath private_insights_dir =
+      profile_dir_.AppendASCII("PrivateInsights");
+  base::FilePath base_dir = private_insights_dir.AppendASCII("base_dir");
+  base::FilePath cache_dir = private_insights_dir.AppendASCII("cache_dir");
+  fcp_task_env_ = base::MakeRefCounted<FcpSimpleTaskEnvironment>(
+      base_dir.AsUTF8Unsafe(), cache_dir.AsUTF8Unsafe());
 }
 
 PrivateInsightsService::~PrivateInsightsService() {
@@ -165,11 +172,14 @@ void PrivateInsightsService::TriggerUpload() {
   }
   is_upload_running_ = true;
 
+  // TODO(b/527985497): Prepare the real result here.
+  fcp_task_env_->result() = fcp::client::ExampleQueryResult();
+
   base::ThreadPool::PostTaskAndReplyWithResult(
       FROM_HERE,
       {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
        base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN},
-      base::BindOnce(&PrivateInsightsService::UploadBlocking, profile_dir_,
+      base::BindOnce(&PrivateInsightsService::UploadBlocking, fcp_task_env_,
                      base::TimeTicks::Now()),
       base::BindOnce(&PrivateInsightsService::OnUploadComplete,
                      weak_ptr_factory_.GetWeakPtr()));
@@ -180,8 +190,9 @@ void PrivateInsightsService::TriggerUpload() {
 
 // static
 PrivateInsightsService::FederatedComputationResult
-PrivateInsightsService::UploadBlocking(const base::FilePath& profile_dir,
-                                       base::TimeTicks trigger_time) {
+PrivateInsightsService::UploadBlocking(
+    scoped_refptr<FcpSimpleTaskEnvironment> task_env,
+    base::TimeTicks trigger_time) {
   base::UmaHistogramTimes(kUploadPendingTimeHistogram,
                           base::TimeTicks::Now() - trigger_time);
   const std::string server_uri = kFcpServerUri.Get();
@@ -193,20 +204,13 @@ PrivateInsightsService::UploadBlocking(const base::FilePath& profile_dir,
   }
   base::TimeTicks upload_start_time = base::TimeTicks::Now();
 
-  base::FilePath private_insights_dir =
-      profile_dir.AppendASCII("PrivateInsights");
-  base::FilePath base_dir = private_insights_dir.AppendASCII("base_dir");
-  base::FilePath cache_dir = private_insights_dir.AppendASCII("cache_dir");
-
-  FcpSimpleTaskEnvironment fcp_task_env(base_dir.AsUTF8Unsafe(),
-                                        cache_dir.AsUTF8Unsafe(), {});
   FcpEventPublisher fcp_event_publisher;
   FcpFiles fcp_files;
   FcpLogManager fcp_log_manager;
   FcpFlags fcp_flags;
 
   FederatedComputationParams params{
-      .task_env = &fcp_task_env,
+      .task_env = task_env.get(),
       .event_publisher = &fcp_event_publisher,
       .files = &fcp_files,
       .log_manager = &fcp_log_manager,

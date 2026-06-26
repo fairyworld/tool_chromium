@@ -24,10 +24,12 @@ TEST(FcpSimpleTaskEnvironmentTest, CreateExampleIterator) {
   values.mutable_string_values()->add_value("example_data");
   (*query_result.mutable_vector_data()->mutable_vectors())["example"] = values;
 
-  FcpSimpleTaskEnvironment task_env("base_dir", "cache_dir", query_result);
+  scoped_refptr<FcpSimpleTaskEnvironment> task_env =
+      base::MakeRefCounted<FcpSimpleTaskEnvironment>("base_dir", "cache_dir");
+  task_env->result() = query_result;
 
   google::internal::federated::plan::ExampleSelector selector;
-  auto iterator_or = task_env.CreateExampleIterator(selector);
+  auto iterator_or = task_env->CreateExampleIterator(selector);
   ASSERT_TRUE(iterator_or.ok());
   ASSERT_NE(*iterator_or, nullptr);
 
@@ -53,10 +55,10 @@ TEST(FcpSimpleTaskEnvironmentTest, CreateExampleIterator) {
 }
 
 TEST(FcpSimpleTaskEnvironmentTest, CreateAttestationVerifier) {
-  fcp::client::ExampleQueryResult query_result;
-  FcpSimpleTaskEnvironment task_env("base_dir", "cache_dir", query_result);
+  scoped_refptr<FcpSimpleTaskEnvironment> task_env =
+      base::MakeRefCounted<FcpSimpleTaskEnvironment>("base_dir", "cache_dir");
 
-  auto verifier = task_env.CreateAttestationVerifier();
+  auto verifier = task_env->CreateAttestationVerifier();
   ASSERT_NE(verifier, nullptr);
 
   auto [public_key, private_key] =

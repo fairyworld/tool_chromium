@@ -126,7 +126,7 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
 
   // Runs on a background thread pool sequence (allows blocking).
   static FederatedComputationResult UploadBlocking(
-      const base::FilePath& profile_dir,
+      scoped_refptr<FcpSimpleTaskEnvironment> task_env,
       base::TimeTicks trigger_time);
 
   static FederatedComputationResult RunFederatedComputation(
@@ -142,6 +142,8 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
 
   bool is_upload_running_ = false;
   base::RepeatingTimer upload_timer_;
+
+  scoped_refptr<FcpSimpleTaskEnvironment> fcp_task_env_;
 
   SEQUENCE_CHECKER(sequence_checker_);
   base::WeakPtrFactory<PrivateInsightsService> weak_ptr_factory_{this};
