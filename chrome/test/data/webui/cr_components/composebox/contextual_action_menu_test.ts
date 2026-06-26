@@ -2681,6 +2681,7 @@ suite('ContextualActionMenu', () => {
     test(
         'pointerLeave is ignored for 1 second after 1st tab added',
         async () => {
+          asInternal(actionMenu).closeMenuOnSelect = false;
           actionMenu.showAt(actionMenu);
           await microtasksFinished();
 
