@@ -28,6 +28,7 @@ import android.view.ViewStub;
 import android.view.animation.Interpolator;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
 import androidx.annotation.Px;
 import androidx.annotation.VisibleForTesting;
 
@@ -1869,52 +1870,32 @@ public class StripLayoutHelperManager
         if (mModelSelectorButton == null) return;
         mModelSelectorButton.setIncognito(mIsIncognito);
 
-        Context context = mContext;
-        @ColorInt
-        int iconDefaultColor =
-                context.getColorStateList(R.color.default_icon_color_tint_list).getDefaultColor();
-        @ColorInt
-        int iconIncognitoColor = context.getColor(R.color.default_icon_color_secondary_light);
+        @ColorRes int iconTintRes = R.color.default_icon_color_tint_list;
+        @ColorRes int bgTintRes = R.color.model_selector_button_bg_color;
+        @ColorRes int bgHoverTintRes = R.color.tab_strip_button_bg_hover_tint;
+        @ColorRes
+        int bgPeripheralPressedTintRes = R.color.tab_strip_button_bg_peripheral_pressed_tint;
 
-        // Model selector button background color.
-        // Default bg color is surface inverse.
-        @ColorInt
-        int backgroundDefaultColor = context.getColor(R.color.model_selector_button_bg_color);
-        // Incognito bg color is surface 1 baseline.
-        @ColorInt
-        int backgroundIncognitoColor =
-                context.getColor(R.color.default_bg_color_dark_elev_1_baseline);
+        if (mIsIncognito) {
+            iconTintRes = R.color.default_icon_color_secondary_light;
+            bgTintRes = R.color.default_bg_color_dark_elev_1_baseline;
+            bgHoverTintRes = R.color.tab_strip_button_bg_incognito_hover_tint;
+            bgPeripheralPressedTintRes =
+                    R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint;
+        }
 
-        @ColorInt
-        int backgroundHoverColor = context.getColor(R.color.tab_strip_button_bg_hover_tint);
-        @ColorInt
-        int backgroundPeripheralPressedColor =
-                context.getColor(R.color.tab_strip_button_bg_peripheral_pressed_tint);
+        mModelSelectorButton.setTint(mContext.getColor(iconTintRes));
+        mModelSelectorButton.setBackgroundTint(
+                mContext.getColor(bgTintRes),
+                mContext.getColor(bgHoverTintRes),
+                mContext.getColor(bgTintRes),
+                mContext.getColor(bgPeripheralPressedTintRes));
 
-        @ColorInt
-        int backgroundHoverIncognitoColor =
-                context.getColor(R.color.tab_strip_button_bg_incognito_hover_tint);
-        @ColorInt
-        int backgroundPeripheralPressedIncognitoColor =
-                context.getColor(R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint);
-
-        int iconColor = mIsIncognito ? iconIncognitoColor : iconDefaultColor;
-        int bgColor = mIsIncognito ? backgroundIncognitoColor : backgroundDefaultColor;
-        int hoverBgColor = mIsIncognito ? backgroundHoverIncognitoColor : backgroundHoverColor;
-        int peripheralPressedBgColor =
+        mModelSelectorButton.setAccessibilityDescription(
                 mIsIncognito
-                        ? backgroundPeripheralPressedIncognitoColor
-                        : backgroundPeripheralPressedColor;
-
-        TintedCompositorButton button = (TintedCompositorButton) mModelSelectorButton;
-        button.setTint(iconColor);
-        button.setBackgroundTint(bgColor, hoverBgColor, bgColor, peripheralPressedBgColor);
-
-        button.setAccessibilityDescription(
-                mIsIncognito
-                        ? context.getString(
+                        ? mContext.getString(
                                 R.string.accessibility_tabstrip_btn_incognito_toggle_incognito)
-                        : context.getString(
+                        : mContext.getString(
                                 R.string.accessibility_tabstrip_btn_incognito_toggle_standard));
     }
 

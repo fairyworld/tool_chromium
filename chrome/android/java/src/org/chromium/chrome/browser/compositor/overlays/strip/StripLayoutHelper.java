@@ -38,6 +38,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
@@ -829,41 +830,33 @@ public class StripLayoutHelper
                         R.drawable.bg_circle_tab_strip_button,
                         BUTTON_CLICK_SLOP_DP);
 
-        int backgroundHoverTint = context.getColor(R.color.tab_strip_button_bg_hover_tint);
-        int backgroundPeripheralPressedTint =
+        @ColorRes int iconTintRes = R.color.default_icon_color_tint_list;
+        @ColorRes int bgHoverTintRes = R.color.tab_strip_button_bg_hover_tint;
+        @ColorRes int bgPressedTintRes = R.color.tab_strip_button_bg_pressed_tint;
+
+        @ColorInt int bgTint = TabUiThemeProvider.getDefaultNtbContainerColor(context);
+        @ColorInt
+        int bgPeripheralPressedTint =
                 context.getColor(R.color.tab_strip_button_bg_peripheral_pressed_tint);
 
-        // Primary container for default bg color.
-        int backgroundTint = TabUiThemeProvider.getDefaultNtbContainerColor(context);
-        // Primary @ 20% for default pressed bg color.
-        int backgroundPressedTint = context.getColor(R.color.tab_strip_button_bg_pressed_tint);
-
-        // Tab strip redesign new tab button night mode bg color.
-        if (ColorUtils.inNightMode(context)) {
-            // colorSurfaceContainerLow for night mode bg color.
-            backgroundTint = SemanticColorUtils.getColorSurfaceContainerLow(context);
-            // colorSurfaceContainerHighest for pressed night mode bg color.
-            backgroundPeripheralPressedTint =
-                    SemanticColorUtils.getColorSurfaceContainerHighest(context);
-        } else if (incognito) {
-            backgroundTint = context.getColor(R.color.tab_strip_bg_incognito_default_tint);
-            backgroundPressedTint = context.getColor(R.color.tab_strip_bg_incognito_pressed_tint);
-            backgroundHoverTint =
-                    context.getColor(R.color.tab_strip_button_bg_incognito_hover_tint);
-            backgroundPeripheralPressedTint =
+        if (incognito) {
+            iconTintRes = R.color.modern_white;
+            bgTint = context.getColor(R.color.tab_strip_bg_incognito_default_tint);
+            bgHoverTintRes = R.color.tab_strip_button_bg_incognito_hover_tint;
+            bgPressedTintRes = R.color.tab_strip_bg_incognito_pressed_tint;
+            bgPeripheralPressedTint =
                     context.getColor(R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint);
+        } else if (ColorUtils.inNightMode(context)) {
+            bgTint = SemanticColorUtils.getColorSurfaceContainerLow(context);
+            bgPeripheralPressedTint = SemanticColorUtils.getColorSurfaceContainerHighest(context);
         }
 
+        mNewTabButton.setTint(context.getColor(iconTintRes));
         mNewTabButton.setBackgroundTint(
-                backgroundTint,
-                backgroundHoverTint,
-                backgroundPressedTint,
-                backgroundPeripheralPressedTint);
-
-        // No pressed state color change for new tab button icon.
-        int iconTint = incognito ? R.color.modern_white : R.color.default_icon_color_tint_list;
-        int iconColor = context.getColorStateList(iconTint).getDefaultColor();
-        mNewTabButton.setTint(iconColor);
+                bgTint,
+                context.getColor(bgHoverTintRes),
+                context.getColor(bgPressedTintRes),
+                bgPeripheralPressedTint);
 
         // y-offset  = lowered tab container + (tab container size - bg size)/2 -
         // Tab title y-offset = 2 + (38 - 32)/2 - 2 = 3dp

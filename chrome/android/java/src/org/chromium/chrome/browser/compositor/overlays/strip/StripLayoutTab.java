@@ -18,6 +18,7 @@ import android.util.FloatProperty;
 import android.util.Size;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
@@ -305,29 +306,26 @@ public class StripLayoutTab extends StripLayoutView {
                         /* clickSlopDp= */ 0f,
                         /* hasLongClickAction= */ true);
 
-        int iconColor =
-                incognito ? R.color.default_icon_color_light : R.color.default_icon_color_tint_list;
-        int iconColorInt = context.getColorStateList(iconColor).getDefaultColor();
-        mCloseButton.setTint(iconColorInt);
-        @ColorInt
-        int backgroundHoverTint = context.getColor(R.color.tab_strip_button_bg_hover_tint);
-        @ColorInt
-        int backgroundPeripheralPressedTint =
-                context.getColor(R.color.tab_strip_button_bg_peripheral_pressed_tint);
+        @ColorRes int iconTintRes = R.color.default_icon_color_tint_list;
+        @ColorRes int bgHoverTintRes = R.color.tab_strip_button_bg_hover_tint;
+        @ColorRes
+        int bgPeripheralPressedTintRes = R.color.tab_strip_button_bg_peripheral_pressed_tint;
 
         if (incognito) {
-            backgroundHoverTint =
-                    context.getColor(R.color.tab_strip_button_bg_incognito_hover_tint);
-            backgroundPeripheralPressedTint =
-                    context.getColor(R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint);
+            iconTintRes = R.color.default_icon_color_light;
+            bgHoverTintRes = R.color.tab_strip_button_bg_incognito_hover_tint;
+            bgPeripheralPressedTintRes =
+                    R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint;
         }
 
-        // Only set color for hover bg.
+        // Only set color for hover and peripheral-pressed bg.
+        mCloseButton.setTint(context.getColor(iconTintRes));
         mCloseButton.setBackgroundTint(
                 Color.TRANSPARENT,
-                backgroundHoverTint,
+                mContext.getColor(bgHoverTintRes),
                 Color.TRANSPARENT,
-                backgroundPeripheralPressedTint);
+                mContext.getColor(bgPeripheralPressedTintRes));
+
         mCloseButtonSize = getCloseButtonSize();
         resetCloseRect();
     }

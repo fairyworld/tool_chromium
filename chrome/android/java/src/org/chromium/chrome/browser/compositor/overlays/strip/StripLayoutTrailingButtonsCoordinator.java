@@ -15,6 +15,7 @@ import android.util.FloatProperty;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.ContextUtils;
@@ -412,22 +413,13 @@ public class StripLayoutTrailingButtonsCoordinator {
             mGlicActorButton.setOpacity(0.0f);
             mGlicActorButton.setVisible(false);
 
+            @ColorInt int bgTint = SemanticColorUtils.getColorSurfaceContainerLow(mContext);
             @ColorInt
-            int backgroundDefaultColor = SemanticColorUtils.getColorSurfaceContainerLow(mContext);
-
+            int bgHoverTint = mContext.getColor(R.color.tab_strip_glic_button_bg_hover_tint);
             @ColorInt
-            int backgroundHoverColor =
-                    mContext.getColor(R.color.tab_strip_glic_button_bg_hover_tint);
+            int bgPressedTint = mContext.getColor(R.color.tab_strip_glic_button_bg_pressed_tint);
 
-            @ColorInt
-            int backgroundPressedColor =
-                    mContext.getColor(R.color.tab_strip_glic_button_bg_pressed_tint);
-
-            mGlicActorButton.setBackgroundTint(
-                    backgroundDefaultColor,
-                    backgroundHoverColor,
-                    backgroundPressedColor,
-                    backgroundPressedColor);
+            mGlicActorButton.setBackgroundTint(bgTint, bgHoverTint, bgPressedTint, bgPressedTint);
 
             mGlicActorButton.setTint(SemanticColorUtils.getDefaultIconColor(mContext));
 
@@ -710,36 +702,25 @@ public class StripLayoutTrailingButtonsCoordinator {
     private void updateButtonTints(boolean incognito) {
         if (mGlicButton == null) return;
 
+        @ColorInt int iconTint = SemanticColorUtils.getDefaultIconColor(mContext);
+        @ColorInt int bgTint = SemanticColorUtils.getColorSurfaceContainerLow(mContext);
+
+        @ColorRes int bgHoverTintRes = R.color.tab_strip_glic_button_bg_hover_tint;
+        @ColorRes int bgPressedTintRes = R.color.tab_strip_glic_button_bg_pressed_tint;
+
         if (incognito) {
-            // Set tints to indicate button is disabled
-            @ColorInt
-            int iconTint = mContext.getColor(R.color.tab_strip_glic_button_icon_incognito_tint);
-            @ColorInt
-            int bgTint = mContext.getColor(R.color.tab_strip_glic_button_bg_incognito_tint);
-
-            mGlicButton.setTint(iconTint);
-            mGlicButton.setBackgroundTint(bgTint, bgTint, bgTint, bgTint);
-        } else {
-            // Reset normal tints
-            @ColorInt
-            int backgroundDefaultColor = SemanticColorUtils.getColorSurfaceContainerLow(mContext);
-
-            @ColorInt
-            int backgroundHoverColor =
-                    mContext.getColor(R.color.tab_strip_glic_button_bg_hover_tint);
-
-            @ColorInt
-            int backgroundPressedColor =
-                    mContext.getColor(R.color.tab_strip_glic_button_bg_pressed_tint);
-
-            mGlicButton.setBackgroundTint(
-                    backgroundDefaultColor,
-                    backgroundHoverColor,
-                    backgroundPressedColor,
-                    backgroundPressedColor);
-
-            mGlicButton.setTint(SemanticColorUtils.getDefaultIconColor(mContext));
+            iconTint = mContext.getColor(R.color.tab_strip_glic_button_icon_incognito_tint);
+            bgTint = mContext.getColor(R.color.tab_strip_glic_button_bg_incognito_tint);
+            bgHoverTintRes = R.color.tab_strip_glic_button_bg_incognito_tint;
+            bgPressedTintRes = R.color.tab_strip_glic_button_bg_incognito_tint;
         }
+
+        mGlicButton.setTint(iconTint);
+        mGlicButton.setBackgroundTint(
+                bgTint,
+                mContext.getColor(bgHoverTintRes),
+                mContext.getColor(bgPressedTintRes),
+                mContext.getColor(bgPressedTintRes));
     }
 
     @VisibleForTesting
