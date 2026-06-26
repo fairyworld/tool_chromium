@@ -307,15 +307,12 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
       UITraitPreferredContentSizeCategory.class, UITraitUserInterfaceStyle.class
     ]
                       withHandler:handler];
-    NSMutableArray<UITrait>* buttonTraits =
-        [@[ UITraitUserInterfaceStyle.class ] mutableCopy];
-    if (IsNTPBackgroundCustomizationEnabled()) {
-      NSArray<UITrait>* customizationTraits =
-          @[ NewTabPageTrait.class, NewTabPageImageBackgroundTrait.class ];
-      [buttonTraits addObjectsFromArray:customizationTraits];
-      [self registerForTraitChanges:customizationTraits
-                         withAction:@selector(applyBackgroundTheme)];
-    }
+    NSArray<UITrait>* customizationTraits =
+        @[ NewTabPageTrait.class, NewTabPageImageBackgroundTrait.class ];
+    NSArray<UITrait>* buttonTraits = [@[ UITraitUserInterfaceStyle.class ]
+        arrayByAddingObjectsFromArray:customizationTraits];
+    [self registerForTraitChanges:customizationTraits
+                       withAction:@selector(applyBackgroundTheme)];
     [self registerForTraitChanges:buttonTraits
                        withAction:@selector
                        (updateButtonsForCurrentTraitCollection)];
@@ -697,9 +694,8 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
   const BOOL darkUIStyle =
       self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
   const BOOL ntpHasCustomBackground =
-      IsNTPBackgroundCustomizationEnabled() &&
-      ([self.traitCollection boolForNewTabPageImageBackgroundTrait] ||
-       [self.traitCollection objectForNewTabPageTrait]);
+      [self.traitCollection boolForNewTabPageImageBackgroundTrait] ||
+      [self.traitCollection objectForNewTabPageTrait];
   const BOOL useColorIcon =
       !darkUIStyle && !forceDisableColors && !ntpHasCustomBackground;
 
@@ -1032,37 +1028,32 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
     [_customizationMenuButton removeFromSuperview];
   }
 
-  if (IsNTPBackgroundCustomizationEnabled()) {
-    UIButtonConfiguration* configuration =
-        [UIButtonConfiguration plainButtonConfiguration];
+  UIButtonConfiguration* configuration =
+      [UIButtonConfiguration plainButtonConfiguration];
 
-    UIImage* icon = DefaultSymbolTemplateWithPointSize(
-        kPencilSymbol, ntp_home::kNTPMenuButtonIconSize);
-    configuration.image = icon;
-    configuration.background.cornerRadius =
-        ntp_home::kNTPMenuButtonCornerRadius;
-    customizationMenuButton.configuration = configuration;
+  UIImage* icon = DefaultSymbolTemplateWithPointSize(
+      kPencilSymbol, ntp_home::kNTPMenuButtonIconSize);
+  configuration.image = icon;
+  configuration.background.cornerRadius = ntp_home::kNTPMenuButtonCornerRadius;
+  customizationMenuButton.configuration = configuration;
 
-    UIColor* unthemedTintColor = [UIColor colorNamed:kBlue600Color];
-    customizationMenuButton.configurationUpdateHandler =
-        CreateThemedButtonConfigurationUpdateHandler(
-            unthemedTintColor, ^UIColor*(NewTabPageColorPalette* palette) {
-              if (palette) {
-                return palette.headerButtonColor;
-              }
+  UIColor* unthemedTintColor = [UIColor colorNamed:kBlue600Color];
+  customizationMenuButton.configurationUpdateHandler =
+      CreateThemedButtonConfigurationUpdateHandler(
+          unthemedTintColor, ^UIColor*(NewTabPageColorPalette* palette) {
+            if (palette) {
+              return palette.headerButtonColor;
+            }
 
-              return [UIColor colorWithDynamicProvider:^UIColor*(
-                                  UITraitCollection* traits) {
-                return traits.userInterfaceStyle == UIUserInterfaceStyleDark
-                           ? [UIColor
-                                 colorNamed:kTabGroupFaviconBackgroundColor]
-                           : [[UIColor colorNamed:kSolidWhiteColor]
-                                 colorWithAlphaComponent:
-                                     ntp_home::
-                                         kNTPMenuButtonLightUnthemedAlpha];
-              }];
-            });
-  }
+            return [UIColor colorWithDynamicProvider:^UIColor*(
+                                UITraitCollection* traits) {
+              return traits.userInterfaceStyle == UIUserInterfaceStyleDark
+                         ? [UIColor colorNamed:kTabGroupFaviconBackgroundColor]
+                         : [[UIColor colorNamed:kSolidWhiteColor]
+                               colorWithAlphaComponent:
+                                   ntp_home::kNTPMenuButtonLightUnthemedAlpha];
+            }];
+          });
 
   customizationMenuButton.translatesAutoresizingMaskIntoConstraints = NO;
   customizationMenuButton.pointerInteractionEnabled = YES;
@@ -1101,10 +1092,7 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
 
   [self.layoutGuideCenter referenceView:customizationMenuButton
                               underName:kFeedIPHNamedGuide];
-
-  if (IsNTPBackgroundCustomizationEnabled()) {
-    [self applyBackgroundTheme];
-  }
+  [self applyBackgroundTheme];
 }
 
 - (void)setToolsMenuButton:(UIButton*)toolsMenuButton {
@@ -1115,36 +1103,31 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
     return;
   }
 
-  if (IsNTPBackgroundCustomizationEnabled()) {
-    UIButtonConfiguration* configuration =
-        [UIButtonConfiguration plainButtonConfiguration];
-    UIImage* icon = DefaultSymbolTemplateWithPointSize(
-        kMenuSymbol, ntp_home::kNTPMenuButtonIconSize);
-    configuration.image = icon;
-    configuration.background.cornerRadius =
-        ntp_home::kNTPMenuButtonCornerRadius;
-    toolsMenuButton.configuration = configuration;
+  UIButtonConfiguration* configuration =
+      [UIButtonConfiguration plainButtonConfiguration];
+  UIImage* icon = DefaultSymbolTemplateWithPointSize(
+      kMenuSymbol, ntp_home::kNTPMenuButtonIconSize);
+  configuration.image = icon;
+  configuration.background.cornerRadius = ntp_home::kNTPMenuButtonCornerRadius;
+  toolsMenuButton.configuration = configuration;
 
-    UIColor* unthemedTintColor = [UIColor colorNamed:kBlue600Color];
-    toolsMenuButton.configurationUpdateHandler =
-        CreateThemedButtonConfigurationUpdateHandler(
-            unthemedTintColor, ^UIColor*(NewTabPageColorPalette* palette) {
-              if (palette) {
-                return palette.headerButtonColor;
-              }
+  UIColor* unthemedTintColor = [UIColor colorNamed:kBlue600Color];
+  toolsMenuButton.configurationUpdateHandler =
+      CreateThemedButtonConfigurationUpdateHandler(
+          unthemedTintColor, ^UIColor*(NewTabPageColorPalette* palette) {
+            if (palette) {
+              return palette.headerButtonColor;
+            }
 
-              return [UIColor colorWithDynamicProvider:^UIColor*(
-                                  UITraitCollection* traits) {
-                return traits.userInterfaceStyle == UIUserInterfaceStyleDark
-                           ? [UIColor
-                                 colorNamed:kTabGroupFaviconBackgroundColor]
-                           : [[UIColor colorNamed:kSolidWhiteColor]
-                                 colorWithAlphaComponent:
-                                     ntp_home::
-                                         kNTPMenuButtonLightUnthemedAlpha];
-              }];
-            });
-  }
+            return [UIColor colorWithDynamicProvider:^UIColor*(
+                                UITraitCollection* traits) {
+              return traits.userInterfaceStyle == UIUserInterfaceStyleDark
+                         ? [UIColor colorNamed:kTabGroupFaviconBackgroundColor]
+                         : [[UIColor colorNamed:kSolidWhiteColor]
+                               colorWithAlphaComponent:
+                                   ntp_home::kNTPMenuButtonLightUnthemedAlpha];
+            }];
+          });
 
   toolsMenuButton.translatesAutoresizingMaskIntoConstraints = NO;
   toolsMenuButton.pointerInteractionEnabled = YES;
@@ -1166,9 +1149,7 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
 
   _toolsMenuButton = toolsMenuButton;
 
-  if (IsNTPBackgroundCustomizationEnabled()) {
-    [self applyBackgroundTheme];
-  }
+  [self applyBackgroundTheme];
 }
 
 - (void)hideBadgeOnCustomizationMenu {
@@ -1329,21 +1310,6 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
   UIButton* customizationMenuButton =
       [[ExtendedTouchTargetButton alloc] initWithFrame:CGRectZero];
 
-  if (!IsNTPBackgroundCustomizationEnabled()) {
-    UIImage* icon = DefaultSymbolTemplateWithPointSize(
-        kPencilSymbol, ntp_home::kNTPMenuButtonIconSize);
-    [customizationMenuButton setImage:icon forState:UIControlStateNormal];
-    customizationMenuButton.backgroundColor =
-        [self defaultButtonBackgroundColor];
-
-    UIColor* tintColor = [UIColor colorNamed:kBlue600Color];
-    customizationMenuButton.tintColor = tintColor;
-
-    customizationMenuButton.layer.cornerRadius =
-        ntp_home::kNTPMenuButtonCornerRadius;
-    customizationMenuButton.clipsToBounds = YES;
-  }
-
   customizationMenuButton.accessibilityIdentifier =
       kNTPCustomizationMenuButtonIdentifier;
   customizationMenuButton.accessibilityLabel =
@@ -1369,18 +1335,6 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
 
   UIButton* toolsMenuButton =
       [[ExtendedTouchTargetButton alloc] initWithFrame:CGRectZero];
-
-  if (!IsNTPBackgroundCustomizationEnabled()) {
-    UIImage* icon = DefaultSymbolTemplateWithPointSize(
-        kEllipsisSymbol, ntp_home::kNTPMenuButtonIconSize);
-    [toolsMenuButton setImage:icon forState:UIControlStateNormal];
-    toolsMenuButton.backgroundColor = [self defaultButtonBackgroundColor];
-
-    UIColor* tintColor = [UIColor colorNamed:kBlue600Color];
-    toolsMenuButton.tintColor = tintColor;
-    toolsMenuButton.layer.cornerRadius = ntp_home::kNTPMenuButtonCornerRadius;
-    toolsMenuButton.clipsToBounds = YES;
-  }
 
   toolsMenuButton.accessibilityIdentifier = kNTPToolsMenuButtonIdentifier;
   toolsMenuButton.accessibilityLabel =
@@ -1669,9 +1623,6 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
 // Creates a thin grey divider that acts as a visual separator.
 - (UIView*)createDivider {
   UIView* divider = [[UIView alloc] init];
-  if (!IsNTPBackgroundCustomizationEnabled()) {
-    divider.backgroundColor = [UIColor colorNamed:kGrey600Color];
-  }
   divider.translatesAutoresizingMaskIntoConstraints = NO;
   CGFloat dividerWidth = 1.0 / [[UIScreen mainScreen] scale];
 

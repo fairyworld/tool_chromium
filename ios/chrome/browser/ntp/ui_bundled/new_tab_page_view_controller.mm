@@ -245,15 +245,11 @@ const CGFloat kBackgroundImageAnimationDuration = 0.2;
   [self updateModularHomeBackgroundColorForUserInterfaceStyle:
             self.traitCollection.userInterfaceStyle];
 
-  if (IsNTPBackgroundCustomizationEnabled()) {
-    _backgroundImageView = [[HomeCustomizationImageView alloc] init];
-    _backgroundImageView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self updateBackgroundImageView];
-    [self.view addSubview:_backgroundImageView];
-    AddSameConstraints(_backgroundImageView, self.view);
-  } else {
-    self.view.backgroundColor = [UIColor colorNamed:@"ntp_background_color"];
-  }
+  _backgroundImageView = [[HomeCustomizationImageView alloc] init];
+  _backgroundImageView.translatesAutoresizingMaskIntoConstraints = NO;
+  [self updateBackgroundImageView];
+  [self.view addSubview:_backgroundImageView];
+  AddSameConstraints(_backgroundImageView, self.view);
 
   [self registerNotifications];
 
@@ -271,12 +267,10 @@ const CGFloat kBackgroundImageAnimationDuration = 0.2;
     [weakSelf updateUIOnTraitChange:previousCollection];
   };
   [self registerForTraitChanges:traits withHandler:handler];
-  if (IsNTPBackgroundCustomizationEnabled()) {
-    [self registerForTraitChanges:
-              @[ NewTabPageTrait.class, NewTabPageImageBackgroundTrait.class ]
-                       withAction:@selector(applyBackgroundTheme)];
-    [self applyBackgroundTheme];
-  }
+  [self registerForTraitChanges:
+            @[ NewTabPageTrait.class, NewTabPageImageBackgroundTrait.class ]
+                     withAction:@selector(applyBackgroundTheme)];
+  [self applyBackgroundTheme];
   [self.mutator checkNewBadgeEligibility];
 }
 
@@ -345,13 +339,6 @@ const CGFloat kBackgroundImageAnimationDuration = 0.2;
 
   [self.helpHandler
       presentInProductHelpWithType:InProductHelpType::kDiscoverFeedMenu];
-
-  if (!IsFirstRunRecent(base::Days(3))) {
-    if (!IsNTPBackgroundCustomizationEnabled()) {
-      [self.helpHandler presentInProductHelpWithType:
-                            InProductHelpType::kHomeCustomizationMenu];
-    }
-  }
 
   [self updateFeedSigninPromoIsVisible];
 
@@ -457,19 +444,15 @@ const CGFloat kBackgroundImageAnimationDuration = 0.2;
     _feedContainer = [[UIView alloc] initWithFrame:CGRectZero];
     _feedContainer.userInteractionEnabled = YES;
     _feedContainer.translatesAutoresizingMaskIntoConstraints = NO;
-    if (IsNTPBackgroundCustomizationEnabled()) {
-      UIVisualEffect* blurEffect =
-          [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial];
-      _feedVisualEffectBackgroundView =
-          [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-      _feedVisualEffectBackgroundView
-          .translatesAutoresizingMaskIntoConstraints = NO;
-      [_feedContainer addSubview:_feedVisualEffectBackgroundView];
-      AddSameConstraints(_feedContainer, _feedVisualEffectBackgroundView);
-      [self applyBackgroundThemeToFeedContainer];
-    } else {
-      _feedContainer.backgroundColor = [UIColor colorNamed:kBackgroundColor];
-    }
+    UIVisualEffect* blurEffect =
+        [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial];
+    _feedVisualEffectBackgroundView =
+        [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+    _feedVisualEffectBackgroundView.translatesAutoresizingMaskIntoConstraints =
+        NO;
+    [_feedContainer addSubview:_feedVisualEffectBackgroundView];
+    AddSameConstraints(_feedContainer, _feedVisualEffectBackgroundView);
+    [self applyBackgroundThemeToFeedContainer];
 
     // Add corner radius to the top border.
     _feedContainer.clipsToBounds = YES;

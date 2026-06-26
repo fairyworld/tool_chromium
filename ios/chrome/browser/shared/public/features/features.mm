@@ -648,22 +648,6 @@ BASE_FEATURE(kNotificationCollisionManagement,
 BASE_FEATURE(kIOSProvidesAppNotificationSettings,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kNTPBackgroundCustomization, base::FEATURE_ENABLED_BY_DEFAULT);
-
-bool IsNTPBackgroundCustomizationEnabled() {
-  return base::FeatureList::IsEnabled(kNTPBackgroundCustomization);
-}
-
-BASE_FEATURE_PARAM(int,
-                   kMaxRecentlyUsedBackgrounds,
-                   &kNTPBackgroundCustomization,
-                   "max-recently-used-backgrounds",
-                   7);
-
-int MaxRecentlyUsedBackgrounds() {
-  return kMaxRecentlyUsedBackgrounds.Get();
-}
-
 BASE_FEATURE(kNTPBackgroundColorSlider, base::FEATURE_ENABLED_BY_DEFAULT);
 
 bool IsNTPBackgroundColorSliderEnabled() {

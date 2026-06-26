@@ -349,10 +349,7 @@
   // Start observing SceneState changes.
   SceneState* sceneState = self.browser->GetSceneState();
   [sceneState addObserver:self];
-
-  if (IsNTPBackgroundCustomizationEnabled()) {
-    [sceneState.tabGridState addObserver:self];
-  }
+  [sceneState.tabGridState addObserver:self];
 
   // Configures incognito NTP if user is in incognito mode.
   if (self.isOffTheRecord) {
@@ -402,11 +399,9 @@
           _identityManager);
   [self updateFeedWithIsSupervisedUser:(capability == signin::Tribool::kTrue)];
 
-  if (IsNTPBackgroundCustomizationEnabled()) {
-    // Ensure the initial background is applied after all components have been
-    // set up.
-    [self.NTPMediator updateBackground];
-  }
+  // Ensure the initial background is applied after all components have been
+  // set up.
+  [self.NTPMediator updateBackground];
 
   self.started = YES;
 }
@@ -422,10 +417,7 @@
 
   SceneState* sceneState = self.browser->GetSceneState();
   [sceneState removeObserver:self];
-
-  if (IsNTPBackgroundCustomizationEnabled()) {
-    [sceneState.tabGridState removeObserver:self];
-  }
+  [sceneState.tabGridState removeObserver:self];
 
   if (self.isOffTheRecord) {
     self.incognitoViewController = nil;
@@ -1905,8 +1897,7 @@
       feature_engagement::TrackerFactory::GetForProfile(self.profile);
 
   tracker->NotifyEvent(feature_engagement::events::kHomeCustomizationMenuUsed);
-  if (page == CustomizationMenuPage::kMain &&
-      IsNTPBackgroundCustomizationEnabled()) {
+  if (page == CustomizationMenuPage::kMain) {
     tracker->NotifyEvent(
         feature_engagement::events::kHomeBackgroundCustomizationMenuUsed);
   }
