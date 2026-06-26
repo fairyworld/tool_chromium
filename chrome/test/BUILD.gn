@@ -4111,7 +4111,6 @@ if (!is_android) {
         "../browser/ui/views/controls/textfield/textfield_dump_accessibility_events_browsertest.cc",
         "../browser/ui/views/download/bubble/download_bubble_row_list_view_browsertest.cc",
         "../browser/ui/views/download/bubble/download_toolbar_ui_controller_browsertest.cc",
-        "../browser/ui/views/global_media_controls/media_item_ui_device_selector_view_dump_accessibility_events_browsertest.cc",
         "../browser/ui/views/profiles/signin_view_controller_delegate_views_browsertest.cc",
       ]
 
@@ -4542,6 +4541,7 @@ if (!is_android) {
         "//chrome/browser/ui/views/animations",
         "//chrome/browser/ui/views/commerce",
         "//chrome/browser/ui/views/commerce:browser_tests",
+        "//chrome/browser/ui/views/global_media_controls:browser_tests",
         "//chrome/browser/ui/views/infobars",
         "//chrome/browser/ui/views/performance_controls:browser_tests",
         "//chrome/browser/ui/views/permissions:permission_prompt_observer",
@@ -9049,6 +9049,7 @@ test("unit_tests") {
       "//chrome/browser/ui/views/controls",
       "//chrome/browser/ui/views/frame",
       "//chrome/browser/ui/views/frame:test_support",
+      "//chrome/browser/ui/views/global_media_controls:unit_tests",
       "//chrome/browser/ui/views/indigo:unit_tests",
       "//chrome/browser/ui/views/infobars",
       "//chrome/browser/ui/views/infobars:unit_tests",
@@ -9155,11 +9156,6 @@ test("unit_tests") {
       "../browser/ui/views/frame/multi_contents_drop_target_view_unittest.cc",
       "../browser/ui/views/frame/multi_contents_view_drop_target_controller_unittest.cc",
       "../browser/ui/views/frame/web_contents_close_handler_unittest.cc",
-      "../browser/ui/views/global_media_controls/cast_device_footer_view_unittest.cc",
-      "../browser/ui/views/global_media_controls/cast_device_selector_view_unittest.cc",
-      "../browser/ui/views/global_media_controls/media_item_ui_device_selector_view_unittest.cc",
-      "../browser/ui/views/global_media_controls/media_item_ui_legacy_cast_footer_view_unittest.cc",
-      "../browser/ui/views/global_media_controls/media_toolbar_button_contextual_menu_unittest.cc",
       "../browser/ui/views/hats/hats_next_web_dialog_unittest.cc",
       "../browser/ui/views/hover_button_unittest.cc",
       "../browser/ui/views/intent_picker_bubble_view_unittest.cc",
@@ -9274,10 +9270,6 @@ test("unit_tests") {
         "../browser/default_browser:test_support",
       ]
     }
-    if (is_linux || is_win || is_mac) {
-      sources += [ "../browser/ui/views/global_media_controls/media_dialog_view_unittest.cc" ]
-      deps += [ "//chrome/browser/accessibility" ]
-    }
     if (use_aura) {
       sources += [
         "../browser/ui/views/apps/shaped_app_window_targeter_unittest.cc",
@@ -9296,12 +9288,6 @@ test("unit_tests") {
           "../browser/ui/views/crypto_module_password_dialog_view_unittest.cc",
         ]
       }
-    }
-  }
-  if (use_nss_certs) {
-    if (is_chromeos) {
-      sources += [ "../browser/ui/views/global_media_controls/media_item_ui_cast_footer_view_unittest.cc" ]
-      deps += [ "//chromeos/ash/components/kcer" ]
     }
   }
   if (!is_android && use_nss_certs) {
@@ -10534,6 +10520,7 @@ if (!is_android && !is_chromeos_device) {
         "//chrome/browser/ui/views/commerce",
         "//chrome/browser/ui/views/commerce:interactive_ui_tests",
         "//chrome/browser/ui/views/frame",
+        "//chrome/browser/ui/views/global_media_controls",
         "//chrome/browser/ui/views/page_action:interactive_ui_tests",
         "//chrome/browser/ui/views/page_info",
         "//chrome/browser/ui/views/performance_controls:interactive_ui_tests",
@@ -10641,14 +10628,12 @@ if (!is_android && !is_chromeos_device) {
           deps += [ "//chrome/browser/ui/ash/gemini_app:interactive_ui_tests" ]
         }
       } else {
-        sources += [
-          "../browser/ui/views/download/bubble/download_bubble_interactive_uitest.cc",
-          "../browser/ui/views/global_media_controls/media_dialog_view_interactive_browsertest.cc",
-        ]
+        sources += [ "../browser/ui/views/download/bubble/download_bubble_interactive_uitest.cc" ]
 
         deps += [
           "../browser/media/router:test_support",
-          "../browser/ui/views:test_support",
+          "../browser/ui/views/global_media_controls:interactive_ui_tests",
+          "../browser/ui/views/global_media_controls:test_support",
           "//chrome/browser/ui/global_media_controls",
           "//chrome/browser/ui/views/relaunch_notification:interactive_ui_tests",
           "//chrome/browser/ui/views/shortcuts:interactive_ui_tests",

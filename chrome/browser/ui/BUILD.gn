@@ -4112,27 +4112,6 @@ static_library("ui") {
       "views/fullscreen_control/fullscreen_control_host.h",
       "views/global_error_bubble_view.cc",
       "views/global_error_bubble_view.h",
-      "views/global_media_controls/cast_device_footer_view.cc",
-      "views/global_media_controls/cast_device_footer_view.h",
-      "views/global_media_controls/cast_device_selector_view.cc",
-      "views/global_media_controls/cast_device_selector_view.h",
-      "views/global_media_controls/media_dialog_view.cc",
-      "views/global_media_controls/media_dialog_view.h",
-      "views/global_media_controls/media_dialog_view_observer.h",
-      "views/global_media_controls/media_item_ui_cast_footer_view.cc",
-      "views/global_media_controls/media_item_ui_cast_footer_view.h",
-      "views/global_media_controls/media_item_ui_device_selector_view.cc",
-      "views/global_media_controls/media_item_ui_device_selector_view.h",
-      "views/global_media_controls/media_item_ui_helper.cc",
-      "views/global_media_controls/media_item_ui_helper.h",
-      "views/global_media_controls/media_item_ui_legacy_cast_footer_view.cc",
-      "views/global_media_controls/media_item_ui_legacy_cast_footer_view.h",
-      "views/global_media_controls/media_notification_device_entry_ui.cc",
-      "views/global_media_controls/media_notification_device_entry_ui.h",
-      "views/global_media_controls/media_toolbar_button_contextual_menu.cc",
-      "views/global_media_controls/media_toolbar_button_contextual_menu.h",
-      "views/global_media_controls/media_toolbar_button_view.cc",
-      "views/global_media_controls/media_toolbar_button_view.h",
       "views/hung_renderer_view.cc",
       "views/hung_renderer_view.h",
       "views/idle_bubble.cc",
@@ -4883,6 +4862,8 @@ static_library("ui") {
       "//chrome/browser/ui/views/frame",
       "//chrome/browser/ui/views/frame:shadow",
       "//chrome/browser/ui/views/frame:toolbar_button_provider",
+      "//chrome/browser/ui/views/global_media_controls",
+      "//chrome/browser/ui/views/global_media_controls:impl",
       "//chrome/browser/ui/views/infobars",
       "//chrome/browser/ui/views/intent_picker:intent_picker_page_action",
       "//chrome/browser/ui/views/interaction",
@@ -5072,6 +5053,13 @@ static_library("ui") {
       # following headers get componentized:
       # c/b/ui/browser.h, browser_window.h
       "//chrome/browser/ui/window_metadata",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following headers get componentized:
+      # c/b/ui/browser.h, singleton_tabs.h
+      # c/b/ui/views/frame/browser_view.h
+      # c/b/ui/views/media_router/cast_dialog_helper.h
+      "//chrome/browser/ui/views/global_media_controls:impl",
 
       # TODO(crbug.com/408801109): Remove this circular dependency when the
       # following headers get componentized:
