@@ -581,8 +581,6 @@ NET_EXPORT BASE_DECLARE_FEATURE_PARAM(bool, kSqlDiskCacheWalMode);
 // Disables synchronous writes in the SQL disk cache's DB.
 // This is faster but less safe.
 NET_EXPORT BASE_DECLARE_FEATURE_PARAM(bool, kSqlDiskCacheSynchronousOff);
-// Enables the database preloading for the SQL disk cache backend.
-NET_EXPORT BASE_DECLARE_FEATURE_PARAM(bool, kSqlDiskCachePreloadDatabase);
 // The number of shards for the SQL disk cache.
 NET_EXPORT BASE_DECLARE_FEATURE_PARAM(int, kSqlDiskCacheShardCount);
 // Loads the in-memory index on initialization.
