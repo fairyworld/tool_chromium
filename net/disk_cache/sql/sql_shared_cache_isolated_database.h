@@ -14,6 +14,7 @@
 #include "base/types/expected.h"
 #include "base/types/pass_key.h"
 #include "components/sqlite_vfs/sqlite_sandboxed_vfs.h"
+#include "components/sqlite_vfs/vfs_utils.h"
 #include "net/base/io_buffer.h"
 #include "net/base/net_export.h"
 #include "net/disk_cache/sql/cache_entry_key.h"
@@ -61,6 +62,7 @@ class NET_EXPORT_PRIVATE SqlSharedCacheIsolatedDatabase {
     kInvalidWriteRange = 19,
     kInvalidReadRange = 20,
     kFailedToReadBlob = 21,
+    kFailedToShareConnection = 22,
   };
 
   using ReadResult = SqlPersistentStore::ReadResult;
@@ -70,6 +72,12 @@ class NET_EXPORT_PRIVATE SqlSharedCacheIsolatedDatabase {
                                  const base::FilePath& directory,
                                  SqlSharedCacheDbId shared_cache_db_id);
   ~SqlSharedCacheIsolatedDatabase();
+
+  // Returns a PendingFileSet that represents a read-only connection to the
+  // database. This PendingFileSet can be passed to another process (like a
+  // sandboxed renderer) to allow it to read from the database directly.
+  base::expected<sqlite_vfs::PendingFileSet, Error>
+  GetSharedReadOnlyConnection();
 
   base::expected<void, Error> Init();
 
@@ -112,7 +120,9 @@ class NET_EXPORT_PRIVATE SqlSharedCacheIsolatedDatabase {
         const base::FilePath& directory,
         SqlSharedCacheDbId shared_cache_db_id);
 
-    DatabaseAssets(sqlite_vfs::SqliteVfsFileSet vfs_file_set,
+    DatabaseAssets(const base::FilePath& directory,
+                   SqlSharedCacheDbId shared_cache_db_id,
+                   sqlite_vfs::SqliteVfsFileSet vfs_file_set,
                    base::PassKey<DatabaseAssets>);
     DatabaseAssets(const DatabaseAssets&) = delete;
     DatabaseAssets& operator=(const DatabaseAssets&) = delete;
@@ -121,8 +131,12 @@ class NET_EXPORT_PRIVATE SqlSharedCacheIsolatedDatabase {
 
     sql::Database& db() { return db_; }
     base::FilePath GetDbVirtualFilePath() const;
+    base::expected<sqlite_vfs::PendingFileSet, sqlite_vfs::FileSetError>
+    ShareConnection();
 
    private:
+    const base::FilePath directory_;
+    const SqlSharedCacheDbId shared_cache_db_id_;
     sqlite_vfs::SqliteVfsFileSet vfs_file_set_;
     sqlite_vfs::SqliteSandboxedVfsDelegate::UnregisterRunner unregister_runner_;
     sql::Database db_;
