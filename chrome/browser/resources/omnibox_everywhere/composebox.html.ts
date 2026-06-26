@@ -6,9 +6,9 @@ import {hasAllowedInputs} from '//resources/cr_components/composebox/common.js';
 import {ToolMode} from '//resources/cr_components/composebox/composebox_query.mojom-webui.js';
 import {html} from '//resources/lit/v3_0/lit.rollup.js';
 
-import type {ComposeboxEverywhereElement} from './composebox_everywhere.js';
+import type {OmniboxEverywhereComposeboxElement} from './composebox.js';
 
-export function getHtml(this: ComposeboxEverywhereElement) {
+export function getHtml(this: OmniboxEverywhereComposeboxElement) {
   // clang-format off
   return html`<!--_html_template_start_-->
     <div id="shadow-container"></div>

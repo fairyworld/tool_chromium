@@ -240,6 +240,7 @@ template("chrome_extra_paks") {
         "$root_gen_dir/chrome/lens_shared_resources.pak",
         "$root_gen_dir/chrome/lens_untrusted_resources.pak",
         "$root_gen_dir/chrome/new_tab_footer_resources.pak",
+        "$root_gen_dir/chrome/omnibox_everywhere_resources.pak",
         "$root_gen_dir/chrome/omnibox_popup_resources.pak",
         "$root_gen_dir/chrome/password_manager_resources.pak",
         "$root_gen_dir/chrome/profile_internals_resources.pak",

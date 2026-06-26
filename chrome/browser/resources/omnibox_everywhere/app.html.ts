@@ -4,14 +4,13 @@
 
 import {html} from '//resources/lit/v3_0/lit.rollup.js';
 
-import type {OmniboxEverywhereAppElement} from './everywhere_app.js';
+import type {OmniboxEverywhereAppElement} from './app.js';
 
 export function getHtml(this: OmniboxEverywhereAppElement) {
   return html`<!--_html_template_start_-->
 <div id="content">
-  ${
-      this.isComposeboxMode_ ? html`
-    <composebox-everywhere id="composebox" searchbox-next-enabled
+  ${this.isComposeboxMode_ ? html`
+    <omnibox-everywhere-composebox id="composebox" searchbox-next-enabled
         searchbox-layout-mode="${this.searchboxLayoutMode_}"
         .state="${this.composeboxState_}"
         @close-composebox="${this.onCloseComposebox_}"
@@ -20,12 +19,11 @@ export function getHtml(this: OmniboxEverywhereAppElement) {
         .usePecApi="${this.usePecApi_}"
         .isOblongShape="${this.isOblongShape_}"
         entrypoint-name="Omnibox">
-    </composebox-everywhere>
-  ` :
-                               html`
-    <omnibox-everywhere id="searchbox"
+    </omnibox-everywhere-composebox>
+  ` : html`
+    <omnibox-everywhere-omnibox id="searchbox"
         @open-composebox="${this.onOpenComposebox_}">
-    </omnibox-everywhere>
+    </omnibox-everywhere-omnibox>
   `}
 </div>
 <!--_html_template_end_-->`;

@@ -26,10 +26,10 @@ import type {PropertyValues} from '//resources/lit/v3_0/lit.rollup.js';
 import type {FileAttachment, PageCallbackRouter as SearchboxPageCallbackRouter, PageHandlerRemote as SearchboxPageHandlerRemote, SearchContext, TabAttachment} from '//resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {ToolMode} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
 
-import {getCss} from './composebox_everywhere.css.js';
-import {getHtml} from './composebox_everywhere.html.js';
+import {getCss} from './composebox.css.js';
+import {getHtml} from './composebox.html.js';
 
-export interface ComposeboxEverywhereElement {
+export interface OmniboxEverywhereComposeboxElement {
   $: {
     composeboxInput: ComposeboxInputElement,
     composebox: HTMLElement,
@@ -37,10 +37,10 @@ export interface ComposeboxEverywhereElement {
   };
 }
 
-export class ComposeboxEverywhereElement extends ComposeboxEmbedderMixin
+export class OmniboxEverywhereComposeboxElement extends ComposeboxEmbedderMixin
 (CrLitElement) {
   static get is() {
-    return 'composebox-everywhere';
+    return 'omnibox-everywhere-composebox';
   }
 
   static override get styles() {
@@ -220,9 +220,9 @@ export class ComposeboxEverywhereElement extends ComposeboxEmbedderMixin
 
 declare global {
   interface HTMLElementTagNameMap {
-    'composebox-everywhere': ComposeboxEverywhereElement;
+    'omnibox-everywhere-composebox': OmniboxEverywhereComposeboxElement;
   }
 }
 
 customElements.define(
-    ComposeboxEverywhereElement.is, ComposeboxEverywhereElement);
+    OmniboxEverywhereComposeboxElement.is, OmniboxEverywhereComposeboxElement);

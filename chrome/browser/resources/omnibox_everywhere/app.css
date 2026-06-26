@@ -7,7 +7,7 @@
  * #scheme=relative
  * #css_wrapper_metadata_end */
 
-everywhere-searchbox {
+omnibox-everywhere-omnibox {
   --cr-searchbox-height: 56px;
   --cr-searchbox-icon-left-position: 12px;
   --cr-searchbox-icon-top-position: 0;
@@ -20,13 +20,13 @@ everywhere-searchbox {
 }
 
 :host([omnibox-popup-debug-enabled_])
-    everywhere-searchbox::part(searchbox-input) {
+    omnibox-everywhere-omnibox::part(searchbox-input) {
   /* For debugging purposes, makes it more obvious when the WebUI input is
    * showing. */
   background-color: lightgreen;
 }
 
-everywhere-searchbox::part(dropdown-content) {
+omnibox-everywhere-omnibox::part(dropdown-content) {
   border-radius: inherit;
 }
 

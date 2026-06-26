@@ -4,9 +4,9 @@
 
 import {html} from '//resources/lit/v3_0/lit.rollup.js';
 
-import type {OmniboxEverywhereElement} from './omnibox_everywhere.js';
+import type {OmniboxEverywhereOmniboxElement} from './omnibox.js';
 
-export function getHtml(this: OmniboxEverywhereElement) {
+export function getHtml(this: OmniboxEverywhereOmniboxElement) {
   return html`
     <div id="inputWrapper" @focusout="${this.onInputWrapperFocusout}"
         @keydown="${this.onInputWrapperKeydown}">

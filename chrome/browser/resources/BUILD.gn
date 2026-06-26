@@ -70,6 +70,7 @@ group("resources") {
       "lens/overlay:resources",
       "lens/shared:resources",
       "new_tab_footer:resources",
+      "omnibox_everywhere:resources",
       "omnibox_popup:resources",
       "password_manager:resources",
       "profile_internals:resources",

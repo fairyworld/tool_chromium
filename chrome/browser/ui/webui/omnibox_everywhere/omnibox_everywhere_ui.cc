@@ -13,11 +13,13 @@
 #include "chrome/browser/ui/webui/favicon_source.h"
 #include "chrome/browser/ui/webui/metrics_reporter/metrics_reporter_service.h"
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_web_contents_helper.h"
+#include "chrome/browser/ui/webui/plural_string_handler.h"
 #include "chrome/browser/ui/webui/sanitized_image/sanitized_image_source.h"
 #include "chrome/browser/ui/webui/searchbox/webui_omnibox_handler.h"
 #include "chrome/common/webui_url_constants.h"
-#include "chrome/grit/omnibox_popup_resources.h"
-#include "chrome/grit/omnibox_popup_resources_map.h"
+#include "chrome/grit/generated_resources.h"
+#include "chrome/grit/omnibox_everywhere_resources.h"
+#include "chrome/grit/omnibox_everywhere_resources_map.h"
 #include "components/contextual_search/contextual_search_metrics_recorder.h"
 #include "components/contextual_search/contextual_search_service.h"
 #include "components/favicon_base/favicon_url_parser.h"
@@ -47,8 +49,8 @@ OmniboxEverywhereUI::OmniboxEverywhereUI(content::WebUI* web_ui)
   content::WebUIDataSource* source = content::WebUIDataSource::CreateAndAdd(
       profile_, chrome::kChromeUIOmniboxEverywhereHost);
 
-  webui::SetupWebUIDataSource(source, kOmniboxPopupResources,
-                              IDR_OMNIBOX_POPUP_OMNIBOX_POPUP_EVERYWHERE_HTML);
+  webui::SetupWebUIDataSource(source, kOmniboxEverywhereResources,
+                              IDR_OMNIBOX_EVERYWHERE_OMNIBOX_EVERYWHERE_HTML);
 
   // Sanitized image and favicon source initialization
   content::URLDataSource::Add(profile_,
@@ -168,6 +170,12 @@ OmniboxEverywhereUI::OmniboxEverywhereUI(content::WebUI* web_ui)
       base::FeatureList::IsEnabled(omnibox::kEnergyEffectInOmnibox));
   source->AddBoolean("contextButtonShapeIsOblong",
                      omnibox::kContextButtonShapeIsOblong.Get());
+
+  // Add a handler to provide pluralized strings.
+  auto plural_string_handler = std::make_unique<PluralStringHandler>();
+  plural_string_handler->AddLocalizedString("sharingTabs",
+                                            IDS_COMPOSE_SHARING_TABS);
+  web_ui->AddMessageHandler(std::move(plural_string_handler));
 }
 
 OmniboxEverywhereUI::~OmniboxEverywhereUI() = default;

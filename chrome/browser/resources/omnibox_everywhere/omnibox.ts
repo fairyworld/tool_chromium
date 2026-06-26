@@ -25,10 +25,10 @@ import type {PageCallbackRouter, PageHandlerInterface, TabInfo} from '//resource
 import {ModelMode, ToolMode} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
 import type {InputState} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
 
-import {getCss} from './omnibox_everywhere.css.js';
-import {getHtml} from './omnibox_everywhere.html.js';
+import {getCss} from './omnibox.css.js';
+import {getHtml} from './omnibox.html.js';
 
-export interface OmniboxEverywhereElement {
+export interface OmniboxEverywhereOmniboxElement {
   $: {
     input: SearchboxInputElement,
     inputWrapper: HTMLElement,
@@ -38,13 +38,13 @@ export interface OmniboxEverywhereElement {
 
 // Note: Copied from omnibox_popup_searchbox.ts.
 //       I18nMixinLit may eventually be moved to SearchboxMixin.
-const OmniboxEverywhereElementBase =
+const OmniboxEverywhereOmniboxElementBase =
     SearchboxMixin(I18nMixinLit(WebUiListenerMixinLit(CrLitElement)));
 
-export class OmniboxEverywhereElement extends OmniboxEverywhereElementBase
-    implements SearchboxMixinInterface {
+export class OmniboxEverywhereOmniboxElement extends
+    OmniboxEverywhereOmniboxElementBase implements SearchboxMixinInterface {
   static get is() {
-    return 'omnibox-everywhere';
+    return 'omnibox-everywhere-omnibox';
   }
 
   static override get styles() {
@@ -298,8 +298,9 @@ export class OmniboxEverywhereElement extends OmniboxEverywhereElementBase
 
 declare global {
   interface HTMLElementTagNameMap {
-    'omnibox-everywhere': OmniboxEverywhereElement;
+    'omnibox-everywhere-omnibox': OmniboxEverywhereOmniboxElement;
   }
 }
 
-customElements.define(OmniboxEverywhereElement.is, OmniboxEverywhereElement);
+customElements.define(
+    OmniboxEverywhereOmniboxElement.is, OmniboxEverywhereOmniboxElement);
