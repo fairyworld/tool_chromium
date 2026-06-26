@@ -23,19 +23,6 @@ chromium-metrics-reviews@google.com.
 
 <histograms>
 
-<histogram name="AccountManager.AccountAdditionResultStatus"
-    enum="AccountManagerAccountUpsertionResultStatus"
-    expires_after="2024-11-01">
-  <owner>sinhak@chromium.org</owner>
-  <owner>emaamari@google.com</owner>
-  <summary>
-    Records the result of in-session account addition (or re-authentication)
-    triggers on Chrome OS. This is recorded whenever an in-session account
-    addition (or re-authentication) is triggered and user finishes or cancels
-    the flow.
-  </summary>
-</histogram>
-
 <histogram name="AccountManager.AccountAdditionSource"
     enum="AccountManagerAccountAdditionSource" expires_after="2025-12-28">
   <owner>sinhak@chromium.org</owner>
@@ -46,6 +33,20 @@ chromium-metrics-reviews@google.com.
     addition (or re-authentication) is triggered - either explicitely by the
     user, or automatically by Gaia (for accounts requiring immediate
     re-authentication).
+  </summary>
+</histogram>
+
+<histogram name="AccountManager.AccountUpsertionResultStatus"
+    enum="AccountManagerAccountUpsertionResultStatus"
+    expires_after="2027-06-25">
+  <owner>sinhak@chromium.org</owner>
+  <owner>emaamari@google.com</owner>
+  <owner>diwux@google.com</owner>
+  <summary>
+    Records the result of in-session account upsertion (addition or
+    re-authentication) triggers on Chrome OS. This is recorded whenever an
+    in-session account addition or re-authentication is triggered and the user
+    finishes or cancels the flow.
   </summary>
 </histogram>
 
