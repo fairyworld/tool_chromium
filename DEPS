@@ -3664,7 +3664,7 @@ deps = {
 
   'src/chrome/browser/indigo/resources/internal': {
       'url': Var('chrome_git') + '/chrome/browser/indigo/resources/internal.git' + '@' +
-        'a404239fda25d713fa73d928ce32df05cfb98262',
+        '17caf888ffa2792cc3f9cac394b662d4c0c1f7df',
       'condition': 'checkout_src_internal',
   },
 
