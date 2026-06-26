@@ -838,6 +838,11 @@ GlicSharingManager* GlicInstanceImpl::GetSharingManager() {
   return &GetSharingManagerInternal();
 }
 
+void GlicInstanceImpl::UpdateSkillPreviews(
+    std::optional<tabs::TabInterface*> updated_tab) {
+  skills_manager().UpdateSkillPreviews(updated_tab);
+}
+
 void GlicInstanceImpl::FetchZeroStateSuggestions(
     bool is_first_run,
     std::optional<std::vector<std::string>> supported_tools,

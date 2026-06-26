@@ -206,6 +206,8 @@ class GlicInstanceImpl : public GlicInstance,
   void CancelTask() override;
   GlicActorTaskManager* GetActorTaskManager() override;
   GlicSharingManager* GetSharingManager() override;
+  void UpdateSkillPreviews(
+      std::optional<tabs::TabInterface*> updated_tab) override;
 
   // Called exactly once, right before the instance is destroyed.
   using DestructionCallback = base::OnceCallback<void(GlicInstance*)>;
