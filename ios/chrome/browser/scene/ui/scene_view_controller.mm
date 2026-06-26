@@ -445,16 +445,16 @@ inline LayoutStateScenePassKey PassKey() {
 
 // Called when the view's trait collection changes.
 - (void)viewTraitDidChange {
-  [self.layoutState
-      setContainedLayoutSupported:IsSidePanelLayout(self.view.traitCollection)
-                          passKey:PassKey()];
-  [self.layoutState setWindowedMode:IsWindowedMode(self.view.window)
-                            passKey:PassKey()];
   if (IsChromeNextIaEnabled()) {
     [self.layoutState updateAppBarPositionWithView:self.view
                                        coordinator:nil
                                            passKey:PassKey()];
   }
+  [self.layoutState
+      setContainedLayoutSupported:IsSidePanelLayout(self.view.traitCollection)
+                          passKey:PassKey()];
+  [self.layoutState setWindowedMode:IsWindowedMode(self.view.window)
+                            passKey:PassKey()];
 }
 
 // Helper to update app content constraints for panel layout.
