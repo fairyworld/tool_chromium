@@ -385,13 +385,26 @@ TEST_F(SessionStorageSqliteTest, UpdateMaps) {
   std::unique_ptr<SessionStorageSqlite> database;
   ASSERT_NO_FATAL_FAILURE(OpenInMemory(&database));
 
-  DomStorageDatabase::MapLocator map1_locator{kFirstSessionId, kFirstStorageKey,
-                                              kFirstMapId};
+  const DomStorageDatabase::MapMetadata kExpectedMapMetadata[] = {
+      {
+          .map_locator{kFirstSessionId, kFirstStorageKey, kFirstMapId},
+      },
+      {
+          .map_locator{kFirstSessionId, kSecondStorageKey, kSecondMapId},
+      },
+  };
+  ASSERT_NO_FATAL_FAILURE(TestUpdateMaps(*database,
+                                         kExpectedMapMetadata[0].map_locator,
+                                         kExpectedMapMetadata[1].map_locator));
 
-  DomStorageDatabase::MapLocator map2_locator{kFirstSessionId,
-                                              kSecondStorageKey, kSecondMapId};
-  ASSERT_NO_FATAL_FAILURE(
-      TestUpdateMaps(*database, map1_locator, map2_locator));
+  // `SessionStorageSqlite::UpdateMaps()` must write metadata for each map
+  // updated.
+  ASSERT_OK_AND_ASSIGN(DomStorageDatabase::Metadata metadata,
+                       database->ReadAllMetadata());
+  ExpectEqualsMapMetadataSpan(metadata.map_metadata, kExpectedMapMetadata);
+
+  // `SessionStorageSqlite::UpdateMaps()` must not update the `next_map_id`.
+  EXPECT_EQ(metadata.next_map_id, 0);
 }
 
 // Verifies that `CloneMap()` correctly copies all key/value pairs from the
@@ -400,10 +413,18 @@ TEST_F(SessionStorageSqliteTest, CloneMap) {
   std::unique_ptr<SessionStorageSqlite> database;
   ASSERT_NO_FATAL_FAILURE(OpenInMemory(&database));
 
-  const DomStorageDatabase::MapLocator kSourceMapLocator{
-      kFirstSessionId, kFirstStorageKey, kFirstMapId};
-  const DomStorageDatabase::MapLocator kTargetMapLocator{
-      kSecondSessionId, kSecondStorageKey, kSecondMapId};
+  const DomStorageDatabase::MapMetadata kExpectedMapMetadata[] = {
+      {
+          .map_locator{kFirstSessionId, kFirstStorageKey, kFirstMapId},
+      },
+      {
+          .map_locator{kSecondSessionId, kSecondStorageKey, kSecondMapId},
+      },
+  };
+  const DomStorageDatabase::MapLocator kSourceMapLocator =
+      kExpectedMapMetadata[0].map_locator.Clone();
+  const DomStorageDatabase::MapLocator kTargetMapLocator =
+      kExpectedMapMetadata[1].map_locator.Clone();
 
   // Insert key/value pairs into the source map.
   const std::map<DomStorageDatabase::Key, DomStorageDatabase::Value>
@@ -431,6 +452,15 @@ TEST_F(SessionStorageSqliteTest, CloneMap) {
                                  DomStorageDatabase::Value> source_entries),
                        database->ReadMapKeyValues(kSourceMapLocator.Clone()));
   EXPECT_EQ(source_entries, kSourceMapEntries);
+
+  // Verify `SessionStorageSqlite::CloneMap()` updated the metadata for
+  // `kTargetMapLocator`.
+  ASSERT_OK_AND_ASSIGN(DomStorageDatabase::Metadata metadata,
+                       database->ReadAllMetadata());
+  ExpectEqualsMapMetadataSpan(metadata.map_metadata, kExpectedMapMetadata);
+
+  // `SessionStorageSqlite::UpdateMaps()` must not update the `next_map_id`.
+  EXPECT_EQ(metadata.next_map_id, 0);
 }
 
 // Verifies deleting a session removes its metadata from the database.

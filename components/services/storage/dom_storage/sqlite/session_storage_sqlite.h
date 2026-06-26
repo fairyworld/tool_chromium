@@ -94,6 +94,10 @@ class SessionStorageSqlite : public DomStorageDatabase,
   StatusOr<std::vector<DomStorageDatabase::MapMetadata>> ReadAllMapMetadata()
       const;
 
+  // Inserts or updates a row in the session_metadata table for each session in
+  // `map_locator`.
+  DbStatus PutMapLocator(const MapLocator& map_locator);
+
   // base::trace_event::MemoryDumpProvider implementation:
   bool OnMemoryDump(const base::trace_event::MemoryDumpArgs& args,
                     base::trace_event::ProcessMemoryDump* pmd) override;
