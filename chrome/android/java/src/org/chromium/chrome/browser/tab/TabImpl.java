@@ -2248,6 +2248,11 @@ class TabImpl implements Tab {
             if (oldWebContents != null) {
                 assumeNonNull(getWebContentsAccessibility(oldWebContents))
                         .setObscuredByAnotherView(false);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM
+                        && mSensitiveContentClientObserver != null) {
+                    SensitiveContentClient.fromWebContents(oldWebContents)
+                            .removeObserver(mSensitiveContentClientObserver);
+                }
             }
 
             ContentUtils.setUserAgentOverride(
