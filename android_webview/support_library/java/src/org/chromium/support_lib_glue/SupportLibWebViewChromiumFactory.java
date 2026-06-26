@@ -161,7 +161,7 @@ public class SupportLibWebViewChromiumFactory implements WebViewProviderFactoryB
     // availability is conditioned on the Lazy Profile flag.
     private static final Map<String, String> sWebViewSupportedFeaturesWithCachedFlagConditions =
             Map.of(
-                    Features.ENQUEUE_PRECONNECT + Features.DEV_SUFFIX,
+                    Features.ENQUEUE_PRECONNECT,
                     AwFeatures.WEBVIEW_PROFILE_STORE_NOT_TRIGGER_STARTUP);
 
     // mAwInit.getLazyInitLock() guards access to fields that are lazily initialized.

@@ -57,8 +57,7 @@ public class SupportLibTest {
         WebViewCachedFlags.initForTesting(prefs);
         List<String> supportedFeaturesList =
                 Arrays.asList(SupportLibWebViewChromiumFactory.assembleSupportedFeatures());
-        Assert.assertTrue(
-                supportedFeaturesList.contains(Features.ENQUEUE_PRECONNECT + Features.DEV_SUFFIX));
+        Assert.assertTrue(supportedFeaturesList.contains(Features.ENQUEUE_PRECONNECT));
     }
 
     @Test
@@ -74,8 +73,7 @@ public class SupportLibTest {
         WebViewCachedFlags.initForTesting(prefs);
         List<String> supportedFeaturesList =
                 Arrays.asList(SupportLibWebViewChromiumFactory.assembleSupportedFeatures());
-        Assert.assertFalse(
-                supportedFeaturesList.contains(Features.ENQUEUE_PRECONNECT + Features.DEV_SUFFIX));
+        Assert.assertFalse(supportedFeaturesList.contains(Features.ENQUEUE_PRECONNECT));
     }
 
     @Test
