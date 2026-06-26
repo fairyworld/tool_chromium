@@ -32,6 +32,7 @@ import java.lang.annotation.RetentionPolicy;
     FeatureConstants.ANDROID_BOTTOM_BAR_NEW_TAB,
     FeatureConstants.ANDROID_BOTTOM_BAR_PROMO_DIALOG,
     FeatureConstants.ANDROID_TAB_DECLUTTER_FEATURE,
+    FeatureConstants.ANDROID_VERTICAL_TABS_PROMO_FEATURE,
     FeatureConstants.APP_RATING_PROMPT_FEATURE,
     FeatureConstants.APP_SPECIFIC_HISTORY_FEATURE,
     FeatureConstants.AUTO_DARK_OPT_OUT_FEATURE,
@@ -190,6 +191,7 @@ public @interface FeatureConstants {
     String ANDROID_BOTTOM_BAR_PROMO_DIALOG = "IPH_AndroidBottomBarPromoDialog";
 
     String ANDROID_TAB_DECLUTTER_FEATURE = "IPH_AndroidTabDeclutter";
+    String ANDROID_VERTICAL_TABS_PROMO_FEATURE = "IPH_AndroidVerticalTabsPromo";
 
     String APP_RATING_PROMPT_FEATURE = "IPH_AppRatingPrompt";
     String APP_SPECIFIC_HISTORY_FEATURE = "IPH_AppSpecificHistory";

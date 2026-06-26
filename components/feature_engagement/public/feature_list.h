@@ -53,6 +53,8 @@ DEFINE_VARIATION_PARAM(kIPHAndroidBottomBarNewTab,
 DEFINE_VARIATION_PARAM(kIPHAndroidBottomBarPromoDialog,
                        "IPH_AndroidBottomBarPromoDialog");
 DEFINE_VARIATION_PARAM(kIPHAndroidTabDeclutter, "IPH_AndroidTabDeclutter");
+DEFINE_VARIATION_PARAM(kIPHAndroidVerticalTabsPromoFeature,
+                       "IPH_AndroidVerticalTabsPromo");
 DEFINE_VARIATION_PARAM(kIPHAdaptiveButtonInTopToolbarCustomizationNewTabFeature,
                        "IPH_AdaptiveButtonInTopToolbarCustomization_NewTab");
 DEFINE_VARIATION_PARAM(
@@ -648,6 +650,7 @@ inline constexpr flags_ui::FeatureEntry::FeatureVariation
         VARIATION_ENTRY(kIPHAndroidBottomBarNewTab),
         VARIATION_ENTRY(kIPHAndroidBottomBarPromoDialog),
         VARIATION_ENTRY(kIPHAndroidTabDeclutter),
+        VARIATION_ENTRY(kIPHAndroidVerticalTabsPromoFeature),
         VARIATION_ENTRY(kIPHAppRatingPromptFeature),
         VARIATION_ENTRY(kIPHAppSpecificHistory),
         VARIATION_ENTRY(kIPHAutoDarkOptOutFeature),

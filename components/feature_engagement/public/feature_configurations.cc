@@ -892,6 +892,24 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
     return config;
   }
 
+  if (kIPHAndroidVerticalTabsPromoFeature.name == feature->name) {
+    // A config that allows the Vertical Tabs promo IPH on Android tab strip:
+    // * Only once per week.
+    // * Up to 3 times per year.
+    FeatureConfig config;
+    config.valid = true;
+    config.availability = Comparator(ANY, 0);
+    config.session_rate = Comparator(EQUAL, 0);
+    config.trigger = EventConfig("android_vertical_tabs_promo_iph_triggered",
+                                 Comparator(EQUAL, 0), 7, 360);
+    config.event_configs.insert(
+        EventConfig("android_vertical_tabs_promo_iph_triggered",
+                    Comparator(LESS_THAN, 3), 360, 360));
+    config.used = EventConfig("android_vertical_tabs_promo_used",
+                              Comparator(EQUAL, 0), 360, 360);
+    return config;
+  }
+
   if (kIPHIncognitoIndicatorCloseAllWindows.name == feature->name) {
     // Allows an IPH to inform users they can close all Incognito windows:
     // - Only once per week.
