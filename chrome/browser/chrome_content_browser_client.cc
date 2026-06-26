@@ -254,6 +254,8 @@
 #include "components/enterprise/content/clipboard_restriction_service.h"
 #include "components/enterprise/content/pref_names.h"
 #include "components/enterprise/data_controls/content/browser/last_replaced_clipboard_data.h"
+#include "components/enterprise/network_header_injection/core/features.h"
+#include "components/enterprise/network_header_injection/core/http_header_injection_service.h"
 #include "components/error_page/common/error.h"
 #include "components/error_page/common/error_page_switches.h"
 #include "components/error_page/common/localized_error.h"
@@ -420,6 +422,7 @@
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "services/network/public/mojom/url_loader_factory.mojom.h"
 #include "services/network/public/mojom/web_transport.mojom.h"
+#include "services/network/public/mojom/websocket.mojom.h"
 #include "third_party/blink/public/common/chrome_debug_urls.h"
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/common/loader/url_loader_throttle.h"
@@ -6850,6 +6853,22 @@ bool ChromeContentBrowserClient::WillInterceptWebSocket(
 #endif
 }
 
+content::ContentBrowserClient::WebSocketOptions
+ChromeContentBrowserClient::GetWebSocketOptions(
+    content::RenderFrameHost* frame) {
+  content::ContentBrowserClient::WebSocketOptions options;
+  options.options = network::mojom::kWebSocketOptionNone;
+
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
+    BUILDFLAG(IS_CHROMEOS)
+  if (frame) {
+    enterprise_custom_headers::MaybeCreateWebSocketHeaderClient(
+        frame->GetBrowserContext(), &options.header_client);
+  }
+#endif
+  return options;
+}
+
 void ChromeContentBrowserClient::CreateWebSocket(
     content::RenderFrameHost* frame,
     WebSocketFactory factory,
@@ -6857,7 +6876,8 @@ void ChromeContentBrowserClient::CreateWebSocket(
     const net::SiteForCookies& site_for_cookies,
     const std::optional<std::string>& user_agent,
     mojo::PendingRemote<network::mojom::WebSocketHandshakeClient>
-        handshake_client) {
+        handshake_client,
+    content::ContentBrowserClient::WebSocketOptions options) {
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   // TODO(crbug.com/40195467): Request w/o a frame also should be proxied.
   if (!frame) {
@@ -6868,9 +6888,9 @@ void ChromeContentBrowserClient::CreateWebSocket(
           frame->GetBrowserContext());
 
   DCHECK(web_request_api);
-  web_request_api->ProxyWebSocket(frame, std::move(factory), url,
-                                  site_for_cookies, user_agent,
-                                  std::move(handshake_client));
+  web_request_api->ProxyWebSocket(
+      frame, std::move(factory), url, site_for_cookies, user_agent,
+      std::move(handshake_client), std::move(options.header_client));
 #endif
 }
 

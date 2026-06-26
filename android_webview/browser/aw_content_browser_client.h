@@ -246,7 +246,8 @@ class AwContentBrowserClient : public content::ContentBrowserClient {
       network::mojom::URLLoaderFactoryOverridePtr* factory_override,
       scoped_refptr<base::SequencedTaskRunner> navigation_response_task_runner)
       override;
-  uint32_t GetWebSocketOptions(content::RenderFrameHost* frame) override;
+  content::ContentBrowserClient::WebSocketOptions GetWebSocketOptions(
+      content::RenderFrameHost* frame) override;
   bool WillCreateRestrictedCookieManager(
       network::mojom::RestrictedCookieManagerRole role,
       content::BrowserContext* browser_context,
