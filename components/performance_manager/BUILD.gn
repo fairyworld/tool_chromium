@@ -217,6 +217,7 @@ static_library("performance_manager") {
     "public/persistence/site_data/feature_usage.h",
     "public/persistence/site_data/site_data_reader.h",
     "public/power/battery_level_provider_creator.h",
+    "public/process_priority_policy_settings.h",
     "public/render_frame_host_proxy.h",
     "public/render_process_host_id.h",
     "public/render_process_host_proxy.h",

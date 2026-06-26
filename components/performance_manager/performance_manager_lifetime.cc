@@ -76,10 +76,15 @@ void AddVoters(GraphImpl* graph, PrefService* pref_service) {
     // in ChildProcessLauncherHelperImpl.
     // TODO(b/400850388): Enable voters on Android.
 #if !BUILDFLAG(IS_ANDROID)
+    const auto policy_settings =
+        PerformanceManagerImpl::GetProcessPriorityPolicySettings();
     // When a frame is visible, casts either a USER_BLOCKING or USER_VISIBLE
     // vote, depending on if the frame is important.
-    priority_voting_system
-        ->AddPriorityVoter<execution_context_priority::FrameVisibilityVoter>();
+    if (!policy_settings.ignore_visibility) {
+      priority_voting_system
+          ->AddPriorityVoter<execution_context_priority::FrameVisibilityVoter>(
+              policy_settings.ignore_main_frame_visibility);
+    }
 
     // Casts a USER_BLOCKING vote when a frame is audible.
     priority_voting_system
@@ -160,8 +165,10 @@ void OnGraphCreated(const GraphFeatures& graph_features,
 PerformanceManagerLifetime::PerformanceManagerLifetime(
     const GraphFeatures& graph_features,
     GraphCreatedCallback graph_created_callback,
-    PrefService* pref_service) {
-  performance_manager_ = PerformanceManagerImpl::Create();
+    PrefService* pref_service,
+    ProcessPriorityPolicySettings process_priority_policy_settings) {
+  performance_manager_ =
+      PerformanceManagerImpl::Create(process_priority_policy_settings);
   OnGraphCreated(graph_features, std::move(graph_created_callback),
                  pref_service);
   performance_manager_registry_ =
