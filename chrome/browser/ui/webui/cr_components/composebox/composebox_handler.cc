@@ -39,38 +39,6 @@
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #endif
 
-namespace {
-
-class ComposeboxOmniboxClient final : public ContextualOmniboxClient {
- public:
-  ComposeboxOmniboxClient(Profile* profile,
-                          content::WebContents* web_contents,
-                          ComposeboxHandler* composebox_handler);
-
-  ~ComposeboxOmniboxClient() override;
-
-  // OmniboxClient:
-  metrics::OmniboxEventProto::PageClassification GetPageClassification(
-      bool is_prefetch) const override;
-  std::optional<lens::ContextualInputData> GetContextualInputData()
-      const override;
-
-  void OnAutocompleteAccept(
-      const GURL& destination_url,
-      TemplateURLRef::PostContent* post_content,
-      WindowOpenDisposition disposition,
-      ui::PageTransition transition,
-      AutocompleteMatchType::Type match_type,
-      base::TimeTicks match_selection_timestamp,
-      bool destination_url_entered_without_scheme,
-      bool destination_url_entered_with_http_scheme,
-      const std::u16string& text,
-      const AutocompleteMatch& match,
-      const AutocompleteMatch& alternative_nav_match) override;
-
- private:
-  raw_ptr<ComposeboxHandler> composebox_handler_;
-};
 
 ComposeboxOmniboxClient::ComposeboxOmniboxClient(
     Profile* profile,
@@ -118,7 +86,6 @@ void ComposeboxOmniboxClient::OnAutocompleteAccept(
       additional_params, /*is_voice_search=*/false);
 }
 
-}  // namespace
 
 ComposeboxHandler::ComposeboxHandler(
     mojo::PendingReceiver<composebox::mojom::PageHandler> pending_handler,

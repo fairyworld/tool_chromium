@@ -29,7 +29,6 @@ namespace content {
 class WebContents;
 }
 
-class OmniboxController;
 class Profile;
 
 class OmniboxEverywhereService : public KeyedService,
@@ -59,7 +58,7 @@ class OmniboxEverywhereService : public KeyedService,
 
   // views::WidgetObserver:
   void OnWidgetActivationChanged(views::Widget* widget, bool active) override;
-  void OnWidgetClosed(views::Widget* widget);
+  void OnWidgetDestroying(views::Widget* widget) override;
 
   // WebUIContentsWrapper::Host:
   void CloseUI() override;
@@ -68,9 +67,6 @@ class OmniboxEverywhereService : public KeyedService,
                              const gfx::Size& new_size) override;
 
   views::Widget* GetWidgetForTesting() { return widget_.get(); }
-  OmniboxController* GetOmniboxControllerForTesting() {
-    return controller_.get();
-  }
 
   void SetIsNavigating(bool is_navigating) { is_navigating_ = is_navigating; }
   void SetWasActiveBeforePopup(bool was_active) {
@@ -81,7 +77,6 @@ class OmniboxEverywhereService : public KeyedService,
   void CreateAndShowWidget();
 
   raw_ptr<Profile> profile_;
-  std::unique_ptr<OmniboxController> controller_;
   std::unique_ptr<WebUIContentsWrapper> contents_wrapper_;
   std::unique_ptr<views::Widget> widget_;
 

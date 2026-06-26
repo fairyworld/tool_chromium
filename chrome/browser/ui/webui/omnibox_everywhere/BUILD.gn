@@ -6,6 +6,10 @@ assert(!is_android)
 
 source_set("omnibox_everywhere") {
   sources = [
+    "composebox_everywhere_handler.cc",
+    "composebox_everywhere_handler.h",
+    "omnibox_everywhere_handler.cc",
+    "omnibox_everywhere_handler.h",
     "omnibox_everywhere_ui.cc",
     "omnibox_everywhere_ui.h",
   ]
@@ -22,9 +26,7 @@ source_set("omnibox_everywhere") {
     "//chrome/browser/ui/webui/cr_components/composebox",
     "//chrome/browser/ui/webui/cr_components/searchbox",
     "//chrome/browser/ui/webui/metrics_reporter",
-    "//chrome/browser/ui/webui/omnibox_popup",
     "//chrome/browser/ui/webui/sanitized_image:sanitized_image_source",
-    "//chrome/browser/ui/webui/searchbox",
     "//chrome/browser/ui/webui/top_chrome",
     "//chrome/common",
     "//components/contextual_search:public",

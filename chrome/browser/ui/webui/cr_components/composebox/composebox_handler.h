@@ -11,17 +11,51 @@
 
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/ui/webui/cr_components/searchbox/contextual_searchbox_handler.h"
+#include "components/omnibox/browser/autocomplete_match_type.h"
 #include "components/omnibox/browser/searchbox.mojom.h"
 #include "content/public/browser/web_contents.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/remote.h"
+#include "third_party/metrics_proto/omnibox_event.pb.h"
 #include "ui/base/window_open_disposition_utils.h"
 #include "ui/webui/resources/cr_components/composebox/composebox.mojom.h"
 #include "url/gurl.h"
 
 class Profile;
 class OmniboxController;
+class ComposeboxHandler;
+
+class ComposeboxOmniboxClient : public ContextualOmniboxClient {
+ public:
+  ComposeboxOmniboxClient(Profile* profile,
+                          content::WebContents* web_contents,
+                          ComposeboxHandler* composebox_handler);
+
+  ~ComposeboxOmniboxClient() override;
+
+  // OmniboxClient:
+  metrics::OmniboxEventProto::PageClassification GetPageClassification(
+      bool is_prefetch) const override;
+  std::optional<lens::ContextualInputData> GetContextualInputData()
+      const override;
+
+  void OnAutocompleteAccept(
+      const GURL& destination_url,
+      TemplateURLRef::PostContent* post_content,
+      WindowOpenDisposition disposition,
+      ui::PageTransition transition,
+      AutocompleteMatchType::Type match_type,
+      base::TimeTicks match_selection_timestamp,
+      bool destination_url_entered_without_scheme,
+      bool destination_url_entered_with_http_scheme,
+      const std::u16string& text,
+      const AutocompleteMatch& match,
+      const AutocompleteMatch& alternative_nav_match) override;
+
+ private:
+  raw_ptr<ComposeboxHandler> composebox_handler_;
+};
 
 class ComposeboxHandler : public composebox::mojom::PageHandler,
                           public ContextualSearchboxHandler {
@@ -121,4 +155,5 @@ class ComposeboxHandler : public composebox::mojom::PageHandler,
   mojo::Remote<composebox::mojom::Page> page_;
   mojo::Receiver<composebox::mojom::PageHandler> handler_;
 };
+
 #endif  // CHROME_BROWSER_UI_WEBUI_CR_COMPONENTS_COMPOSEBOX_COMPOSEBOX_HANDLER_H_

@@ -52,48 +52,10 @@ void OrderOmniboxEverywhereFrontOnMac(views::Widget* widget);
 
 namespace {
 
-class OmniboxEverywhereClient : public SearchboxOmniboxClient {
- public:
-  OmniboxEverywhereClient(Profile* profile, OmniboxEverywhereService* service)
-      : SearchboxOmniboxClient(profile, nullptr), service_(service) {}
-  ~OmniboxEverywhereClient() override = default;
-
-  metrics::OmniboxEventProto::PageClassification GetPageClassification(
-      bool is_prefetch) const override {
-    return metrics::OmniboxEventProto::OTHER;
-  }
-
-  metrics::OmniboxEventProto::PageClassification
-  GetOmniboxComposeboxPageClassification() const override {
-    return metrics::OmniboxEventProto::OTHER_OMNIBOX_COMPOSEBOX;
-  }
-
-  void OnAutocompleteAccept(
-      const GURL& destination_url,
-      TemplateURLRef::PostContent* post_content,
-      WindowOpenDisposition disposition,
-      ui::PageTransition transition,
-      AutocompleteMatchType::Type match_type,
-      base::TimeTicks match_selection_timestamp,
-      bool destination_url_entered_without_scheme,
-      bool destination_url_entered_with_http_scheme,
-      const std::u16string& text,
-      const AutocompleteMatch& match,
-      const AutocompleteMatch& alternative_nav_match) override {
-    service_->OpenUrl(destination_url, disposition, transition);
-  }
-
- private:
-  raw_ptr<OmniboxEverywhereService> service_;
-};
-
 }  // namespace
 
 OmniboxEverywhereService::OmniboxEverywhereService(Profile* profile)
     : profile_(profile) {
-  controller_ = std::make_unique<OmniboxController>(
-      std::make_unique<OmniboxEverywhereClient>(profile_, this), std::nullopt);
-
   if (base::FeatureList::IsEnabled(omnibox::kOmniboxEverywhere) &&
       ui::GlobalAcceleratorListener::GetInstance()) {
     ui::GlobalAcceleratorListener::GetInstance()->RegisterAccelerator(
@@ -117,7 +79,6 @@ void OmniboxEverywhereService::Shutdown() {
     widget_.reset();
   }
   contents_wrapper_.reset();
-  controller_.reset();
 }
 
 void OmniboxEverywhereService::TogglePopup() {
@@ -207,9 +168,6 @@ void OmniboxEverywhereService::CreateAndShowWidget() {
 
     OmniboxPopupWebContentsHelper::CreateForWebContents(
         contents_wrapper_->web_contents());
-    OmniboxPopupWebContentsHelper::FromWebContents(
-        contents_wrapper_->web_contents())
-        ->set_omnibox_controller(controller_.get());
 
     contents_wrapper_->SetHost(weak_factory_.GetWeakPtr());
   }
@@ -271,9 +229,13 @@ void OmniboxEverywhereService::OnWidgetActivationChanged(views::Widget* widget,
   }
 }
 
-void OmniboxEverywhereService::OnWidgetClosed(views::Widget* widget) {
+void OmniboxEverywhereService::OnWidgetDestroying(views::Widget* widget) {
   widget_observation_.Reset();
-  widget_.reset();
+  views::Widget* raw_widget = widget_.release();
+  if (raw_widget) {
+    base::SequencedTaskRunner::GetCurrentDefault()->DeleteSoon(FROM_HERE,
+                                                               raw_widget);
+  }
   contents_wrapper_.reset();
 }
 
