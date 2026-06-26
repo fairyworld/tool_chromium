@@ -46,6 +46,7 @@
 #include "base/strings/string_split.h"
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
+#include "base/supports_user_data.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/types/expected.h"
 #include "base/types/expected_macros.h"
@@ -2474,6 +2475,16 @@ bool ChromeContentBrowserClient::ShouldEmbeddedFramesTryToReuseExistingProcess(
 #endif
 }
 
+namespace {
+
+class NTPUserData : public base::SupportsUserData::Data {
+ public:
+  NTPUserData() = default;
+  ~NTPUserData() override = default;
+};
+
+}  // namespace
+
 void ChromeContentBrowserClient::SiteInstanceGotProcessAndSite(
     SiteInstance* site_instance) {
   CHECK(site_instance->HasProcess());
@@ -2482,6 +2493,13 @@ void ChromeContentBrowserClient::SiteInstanceGotProcessAndSite(
       Profile::FromBrowserContext(site_instance->GetBrowserContext());
   if (!profile) {
     return;
+  }
+
+  const GURL& site_url =
+      site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL();
+  if (search::IsNTPURL(site_url)) {
+    site_instance->GetProcess()->SetUserData(search::kIsNTPProcessKey,
+                                             std::make_unique<NTPUserData>());
   }
 
 #if !BUILDFLAG(IS_ANDROID)

@@ -893,6 +893,9 @@ extern const base::FeatureParam<std::string> kIndigoGlicSkillId;
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<base::TimeDelta> kIndigoGlicTriggerDelay;
 
+COMPONENT_EXPORT(CHROME_FEATURES)
+BASE_DECLARE_FEATURE(kInitialWebUIWithoutSpellCheckForNtp);
+
 #if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kInstantUsesSpareRenderer);
