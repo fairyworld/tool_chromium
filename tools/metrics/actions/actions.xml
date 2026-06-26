@@ -5111,6 +5111,15 @@ should be able to be added at any place in this file.
   </description>
 </action>
 
+<action name="Android.TabStripMenu.TaskManager">
+  <owner>mwoj@google.com</owner>
+  <owner>cros-ui-foundations@google.com</owner>
+  <description>
+    User tapped 'Task Manager' on the tab strip context menu to launch the Task
+    Manager.
+  </description>
+</action>
+
 <action name="Android.TabStripMenu.ToggleTabLayout">
   <owner>eleanorlee@google.com</owner>
   <description>

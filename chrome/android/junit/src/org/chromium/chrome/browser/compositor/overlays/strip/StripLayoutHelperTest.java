@@ -191,6 +191,7 @@ import java.util.stream.IntStream;
 @DisableFeatures({
     ChromeFeatureList.DATA_SHARING,
     ChromeFeatureList.GLIC,
+    ChromeFeatureList.TASK_MANAGER_CLANK,
     TabGroupsFeatureMap.UPDATE_TAB_GROUP_COLORS
 })
 @EnableFeatures(ChromeFeatureList.TAB_STRIP_AUTO_SELECT_ON_CLOSE_CHANGE)
