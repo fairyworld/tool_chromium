@@ -19,9 +19,11 @@
 #import "ios/chrome/browser/bubble/model/tab_based_iph_browser_agent.h"
 #import "ios/chrome/browser/bubble/ui_bundled/bubble_view_controller_presenter.h"
 #import "ios/chrome/browser/feature_engagement/model/tracker_factory.h"
+#import "ios/chrome/browser/home_customization/model/home_background_customization_service_factory.h"
 #import "ios/chrome/browser/intelligence/features/features.h"
 #import "ios/chrome/browser/lens_overlay/coordinator/lens_overlay_availability.h"
 #import "ios/chrome/browser/ntp/model/new_tab_page_util.h"
+#import "ios/chrome/browser/ntp/model/ntp_background_image_cache_service_factory.h"
 #import "ios/chrome/browser/overlays/model/public/overlay_presenter.h"
 #import "ios/chrome/browser/policy/model/browser_management_service_factory.h"
 #import "ios/chrome/browser/popup_menu/coordinator/popup_menu_help_coordinator.h"
@@ -325,6 +327,12 @@ using base::UserMetricsAction;
   mediator.browserPolicyConnector =
       GetApplicationContext()->GetBrowserPolicyConnector();
   mediator.syncService = SyncServiceFactory::GetForProfile(profile);
+  if (IsOverflowMenuHomeCustomizationEntrypointEnabled()) {
+    mediator.backgroundCustomizationService =
+        HomeBackgroundCustomizationServiceFactory::GetForProfile(profile);
+    mediator.backgroundImageCacheService =
+        NTPBackgroundImageCacheServiceFactory::GetForProfile(profile);
+  }
   mediator.templateURLService =
       ios::TemplateURLServiceFactory::GetForProfile(profile);
   mediator.browserManagementService =

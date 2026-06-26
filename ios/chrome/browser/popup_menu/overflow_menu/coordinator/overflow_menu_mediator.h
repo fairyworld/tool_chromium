@@ -14,20 +14,20 @@
 
 namespace bookmarks {
 class BookmarkModel;
-}
+}  // namespace bookmarks
 namespace feature_engagement {
 class Tracker;
-}
+}  // namespace feature_engagement
 namespace signin {
 class AvatarProvider;
 class IdentityManager;
-}
+}  // namespace signin
 namespace syncer {
 class SyncService;
-}
+}  // namespace syncer
 namespace web {
 class WebState;
-}
+}  // namespace web
 
 @protocol ActivityServiceCommands;
 class AuthenticationService;
@@ -38,9 +38,11 @@ class BrowserPolicyConnectorIOS;
 @protocol FindInPageCommands;
 @protocol GeminiCommands;
 @protocol HelpCommands;
+class HomeBackgroundCustomizationService;
 @class LayoutGuideCenter;
 @protocol LensOverlayCommands;
 @protocol LevelUpCommands;
+class NTPBackgroundImageCacheService;
 @protocol OverflowMenuCustomizationCommands;
 @class OverflowMenuOrderer;
 class OverlayPresenter;
@@ -123,6 +125,14 @@ class WebStateList;
 
 // Readinglist model to know if model has finished loading.
 @property(nonatomic, assign) ReadingListModel* readingListModel;
+
+// Service for NTP background customization.
+@property(nonatomic, assign)
+    HomeBackgroundCustomizationService* backgroundCustomizationService;
+
+// Service for NTP background image cache.
+@property(nonatomic, assign)
+    NTPBackgroundImageCacheService* backgroundImageCacheService;
 
 // Pref service to retrieve profile preference values.
 @property(nonatomic, assign) PrefService* profilePrefs;
