@@ -312,14 +312,16 @@ class FirstRunInteractiveUiBaseTest
   explicit FirstRunInteractiveUiBaseTest(
       const TestParam& params = TestParam(),
       const std::vector<base::test::FeatureRefAndParams>&
-          fixture_enabled_features = {})
+          fixture_enabled_features = {},
+      const std::vector<base::test::FeatureRef>& fixture_disabled_features = {})
       : InteractiveFeaturePromoTestMixin<FirstRunServiceBrowserTestBase>(
             UseDefaultTrackerAllowingPromos(
                 {feature_engagement::kIPHSupervisedUserProfileSigninFeature})),
         params_(params) {
     std::vector<base::test::FeatureRefAndParams> enabled_features =
         fixture_enabled_features;
-    std::vector<base::test::FeatureRef> disabled_features;
+    std::vector<base::test::FeatureRef> disabled_features =
+        fixture_disabled_features;
     std::visit(
         absl::Overload{
             [&](FirstRunVersion::Legacy) {
@@ -960,6 +962,11 @@ IN_PROC_BROWSER_TEST_P(FirstRunInteractiveUiTestWithSyncService, MAYBE_SignIn) {
     RunTestSequenceInContext(
         views::ElementTrackerViews::GetContextForView(view()),
         // Web Contents already instrumented in the previous sequence.
+        If([this]() { return UseRevampedView(); },
+           Then(WaitForWebContentsNavigation(
+               kWebContentsId,
+               GURL(chrome::kChromeUIIntroURL)
+                   .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage)))),
         WaitForWebContentsNavigation(kWebContentsId, sync_page_url),
         // Button is visible once capabilities are loaded or defaulted.
         WaitForButtonVisible(kWebContentsId, GetDontSyncButtonQuery()),
@@ -2348,10 +2355,14 @@ INSTANTIATE_TEST_SUITE_P(,
 // feature showcase step.
 class FirstRunRevampInteractiveUiTest : public FirstRunInteractiveUiBaseTest {
  public:
-  FirstRunRevampInteractiveUiTest()
+  explicit FirstRunRevampInteractiveUiTest(
+      const std::vector<base::test::FeatureRefAndParams>&
+          fixture_enabled_features = {},
+      const std::vector<base::test::FeatureRef>& fixture_disabled_features = {})
       : FirstRunInteractiveUiBaseTest(
             TestParam{.flow_version = FirstRunVersion::Revamped{}},
-            {{syncer::kReplaceSyncPromosWithSignInPromos, {}}}) {}
+            fixture_enabled_features,
+            fixture_disabled_features) {}
 
  protected:
   GURL GetFeatureShowcaseUrl() const {
@@ -2781,4 +2792,77 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
   histogram_tester().ExpectUniqueSample(
       "ProfilePicker.FREFlow.FeatureShowcase.StartBrowsing",
       FeatureShowcaseStep::kDefaultBrowser, 1);
+}
+
+class FirstRunRevampTurnOnSyncCelebrationInteractiveUiTest
+    : public FirstRunRevampInteractiveUiTest {
+ public:
+  FirstRunRevampTurnOnSyncCelebrationInteractiveUiTest()
+      : FirstRunRevampInteractiveUiTest(
+            /*fixture_enabled_features=*/{},
+            /*fixture_disabled_features=*/
+            {syncer::kReplaceSyncPromosWithSignInPromos,
+             syncer::kReplaceSyncPromosWithSigninPromosNewSignin}) {}
+
+ protected:
+  std::vector<std::string> GetForcedFeatureShowcaseSteps() const override {
+    return {"default-browser"};
+  }
+};
+
+using FirstRunRevampTurnOnSyncCelebrationInteractiveUiTestWithSyncService =
+    WithTestSyncServiceMixin<
+        FirstRunRevampTurnOnSyncCelebrationInteractiveUiTest>;
+
+IN_PROC_BROWSER_TEST_F(
+    FirstRunRevampTurnOnSyncCelebrationInteractiveUiTestWithSyncService,
+    SignInSyncDisabledBypassesCelebrationShowsSyncDisabledNotice) {
+  base::test::TestFuture<bool> proceed_future;
+
+  ASSERT_TRUE(IsProfileNameDefault());
+  ASSERT_TRUE(fre_service()->ShouldOpenFirstRun());
+
+  OpenFirstRun(proceed_future.GetCallback());
+
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      // Wait for the profile picker to show the intro.
+      WaitForShow(kProfilePickerViewId),
+      InstrumentNonTabWebView(kWebContentsId, web_view()),
+      CompleteIntroStep(/*sign_in=*/true),
+      // Wait for switch to the Gaia sign-in page to complete.
+      WaitForWebContentsNavigation(kWebContentsId,
+                                   GetSigninChromeSyncDiceUrl()));
+
+  // Configure SyncService to be disabled by policy.
+  auto* sync_service = static_cast<syncer::TestSyncService*>(
+      SyncServiceFactory::GetForProfile(profile()));
+  ASSERT_TRUE(sync_service);
+  sync_service->SetAllowedByEnterprisePolicy(false);
+
+  SimulateSignIn(kTestEmail, kTestGivenName);
+
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      // Verify we navigate directly to the sync disabled notice screen,
+      // bypassing Sign-in Celebration.
+      WaitForWebContentsNavigation(
+          kWebContentsId,
+          ManagedUserProfileNoticeUI::GetURLForType(
+              ManagedUserProfileNoticeUI::ScreenType::
+                  kConsumerAccountSyncDisabled)),
+      WaitForStateChange(
+          kWebContentsId,
+          IsVisible({"managed-user-profile-notice-app-refresh"})),
+      EnsurePresent(kWebContentsId, GetAcceptManagementButtonQuery()),
+      PressJsButton(kWebContentsId, GetAcceptManagementButtonQuery()),
+
+      // Complete the feature showcase step.
+      WaitForWebContentsNavigation(kWebContentsId, GetFeatureShowcaseUrl()),
+      WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
+      PressButton(kProfilePickerToolbarStartBrowsingButtonElementId));
+
+  WaitForPickerClosed();
+
+  EXPECT_TRUE(proceed_future.Get());
 }
