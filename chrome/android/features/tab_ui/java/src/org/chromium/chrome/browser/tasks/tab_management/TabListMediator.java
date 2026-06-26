@@ -733,11 +733,12 @@ public class TabListMediator implements TabListNotificationHandler {
                     int index = mModelList.indexFromTabId(tab.getId());
                     if (index == TabModel.INVALID_TAB_INDEX) return;
 
-                    updateTab(index, tab, /* isUpdatingId= */ false, /* quickMode= */ false);
-
                     // When pinning a tab in a group it will be removed from the group so the index
                     // update is unnecessary.
-                    if (mLayoutType == TabListLayoutType.FLAT) return;
+                    if (mLayoutType == TabListLayoutType.FLAT) {
+                        updateTab(index, tab, /* isUpdatingId= */ false, /* quickMode= */ false);
+                        return;
+                    }
 
                     int finalIndex =
                             mModelList.indexOfNthTabCard(getCurrentTabModelChecked().indexOf(tab));
@@ -751,6 +752,14 @@ public class TabListMediator implements TabListNotificationHandler {
                         ListItem item = mModelList.get(index);
                         mModelList.removeAt(index);
                         finalIndex = Math.min(finalIndex, mModelList.size());
+                        // Update properties while the item is detached to avoid temporary view type
+                        // mismatch in the adapter and double-notifications (change + remove).
+                        updateTab(
+                                item.model,
+                                finalIndex,
+                                tab,
+                                /* isUpdatingId= */ false,
+                                /* quickMode= */ false);
                         mModelList.add(finalIndex, item);
                     }
                 }
@@ -2342,7 +2351,11 @@ public class TabListMediator implements TabListNotificationHandler {
     private void updateTab(int index, Tab tab, boolean isUpdatingId, boolean quickMode) {
         if (index < 0 || index >= mModelList.size()) return;
 
-        PropertyModel model = mModelList.get(index).model;
+        updateTab(mModelList.get(index).model, index, tab, isUpdatingId, quickMode);
+    }
+
+    private void updateTab(
+            PropertyModel model, int index, Tab tab, boolean isUpdatingId, boolean quickMode) {
         if (isUpdatingId) {
             model.set(TabProperties.TAB_ID, tab.getId());
         } else {
@@ -2378,7 +2391,7 @@ public class TabListMediator implements TabListNotificationHandler {
 
         model.set(TabProperties.URL_DOMAIN, getDomainForTab(tab, model));
 
-        setupPersistedTabDataFetcherForTab(tab, index);
+        setupPersistedTabDataFetcherForTab(tab, model);
 
         updateFaviconForTab(model, tab, null, null);
 
@@ -2881,7 +2894,7 @@ public class TabListMediator implements TabListNotificationHandler {
                 mTabListFaviconProvider.getDefaultFaviconFetcher(tab.isIncognito()));
         tabInfo.set(TabProperties.IS_LOADING, false);
 
-        setupPersistedTabDataFetcherForTab(tab, index);
+        setupPersistedTabDataFetcherForTab(tab, tabInfo);
 
         updateFaviconForTab(tabInfo, tab, null, null);
 
@@ -3321,8 +3334,7 @@ public class TabListMediator implements TabListNotificationHandler {
         return TabModelUtils.getCurrentTabId(getCurrentTabModelChecked());
     }
 
-    private void setupPersistedTabDataFetcherForTab(Tab tab, int index) {
-        PropertyModel model = mModelList.get(index).model;
+    private void setupPersistedTabDataFetcherForTab(Tab tab, PropertyModel model) {
         if (mSupportsMessageCards && !tab.isIncognito()) {
             assert mOriginalProfile != null;
             if (PriceTrackingUtilities.isTrackPricesOnTabsEnabled(mOriginalProfile)

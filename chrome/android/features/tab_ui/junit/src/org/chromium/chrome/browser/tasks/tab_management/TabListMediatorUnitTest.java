@@ -202,6 +202,7 @@ import org.chromium.components.tab_groups.TabGroupColorId;
 import org.chromium.components.tab_groups.TabGroupColorPickerUtils;
 import org.chromium.content_public.browser.NavigationHandle;
 import org.chromium.ui.modaldialog.ModalDialogManager;
+import org.chromium.ui.modelutil.ListObservable.ListObserver;
 import org.chromium.ui.modelutil.PropertyKey;
 import org.chromium.ui.modelutil.PropertyModel;
 import org.chromium.ui.modelutil.PropertyModel.ReadableObjectPropertyKey;
@@ -5809,6 +5810,50 @@ public class TabListMediatorUnitTest {
         assertEquals(TAB2_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
         assertEquals(TAB1_ID, mModelList.get(1).model.get(TabProperties.TAB_ID));
         assertFalse(mModelList.get(1).model.get(TabProperties.IS_PINNED));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void onTabPinnedStateChanged_NestedLayout_UnpinTab_DetachedPropertyUpdate() {
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
+        mMediator.initWithNative(mProfile);
+        mMediator.resetWithListOfTabs(null, null, false);
+
+        // Initially, both mTab1 and mTab2 are pinned.
+        when(mTab1.getIsPinned()).thenReturn(true);
+        when(mTab2.getIsPinned()).thenReturn(true);
+
+        mockTabIndexes(mTab1, mTab2);
+
+        // Reset list with both pinned.
+        mMediator.resetWithListOfTabs(List.of(mTab1, mTab2), null, false);
+
+        // List contains: [0] Pinned Tab 1, [1] Pinned Tab 2.
+        assertEquals(2, mModelList.size());
+        PropertyModel model1 = mModelList.get(0).model;
+
+        // Unpin mTab1.
+        when(mTab1.getIsPinned()).thenReturn(false);
+
+        mockTabIndexes(mTab2, mTab1);
+
+        ListObserver<Void> listObserver = mock(ListObserver.class);
+        PropertyObservable.PropertyObserver<PropertyKey> propertyObserver =
+                mock(PropertyObservable.PropertyObserver.class);
+
+        mModelList.addObserver(listObserver);
+        model1.addObserver(propertyObserver);
+
+        mTabObserverCaptor.getValue().onTabPinnedStateChanged(mTab1, false);
+
+        // Verifies the exact sequence to prevent temporary layout shifts:
+        // 1. Pinned tab 1 is removed from mModelList.
+        // 2. Its IS_PINNED property is updated while detached.
+        // 3. It is added back to mModelList at the final position.
+        InOrder inOrder = Mockito.inOrder(listObserver, propertyObserver);
+        inOrder.verify(listObserver).onItemRangeRemoved(eq(mModelList), eq(0), eq(1));
+        inOrder.verify(propertyObserver).onPropertyChanged(eq(model1), eq(TabProperties.IS_PINNED));
+        inOrder.verify(listObserver).onItemRangeInserted(eq(mModelList), eq(1), eq(1));
     }
 
     @Test
