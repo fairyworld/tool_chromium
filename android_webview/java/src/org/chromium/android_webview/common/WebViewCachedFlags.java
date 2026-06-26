@@ -19,6 +19,7 @@ import org.jni_zero.NativeMethods;
 import org.chromium.base.BaseFeatures;
 import org.chromium.base.FeatureList;
 import org.chromium.base.FeatureOverrides;
+import org.chromium.base.ResettersForTesting;
 import org.chromium.base.metrics.RecordHistogram;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
@@ -132,6 +133,15 @@ public class WebViewCachedFlags {
      */
     public static void initForTesting(SharedPreferences prefs) {
         initInternal(prefs, false);
+        ResettersForTesting.register(() -> resetForTesting());
+    }
+
+    /** Resets the singleton instance for testing. */
+    @VisibleForTesting
+    public static void resetForTesting() {
+        synchronized (sLock) {
+            sInstance = null;
+        }
     }
 
     private static void initInternal(SharedPreferences prefs, boolean forceDefaults) {
