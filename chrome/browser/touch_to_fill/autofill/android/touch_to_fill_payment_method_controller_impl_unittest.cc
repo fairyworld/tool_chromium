@@ -12,7 +12,7 @@
 #include "base/containers/span.h"
 #include "base/functional/callback.h"
 #include "base/test/mock_callback.h"
-#include "chrome/browser/touch_to_fill/autofill/android/touch_to_fill_delegate_android_impl.h"
+#include "chrome/browser/touch_to_fill/autofill/android/touch_to_fill_payment_method_delegate_android_impl.h"
 #include "chrome/browser/touch_to_fill/autofill/android/touch_to_fill_payment_method_view.h"
 #include "chrome/browser/touch_to_fill/autofill/android/touch_to_fill_payment_method_view_controller.h"
 #include "chrome/browser/ui/android/tab_model/tab_model_list.h"
