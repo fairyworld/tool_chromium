@@ -1281,3 +1281,25 @@ BASE_FEATURE(kSupportGoogleOneDeepLink, base::FEATURE_DISABLED_BY_DEFAULT);
 bool IsGoogleOneDeepLinkEnabled() {
   return base::FeatureList::IsEnabled(kSupportGoogleOneDeepLink);
 }
+
+BASE_FEATURE(kEnableDiscoverBackgroundRefresh,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
+bool IsDiscoverBackgroundRefreshEnabled() {
+  return base::FeatureList::IsEnabled(kEnableDiscoverBackgroundRefresh);
+}
+
+const base::FeatureParam<base::TimeDelta>
+    kDiscoverFeedBackgroundRefreshNoServiceInterval{
+        &kEnableDiscoverBackgroundRefresh,
+        "discover_refresh_no_service_interval", base::Minutes(30)};
+
+const base::FeatureParam<base::TimeDelta>
+    kDiscoverFeedBackgroundRefreshNoDateInterval{
+        &kEnableDiscoverBackgroundRefresh, "discover_refresh_no_date_interval",
+        base::Hours(24)};  // 1 day
+
+const base::FeatureParam<base::TimeDelta>
+    kDiscoverFeedBackgroundRefreshMinBuffer{&kEnableDiscoverBackgroundRefresh,
+                                            "discover_refresh_min_buffer",
+                                            base::Minutes(15)};

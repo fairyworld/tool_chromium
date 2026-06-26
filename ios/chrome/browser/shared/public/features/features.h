@@ -1063,4 +1063,22 @@ BASE_DECLARE_FEATURE(kSupportGoogleOneDeepLink);
 // Returns true if SupportGoogleOneDeepLink is enabled.
 bool IsGoogleOneDeepLinkEnabled();
 
+// Feature to enable Discover feed background refresh.
+BASE_DECLARE_FEATURE(kEnableDiscoverBackgroundRefresh);
+
+// Whether Discover feed background refresh is enabled.
+bool IsDiscoverBackgroundRefreshEnabled();
+
+// Interval when the Discover feed service is missing.
+extern const base::FeatureParam<base::TimeDelta>
+    kDiscoverFeedBackgroundRefreshNoServiceInterval;
+
+// Interval when the Discover feed service exists but provides no refresh date.
+extern const base::FeatureParam<base::TimeDelta>
+    kDiscoverFeedBackgroundRefreshNoDateInterval;
+
+// Delay when the scheduled Discover feed refresh time has already passed.
+extern const base::FeatureParam<base::TimeDelta>
+    kDiscoverFeedBackgroundRefreshMinBuffer;
+
 #endif  // IOS_CHROME_BROWSER_SHARED_PUBLIC_FEATURES_FEATURES_H_

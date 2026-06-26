@@ -2862,6 +2862,11 @@ constexpr auto kFeatureEntries = std::to_array<flags_ui::FeatureEntry>({
      flag_descriptions::kSupportGoogleOneDeepLinkName,
      flag_descriptions::kSupportGoogleOneDeepLinkDescription, flags_ui::kOsIos,
      FEATURE_VALUE_TYPE(kSupportGoogleOneDeepLink)},
+    {"enable-discover-background-refresh",
+     flag_descriptions::kEnableDiscoverBackgroundRefreshName,
+     flag_descriptions::kEnableDiscoverBackgroundRefreshDescription,
+     flags_ui::kOsIos, FEATURE_VALUE_TYPE(kEnableDiscoverBackgroundRefresh)},
+
 });
 
 bool SkipConditionalFeatureEntry(const flags_ui::FeatureEntry& entry) {

@@ -3369,6 +3369,11 @@
     "expiry_milestone": 180
   },
   {
+    "name": "enable-discover-background-refresh",
+    "owners": [ "sadhvikch@google.com", "sreeshmanair@google.com", "iga-discover-bld@google.com" ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "enable-display-performance-mode",
     "owners": [
       "markyacoub@chromium.org",

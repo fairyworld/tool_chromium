@@ -668,6 +668,11 @@ inline constexpr char kEnableCompromisedPasswordsMutingDescription[] =
     "Enable the compromised password alert mutings in Password Manager to be "
     "respected in the app.";
 
+inline constexpr char kEnableDiscoverBackgroundRefreshName[] =
+    "Enable Discover Feed Background Refresh";
+inline constexpr char kEnableDiscoverBackgroundRefreshDescription[] =
+    "Enables background refresh for the Discover feed.";
+
 inline constexpr char kEnableFamilyLinkControlsName[] =
     "Family Link parental controls";
 inline constexpr char kEnableFamilyLinkControlsDescription[] =
