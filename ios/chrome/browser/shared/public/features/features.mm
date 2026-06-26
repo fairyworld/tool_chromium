@@ -1275,3 +1275,9 @@ BASE_FEATURE(kAppBarHideLabels, base::FEATURE_DISABLED_BY_DEFAULT);
 bool IsAppBarLabelsHidden() {
   return base::FeatureList::IsEnabled(kAppBarHideLabels);
 }
+
+BASE_FEATURE(kSupportGoogleOneDeepLink, base::FEATURE_DISABLED_BY_DEFAULT);
+
+bool IsGoogleOneDeepLinkEnabled() {
+  return base::FeatureList::IsEnabled(kSupportGoogleOneDeepLink);
+}

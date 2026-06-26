@@ -3124,6 +3124,7 @@ chromium-metrics-reviews@google.com.
     The outcome of the GoogleOne flow initiated from {EntryPoint}.
   </summary>
   <token key="EntryPoint">
+    <variant name="DeepLink" summary="a deep link"/>
     <variant name="Drive" summary="Google Drive save error"/>
     <variant name="Photos" summary="Google Photos save error"/>
     <variant name="Settings" summary="the settings"/>

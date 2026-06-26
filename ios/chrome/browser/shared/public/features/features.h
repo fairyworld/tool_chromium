@@ -1057,4 +1057,10 @@ BASE_DECLARE_FEATURE(kAppBarHideLabels);
 // Returns true if the App Bar labels should be hidden.
 bool IsAppBarLabelsHidden();
 
+// Enables Google One deep link support on startup.
+BASE_DECLARE_FEATURE(kSupportGoogleOneDeepLink);
+
+// Returns true if SupportGoogleOneDeepLink is enabled.
+bool IsGoogleOneDeepLinkEnabled();
+
 #endif  // IOS_CHROME_BROWSER_SHARED_PUBLIC_FEATURES_FEATURES_H_

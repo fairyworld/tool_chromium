@@ -5665,12 +5665,23 @@ const char kChromeAppStoreUrl[] =
 - (void)showGoogleOneForIdentity:(id<SystemIdentity>)identity
                       entryPoint:(GoogleOneEntryPoint)entryPoint
               baseViewController:(UIViewController*)baseViewController {
+  [self hideGoogleOne];
   UIViewController* viewController = baseViewController ?: self.viewController;
   _googleOneCoordinator =
       [[GoogleOneCoordinator alloc] initWithBaseViewController:viewController
                                                        browser:self.browser
                                                     entryPoint:entryPoint
                                                       identity:identity];
+  [_googleOneCoordinator start];
+}
+
+- (void)showGoogleOneForURL:(const GURL&)inputURL {
+  [self hideGoogleOne];
+  _googleOneCoordinator = [[GoogleOneCoordinator alloc]
+      initWithBaseViewController:self.viewController
+                         browser:self.browser
+                      entryPoint:GoogleOneEntryPoint::kDeepLink
+                        inputURL:inputURL];
   [_googleOneCoordinator start];
 }
 
