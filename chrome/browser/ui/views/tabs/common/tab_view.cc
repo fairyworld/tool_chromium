@@ -914,8 +914,21 @@ views::BubbleAnchor TabView::GetAnchor() {
 void TabView::ResetCollectionNode() {
   CHECK(collection_node_);
 
-  TabHoverCardController* hover_card_controller =
-      collection_node_->GetController()->GetHoverCardController();
+  // Fetch the hover card controller before we clear `collection_node_`.
+  TabHoverCardController* const hover_card_controller =
+      collection_node_->GetController()
+          ? collection_node_->GetController()->GetHoverCardController()
+          : nullptr;
+
+  // Clear all observers and subscriptions immediately to prevent any callback
+  // execution during the rest of this cleanup.
+  tab_data_changed_subscription_ = base::CallbackListSubscription();
+  tab_state_changed_subscription_ = base::CallbackListSubscription();
+  collapsed_state_changed_subscription_ = base::CallbackListSubscription();
+  node_destroyed_subscription_ = base::CallbackListSubscription();
+
+  collection_node_ = nullptr;
+
   if (hover_card_controller && hover_card_controller->target_tab() == this) {
     hover_card_controller->UpdateHoverCard(
         nullptr, TabSlotController::HoverCardUpdateType::kTabRemoved);
@@ -929,11 +942,6 @@ void TabView::ResetCollectionNode() {
   // Update the callbacks for the buttons so that we don't call anything that
   // needs the node.
   close_button_->SetCallback(base::RepeatingClosure(base::DoNothing()));
-
-  // Stop listening to tab data changes since the tab will be destroyed.
-  tab_data_changed_subscription_ = base::CallbackListSubscription();
-
-  collection_node_ = nullptr;
 }
 
 void TabView::UpdateAccessibleName() {
