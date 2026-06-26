@@ -1167,10 +1167,7 @@ public abstract class ChromeFeatureList {
     public static final CachedFlag sSettingsMultiColumn =
             newCachedFlag(SETTINGS_MULTI_COLUMN, /* defaultValue= */ true);
     public static final CachedFlag sSettingsSingleActivity =
-            newCachedFlag(
-                    SETTINGS_SINGLE_ACTIVITY,
-                    /* defaultValue= */ false,
-                    /* defaultValueInTests= */ true);
+            newCachedFlag(SETTINGS_SINGLE_ACTIVITY, /* defaultValue= */ true);
     public static final CachedFlag sShutdownPreNativeThreadPoolAfterStartup =
             newCachedFlag(
                     BaseFeatures.SHUTDOWN_PRE_NATIVE_THREAD_POOL_AFTER_STARTUP,
