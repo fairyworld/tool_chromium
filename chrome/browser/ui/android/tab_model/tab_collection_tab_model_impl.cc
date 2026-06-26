@@ -30,7 +30,6 @@
 #include "components/tabs/public/tab_interface.h"
 #include "components/tabs/public/tab_strip_collection.h"
 #include "components/tabs/public/unpinned_tab_collection.h"
-#include "tab_collection_tab_model_impl.h"
 #include "ui/gfx/range/range.h"
 
 // Must come after all headers that specialize FromJniType() / ToJniType().
@@ -86,12 +85,7 @@ void TabCollectionTabModelImpl::Destroy(JNIEnv* env) {
   delete this;
 }
 
-int TabCollectionTabModelImpl::GetTabCountRecursive(JNIEnv* env) const {
-  return base::checked_cast<int>(tab_strip_collection_->TabCountRecursive());
-}
-
 int TabCollectionTabModelImpl::GetIndexOfTabRecursive(
-    JNIEnv* env,
     TabAndroid* tab_android) const {
   if (!tab_android) {
     return kInvalidTabIndex;
@@ -105,16 +99,6 @@ int TabCollectionTabModelImpl::GetIndexOfTabRecursive(
     current_index++;
   }
   return kInvalidTabIndex;
-}
-
-TabAndroid* TabCollectionTabModelImpl::GetTabAtIndexRecursive(
-    JNIEnv* env,
-    size_t index) const {
-  if (index >= tab_strip_collection_->TabCountRecursive()) {
-    return nullptr;
-  }
-  TabInterface* tab = tab_strip_collection_->GetTabAtIndexRecursive(index);
-  return ToTabAndroidOrNull(tab);
 }
 
 int TabCollectionTabModelImpl::MoveTabRecursive(
@@ -165,7 +149,7 @@ int TabCollectionTabModelImpl::AddTabRecursive(
 
 void TabCollectionTabModelImpl::RemoveTabRecursive(JNIEnv* env,
                                                    TabAndroid* tab) {
-  int index = GetIndexOfTabRecursive(env, tab);
+  int index = GetIndexOfTabRecursive(tab);
   CHECK_NE(index, kInvalidTabIndex);
   tab_strip_collection_->RemoveTabAtIndexRecursive(index);
 }
@@ -188,10 +172,10 @@ void TabCollectionTabModelImpl::CreateTabGroup(
 
 std::vector<TabAndroid*> TabCollectionTabModelImpl::GetTabsInGroup(
     JNIEnv* env,
-    const base::Token& token) {
+    const base::Token& tab_group_id) const {
   TabGroupTabCollection* group_collection =
       tab_strip_collection_->GetTabGroupCollection(
-          TabGroupId::FromRawToken(token));
+          TabGroupId::FromRawToken(tab_group_id));
 
   std::vector<TabAndroid*> tabs;
   if (!group_collection) {
@@ -205,11 +189,12 @@ std::vector<TabAndroid*> TabCollectionTabModelImpl::GetTabsInGroup(
   return tabs;
 }
 
-int TabCollectionTabModelImpl::GetTabCountForGroup(JNIEnv* env,
-                                                   const base::Token& token) {
+int TabCollectionTabModelImpl::GetTabCountForGroup(
+    JNIEnv* env,
+    const base::Token& tab_group_id) const {
   TabGroupTabCollection* group_collection =
       tab_strip_collection_->GetTabGroupCollection(
-          TabGroupId::FromRawToken(token));
+          TabGroupId::FromRawToken(tab_group_id));
 
   if (!group_collection) {
     return 0;
@@ -218,33 +203,36 @@ int TabCollectionTabModelImpl::GetTabCountForGroup(JNIEnv* env,
   return group_collection->TabCountRecursive();
 }
 
-bool TabCollectionTabModelImpl::TabGroupExists(JNIEnv* env,
-                                               const base::Token& token) {
+bool TabCollectionTabModelImpl::TabGroupExists(
+    JNIEnv* env,
+    const base::Token& tab_group_id) const {
   TabGroupTabCollection* group_collection =
       tab_strip_collection_->GetTabGroupCollection(
-          TabGroupId::FromRawToken(token));
+          TabGroupId::FromRawToken(tab_group_id));
   return group_collection;
 }
 
-int TabCollectionTabModelImpl::GetIndividualTabAndGroupCount(JNIEnv* env) {
+int TabCollectionTabModelImpl::GetIndividualTabAndGroupCount(
+    JNIEnv* env) const {
   // The direct child count of the pinned and unpinned collections will include
   // all individual tabs and tab groups.
   return tab_strip_collection_->unpinned_collection()->ChildCount() +
          tab_strip_collection_->pinned_collection()->ChildCount();
 }
 
-int TabCollectionTabModelImpl::GetTabGroupCount(JNIEnv* env) {
+int TabCollectionTabModelImpl::GetTabGroupCount(JNIEnv* env) const {
   return tab_strip_collection_->GetAllTabGroupIds().size();
 }
 
-int TabCollectionTabModelImpl::GetIndexOfTabInGroup(JNIEnv* env,
-                                                    TabAndroid* tab_android,
-                                                    const base::Token& token) {
+int TabCollectionTabModelImpl::GetIndexOfTabInGroup(
+    JNIEnv* env,
+    TabAndroid* tab_android,
+    const base::Token& tab_group_id) const {
   CHECK(tab_android);
 
   TabGroupTabCollection* group_collection =
       tab_strip_collection_->GetTabGroupCollection(
-          TabGroupId::FromRawToken(token));
+          TabGroupId::FromRawToken(tab_group_id));
 
   if (!group_collection) {
     return kInvalidTabIndex;
@@ -317,7 +305,7 @@ void TabCollectionTabModelImpl::UpdateTabGroupVisualData(
 
 std::u16string TabCollectionTabModelImpl::GetTabGroupTitle(
     JNIEnv* env,
-    const base::Token& tab_group_id) {
+    const base::Token& tab_group_id) const {
   auto group_id = TabGroupId::FromRawToken(tab_group_id);
   if (!HasTabGroup(group_id)) {
     return std::u16string();
@@ -329,7 +317,7 @@ std::u16string TabCollectionTabModelImpl::GetTabGroupTitle(
 
 int32_t TabCollectionTabModelImpl::GetTabGroupColor(
     JNIEnv* env,
-    const base::Token& tab_group_id) {
+    const base::Token& tab_group_id) const {
   auto group_id = TabGroupId::FromRawToken(tab_group_id);
   if (!HasTabGroup(group_id)) {
     return kInvalidTabGroupColorId;
@@ -341,7 +329,7 @@ int32_t TabCollectionTabModelImpl::GetTabGroupColor(
 
 bool TabCollectionTabModelImpl::GetTabGroupCollapsed(
     JNIEnv* env,
-    const base::Token& tab_group_id) {
+    const base::Token& tab_group_id) const {
   auto group_id = TabGroupId::FromRawToken(tab_group_id);
   if (!HasTabGroup(group_id)) {
     return false;
@@ -353,7 +341,7 @@ bool TabCollectionTabModelImpl::GetTabGroupCollapsed(
 
 bool TabCollectionTabModelImpl::DetachedTabGroupExists(
     JNIEnv* env,
-    const base::Token& tab_group_id) {
+    const base::Token& tab_group_id) const {
   TabGroupId group_id = TabGroupId::FromRawToken(tab_group_id);
   TabGroupTabCollection* detached_group =
       tab_strip_collection_->GetDetachedTabGroup(group_id);
@@ -375,7 +363,8 @@ void TabCollectionTabModelImpl::CloseDetachedTabGroup(
   tab_strip_collection_->CloseDetachedTabGroup(group_id);
 }
 
-std::vector<TabAndroid*> TabCollectionTabModelImpl::GetAllTabs(JNIEnv* env) {
+std::vector<TabAndroid*> TabCollectionTabModelImpl::GetAllTabs(
+    JNIEnv* env) const {
   std::vector<TabAndroid*> tabs;
   tabs.reserve(tab_strip_collection_->TabCountRecursive());
 
@@ -390,7 +379,7 @@ std::vector<TabAndroid*> TabCollectionTabModelImpl::GetAllTabs(JNIEnv* env) {
 }
 
 std::vector<base::Token> TabCollectionTabModelImpl::GetAllTabGroupIds(
-    JNIEnv* env) {
+    JNIEnv* env) const {
   std::vector<TabGroupId> group_ids =
       tab_strip_collection_->GetAllTabGroupIds();
 
@@ -403,7 +392,7 @@ std::vector<base::Token> TabCollectionTabModelImpl::GetAllTabGroupIds(
 }
 
 std::vector<TabAndroid*> TabCollectionTabModelImpl::GetRepresentativeTabList(
-    JNIEnv* env) {
+    JNIEnv* env) const {
   std::vector<TabAndroid*> tabs;
   tabs.reserve(tab_strip_collection_->pinned_collection()->ChildCount() +
                tab_strip_collection_->unpinned_collection()->ChildCount());
@@ -436,10 +425,10 @@ std::vector<TabAndroid*> TabCollectionTabModelImpl::GetRepresentativeTabList(
 
 void TabCollectionTabModelImpl::SetLastShownTabForGroup(
     JNIEnv* env,
-    const base::Token& group_id,
+    const base::Token& tab_group_id,
     TabAndroid* tab_android) {
   TabGroupAndroid* group = static_cast<TabGroupAndroid*>(GetTabGroupChecked(
-      TabGroupId::FromRawToken(group_id), /*allow_detached=*/true));
+      TabGroupId::FromRawToken(tab_group_id), /*allow_detached=*/true));
   if (tab_android) {
     group->set_last_shown_tab(tab_android->GetHandle());
   } else {
@@ -449,9 +438,9 @@ void TabCollectionTabModelImpl::SetLastShownTabForGroup(
 
 TabAndroid* TabCollectionTabModelImpl::GetLastShownTabForGroup(
     JNIEnv* env,
-    const base::Token& group_id) {
+    const base::Token& tab_group_id) const {
   TabGroupAndroid* group = static_cast<TabGroupAndroid*>(
-      GetTabGroupChecked(TabGroupId::FromRawToken(group_id),
+      GetTabGroupChecked(TabGroupId::FromRawToken(tab_group_id),
                          /*allow_detached=*/true));
   auto handle = group->last_shown_tab();
   if (!handle) {
@@ -460,7 +449,7 @@ TabAndroid* TabCollectionTabModelImpl::GetLastShownTabForGroup(
   return TabAndroid::FromTabHandle(*handle);
 }
 
-int TabCollectionTabModelImpl::GetIndexOfFirstNonPinnedTab(JNIEnv* env) {
+int TabCollectionTabModelImpl::GetIndexOfFirstNonPinnedTab(JNIEnv* env) const {
   return tab_strip_collection_->IndexOfFirstNonPinnedTab();
 }
 
