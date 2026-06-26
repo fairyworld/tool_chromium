@@ -1816,6 +1816,7 @@ test("content_browsertests") {
     "../browser/web_contents/opened_by_dom_browsertest.cc",
     "../browser/web_contents/web_contents_impl_browsertest.cc",
     "../browser/web_contents/web_contents_observer_browsertest.cc",
+    "../browser/web_package/signed_exchange_reporter_browsertest.cc",
     "../browser/web_package/signed_exchange_request_handler_browsertest.cc",
     "../browser/web_package/signed_exchange_subresource_prefetch_browsertest.cc",
     "../browser/webid/delegation/jwt_signer_browsertest.cc",
