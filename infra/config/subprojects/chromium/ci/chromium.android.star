@@ -714,6 +714,9 @@ ci.builder(
     contact_team_email = "clank-engprod@google.com",
     execution_timeout = 7 * time.hour,
     notifies = ["Deterministic Android"],
+    # crbug.com/528174631: Deterministic builder needs to download all remote
+    # outputs to compare them.
+    siso_output_local_strategy = "full",
 )
 
 ci.builder(
@@ -739,6 +742,9 @@ ci.builder(
     contact_team_email = "clank-engprod@google.com",
     execution_timeout = 6 * time.hour,
     notifies = ["Deterministic Android"],
+    # crbug.com/528174631: Deterministic builder needs to download all remote
+    # outputs to compare them.
+    siso_output_local_strategy = "full",
     siso_remote_jobs = siso.remote_jobs.DEFAULT,
 )
 

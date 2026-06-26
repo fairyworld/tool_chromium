@@ -255,6 +255,9 @@ ci.builder(
     contact_team_email = "chrome-build-team@google.com",
     execution_timeout = 6 * time.hour,
     notifies = ["Deterministic Linux"],
+    # crbug.com/528174631: Deterministic builder needs to download all remote
+    # outputs to compare them.
+    siso_output_local_strategy = "full",
     siso_remote_jobs = siso.remote_jobs.DEFAULT,
 )
 
@@ -276,6 +279,9 @@ ci.builder(
     ),
     contact_team_email = "chrome-build-team@google.com",
     execution_timeout = 7 * time.hour,
+    # crbug.com/528174631: Deterministic builder needs to download all remote
+    # outputs to compare them.
+    siso_output_local_strategy = "full",
     siso_remote_jobs = siso.remote_jobs.DEFAULT,
 )
 
