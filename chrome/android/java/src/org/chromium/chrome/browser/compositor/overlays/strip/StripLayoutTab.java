@@ -44,7 +44,6 @@ import org.chromium.components.browser_ui.styles.ChromeColors;
 import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.ui.accessibility.AccessibilityState;
 import org.chromium.ui.base.LocalizationUtils;
-import org.chromium.ui.util.ColorUtils;
 import org.chromium.ui.util.MotionEventUtils;
 import org.chromium.ui.util.StyleUtils;
 
@@ -207,10 +206,6 @@ public class StripLayoutTab extends StripLayoutView {
     // Divider Constants
     private static final int DIVIDER_OFFSET_X = 13;
 
-    // Close button hover highlight alpha
-    private static final float CLOSE_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY = 0.12f;
-    private static final float CLOSE_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY = 0.08f;
-
     // Tab's ID this view refers to.
     private int mTabId;
 
@@ -315,25 +310,16 @@ public class StripLayoutTab extends StripLayoutView {
         int iconColorInt = context.getColorStateList(iconColor).getDefaultColor();
         mCloseButton.setTint(iconColorInt);
         @ColorInt
-        int backgroundHoverTint =
-                ColorUtils.setAlphaComponentWithFloat(
-                        SemanticColorUtils.getDefaultTextColor(context),
-                        CLOSE_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY);
+        int backgroundHoverTint = context.getColor(R.color.tab_strip_button_bg_hover_tint);
         @ColorInt
         int backgroundPeripheralPressedTint =
-                ColorUtils.setAlphaComponentWithFloat(
-                        SemanticColorUtils.getDefaultTextColor(context),
-                        CLOSE_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY);
+                context.getColor(R.color.tab_strip_button_bg_peripheral_pressed_tint);
 
         if (incognito) {
             backgroundHoverTint =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            context.getColor(R.color.tab_strip_button_hover_bg_color),
-                            CLOSE_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY);
+                    context.getColor(R.color.tab_strip_button_bg_incognito_hover_tint);
             backgroundPeripheralPressedTint =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            context.getColor(R.color.tab_strip_button_hover_bg_color),
-                            CLOSE_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY);
+                    context.getColor(R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint);
         }
 
         // Only set color for hover bg.

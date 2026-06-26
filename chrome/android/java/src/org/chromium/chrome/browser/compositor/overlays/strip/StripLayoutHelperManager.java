@@ -114,7 +114,6 @@ import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 import org.chromium.components.browser_ui.desktop_windowing.AppHeaderState;
 import org.chromium.components.browser_ui.desktop_windowing.DesktopWindowStateManager;
 import org.chromium.components.browser_ui.desktop_windowing.DesktopWindowStateManager.AppHeaderObserver;
-import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.components.browser_ui.widget.gesture.BackPressHandler;
 import org.chromium.content_public.browser.LoadUrlParams;
 import org.chromium.ui.base.ActivityResultTracker;
@@ -125,7 +124,6 @@ import org.chromium.ui.dragdrop.DragAndDropDelegate;
 import org.chromium.ui.dragdrop.DragDropGlobalState;
 import org.chromium.ui.interpolators.Interpolators;
 import org.chromium.ui.resources.ResourceManager;
-import org.chromium.ui.util.ColorUtils;
 import org.chromium.ui.util.StyleUtils;
 import org.chromium.url.GURL;
 
@@ -195,8 +193,6 @@ public class StripLayoutHelperManager
     private static final float MODEL_SELECTOR_BUTTON_BACKGROUND_Y_OFFSET_DP = 3.f;
     static final float MODEL_SELECTOR_BUTTON_BACKGROUND_WIDTH_DP = 32.f;
     private static final float MODEL_SELECTOR_BUTTON_BACKGROUND_HEIGHT_DP = 32.f;
-    private static final float MODEL_SELECTOR_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY = 0.12f;
-    private static final float MODEL_SELECTOR_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY = 0.08f;
     private static final float MODEL_SELECTOR_BUTTON_CLICK_SLOP_DP =
             (BUTTON_DESIRED_TOUCH_TARGET_SIZE - MODEL_SELECTOR_BUTTON_BACKGROUND_WIDTH_DP) / 2;
 
@@ -1890,26 +1886,17 @@ public class StripLayoutHelperManager
                 context.getColor(R.color.default_bg_color_dark_elev_1_baseline);
 
         @ColorInt
-        int backgroundHoverColor =
-                ColorUtils.setAlphaComponentWithFloat(
-                        SemanticColorUtils.getDefaultTextColor(context),
-                        MODEL_SELECTOR_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY);
+        int backgroundHoverColor = context.getColor(R.color.tab_strip_button_bg_hover_tint);
         @ColorInt
         int backgroundPeripheralPressedColor =
-                ColorUtils.setAlphaComponentWithFloat(
-                        SemanticColorUtils.getDefaultTextColor(context),
-                        MODEL_SELECTOR_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY);
+                context.getColor(R.color.tab_strip_button_bg_peripheral_pressed_tint);
 
         @ColorInt
         int backgroundHoverIncognitoColor =
-                ColorUtils.setAlphaComponentWithFloat(
-                        context.getColor(R.color.tab_strip_button_hover_bg_color),
-                        MODEL_SELECTOR_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY);
+                context.getColor(R.color.tab_strip_button_bg_incognito_hover_tint);
         @ColorInt
         int backgroundPeripheralPressedIncognitoColor =
-                ColorUtils.setAlphaComponentWithFloat(
-                        context.getColor(R.color.tab_strip_button_hover_bg_color),
-                        MODEL_SELECTOR_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY);
+                context.getColor(R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint);
 
         int iconColor = mIsIncognito ? iconIncognitoColor : iconDefaultColor;
         int bgColor = mIsIncognito ? backgroundIncognitoColor : backgroundDefaultColor;

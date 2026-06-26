@@ -60,7 +60,6 @@ import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
 
 import androidx.annotation.Nullable;
-import androidx.core.graphics.ColorUtils;
 import androidx.test.core.app.ApplicationProvider;
 
 import org.junit.After;
@@ -149,7 +148,6 @@ import org.chromium.chrome.browser.tasks.tab_management.TabGroupListBottomSheetC
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
 import org.chromium.chrome.test.util.browser.tabmodel.MockTabModel;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
-import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.components.browser_ui.widget.ActionConfirmationResult;
 import org.chromium.components.collaboration.CollaborationService;
 import org.chromium.components.collaboration.ServiceStatus;
@@ -1619,8 +1617,7 @@ public class StripLayoutHelperTest {
 
         ntb.setHovered(true);
         int defaultNtbHoverBackgroundTint =
-                ColorUtils.setAlphaComponent(
-                        SemanticColorUtils.getDefaultTextColor(mContext), (int) (0.08 * 255));
+                mActivity.getColor(R.color.tab_strip_button_bg_hover_tint);
         assertEquals(
                 "New tab button hover highlight default tint is not as expected",
                 defaultNtbHoverBackgroundTint,
@@ -1630,8 +1627,7 @@ public class StripLayoutHelperTest {
         ntb.setHovered(false);
         ntb.setPressed(true, true);
         int pressedNtbHoverBackgroundTint =
-                ColorUtils.setAlphaComponent(
-                        SemanticColorUtils.getDefaultTextColor(mContext), (int) (0.12 * 255));
+                mActivity.getColor(R.color.tab_strip_button_bg_peripheral_pressed_tint);
         assertEquals(
                 "New tab button hover highlight pressed tint is not as expected",
                 pressedNtbHoverBackgroundTint,
@@ -1652,9 +1648,7 @@ public class StripLayoutHelperTest {
         // Verify new tab button incognito hover highlight default tint.
         ntb.setHovered(true);
         int defaultNtbHoverBackgroundIncognitoTint =
-                ColorUtils.setAlphaComponent(
-                        mContext.getColor(R.color.tab_strip_button_hover_bg_color),
-                        (int) (0.08 * 255));
+                mActivity.getColor(R.color.tab_strip_button_bg_incognito_hover_tint);
         assertEquals(
                 "New tab button hover highlight default tint is not as expected",
                 defaultNtbHoverBackgroundIncognitoTint,
@@ -1664,9 +1658,7 @@ public class StripLayoutHelperTest {
         ntb.setHovered(false);
         ntb.setPressed(true, true);
         int hoverBackgroundPressedIncognitoColor =
-                ColorUtils.setAlphaComponent(
-                        mContext.getColor(R.color.tab_strip_button_hover_bg_color),
-                        (int) (0.12 * 255));
+                mActivity.getColor(R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint);
         assertEquals(
                 "New tab button hover highlight pressed tint is not as expected",
                 hoverBackgroundPressedIncognitoColor,
@@ -1789,8 +1781,7 @@ public class StripLayoutHelperTest {
         closeButton.setHovered(true);
 
         int defaultCloseButtonHoverBackgroundTint =
-                ColorUtils.setAlphaComponent(
-                        SemanticColorUtils.getDefaultTextColor(mContext), (int) (0.08 * 255));
+                mActivity.getColor(R.color.tab_strip_button_bg_hover_tint);
         assertEquals(
                 "Close button hover highlight default tint is not as expected",
                 defaultCloseButtonHoverBackgroundTint,
@@ -1800,8 +1791,7 @@ public class StripLayoutHelperTest {
         closeButton.setHovered(false);
         closeButton.setPressed(true, true);
         int pressedCloseButtonHoverBackgroundTint =
-                ColorUtils.setAlphaComponent(
-                        SemanticColorUtils.getDefaultTextColor(mContext), (int) (0.12 * 255));
+                mActivity.getColor(R.color.tab_strip_button_bg_peripheral_pressed_tint);
         assertEquals(
                 "Close button hover highlight pressed tint is not as expected",
                 pressedCloseButtonHoverBackgroundTint,
@@ -1818,9 +1808,7 @@ public class StripLayoutHelperTest {
         // Verify close button incognito hover highlight default tint.
         closeButton.setHovered(true);
         int defaultNtbHoverBackgroundIncognitoTint =
-                ColorUtils.setAlphaComponent(
-                        mContext.getColor(R.color.tab_strip_button_hover_bg_color),
-                        (int) (0.08 * 255));
+                mActivity.getColor(R.color.tab_strip_button_bg_incognito_hover_tint);
         assertEquals(
                 "Close button hover highlight default tint is not as expected",
                 defaultNtbHoverBackgroundIncognitoTint,
@@ -1830,9 +1818,7 @@ public class StripLayoutHelperTest {
         closeButton.setHovered(false);
         closeButton.setPressed(true, true);
         int hoverBackgroundPressedIncognitoColor =
-                ColorUtils.setAlphaComponent(
-                        mContext.getColor(R.color.tab_strip_button_hover_bg_color),
-                        (int) (0.12 * 255));
+                mActivity.getColor(R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint);
         assertEquals(
                 "Close button hover highlight pressed tint is not as expected",
                 hoverBackgroundPressedIncognitoColor,

@@ -194,9 +194,6 @@ public class StripLayoutHelper
 
     // Desired spacing between new tab button and tabs when tab strip is not full.
     private static final float DESIRED_PADDING_BETWEEN_NEW_TAB_BUTTON_AND_TABS = 2.f;
-    private static final float NEW_TAB_BUTTON_DEFAULT_PRESSED_OPACITY = 0.2f;
-    private static final float NEW_TAB_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY = 0.12f;
-    private static final float NEW_TAB_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY = 0.08f;
     static final float FADE_FULL_OPACITY_THRESHOLD_DP = 24.f;
 
     // Values adapt based on whether the device is desktop or tablet.
@@ -832,22 +829,14 @@ public class StripLayoutHelper
                         R.drawable.bg_circle_tab_strip_button,
                         BUTTON_CLICK_SLOP_DP);
 
-        int backgroundHoverTint =
-                ColorUtils.setAlphaComponentWithFloat(
-                        SemanticColorUtils.getDefaultTextColor(context),
-                        NEW_TAB_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY);
+        int backgroundHoverTint = context.getColor(R.color.tab_strip_button_bg_hover_tint);
         int backgroundPeripheralPressedTint =
-                ColorUtils.setAlphaComponentWithFloat(
-                        SemanticColorUtils.getDefaultTextColor(context),
-                        NEW_TAB_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY);
+                context.getColor(R.color.tab_strip_button_bg_peripheral_pressed_tint);
 
         // Primary container for default bg color.
         int backgroundTint = TabUiThemeProvider.getDefaultNtbContainerColor(context);
         // Primary @ 20% for default pressed bg color.
-        int backgroundPressedTint =
-                ColorUtils.setAlphaComponentWithFloat(
-                        SemanticColorUtils.getDefaultIconColorAccent1(context),
-                        NEW_TAB_BUTTON_DEFAULT_PRESSED_OPACITY);
+        int backgroundPressedTint = context.getColor(R.color.tab_strip_button_bg_pressed_tint);
 
         // Tab strip redesign new tab button night mode bg color.
         if (ColorUtils.inNightMode(context)) {
@@ -860,13 +849,9 @@ public class StripLayoutHelper
             backgroundTint = context.getColor(R.color.tab_strip_bg_incognito_default_tint);
             backgroundPressedTint = context.getColor(R.color.tab_strip_bg_incognito_pressed_tint);
             backgroundHoverTint =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            context.getColor(R.color.tab_strip_button_hover_bg_color),
-                            NEW_TAB_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY);
+                    context.getColor(R.color.tab_strip_button_bg_incognito_hover_tint);
             backgroundPeripheralPressedTint =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            context.getColor(R.color.tab_strip_button_hover_bg_color),
-                            NEW_TAB_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY);
+                    context.getColor(R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint);
         }
 
         mNewTabButton.setBackgroundTint(

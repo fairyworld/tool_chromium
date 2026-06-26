@@ -67,7 +67,6 @@ import org.chromium.components.user_prefs.UserPrefs;
 import org.chromium.ui.base.LocalizationUtils;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.interpolators.Interpolators;
-import org.chromium.ui.util.ColorUtils;
 import org.chromium.ui.util.MotionEventUtils;
 import org.chromium.ui.util.StyleUtils;
 import org.chromium.ui.widget.RectProvider;
@@ -90,11 +89,6 @@ public class StripLayoutTrailingButtonsCoordinator {
     private static final float GLIC_BUTTON_BACKGROUND_Y_OFFSET_DP = 3.f;
     private static final float GLIC_BUTTON_BACKGROUND_WIDTH_DP = 42.f;
     private static final float GLIC_BUTTON_BACKGROUND_HEIGHT_DP = 32.f;
-    private static final float GLIC_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY = 0.30f;
-    private static final float GLIC_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY = 0.20f;
-    private static final float GLIC_BUTTON_UNFOCUSED_OPACITY = 0.65f;
-    private static final float GLIC_BUTTON_INCOGNITO_ICON_OPACITY = 0.38f;
-    private static final float GLIC_BUTTON_INCOGNITO_BACKGROUND_OPACITY = 0.10f;
     // Total vertical margin (Tab Strip Height(40dp) - Glic Background Height(32dp) = 8dp).
     public static final float GLIC_BUTTON_MARGIN_HEIGHT_DP = 8.f;
     public static final float GLIC_BUTTON_START_PADDING_DP = 6.f;
@@ -423,15 +417,11 @@ public class StripLayoutTrailingButtonsCoordinator {
 
             @ColorInt
             int backgroundHoverColor =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            SemanticColorUtils.getColorPrimary(mContext),
-                            GLIC_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY);
+                    mContext.getColor(R.color.tab_strip_glic_button_bg_hover_tint);
 
             @ColorInt
             int backgroundPressedColor =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            SemanticColorUtils.getColorPrimary(mContext),
-                            GLIC_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY);
+                    mContext.getColor(R.color.tab_strip_glic_button_bg_pressed_tint);
 
             mGlicActorButton.setBackgroundTint(
                     backgroundDefaultColor,
@@ -722,15 +712,10 @@ public class StripLayoutTrailingButtonsCoordinator {
 
         if (incognito) {
             // Set tints to indicate button is disabled
-            @ColorInt int colorOnSurface = mContext.getColor(R.color.default_icon_color_light);
             @ColorInt
-            int iconTint =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            colorOnSurface, GLIC_BUTTON_INCOGNITO_ICON_OPACITY);
+            int iconTint = mContext.getColor(R.color.tab_strip_glic_button_icon_incognito_tint);
             @ColorInt
-            int bgTint =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            colorOnSurface, GLIC_BUTTON_INCOGNITO_BACKGROUND_OPACITY);
+            int bgTint = mContext.getColor(R.color.tab_strip_glic_button_bg_incognito_tint);
 
             mGlicButton.setTint(iconTint);
             mGlicButton.setBackgroundTint(bgTint, bgTint, bgTint, bgTint);
@@ -741,15 +726,11 @@ public class StripLayoutTrailingButtonsCoordinator {
 
             @ColorInt
             int backgroundHoverColor =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            SemanticColorUtils.getColorPrimary(mContext),
-                            GLIC_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY);
+                    mContext.getColor(R.color.tab_strip_glic_button_bg_hover_tint);
 
             @ColorInt
             int backgroundPressedColor =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            SemanticColorUtils.getColorPrimary(mContext),
-                            GLIC_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY);
+                    mContext.getColor(R.color.tab_strip_glic_button_bg_pressed_tint);
 
             mGlicButton.setBackgroundTint(
                     backgroundDefaultColor,
@@ -1061,7 +1042,11 @@ public class StripLayoutTrailingButtonsCoordinator {
             boolean animate, float targetGlicWidth, float targetActorWidth) {
         if (mGlicButton == null || mGlicActorButton == null) return;
 
-        float targetOpacity = isUnfocusedInDw() ? GLIC_BUTTON_UNFOCUSED_OPACITY : 1.0f;
+        float targetOpacity =
+                isUnfocusedInDw()
+                        ? mContext.getResources()
+                                .getFloat(R.dimen.tab_strip_glic_button_icon_unfocused_alpha)
+                        : 1.0f;
         boolean targetActorVisible = shouldGlicActorBeVisible();
 
         if (animate) {
@@ -1246,7 +1231,11 @@ public class StripLayoutTrailingButtonsCoordinator {
         mIsAppInDesktopWindow = isAppInDesktopWindow;
         mIsTopResumedActivity = isTopResumedActivity;
         if (mGlicButton == null || mGlicActorButton == null) return;
-        float targetOpacity = isUnfocusedInDw() ? GLIC_BUTTON_UNFOCUSED_OPACITY : 1.0f;
+        float targetOpacity =
+                isUnfocusedInDw()
+                        ? mContext.getResources()
+                                .getFloat(R.dimen.tab_strip_glic_button_icon_unfocused_alpha)
+                        : 1.0f;
         mGlicButton.setOpacity(targetOpacity);
         mGlicActorButton.setOpacity(targetOpacity);
     }
