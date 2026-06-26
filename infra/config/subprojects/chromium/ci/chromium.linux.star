@@ -805,9 +805,14 @@ ci.thin_tester(
             "not_site_per_process_blink_web_tests": targets.remove(
                 reason = "removal was present before migration to starlark",
             ),
+            "not_site_per_process_headless_shell_wpt_tests": targets.mixin(
+                swarming = targets.swarming(
+                    shards = 24,
+                ),
+            ),
             "sync_integration_tests": targets.mixin(
                 swarming = targets.swarming(
-                    shards = 8,
+                    shards = 16,
                 ),
             ),
             "telemetry_perf_unittests": targets.mixin(
