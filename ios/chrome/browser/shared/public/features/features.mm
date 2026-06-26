@@ -1285,3 +1285,9 @@ BASE_FEATURE(kIOSPhishGuardPasteShortcutDetection,
 bool IsIOSPhishGuardPasteShortcutDetectionEnabled() {
   return base::FeatureList::IsEnabled(kIOSPhishGuardPasteShortcutDetection);
 }
+
+BASE_FEATURE(kAppBarHideLabels, base::FEATURE_DISABLED_BY_DEFAULT);
+
+bool IsAppBarLabelsHidden() {
+  return base::FeatureList::IsEnabled(kAppBarHideLabels);
+}

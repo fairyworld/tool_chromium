@@ -122,7 +122,7 @@ constexpr CGFloat kDefaultAppBarWidth = 300;
       appBarWidth = windowSize.width;
       heightInAppCoordinates = windowSize.height;
       extraOffset = (1 - self.fullscreenProgress) *
-                    (kAppBarHeight - kAppBarHeightFullscreen);
+                    (AppBarHeightPortrait() - kAppBarHeightFullscreen);
       break;
 
     case AppBarPosition::kLeft:
@@ -130,7 +130,7 @@ constexpr CGFloat kDefaultAppBarWidth = 300;
     case AppBarPosition::kRight:
       appBarWidth = windowSize.height;
       heightInAppCoordinates = windowSize.width;
-      extraOffset = kAppBarHeight - kAppBarHeightLandscape;
+      extraOffset = 0;
       break;
     case AppBarPosition::kNone:
       break;

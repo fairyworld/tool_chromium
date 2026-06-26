@@ -103,15 +103,15 @@
   switch (position) {
     case AppBarPosition::kBottom:
       agent->AddObscuredInsetRange(UIRectEdgeBottom, kAppBarHeightFullscreen,
-                                   kAppBarHeight);
+                                   AppBarHeightPortrait());
       break;
     case AppBarPosition::kLeft:
-      agent->AddObscuredInsetRange(UIRectEdgeLeft, kAppBarHeightLandscape,
-                                   kAppBarHeightLandscape);
+      agent->AddObscuredInsetRange(UIRectEdgeLeft, AppBarHeightLandscape(),
+                                   AppBarHeightLandscape());
       break;
     case AppBarPosition::kRight:
-      agent->AddObscuredInsetRange(UIRectEdgeRight, kAppBarHeightLandscape,
-                                   kAppBarHeightLandscape);
+      agent->AddObscuredInsetRange(UIRectEdgeRight, AppBarHeightLandscape(),
+                                   AppBarHeightLandscape());
       break;
     case AppBarPosition::kNone:
       break;
@@ -125,7 +125,8 @@
       _fullscreenProgress = agent->bottom_progress();
       CGFloat currentHeight =
           kAppBarHeightFullscreen +
-          (kAppBarHeight - kAppBarHeightFullscreen) * agent->bottom_progress();
+          (AppBarHeightPortrait() - kAppBarHeightFullscreen) *
+              agent->bottom_progress();
       agent->AddObscuredInset(UIRectEdgeBottom, currentHeight);
       [self updateLayout];
       // If this is inside an animation, layout immediately.
@@ -135,10 +136,10 @@
       break;
     }
     case AppBarPosition::kLeft:
-      agent->AddObscuredInset(UIRectEdgeLeft, kAppBarHeightLandscape);
+      agent->AddObscuredInset(UIRectEdgeLeft, AppBarHeightLandscape());
       break;
     case AppBarPosition::kRight:
-      agent->AddObscuredInset(UIRectEdgeRight, kAppBarHeightLandscape);
+      agent->AddObscuredInset(UIRectEdgeRight, AppBarHeightLandscape());
       break;
     case AppBarPosition::kNone:
       break;

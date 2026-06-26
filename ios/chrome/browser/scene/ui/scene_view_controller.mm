@@ -619,17 +619,17 @@ inline LayoutStateScenePassKey PassKey() {
   UIEdgeInsets insets = UIEdgeInsetsZero;
   switch (position) {
     case AppBarPosition::kLeft:
-      insets.left += kAppBarHeightLandscape;
+      insets.left += AppBarHeightLandscape();
       break;
 
     case AppBarPosition::kRight:
-      insets.right += kAppBarHeightLandscape;
+      insets.right += AppBarHeightLandscape();
       break;
 
     case AppBarPosition::kBottom: {
-      CGFloat appBarHeight =
-          kAppBarHeightFullscreen -
-          _fullscreenProgress * (kAppBarHeightFullscreen - kAppBarHeight);
+      CGFloat appBarHeight = kAppBarHeightFullscreen -
+                             _fullscreenProgress * (kAppBarHeightFullscreen -
+                                                    AppBarHeightPortrait());
       insets.bottom += appBarHeight;
       break;
     }

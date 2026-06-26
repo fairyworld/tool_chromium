@@ -1435,12 +1435,12 @@ bool IsFullscreenNextIAEnabled() {
   AppBarPosition position = self.layoutState.appBarPosition;
   switch (position) {
     case AppBarPosition::kLeft:
-      _toolbarLeadingConstraint.constant = kAppBarHeightLandscape;
+      _toolbarLeadingConstraint.constant = AppBarHeightLandscape();
       _toolbarTrailingConstraint.constant = 0;
       break;
     case AppBarPosition::kRight:
       _toolbarLeadingConstraint.constant = 0;
-      _toolbarTrailingConstraint.constant = -kAppBarHeightLandscape;
+      _toolbarTrailingConstraint.constant = -AppBarHeightLandscape();
       break;
     default:
       _toolbarLeadingConstraint.constant = 0;
@@ -2680,9 +2680,9 @@ bool IsFullscreenNextIAEnabled() {
     AppBarPosition position = self.layoutState.appBarPosition;
 
     if (position == AppBarPosition::kLeft) {
-      insets.left = kAppBarHeightLandscape;
+      insets.left = AppBarHeightLandscape();
     } else if (position == AppBarPosition::kRight) {
-      insets.right = kAppBarHeightLandscape;
+      insets.right = AppBarHeightLandscape();
     }
   }
 
@@ -2691,7 +2691,7 @@ bool IsFullscreenNextIAEnabled() {
       insets.bottom = [self secondaryToolbarHeightWithInset];
       insets.top = [self expandedTopToolbarHeight];
       if (self.layoutState.appBarPosition == AppBarPosition::kBottom) {
-        insets.bottom += kAppBarHeight;
+        insets.bottom += AppBarHeightPortrait();
       }
     } else {
       insets.top = [self expandedTopToolbarHeight];

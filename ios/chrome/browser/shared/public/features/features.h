@@ -1064,4 +1064,10 @@ BASE_DECLARE_FEATURE(kIOSPhishGuardPasteShortcutDetection);
 // Returns true if kIOSPhishGuardPasteShortcutDetection is enabled.
 bool IsIOSPhishGuardPasteShortcutDetectionEnabled();
 
+// Feature to hide the labels for the buttons in the App Bar.
+BASE_DECLARE_FEATURE(kAppBarHideLabels);
+
+// Returns true if the App Bar labels should be hidden.
+bool IsAppBarLabelsHidden();
+
 #endif  // IOS_CHROME_BROWSER_SHARED_PUBLIC_FEATURES_FEATURES_H_
