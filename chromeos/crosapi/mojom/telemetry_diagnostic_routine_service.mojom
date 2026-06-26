@@ -431,11 +431,6 @@ struct TelemetryDiagnosticMemoryRoutineDetail {
   TelemetryDiagnosticMemtesterResult result@1;
 };
 
-// Details regarding volume button routine.
-//
-// NextMinVersion: 1, NextIndex: 0
-struct TelemetryDiagnosticVolumeButtonRoutineDetail {};
-
 // Whether the given hardware probed matches the hardware description recorded.
 //
 // NextMinVersion: 1, NextIndex: 4
@@ -531,8 +526,6 @@ union TelemetryDiagnosticRoutineDetail {
   // Details of a completed memory routine.
   [MinVersion=1] TelemetryDiagnosticMemoryRoutineDetail memory@1;
   // Details of a completed volume button routine.
-  [MinVersion=2] TelemetryDiagnosticVolumeButtonRoutineDetail volume_button@2;
-  // Details of a completed fan routine.
   [MinVersion=3] TelemetryDiagnosticFanRoutineDetail fan@3;
   // Details of a completed network bandwidth routine.
   [MinVersion=4]

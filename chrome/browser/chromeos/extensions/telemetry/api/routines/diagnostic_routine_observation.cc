@@ -30,9 +30,9 @@ CreateEventForLegacyFinishedVolumeButtonRoutine(
     bool has_passed,
     base::Uuid uuid,
     content::BrowserContext* browser_context) {
-  auto finished_info = converters::routines::ConvertPtr(
-      crosapi::TelemetryDiagnosticVolumeButtonRoutineDetail::New(), uuid,
-      has_passed);
+  cx_diag::LegacyVolumeButtonRoutineFinishedInfo finished_info;
+  finished_info.uuid = uuid.AsLowercaseString();
+  finished_info.has_passed = has_passed;
   return std::make_unique<extensions::Event>(
       extensions::events::OS_DIAGNOSTICS_ON_VOLUME_BUTTON_ROUTINE_FINISHED,
       cx_diag::OnVolumeButtonRoutineFinished::kEventName,
@@ -68,13 +68,6 @@ std::unique_ptr<extensions::Event> GetEventForLegacyFinishedRoutine(
           extensions::events::OS_DIAGNOSTICS_ON_MEMORY_ROUTINE_FINISHED,
           cx_diag::OnMemoryRoutineFinished::kEventName,
           base::ListValue().Append(finished_info.ToValue()), browser_context);
-    }
-    case crosapi::TelemetryDiagnosticRoutineDetail::Tag::kVolumeButton: {
-      // Though unexpected, we should handle it gracefully because the input is
-      // from another service.
-      LOG(WARNING)
-          << "Got volume button routine detail for non-volume-button routine";
-      return nullptr;
     }
     case crosapi::TelemetryDiagnosticRoutineDetail::Tag::kFan: {
       auto finished_info = converters::routines::ConvertPtr(
