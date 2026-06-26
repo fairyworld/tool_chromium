@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "base/check_op.h"
 #include "base/functional/bind.h"
@@ -140,7 +141,10 @@ TEST_F(ChildMemoryConsumerRegistryHostTest, RegisterAndUnregister) {
               OnConsumerGroupAdded(kConsumerId, kConsumerName, _,
                                    PROCESS_TYPE_UTILITY, kChildId));
 
-  remote_host->Register(kConsumerId, kConsumerName, {});
+  std::vector<mojom::MemoryConsumerRegistrationPtr> registrations;
+  registrations.push_back(mojom::MemoryConsumerRegistration::New(
+      kConsumerId, kConsumerName, std::nullopt));
+  remote_host->Register(std::move(registrations));
   remote_host.FlushForTesting();
 
   EXPECT_CALL(controller_, OnConsumerGroupRemoved(kConsumerId, kChildId));
@@ -173,7 +177,10 @@ TEST_F(ChildMemoryConsumerRegistryHostTest, UpdateConsumers) {
   static constexpr char kConsumerName[] = "consumer";
   const uint32_t kConsumerId = base::PersistentHash(kConsumerName);
 
-  remote_host->Register(kConsumerId, kConsumerName, {});
+  std::vector<mojom::MemoryConsumerRegistrationPtr> registrations;
+  registrations.push_back(mojom::MemoryConsumerRegistration::New(
+      kConsumerId, kConsumerName, std::nullopt));
+  remote_host->Register(std::move(registrations));
   remote_host.FlushForTesting();
 
   ASSERT_TRUE(host);
@@ -209,7 +216,10 @@ TEST_F(ChildMemoryConsumerRegistryHostTest, DisconnectCoordinator) {
   static constexpr char kConsumerName[] = "consumer";
   const uint32_t kConsumerId = base::PersistentHash(kConsumerName);
 
-  remote_host->Register(kConsumerId, kConsumerName, {});
+  std::vector<mojom::MemoryConsumerRegistrationPtr> registrations;
+  registrations.push_back(mojom::MemoryConsumerRegistration::New(
+      kConsumerId, kConsumerName, std::nullopt));
+  remote_host->Register(std::move(registrations));
   remote_host.FlushForTesting();
 
   EXPECT_CALL(controller_, OnConsumerGroupRemoved(_, kChildId));
@@ -259,16 +269,22 @@ TEST_F(ChildMemoryConsumerRegistryHostTest, Register_TooManyConsumers) {
   EXPECT_CALL(controller_, OnConsumerGroupAdded(_, _, _, _, _))
       .Times(kMaxMemoryConsumersPerProcess);
 
+  std::vector<mojom::MemoryConsumerRegistrationPtr> registrations;
   for (size_t i = 0; i < kMaxMemoryConsumersPerProcess; ++i) {
     std::string name = "consumer" + base::NumberToString(i);
-    remote_host->Register(base::PersistentHash(name), name, {});
+    registrations.push_back(mojom::MemoryConsumerRegistration::New(
+        base::PersistentHash(name), name, std::nullopt));
   }
+  remote_host->Register(std::move(registrations));
   remote_host.FlushForTesting();
 
   // The next registration should fail.
   mojo::test::BadMessageObserver bad_message_observer;
   std::string name = "extra";
-  remote_host->Register(base::PersistentHash(name), name, {});
+  std::vector<mojom::MemoryConsumerRegistrationPtr> extra_registrations;
+  extra_registrations.push_back(mojom::MemoryConsumerRegistration::New(
+      base::PersistentHash(name), name, std::nullopt));
+  remote_host->Register(std::move(extra_registrations));
   EXPECT_EQ("Too many memory consumers registered",
             bad_message_observer.WaitForBadMessage());
 
@@ -293,7 +309,10 @@ TEST_F(ChildMemoryConsumerRegistryHostTest, Register_NameTooLong) {
 
   mojo::test::BadMessageObserver bad_message_observer;
   std::string long_name(kMaxMemoryConsumerNameLength + 1, 'a');
-  remote_host->Register(base::PersistentHash(long_name), long_name, {});
+  std::vector<mojom::MemoryConsumerRegistrationPtr> registrations;
+  registrations.push_back(mojom::MemoryConsumerRegistration::New(
+      base::PersistentHash(long_name), long_name, std::nullopt));
+  remote_host->Register(std::move(registrations));
   EXPECT_EQ("Memory consumer name is too long",
             bad_message_observer.WaitForBadMessage());
 
@@ -317,10 +336,99 @@ TEST_F(ChildMemoryConsumerRegistryHostTest, Register_InvalidConsumerId) {
   mojo::test::BadMessageObserver bad_message_observer;
   static constexpr char kConsumerName[] = "consumer";
   const uint32_t kInvalidConsumerId = base::PersistentHash(kConsumerName) + 1;
-  remote_host->Register(kInvalidConsumerId, kConsumerName, {});
+  std::vector<mojom::MemoryConsumerRegistrationPtr> registrations;
+  registrations.push_back(mojom::MemoryConsumerRegistration::New(
+      kInvalidConsumerId, kConsumerName, std::nullopt));
+  remote_host->Register(std::move(registrations));
   EXPECT_EQ("consumer_id does not match the hash of consumer_name",
             bad_message_observer.WaitForBadMessage());
 
+  EXPECT_CALL(controller_, RemoveMemoryConsumerGroupHost(kChildId));
+  hosts_.clear();
+}
+
+TEST_F(ChildMemoryConsumerRegistryHostTest, Register_Batch) {
+  const ChildProcessId kChildId(1);
+
+  EXPECT_CALL(controller_, AddMemoryConsumerGroupHost(kChildId, _));
+  mojo::Remote<mojom::ChildMemoryConsumerRegistryHost> remote_host;
+  BindHost(PROCESS_TYPE_UTILITY, kChildId,
+           remote_host.BindNewPipeAndPassReceiver());
+
+  MockChildMemoryCoordinator mock_coordinator;
+  mojo::Receiver<mojom::ChildMemoryCoordinator> coordinator_receiver(
+      &mock_coordinator);
+  remote_host->BindCoordinator(coordinator_receiver.BindNewPipeAndPassRemote());
+
+  static constexpr char kNameA[] = "consumer_a";
+  static constexpr char kNameB[] = "consumer_b";
+  const uint32_t kIdA = base::PersistentHash(kNameA);
+  const uint32_t kIdB = base::PersistentHash(kNameB);
+
+  // A batched Register() registers every consumer in the batch.
+  EXPECT_CALL(
+      controller_,
+      OnConsumerGroupAdded(kIdA, kNameA, _, PROCESS_TYPE_UTILITY, kChildId));
+  EXPECT_CALL(
+      controller_,
+      OnConsumerGroupAdded(kIdB, kNameB, _, PROCESS_TYPE_UTILITY, kChildId));
+
+  std::vector<mojom::MemoryConsumerRegistrationPtr> registrations;
+  registrations.push_back(
+      mojom::MemoryConsumerRegistration::New(kIdA, kNameA, std::nullopt));
+  registrations.push_back(
+      mojom::MemoryConsumerRegistration::New(kIdB, kNameB, std::nullopt));
+  remote_host->Register(std::move(registrations));
+  remote_host.FlushForTesting();
+
+  EXPECT_CALL(controller_, OnConsumerGroupRemoved(_, _)).Times(2);
+  EXPECT_CALL(controller_, RemoveMemoryConsumerGroupHost(kChildId));
+  hosts_.clear();
+}
+
+// Tests that an invalid entry in a batched Register() reports a bad message
+// and stops processing, leaving entries after it unregistered.
+TEST_F(ChildMemoryConsumerRegistryHostTest, Register_StopsOnInvalidEntry) {
+  const ChildProcessId kChildId(1);
+
+  EXPECT_CALL(controller_, AddMemoryConsumerGroupHost(kChildId, _));
+  mojo::Remote<mojom::ChildMemoryConsumerRegistryHost> remote_host;
+  BindHost(PROCESS_TYPE_UTILITY, kChildId,
+           remote_host.BindNewPipeAndPassReceiver());
+
+  MockChildMemoryCoordinator mock_coordinator;
+  mojo::Receiver<mojom::ChildMemoryCoordinator> coordinator_receiver(
+      &mock_coordinator);
+  remote_host->BindCoordinator(coordinator_receiver.BindNewPipeAndPassRemote());
+
+  static constexpr char kGoodName[] = "good";
+  static constexpr char kBadName[] = "bad";
+  static constexpr char kAfterName[] = "after";
+  const uint32_t kGoodId = base::PersistentHash(kGoodName);
+
+  // The first (valid) entry registers; the second has a mismatched id, which
+  // reports a bad message and aborts the batch; the third is never reached.
+  EXPECT_CALL(controller_,
+              OnConsumerGroupAdded(kGoodId, kGoodName, _, _, kChildId));
+  EXPECT_CALL(controller_, OnConsumerGroupAdded(
+                               base::PersistentHash(kAfterName), _, _, _, _))
+      .Times(0);
+
+  std::vector<mojom::MemoryConsumerRegistrationPtr> registrations;
+  registrations.push_back(
+      mojom::MemoryConsumerRegistration::New(kGoodId, kGoodName, std::nullopt));
+  registrations.push_back(mojom::MemoryConsumerRegistration::New(
+      base::PersistentHash(kBadName) + 1, kBadName, std::nullopt));
+  registrations.push_back(mojom::MemoryConsumerRegistration::New(
+      base::PersistentHash(kAfterName), kAfterName, std::nullopt));
+
+  mojo::test::BadMessageObserver bad_message_observer;
+  remote_host->Register(std::move(registrations));
+  EXPECT_EQ("consumer_id does not match the hash of consumer_name",
+            bad_message_observer.WaitForBadMessage());
+
+  // Only the first (valid) consumer remains registered.
+  EXPECT_CALL(controller_, OnConsumerGroupRemoved(kGoodId, _));
   EXPECT_CALL(controller_, RemoveMemoryConsumerGroupHost(kChildId));
   hosts_.clear();
 }
@@ -391,7 +499,10 @@ TEST_F(ChildMemoryConsumerRegistryHostTest, OnMemoryLimitChanged_Valid) {
       &mock_coordinator);
   remote_host->BindCoordinator(coordinator_receiver.BindNewPipeAndPassRemote());
   EXPECT_CALL(controller_, OnConsumerGroupAdded(kConsumerId, _, _, _, _));
-  remote_host->Register(kConsumerId, kConsumerName, {});
+  std::vector<mojom::MemoryConsumerRegistrationPtr> registrations;
+  registrations.push_back(mojom::MemoryConsumerRegistration::New(
+      kConsumerId, kConsumerName, std::nullopt));
+  remote_host->Register(std::move(registrations));
   remote_host.FlushForTesting();
 
   // Valid percentage (positive) should be forwarded.
@@ -420,7 +531,10 @@ TEST_F(ChildMemoryConsumerRegistryHostTest, OnMemoryLimitChanged_InvalidRange) {
       &mock_coordinator);
   remote_host->BindCoordinator(coordinator_receiver.BindNewPipeAndPassRemote());
   EXPECT_CALL(controller_, OnConsumerGroupAdded(kConsumerId, _, _, _, _));
-  remote_host->Register(kConsumerId, kConsumerName, {});
+  std::vector<mojom::MemoryConsumerRegistrationPtr> registrations;
+  registrations.push_back(mojom::MemoryConsumerRegistration::New(
+      kConsumerId, kConsumerName, std::nullopt));
+  remote_host->Register(std::move(registrations));
   remote_host.FlushForTesting();
 
   // Invalid percentage (negative) should trigger a bad message.

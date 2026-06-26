@@ -10,6 +10,7 @@
 #include <string_view>
 #include <vector>
 
+#include "base/memory/weak_ptr.h"
 #include "base/sequence_checker.h"
 #include "content/common/buildflags.h"
 #include "content/common/memory_coordinator/memory_coordinator_policy.h"
@@ -18,6 +19,7 @@
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
+#include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 
 #if BUILDFLAG(ENABLE_MEMORY_COORDINATOR_INTERNALS)
 #include "content/common/memory_coordinator/mojom/memory_coordinator_diagnostics.mojom.h"
@@ -71,6 +73,16 @@ class BrowserMemoryCoordinatorBridge
   void OnReportingHostDisconnected();
 #endif
 
+  // Posts FlushPendingRegistrations() if the host is connected, there are
+  // pending registrations, and a flush isn't already scheduled. Consumers that
+  // register in a burst (e.g. during process startup) are thereby coalesced
+  // into a single Register() IPC.
+  void ScheduleRegistrationFlush();
+
+  // sends all `pending_registrations_` to the browser as a single batched
+  // Register() IPC.
+  void FlushPendingRegistrations();
+
   // Used to register consumers in the child process with the browser process.
   mojo::Remote<mojom::ChildMemoryConsumerRegistryHost> registry_host_;
 
@@ -90,7 +102,17 @@ class BrowserMemoryCoordinatorBridge
   // Tracks all consumer groups known to this class.
   absl::flat_hash_map<uint32_t, ConsumerDetails> groups_;
 
+  // Consumer ids that have been added but whose registration has not yet been
+  // flushed to the browser. A strict subset of `groups_`. Coalesced into one
+  // Register() by FlushPendingRegistrations().
+  absl::flat_hash_set<uint32_t> pending_registrations_;
+
+  // Whether a FlushPendingRegistrations() task is already posted.
+  bool flush_scheduled_ = false;
+
   SEQUENCE_CHECKER(sequence_checker_);
+
+  base::WeakPtrFactory<BrowserMemoryCoordinatorBridge> weak_factory_{this};
 };
 
 }  // namespace content
