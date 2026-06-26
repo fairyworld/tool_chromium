@@ -196,13 +196,6 @@ void ClientSession::NotifyClientResolution(
 
   webrtc::DesktopSize client_size(resolution.width_pixels(),
                                   resolution.height_pixels());
-  // Round down the dimensions to a multiple of 2. Otherwise the dimensions will
-  // be rounded on the receiver, which will cause blurring due to scaling. The
-  // resulting size is still close to the client size and will fit on the
-  // client's screen without scaling.
-  // TODO(sergeyu): Make WebRTC handle odd dimensions properly.
-  // crbug.com/636071
-  client_size.set(client_size.width() & (~1), client_size.height() & (~1));
 
   // TODO(joedow): Determine if other platforms support desktop scaling.
   webrtc::DesktopVector dpi_vector{kDefaultDpi, kDefaultDpi};
