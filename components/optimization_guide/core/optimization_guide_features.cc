@@ -562,10 +562,6 @@ bool ShouldUseTextSafetyClassifierModel() {
   return base::FeatureList::IsEnabled(kTextSafetyClassifier);
 }
 
-bool ShouldUseGeneralizedSafetyModel() {
-  return true;
-}
-
 double GetOnDeviceModelLanguageDetectionMinimumReliability() {
   static const base::FeatureParam<double>
       kOnDeviceModelLanguageDetectionMinimumReliability{
