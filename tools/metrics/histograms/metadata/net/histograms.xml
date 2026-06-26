@@ -305,9 +305,13 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//components/unexportable_keys/background_task_type.h:BackgroundTaskType) -->
 
+<!-- LINT.IfChange(UnexportableKeysSpareKeyPoolType) -->
+
 <variants name="UnexportableKeysSpareKeyPoolType">
   <variant name="Signing" summary="signing"/>
 </variants>
+
+<!-- LINT.ThenChange(//components/unexportable_keys/unexportable_key_service_impl.cc:GetSpareKeyPoolHistogramName) -->
 
 <variants name="URLLoaderThrottleStages">
   <variant name="BeforeWillProcessResponse"/>
