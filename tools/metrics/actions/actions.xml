@@ -18665,8 +18665,8 @@ should be able to be added at any place in this file.
     Recorded when the user clicks on the intent picker icon that pops up
     whenever a navigation occurs to a site that is already installed by a PWA
     and controlled by the PWA's scope. This is measured regardless of whether
-    the intent picker icon is extended or not. This is currently measured only
-    on Windows, Mac and Linux platforms.
+    the intent picker icon is extended or not. This is currently measured on all
+    desktop platforms (ChromeOS, Mac, Windows and Linux).
   </description>
 </action>
 
@@ -18676,7 +18676,8 @@ should be able to be added at any place in this file.
   <description>
     Recorded when the user clicks on a PWA that shows up in the intent picker,
     and clicks on Open, leading to the current site being launched in the PWA.
-    This is currently measured only on Windows, Mac and Linux platforms.
+    This is currently measured on all desktop platforms (ChromeOS, Mac, Windows
+    and Linux).
   </description>
 </action>
 
@@ -18697,7 +18698,7 @@ should be able to be added at any place in this file.
   <description>
     Recorded when the user manually closes the intent picker bubble view,
     leading to the site not being launched in a PWA. This is currently measured
-    only on Windows, Mac and Linux platforms.
+    on all desktop platforms (ChromeOS, Mac, Windows and Linux).
   </description>
 </action>
 
@@ -18707,7 +18708,7 @@ should be able to be added at any place in this file.
   <description>
     Recorded when the user navigates away from the current site with an open
     intent picker bubble view, leading to it being closed. This is currently
-    only meaasured on Windows, Mac and Linux.
+    measured on all desktop platforms (ChromeOS, Mac, Windows and Linux).
   </description>
 </action>
 
