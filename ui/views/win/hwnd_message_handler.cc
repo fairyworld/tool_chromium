@@ -2601,6 +2601,15 @@ LRESULT HWNDMessageHandler::OnNCCreate(LPCREATESTRUCT lpCreateStruct) {
 }
 
 LRESULT HWNDMessageHandler::OnNCHitTest(const gfx::Point& point) {
+  // If pointer lock with unadjusted movement is active in fullscreen and we
+  // have mouse capture, we want all mouse events to register as client area
+  // events. Returning HTCLIENT prevents Windows from treating clicks near the
+  // window edges (e.g. caption/reveal zones in fullscreen) as non-client clicks
+  // and swallowing them.
+  if (mouse_locked_ && using_wm_input_ && HasCapture() && IsFullscreen()) {
+    return HTCLIENT;
+  }
+
   if (!delegate_->HasNonClientView()) {
     SetMsgHandled(FALSE);
     return 0;
