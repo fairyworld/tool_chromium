@@ -139,3 +139,14 @@ export function assertIconMaskImageUrl(
       `url("${new URL(url, document.baseURI).href}")`);
   assertStyle(iconElement.$.icon, 'background-image', 'none');
 }
+
+export function createKeyboardEvent(
+    key: string, modifiers?: Partial<KeyboardEventInit>): KeyboardEvent {
+  return new KeyboardEvent('keydown', {
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    key,
+    ...modifiers,
+  });
+}
