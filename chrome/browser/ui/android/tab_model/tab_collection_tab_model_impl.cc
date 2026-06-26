@@ -91,14 +91,15 @@ int TabCollectionTabModelImpl::GetIndexOfTabRecursive(
     return kInvalidTabIndex;
   }
 
-  int current_index = 0;
-  for (TabInterface* tab_in_collection : *tab_strip_collection_) {
-    if (ToTabAndroidChecked(tab_in_collection) == tab_android) {
-      return current_index;
-    }
-    current_index++;
+  auto it = tab_map_.find(tab_android);
+  if (it == tab_map_.end()) {
+    return kInvalidTabIndex;
   }
-  return kInvalidTabIndex;
+
+  TabInterface* tab_interface = it->second;
+  std::optional<size_t> index =
+      tab_strip_collection_->GetIndexOfTabRecursive(tab_interface);
+  return index ? base::checked_cast<int>(*index) : kInvalidTabIndex;
 }
 
 int TabCollectionTabModelImpl::MoveTabRecursive(
@@ -133,6 +134,7 @@ int TabCollectionTabModelImpl::AddTabRecursive(
                        index, tab_group_id, is_pinned);
 
   auto tab_interface_android = ToTabInterface(tab_android);
+  TabInterface* tab_interface_ptr = tab_interface_android.get();
 
   // When the tab is attaching a detached group we first add the tab to the
   // collection and then move the tab to the group.
@@ -144,6 +146,9 @@ int TabCollectionTabModelImpl::AddTabRecursive(
     tab_strip_collection_->MoveTabRecursive(index, index, *tab_group_id,
                                             is_pinned);
   }
+
+  tab_map_[tab_android] = tab_interface_ptr;
+
   return base::checked_cast<int>(index);
 }
 
@@ -152,6 +157,7 @@ void TabCollectionTabModelImpl::RemoveTabRecursive(JNIEnv* env,
   int index = GetIndexOfTabRecursive(tab);
   CHECK_NE(index, kInvalidTabIndex);
   tab_strip_collection_->RemoveTabAtIndexRecursive(index);
+  tab_map_.erase(tab);
 }
 
 void TabCollectionTabModelImpl::CreateTabGroup(
@@ -238,15 +244,14 @@ int TabCollectionTabModelImpl::GetIndexOfTabInGroup(
     return kInvalidTabIndex;
   }
 
-  int index = 0;
-  for (TabInterface* group_tab : *group_collection) {
-    if (ToTabAndroidChecked(group_tab) == tab_android) {
-      return index;
-    }
-    index++;
+  auto it = tab_map_.find(tab_android);
+  if (it == tab_map_.end()) {
+    return kInvalidTabIndex;
   }
 
-  return kInvalidTabIndex;
+  TabInterface* tab_interface = it->second;
+  std::optional<size_t> index = group_collection->GetIndexOfTab(tab_interface);
+  return index ? base::checked_cast<int>(*index) : kInvalidTabIndex;
 }
 
 int TabCollectionTabModelImpl::MoveTabGroupTo(JNIEnv* env,
