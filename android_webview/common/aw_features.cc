@@ -265,12 +265,11 @@ BASE_FEATURE(kPrerender2WarmUpCompositorForWebView,
 
 // Keeps the renderer process alive after the last WebView is destroyed to
 // allow for reuse.
-BASE_FEATURE(kWebViewRendererKeepAlive, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kWebViewRendererKeepAlive, base::FEATURE_ENABLED_BY_DEFAULT);
 
 const base::FeatureParam<base::TimeDelta> kWebViewRendererKeepAliveDuration{
     &kWebViewRendererKeepAlive, "webview_renderer_keep_alive_duration",
-    base::Seconds(30)};
-
+    base::Days(1000)};
 
 // Enables recording user actions for API calls.
 BASE_FEATURE(kWebViewEnableApiCallUserActions,
