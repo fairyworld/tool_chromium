@@ -882,6 +882,18 @@ void TabWebContentsDelegateAndroid::RequestImmersivePlaybackConfirmation(
           options.projection_type =
               static_cast<content::ImmersiveProjectionType>(
                   (packed_result >> 8) & 0xF);
+
+          // When the backend provides a non-default spatial format, the
+          // confirmation flow skips the format selection dialog and returns
+          // those exact options. Therefore, any confirmed option matching a
+          // non-default spatial format is marked as recommended.
+          options.is_recommended =
+              (options.stereo_mode == default_options.stereo_mode &&
+               options.projection_type == default_options.projection_type &&
+               (default_options.stereo_mode !=
+                    content::ImmersiveStereoMode::kMono ||
+                default_options.projection_type !=
+                    content::ImmersiveProjectionType::kQuad));
           result.options = options;
         }
 
