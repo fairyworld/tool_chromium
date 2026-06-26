@@ -21,21 +21,28 @@ namespace {
 struct ExtractState {
   raw_ptr<ui::AXNode> node;
   bool inside_code;
+  bool in_link;
+  bool in_list;
 };
 
-// Extracts structural and formatting text fragments from the AXTree.
+// Extracts structural properties, formatting text fragments, and link density
+// metrics from the AXTree.
 void ExtractOriginalStructure(ui::AXNode* root,
                               reading_mode::OriginalStructure& structure,
-                              bool root_inside_code) {
+                              bool root_inside_code,
+                              bool root_in_link) {
   if (!root) {
     return;
   }
+
+  structure.original_total_text_len = 0;
+  structure.original_link_text_len = 0;
 
   std::vector<ExtractState> stack;
   // Pre-allocate space based on max AXTree size (5000 nodes) to avoid heap
   // resizing.
   stack.reserve(5000);
-  stack.push_back({root, root_inside_code});
+  stack.push_back({root, root_inside_code, root_in_link, /*in_list=*/false});
 
   while (!stack.empty()) {
     ExtractState current = stack.back();
@@ -43,36 +50,48 @@ void ExtractOriginalStructure(ui::AXNode* root,
 
     ui::AXNode* node = current.node.get();
     bool inside_code = current.inside_code;
+    bool in_link = current.in_link;
+    bool in_list = current.in_list;
 
     ax::mojom::Role role = node->GetRole();
-    if (role == ax::mojom::Role::kHeading) {
-      std::string text = node->GetTextContentUTF8();
-      if (!text.empty()) {
-        structure.headings.push_back(rust::String(text));
-      }
-    } else if (role == ax::mojom::Role::kList) {
-      reading_mode::OriginalList current_list;
-      for (const auto& child : node->children()) {
-        if (child->GetRole() == ax::mojom::Role::kListItem) {
-          std::string text = child->GetTextContentUTF8();
-          if (!text.empty()) {
-            current_list.items.push_back(rust::String(text));
+    bool current_is_link = in_link || (role == ax::mojom::Role::kLink);
+
+    if (!in_list) {
+      if (role == ax::mojom::Role::kHeading) {
+        std::string text = node->GetTextContentUTF8();
+        if (!text.empty()) {
+          structure.headings.push_back(rust::String(text));
+        }
+      } else if (role == ax::mojom::Role::kList) {
+        reading_mode::OriginalList current_list;
+        for (const auto& child : node->children()) {
+          if (child->GetRole() == ax::mojom::Role::kListItem) {
+            std::string text = child->GetTextContentUTF8();
+            if (!text.empty()) {
+              current_list.items.push_back(rust::String(text));
+            }
           }
         }
-      }
-      if (!current_list.items.empty()) {
-        structure.lists.push_back(current_list);
-      }
-    } else if (role == ax::mojom::Role::kBlockquote) {
-      std::string text = node->GetTextContentUTF8();
-      if (!text.empty()) {
-        structure.blockquotes.push_back(rust::String(text));
+        if (!current_list.items.empty()) {
+          structure.lists.push_back(current_list);
+        }
+      } else if (role == ax::mojom::Role::kBlockquote) {
+        std::string text = node->GetTextContentUTF8();
+        if (!text.empty()) {
+          structure.blockquotes.push_back(rust::String(text));
+        }
       }
     }
 
     if (role == ax::mojom::Role::kStaticText) {
       std::string text = node->GetTextContentUTF8();
-      if (!text.empty()) {
+      size_t len = text.length();
+      structure.original_total_text_len += len;
+      if (current_is_link) {
+        structure.original_link_text_len += len;
+      }
+
+      if (!in_list && !text.empty()) {
         if (node->HasTextStyle(ax::mojom::TextStyle::kBold)) {
           structure.bold_fragments.push_back(rust::String(text));
         }
@@ -87,60 +106,15 @@ void ExtractOriginalStructure(ui::AXNode* root,
     }
 
     bool current_is_code = inside_code || (role == ax::mojom::Role::kCode);
-
-    // We fully traversed lists above, so don't push list children onto stack.
-    if (role != ax::mojom::Role::kList) {
-      const auto& children = node->children();
-      // Push children in reverse order to ensure leftmost child is popped and
-      // processed first (matches canonical DFS left-to-right preorder
-      // traversal).
-      for (const auto& it : base::Reversed(children)) {
-        stack.push_back({it.get(), current_is_code});
-      }
-    }
-  }
-}
-
-struct LinkDensityState {
-  raw_ptr<ui::AXNode> node;
-  bool in_link;
-};
-
-void CalculateLinkDensityInAXTree(ui::AXNode* root,
-                                  size_t& total_len,
-                                  size_t& link_len,
-                                  bool root_in_link) {
-  if (!root) {
-    return;
-  }
-
-  std::vector<LinkDensityState> stack;
-  stack.reserve(5000);
-  stack.push_back({root, root_in_link});
-
-  while (!stack.empty()) {
-    LinkDensityState current = stack.back();
-    stack.pop_back();
-
-    ui::AXNode* node = current.node.get();
-    bool in_link = current.in_link;
-
-    bool current_is_link =
-        in_link || (node->GetRole() == ax::mojom::Role::kLink);
-
-    if (node->GetRole() == ax::mojom::Role::kStaticText) {
-      size_t len = node->GetTextContentUTF8().length();
-      total_len += len;
-      if (current_is_link) {
-        link_len += len;
-      }
-    }
+    bool current_is_list = in_list || (role == ax::mojom::Role::kList);
 
     const auto& children = node->children();
-    // Push in reverse for canonical preorder traversal sequence (leftmost
-    // first).
+    // Push children in reverse order to ensure leftmost child is popped and
+    // processed first (matches canonical DFS left-to-right preorder
+    // traversal).
     for (const auto& it : base::Reversed(children)) {
-      stack.push_back({it.get(), current_is_link});
+      stack.push_back(
+          {it.get(), current_is_code, current_is_link, current_is_list});
     }
   }
 }
@@ -150,7 +124,8 @@ void CalculateLinkDensityInAXTree(ui::AXNode* root,
 void ExtractOriginalStructureForTesting(ui::AXNode* root,
                                         OriginalStructure& structure,
                                         bool root_inside_code) {
-  ExtractOriginalStructure(root, structure, root_inside_code);
+  ExtractOriginalStructure(root, structure, root_inside_code,
+                           /*root_in_link=*/false);
 }
 
 ReadingModeMetricsService::ReadingModeMetricsService(
@@ -187,16 +162,8 @@ void ReadingModeMetricsService::Evaluate(
   }
 
   reading_mode::OriginalStructure structure;
-  ExtractOriginalStructure(tree.root(), structure, false);
-
-  size_t original_total_text_len = 0;
-  size_t original_link_text_len = 0;
-  CalculateLinkDensityInAXTree(tree.root(), original_total_text_len,
-                               original_link_text_len, false);
-  structure.original_link_text_len =
-      static_cast<uint32_t>(original_link_text_len);
-  structure.original_total_text_len =
-      static_cast<uint32_t>(original_total_text_len);
+  ExtractOriginalStructure(tree.root(), structure, /*root_inside_code=*/false,
+                           /*root_in_link=*/false);
 
   // Call the Rust evaluator to compute metrics.
   auto rust_metrics =
