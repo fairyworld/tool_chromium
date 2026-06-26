@@ -16,6 +16,30 @@ export function getHtml(this: MemoryBanksElement) {
             <div class="header-container">
               <h1>Memory banks</h1>
             </div>
+
+            ${
+      this.entries.length === 0 ?
+          '' :
+          html`
+              <div class="action-bar">
+                <cr-checkbox
+                    ?checked="${this.isAllSelected_()}"
+                    ?indeterminate="${this.isSomeSelected_()}"
+                    @change="${this.onSelectAllChange_}">
+                  Select all
+                </cr-checkbox>
+                <div class="action-buttons">
+                  <cr-button ?disabled="${
+              this.selectedIds.size === 0}" @click="${this.onCopyClick_}">
+                    Copy selected
+                  </cr-button>
+                  <cr-button ?disabled="${
+              this.selectedIds.size === 0}" @click="${this.onDownloadClick_}">
+                    Download selected
+                  </cr-button>
+                </div>
+              </div>
+            `}
             ${
       this.entries.length === 0 ?
           html`
@@ -27,13 +51,22 @@ export function getHtml(this: MemoryBanksElement) {
                 ${
               this.recentlySaved_.map(
                   entry => html`
-                  <a class="card" href="${entry.url}" target="_blank">
+                  <a class="card ${
+                      this.isSelected_(entry.id) ?
+                          'selected' :
+                          ''}" href="${entry.url}" target="_blank">
+                    <cr-checkbox class="card-checkbox"
+                        data-id="${entry.id}"
+                        ?checked="${this.isSelected_(entry.id)}"
+                        @change="${this.onCheckboxChange_}"
+                        @click="${this.onCheckboxClick_}">
+                    </cr-checkbox>
                     ${
                       entry.type === EntryType.kTextSelection ?
                           html`
                       <div class="card-body">
                         <p class="text-preview">"${
-                              this.getTruncatedText_(entry.selectedText)}"</p>
+                              entry.selectedText || ''}"</p>
                       </div>
                     ` :
                           html`
@@ -68,13 +101,22 @@ export function getHtml(this: MemoryBanksElement) {
                 ${
               this.entries.map(
                   entry => html`
-                  <a class="card" href="${entry.url}" target="_blank">
+                  <a class="card ${
+                      this.isSelected_(entry.id) ?
+                          'selected' :
+                          ''}" href="${entry.url}" target="_blank">
+                    <cr-checkbox class="card-checkbox"
+                        data-id="${entry.id}"
+                        ?checked="${this.isSelected_(entry.id)}"
+                        @change="${this.onCheckboxChange_}"
+                        @click="${this.onCheckboxClick_}">
+                    </cr-checkbox>
                     ${
                       entry.type === EntryType.kTextSelection ?
                           html`
                       <div class="card-body">
                         <p class="text-preview">"${
-                              this.getTruncatedText_(entry.selectedText)}"</p>
+                              entry.selectedText || ''}"</p>
                       </div>
                     ` :
                           html`
