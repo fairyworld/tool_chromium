@@ -1111,44 +1111,4 @@ TEST_F(EmailVerifierDelegateTest,
   checkpoint.Call(4);
 }
 
-// Verifies that an email value shorter than 5 characters is rejected and does
-// not trigger verification.
-TEST_F(EmailVerifierDelegateTest, OnFieldLostFocus_RejectsShortEmail) {
-  FormStructure* form = SetUpValidForm();
-
-  // Expect NO verification.
-  EXPECT_CALL(email_verifier(), CheckIfVerifiable).Times(0);
-  EXPECT_CALL(email_verifier(), Verify).Times(0);
-  EXPECT_CALL(driver(), SendEmailVerificationToken).Times(0);
-
-  // Set a short email (length 3: "a@b").
-  form->field(0)->set_value(u"a@b");
-  form->field(0)->AddFieldModifier(FieldModifier::kUser);
-
-  // Focus and blur.
-  delegate().OnAfterFocusOnFormField(manager(), form->global_id(),
-                                     form->field(0)->global_id());
-  delegate().OnAfterFocusOnNonFormField(manager());
-}
-
-// Verifies that an email value without a dot in the domain part (after the @)
-// is rejected and does not trigger verification.
-TEST_F(EmailVerifierDelegateTest, OnFieldLostFocus_RejectsNoDomainDot) {
-  FormStructure* form = SetUpValidForm();
-
-  // Expect NO verification.
-  EXPECT_CALL(email_verifier(), CheckIfVerifiable).Times(0);
-  EXPECT_CALL(email_verifier(), Verify).Times(0);
-  EXPECT_CALL(driver(), SendEmailVerificationToken).Times(0);
-
-  // Set an email without a dot in the domain ("user@domain").
-  form->field(0)->set_value(u"user@domain");
-  form->field(0)->AddFieldModifier(FieldModifier::kUser);
-
-  // Focus and blur.
-  delegate().OnAfterFocusOnFormField(manager(), form->global_id(),
-                                     form->field(0)->global_id());
-  delegate().OnAfterFocusOnNonFormField(manager());
-}
-
 }  // namespace autofill

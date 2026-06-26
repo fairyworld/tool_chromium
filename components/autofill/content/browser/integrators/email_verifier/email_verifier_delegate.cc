@@ -19,6 +19,7 @@
 #include "components/autofill/content/browser/renderer_forms_from_browser_form.h"
 #include "components/autofill/core/browser/autofill_field.h"
 #include "components/autofill/core/browser/data_model/addresses/autofill_profile.h"
+#include "components/autofill/core/browser/data_quality/validation.h"
 #include "components/autofill/core/browser/form_structure.h"
 #include "components/autofill/core/browser/foundations/autofill_client.h"
 #include "components/autofill/core/browser/foundations/browser_autofill_manager.h"
@@ -422,14 +423,9 @@ void EmailVerifierDelegate::OnFieldLostFocus(AutofillManager& manager,
     return;
   }
 
-  // Check 3: Value validation (length [5, 256], contains '@' and '.' after '@')
+  // Check 3: Value validation
   const std::u16string& value = email_field->value();
-  if (value.length() < 5 || value.length() > 256) {
-    return;
-  }
-  size_t at_pos = value.find(u'@');
-  if (at_pos == std::u16string::npos ||
-      value.find(u'.', at_pos) == std::u16string::npos) {
+  if (!IsValidEmailAddress(value)) {
     return;
   }
 
