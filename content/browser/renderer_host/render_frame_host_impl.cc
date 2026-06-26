@@ -9632,12 +9632,15 @@ void RenderFrameHostImpl::UpdateUserActivationState(
 }
 
 void RenderFrameHostImpl::DidConsumeHistoryUserActivation() {
-  // owner_ may be null for IsPendingDeletion() or IsInBackForwardCache(), in
-  // which case the history user activation is managed by a different active
-  // RenderFrameHost.
-  if (owner_) {
-    owner_->DidConsumeHistoryUserActivation();
+  // This IPC is only sent from an active document, but might be received after
+  // the transition to the backforward cache or after entering pending
+  // deletion. It must be ignored as it would affect the state of the primary
+  // page instead of the old one.
+  if (lifecycle_state() != LifecycleStateImpl::kActive) {
+    return;
   }
+  CHECK(owner_);  // See `owner_` invariants about `lifecycle_state_`.
+  owner_->DidConsumeHistoryUserActivation();
 }
 
 void RenderFrameHostImpl::HadStickyUserActivationBeforeNavigationChanged(

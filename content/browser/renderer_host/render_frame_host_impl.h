@@ -3544,6 +3544,8 @@ class CONTENT_EXPORT RenderFrameHostImpl
   FRIEND_TEST_ALL_PREFIXES(
       RenderFrameHostImplTest,
       BrowserInitiatedCloseIsNotCancelledIfPageIsntPrimary);
+  FRIEND_TEST_ALL_PREFIXES(RenderFrameHostImplTest,
+                           DidConsumeHistoryUserActivationNonActive);
   FRIEND_TEST_ALL_PREFIXES(DocumentUserDataTest, CheckInPendingDeletionState);
   FRIEND_TEST_ALL_PREFIXES(WebContentsImplBrowserTest, FrozenAndUnfrozenIPC);
   FRIEND_TEST_ALL_PREFIXES(RenderFrameHostImplBrowserTest,
