@@ -285,6 +285,7 @@ void ContextualTasksSidePanelCoordinator::Show(
   tabs::TabInterface* active_tab_interface =
       TabListInterface::From(browser_window_)->GetActiveTab();
   CHECK(active_tab_interface);
+  CloseLensSessionIfActive(active_tab_interface, entry_point);
   if (!GetCurrentTask()) {
     // If no task is found, create a new task and associate it with the active
     // tab.
@@ -991,6 +992,25 @@ void ContextualTasksSidePanelCoordinator::CloseLensSessionsForTask(
 #endif  // !BUILDFLAG(IS_ANDROID)
     }
   }
+}
+
+void ContextualTasksSidePanelCoordinator::CloseLensSessionIfActive(
+    tabs::TabInterface* tab_interface,
+    omnibox::ChromeAimEntryPoint entry_point) {
+#if !BUILDFLAG(IS_ANDROID)
+  if (entry_point != omnibox::ChromeAimEntryPoint::
+                         DESKTOP_CHROME_COBROWSE_PINNED_TOOLBAR_BUTTON &&
+      entry_point != omnibox::ChromeAimEntryPoint::
+                         DESKTOP_CHROME_COBROWSE_TOOLBAR_BUTTON) {
+    return;
+  }
+
+  auto* search_controller = LensSearchController::From(tab_interface);
+  if (search_controller && search_controller->IsActive()) {
+    search_controller->CloseLensSync(
+        lens::LensOverlayDismissalSource::kUnexpectedSidePanelOpen);
+  }
+#endif
 }
 
 std::pair<std::optional<base::Uuid>,

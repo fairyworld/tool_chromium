@@ -46,6 +46,7 @@
 #include "chrome/browser/ui/hats/hats_service_factory.h"
 #include "chrome/browser/ui/hats/mock_hats_service.h"
 #include "chrome/browser/ui/hats/survey_config.h"
+#include "chrome/browser/ui/lens/test_lens_search_controller.h"
 #include "chrome/browser/ui/tabs/tab_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/tabs/test_tab_strip_model_delegate.h"
@@ -207,6 +208,7 @@ class ContextualTasksSidePanelCoordinatorTest : public testing::Test {
     // WebContents must be destroyed before Profile.
     web_contents_list_.clear();
     tabs_.clear();
+    mock_tab_user_data_hosts_.clear();
 
     profile_.reset();
 #if !BUILDFLAG(IS_ANDROID)
@@ -224,6 +226,12 @@ class ContextualTasksSidePanelCoordinatorTest : public testing::Test {
                                                      base::NullCallback());
 
     ON_CALL(*tab, GetContents()).WillByDefault(Return(web_contents_ptr));
+
+    auto host = std::make_unique<ui::UnownedUserDataHost>();
+    ON_CALL(*tab, GetUnownedUserDataHost()).WillByDefault(ReturnRef(*host));
+    ON_CALL(Const(*tab), GetUnownedUserDataHost())
+        .WillByDefault(ReturnRef(*host));
+    mock_tab_user_data_hosts_.push_back(std::move(host));
 
     tabs::TabInterface* tab_ptr = tab.get();
     tabs_.push_back(std::move(tab));
@@ -296,6 +304,8 @@ class ContextualTasksSidePanelCoordinatorTest : public testing::Test {
 
   std::vector<std::unique_ptr<tabs::TabInterface>> tabs_;
   std::vector<std::unique_ptr<content::WebContents>> web_contents_list_;
+  std::vector<std::unique_ptr<ui::UnownedUserDataHost>>
+      mock_tab_user_data_hosts_;
 };
 
 TEST_F(ContextualTasksSidePanelCoordinatorTest,
@@ -551,6 +561,25 @@ TEST_F(ContextualTasksSidePanelCoordinatorTest,
       .Times(1);
 
   coordinator_->OpenInZeroState();
+}
+
+TEST_F(ContextualTasksSidePanelCoordinatorTest,
+       CloseLensSessionWhenShowingPanel) {
+  tabs::TabInterface* active_tab = tab_list_->GetActiveTab();
+  ASSERT_TRUE(active_tab);
+
+  testing::NiceMock<lens::MockLensSearchController> mock_lens_controller(
+      active_tab);
+
+  EXPECT_CALL(mock_lens_controller, IsActive()).WillOnce(Return(true));
+  EXPECT_CALL(
+      mock_lens_controller,
+      CloseLensSync(lens::LensOverlayDismissalSource::kUnexpectedSidePanelOpen))
+      .Times(1);
+
+  coordinator_->Show(
+      /*transition_from_tab=*/false,
+      omnibox::ChromeAimEntryPoint::DESKTOP_CHROME_COBROWSE_TOOLBAR_BUTTON);
 }
 #endif
 

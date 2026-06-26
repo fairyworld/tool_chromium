@@ -218,6 +218,11 @@ class ContextualTasksSidePanelCoordinator
   // Closes any active Lens sessions for tabs associated with the given task.
   void CloseLensSessionsForTask(const ContextualTask& task);
 
+  // Closes any active Lens session on the given tab if it matches an
+  // eligibility criteria.
+  void CloseLensSessionIfActive(tabs::TabInterface* tab_interface,
+                                omnibox::ChromeAimEntryPoint entry_point);
+
   // Notifies the ActiveTaskContextProvider about the current session state.
   // This checks both the panel and the active tab for a valid session handle.
   void NotifyActiveTaskContextProvider();
