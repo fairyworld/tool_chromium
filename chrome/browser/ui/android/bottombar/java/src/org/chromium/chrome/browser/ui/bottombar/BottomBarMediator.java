@@ -76,6 +76,7 @@ public class BottomBarMediator
     private final NonNullObservableSupplier<Boolean> mOmniboxFocusStateSupplier;
     private final NullableObservableSupplier<Profile> mProfileSupplier;
     private final NullableObservableSupplier<PropertyModel> mGlicActionSupplier;
+    private final NullableObservableSupplier<PropertyModel> mAiModeActionSupplier;
     private final NullableObservableSupplier<PropertyModel> mNewTabActionSupplier;
     private final boolean mShouldIncludeHomeButton;
 
@@ -147,6 +148,7 @@ public class BottomBarMediator
         mOmniboxFocusStateSupplier = omniboxFocusStateSupplier;
         mPromoDialogCoordinator = promoDialogCoordinator;
         mGlicActionSupplier = actionRegistry.get(ActionId.GLIC);
+        mAiModeActionSupplier = actionRegistry.get(ActionId.AI_MODE);
         mNewTabActionSupplier = actionRegistry.get(ActionId.NEW_TAB);
         mGlicTimeToAppearRecorded = false;
 
@@ -395,36 +397,55 @@ public class BottomBarMediator
 
     @Override
     public void onPromoDialogAccepted() {
-        PropertyModel glicModel = mGlicActionSupplier.get();
-        if (glicModel == null) return;
+        @ActionId int eligibleAction = mModel.get(BottomBarProperties.EXTRA_BUTTON_ACTION_ID);
 
-        HighlightParams glicHighlightParams = new HighlightParams(HighlightShape.RECTANGLE);
-        glicHighlightParams.setBoundsRespectPadding(true);
+        PropertyModel actionModel;
+        int stringResId;
+        String featureTracker;
+
+        if (eligibleAction == ActionId.AI_MODE) {
+            actionModel = mAiModeActionSupplier.get();
+            stringResId = R.string.iph_android_bottom_bar_aim;
+            featureTracker = FeatureConstants.ANDROID_BOTTOM_BAR_AIM;
+        } else {
+            actionModel = mGlicActionSupplier.get();
+            stringResId = R.string.iph_android_bottom_bar_glic;
+            featureTracker = FeatureConstants.ANDROID_BOTTOM_BAR_GLIC;
+        }
+
+        if (actionModel == null) return;
+
+        HighlightParams highlightParams = new HighlightParams(HighlightShape.RECTANGLE);
+        highlightParams.setBoundsRespectPadding(true);
         int circleRadius =
                 mContext.getResources()
                         .getDimensionPixelSize(R.dimen.bottom_bar_button_highlight_radius);
-        glicHighlightParams.setCornerRadius(circleRadius);
+        highlightParams.setCornerRadius(circleRadius);
 
-        IphIntent glicIph =
-                new IphIntent.Builder(FeatureConstants.ANDROID_BOTTOM_BAR_GLIC)
-                        .setStringResId(R.string.iph_android_bottom_bar_glic)
-                        .setAccessibilityResId(R.string.iph_android_bottom_bar_glic)
-                        .setHighlightParams(glicHighlightParams)
+        @BottomBarMetrics.IphFeature
+        String iphFeatureType =
+                eligibleAction == ActionId.AI_MODE
+                        ? BottomBarMetrics.IphFeature.AIM
+                        : BottomBarMetrics.IphFeature.GLIC;
+
+        IphIntent iphIntent =
+                new IphIntent.Builder(featureTracker)
+                        .setStringResId(stringResId)
+                        .setAccessibilityResId(stringResId)
+                        .setHighlightParams(highlightParams)
                         .setOnShowCallback(
                                 () ->
                                         BottomBarMetrics.recordIphEvent(
-                                                BottomBarMetrics.IphEvent.SHOWN,
-                                                BottomBarMetrics.IphFeature.GLIC))
+                                                BottomBarMetrics.IphEvent.SHOWN, iphFeatureType))
                         .setOnDismissCallback(
                                 () -> {
                                     BottomBarMetrics.recordIphEvent(
-                                            BottomBarMetrics.IphEvent.DISMISSED,
-                                            BottomBarMetrics.IphFeature.GLIC);
+                                            BottomBarMetrics.IphEvent.DISMISSED, iphFeatureType);
                                     triggerNewTabIph();
                                 })
                         .build();
 
-        glicModel.set(ActionProperties.IPH_INTENT, glicIph);
+        actionModel.set(ActionProperties.IPH_INTENT, iphIntent);
     }
 
     private void triggerNewTabIph() {
@@ -501,6 +522,10 @@ public class BottomBarMediator
         PropertyModel glicModel = mGlicActionSupplier.get();
         if (glicModel != null) {
             glicModel.set(ActionProperties.IPH_INTENT, null);
+        }
+        PropertyModel aiModeModel = mAiModeActionSupplier.get();
+        if (aiModeModel != null) {
+            aiModeModel.set(ActionProperties.IPH_INTENT, null);
         }
         PropertyModel newTabModel = mNewTabActionSupplier.get();
         if (newTabModel != null) {

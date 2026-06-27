@@ -38,6 +38,7 @@ import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.ui.actions.ActionId;
 import org.chromium.chrome.browser.ui.actions.ActionProperties;
 import org.chromium.chrome.browser.ui.actions.ActionRegistry;
+import org.chromium.chrome.browser.user_education.UserEducationHelper;
 import org.chromium.components.search_engines.TemplateUrlService;
 import org.chromium.content_public.browser.LoadUrlParams;
 import org.chromium.ui.base.TestActivity;
@@ -59,6 +60,7 @@ public class AiModeActionCoordinatorUnitTest {
     @Mock private Profile mProfile;
     @Mock private TemplateUrlService mTemplateUrlService;
     @Mock private View mView;
+    @Mock private UserEducationHelper mUserEducationHelper;
 
     @Captor private ArgumentCaptor<LoadUrlParams> mLoadUrlParamsCaptor;
 
@@ -81,7 +83,9 @@ public class AiModeActionCoordinatorUnitTest {
         when(mTab.getProfile()).thenReturn(mProfile);
         mTabSupplier.set(mTab);
 
-        mCoordinator = new AiModeActionCoordinator(mActivity, mActionRegistry, mTabSupplier);
+        mCoordinator =
+                new AiModeActionCoordinator(
+                        mActivity, mActionRegistry, mTabSupplier, mUserEducationHelper);
     }
 
     @After
@@ -102,6 +106,11 @@ public class AiModeActionCoordinatorUnitTest {
         // Verify callback is bound.
         Callback<View> onPressCallback = mAiModeActionModel.get(ActionProperties.ON_PRESS_CALLBACK);
         assertNotNull(onPressCallback);
+
+        // Verify UserEducationHelper is set.
+        assertEquals(
+                mUserEducationHelper,
+                mAiModeActionModel.get(ActionProperties.USER_EDUCATION_HELPER));
     }
 
     @Test

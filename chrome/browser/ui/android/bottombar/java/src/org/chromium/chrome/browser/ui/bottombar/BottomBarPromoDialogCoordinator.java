@@ -7,6 +7,7 @@ package org.chromium.chrome.browser.ui.bottombar;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.chromium.base.lifetime.Destroyable;
@@ -40,6 +41,7 @@ public class BottomBarPromoDialogCoordinator
     private @Nullable BottomBarPromoDialogListener mListener;
     private @Nullable PropertyModel mDialogModel;
     private @Nullable Tracker mTracker;
+    private @Nullable String mFeatureName;
 
     /**
      * Constructs a {@link BottomBarPromoDialogCoordinator} instance.
@@ -80,13 +82,21 @@ public class BottomBarPromoDialogCoordinator
             return false;
         }
 
-        if (BottomBarActionEligibility.getEligibleExtraAction(profile.getOriginalProfile())
-                != ActionId.GLIC) {
+        @ActionId
+        int eligibleAction =
+                BottomBarActionEligibility.getEligibleExtraAction(profile.getOriginalProfile());
+        if (eligibleAction != ActionId.GLIC && eligibleAction != ActionId.AI_MODE) {
             return false;
         }
 
+        mFeatureName =
+                eligibleAction == ActionId.AI_MODE
+                        ? FeatureConstants.ANDROID_BOTTOM_BAR_AIM_PROMO_DIALOG
+                        : FeatureConstants.ANDROID_BOTTOM_BAR_PROMO_DIALOG;
+
         Tracker tracker = TrackerFactory.getTrackerForProfile(profile);
-        if (!tracker.shouldTriggerHelpUi(FeatureConstants.ANDROID_BOTTOM_BAR_PROMO_DIALOG)) {
+        if (!tracker.shouldTriggerHelpUi(mFeatureName)) {
+            mFeatureName = null;
             return false;
         }
         mTracker = tracker;
@@ -94,12 +104,29 @@ public class BottomBarPromoDialogCoordinator
         Context context = mContext;
         View dialogView =
                 LayoutInflater.from(context).inflate(R.layout.bottom_bar_promo_dialog_view, null);
+        int titleResId;
+        int descriptionResId;
+        int illustrationResId;
+
+        if (eligibleAction == ActionId.AI_MODE) {
+            illustrationResId = R.drawable.bottom_bar_aim_promo_illustration;
+            titleResId = R.string.iph_android_bottom_bar_aim_dialog_title;
+            descriptionResId = R.string.iph_android_bottom_bar_aim_dialog_description;
+        } else {
+            assert eligibleAction == ActionId.GLIC;
+            illustrationResId = R.drawable.bottom_bar_promo_illustration;
+            titleResId = R.string.iph_android_bottom_bar_dialog_title;
+            descriptionResId = R.string.iph_android_bottom_bar_dialog_description;
+        }
+
+        ImageView illustrationView = dialogView.findViewById(R.id.illustration);
+        illustrationView.setImageResource(illustrationResId);
+
         TextView titleView = dialogView.findViewById(R.id.title);
         TextView descriptionView = dialogView.findViewById(R.id.description);
 
-        titleView.setText(context.getString(R.string.iph_android_bottom_bar_dialog_title));
-        descriptionView.setText(
-                context.getString(R.string.iph_android_bottom_bar_dialog_description));
+        titleView.setText(context.getString(titleResId));
+        descriptionView.setText(context.getString(descriptionResId));
 
         mDialogModel =
                 new PropertyModel.Builder(ModalDialogProperties.ALL_KEYS)
@@ -135,9 +162,10 @@ public class BottomBarPromoDialogCoordinator
     public void onDismiss(PropertyModel model, @DialogDismissalCause int dismissalCause) {
         mDialogModel = null;
 
-        if (mTracker != null) {
-            mTracker.dismissed(FeatureConstants.ANDROID_BOTTOM_BAR_PROMO_DIALOG);
+        if (mTracker != null && mFeatureName != null) {
+            mTracker.dismissed(mFeatureName);
             mTracker = null;
+            mFeatureName = null;
         }
 
         if (mListener != null && dismissalCause == DialogDismissalCause.POSITIVE_BUTTON_CLICKED) {

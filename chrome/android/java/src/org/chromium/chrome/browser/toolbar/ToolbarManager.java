@@ -2584,7 +2584,10 @@ public class ToolbarManager
                             mUserEducationHelper);
             mAiModeActionCoordinator =
                     new AiModeActionCoordinator(
-                            mActivity, mActionRegistry, mActivityTabProvider.asObservable());
+                            mActivity,
+                            mActionRegistry,
+                            mActivityTabProvider.asObservable(),
+                            mUserEducationHelper);
         }
 
         Profile profile = tabModelSelector.getModel(false).getProfile();

@@ -12,7 +12,7 @@ size over inflation time.
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="VectorRaster,UnusedResources"
+    tools:ignore="VectorRaster"
     android:width="300dp"
     android:height="200dp"
     android:viewportWidth="300"

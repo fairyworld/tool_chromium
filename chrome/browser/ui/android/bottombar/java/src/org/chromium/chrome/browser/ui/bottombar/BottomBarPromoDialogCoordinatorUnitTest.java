@@ -237,13 +237,77 @@ public class BottomBarPromoDialogCoordinatorUnitTest {
     }
 
     @Test
-    public void testMaybeShowPromoDialog_GlicDisabled() {
+    public void testMaybeShowPromoDialog_NoActionEligible() {
         when(mGlicEnablingJniMock.isEnabledForProfile(any())).thenReturn(false);
+        when(mTemplateUrlService.isDefaultSearchEngineGoogle()).thenReturn(false);
         when(mTracker.shouldTriggerHelpUi(FeatureConstants.ANDROID_BOTTOM_BAR_PROMO_DIALOG))
+                .thenReturn(true);
+        when(mTracker.shouldTriggerHelpUi(FeatureConstants.ANDROID_BOTTOM_BAR_AIM_PROMO_DIALOG))
                 .thenReturn(true);
 
         mCoordinator.maybeShowPromoDialog(mProfile);
 
         verify(mModalDialogManager, never()).showDialog(any(), anyInt(), anyBoolean());
+    }
+
+    @Test
+    public void testMaybeShowPromoDialog_AimSuccessfulShow() {
+        when(mGlicEnablingJniMock.isEnabledForProfile(any())).thenReturn(false);
+        when(mTracker.shouldTriggerHelpUi(FeatureConstants.ANDROID_BOTTOM_BAR_AIM_PROMO_DIALOG))
+                .thenReturn(true);
+
+        HistogramWatcher watcher =
+                HistogramWatcher.newBuilder()
+                        .expectIntRecord(
+                                "Android.BottomBar.Promo.Event", BottomBarMetrics.PromoEvent.SHOWN)
+                        .build();
+
+        mCoordinator.maybeShowPromoDialog(mProfile);
+
+        watcher.assertExpected();
+
+        verify(mModalDialogManager)
+                .showDialog(
+                        mModelCaptor.capture(),
+                        eq(ModalDialogManager.ModalDialogType.APP),
+                        eq(true));
+
+        PropertyModel model = mModelCaptor.getValue();
+        assertNotNull(model);
+        assertEquals(mCoordinator, model.get(ModalDialogProperties.CONTROLLER));
+        assertNotNull(model.get(ModalDialogProperties.CUSTOM_VIEW));
+    }
+
+    @Test
+    public void testAimPositiveButtonClickDismissesAndNotifiesAccepted() {
+        when(mGlicEnablingJniMock.isEnabledForProfile(any())).thenReturn(false);
+        when(mTracker.shouldTriggerHelpUi(FeatureConstants.ANDROID_BOTTOM_BAR_AIM_PROMO_DIALOG))
+                .thenReturn(true);
+
+        mCoordinator.maybeShowPromoDialog(mProfile);
+        verify(mModalDialogManager).showDialog(mModelCaptor.capture(), anyInt(), anyBoolean());
+        PropertyModel model = mModelCaptor.getValue();
+
+        // Perform click
+        mCoordinator.onClick(model, ModalDialogProperties.ButtonType.POSITIVE);
+        verify(mModalDialogManager)
+                .dismissDialog(model, DialogDismissalCause.POSITIVE_BUTTON_CLICKED);
+
+        HistogramWatcher watcher =
+                HistogramWatcher.newBuilder()
+                        .expectIntRecord(
+                                "Android.BottomBar.Promo.Event",
+                                BottomBarMetrics.PromoEvent.ACCEPTED)
+                        .build();
+
+        // Perform dismiss
+        mCoordinator.onDismiss(model, DialogDismissalCause.POSITIVE_BUTTON_CLICKED);
+
+        watcher.assertExpected();
+
+        verify(mTracker).dismissed(FeatureConstants.ANDROID_BOTTOM_BAR_AIM_PROMO_DIALOG);
+
+        // Check listener callback is invoked synchronously
+        verify(mListener).onPromoDialogAccepted();
     }
 }
