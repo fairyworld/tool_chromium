@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{1 нууц үгийг энэ төхөөрөмжийн <ph name="BRAND" /> руу импорт хийсэн}other{{NUM_PASSWORDS} нууц үгийг энэ төхөөрөмжийн <ph name="BRAND" /> руу импорт хийсэн}}</translation>
 <translation id="1046572983040892965">Цонхыг зүүн дээш зөөсөн</translation>
 <translation id="1047431265488717055">Текстийн холбоосыг хуулах</translation>
+<translation id="1048350929895890054">Хөвөгч цэсийг блоклосон сайтууд</translation>
 <translation id="1048986595386481879">Динамикаар хуваарилсан</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{<ph name="DEVICE_NAME" />-с <ph name="ATTACHMENTS" />-г хүлээн авч байна}other{<ph name="DEVICE_NAME" />-с <ph name="ATTACHMENTS" />-г хүлээн авч байна}}</translation>
 <translation id="1049743911850919806">Нууцлал</translation>
@@ -937,6 +938,7 @@
 <translation id="1695510246756136088">Интернэтэд холбогдох боломжгүй. Дахин оролдоно уу.</translation>
 <translation id="1696555181932908973">Та <ph name="SITE_ETLD_PLUS_ONE" />-д үргэлжлүүлэх бусад аргыг турших боломжтой.</translation>
 <translation id="1696685050160038195">Төхөөрөмжөө аюулгүй байлгахын тулд та зөвхөн итгэдэг эх сурвалж болон хөгжүүлэгчийн программ хангамжийг ажиллуулж, суулгах хэрэгтэй.</translation>
+<translation id="1696832149095851409">сонгосон текст дээрх хөвөгч цэс</translation>
 <translation id="1697122132646041614">Муу тэмдэглэгээ нь танд эдгээр илэрц яагаад таалагдаагүй талаарх дэлгэрэнгүй санал хүсэлтийг илгээх маягтыг нээнэ.</translation>
 <translation id="1697532407822776718">Тохируулга дууссан</translation>
 <translation id="1698796500103229697">&amp;Төлбөрийн хэрэгслүүд</translation>
@@ -2511,6 +2513,7 @@
 <translation id="2845276301195220700">Google Календарийн бусад үйлдэл</translation>
 <translation id="2845382757467349449">Хавчуургын мөрийг байнга харуулах</translation>
 <translation id="284581348330507117">Өвөрмөц нууц үгнүүд үүсгэнэ үү</translation>
+<translation id="2846345106886298325">Даалгаврыг хийж дуусгаад, Gemini Spark руу буцаасан</translation>
 <translation id="284884486564166077">Дурын зургийг Lens-р хайгаарай</translation>
 <translation id="2849035674501872372">Хайх</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> ( <ph name="UNICODE_NAME" /> )</translation>
@@ -3014,6 +3017,7 @@
 <translation id="3223109931751684474">Энэ төхөөрөмж дээрх нэвтрэх түлхүүрт тань хандах эрхийг хасна уу</translation>
 <translation id="3223531857777746191">Шинэчлэх товчлуур</translation>
 <translation id="3225084153129302039">Өгөгдмөл нил ягаан аватар</translation>
+<translation id="3226249862705569834">Ашиглаж буй мэдрэгчид</translation>
 <translation id="3226487301970807183">Зүүн талд зэрэгцүүлсэн хажуугийн самбарыг асаах/унтраах</translation>
 <translation id="322708765617468434">Та тохируулгын дараа төхөөрөмжид хүссэн үедээ өөр хүн нэмэх боломжтой. Хүн бүр хэрэглээгээ хувийн болгох ба өгөгдлийг хувийн байлгах боломжтой.</translation>
 <translation id="3227137524299004712">Микрофон</translation>
@@ -5232,7 +5236,6 @@
 <translation id="486505726797718946">Хэмнэсэн санах ой</translation>
 <translation id="486635084936119914">Татаж авсны дараа тодорхой файлын хэлбэрийг автоматаар нээх</translation>
 <translation id="4867272607148176509">Эцэг эхчүүд аппуудыг зөвшөөрөх эсвэл блоклох, цагийн хязгаар тохируулах болон веб үзэхийг хянах боломжтой. Сургуулийн бүртгэлийг сургуулийн ихэнх нөөцөд хандахын тулд дараа нь нэмэх боломжтой.</translation>
-<translation id="486796517585164369">· Саяхны таб</translation>
 <translation id="4868284252360267853">Энэ харилцаг яриаг одоогоор сонгоогүй байна. Энэ харилцан яриаг сонгохын тулд Command-Shift-Option дээр дарна уу.</translation>
 <translation id="4869170227080975044">ChromeOS-н сүлжээний мэдээллийг унших</translation>
 <translation id="4870724079713069532">Та File Explorer-с энэ аппаар эсвэл бусад аппаар дэмжигдсэн файлуудыг нээх болон засах боломжтой. Энэ аппад өгөгдмөлөөр аль файлуудыг нээхийг хянахын тулд <ph name="BEGIN_LINK" />Windows-н тохиргоо<ph name="END_LINK" /> руу очно уу.</translation>
@@ -6126,6 +6129,7 @@
 <translation id="5546865291508181392">Хайж олох</translation>
 <translation id="5547868626772433490">Gemini-с хүсэх</translation>
 <translation id="5548075230008247516">Бүх зүйлийн сонголтыг болиулсан. Сонголтын горимоос гарсан.</translation>
+<translation id="554810465530189549">Текст сонгоход хөвөгч цэсийг бүү харуул</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{"<ph name="TAB_TITLE" />"}=1{"<ph name="TAB_TITLE" />" болон бусад 1 таб}other{"<ph name="TAB_TITLE" />" болон бусад # таб}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">Тохируулгаа сонгоно уу</translation>
@@ -6292,6 +6296,7 @@
 <translation id="5678955352098267522"><ph name="WEBSITE_1" /> дээрх өөрийнхөө мэдээллийг уншина уу</translation>
 <translation id="5680050361008726776">"<ph name="ESIM_PROFILE_NAME" />"-г хасах уу?</translation>
 <translation id="5681586175480958839">Файлыг аль хэдийн нээсэн байна</translation>
+<translation id="5682950763196110705">Текст сонгоход хөвөгч цэсийг харуулах</translation>
 <translation id="5684110242705861346">"<ph name="NAME" />" өргөтгөлийг танай байгууллагын бодлогоор нэмсэн бөгөөд энэ тохиргоог хянаж байна. <ph name="BEGIN_LINK" />Дэлгэрэнгүйг харах<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Wi-Fi-н дэлгэрэнгүй</translation>
 <translation id="5684661240348539843">Үндсэн мэдээлэл тодорхойлогч</translation>
@@ -10063,6 +10068,7 @@
 <translation id="8505669004895429027">Жижиг хэмнэлт</translation>
 <translation id="8507052544157927817">Доогуур зураасны загвар</translation>
 <translation id="8507227974644337342">Дэлгэцийн нягтрал</translation>
+<translation id="8507443886219296894">Энэ сайтад нуух</translation>
 <translation id="850763987657366362">Сертификатыг импортлох боломжгүй</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> таны Android төхөөрөмж дээр мэдээлэл хадгалахыг хүсэж байна</translation>
 <translation id="8509177919508253835">Аюулгүй байдлын түлхүүрийг шинэчилж, ПИН үүсгэнэ үү</translation>
@@ -10123,6 +10129,7 @@
 <translation id="8552102814346875916">"Эдгээр сайтыг үргэлж идэвхтэй байлгах" жагсаалтад хадгалах</translation>
 <translation id="8552947739661397736">Ажлыг хяналтдаа авах, Gemini одоогоор хянаж байна</translation>
 <translation id="8553342806078037065">Бусад хүмүүсийг удирдах</translation>
+<translation id="8554642222921881444">Сонгосон текст дээрх хөвөгч цэс</translation>
 <translation id="8554899698005018844">Хэл байхгүй</translation>
 <translation id="8555444629041783356">Нар жаргах автомат хуваарь</translation>
 <translation id="8557022314818157177">Хурууны хээг автал аюулгүй байдлын түлхүүр дээрээ үргэлжлүүлэн хүрнэ үү</translation>
@@ -10417,6 +10424,7 @@
 <translation id="8759753423332885148">Дэлгэрэнгүй үзэх.</translation>
 <translation id="876161309768861172">Таныг нэвтрүүлж чадсангүй. Дахин оролдоно уу</translation>
 <translation id="8761945298804995673">Ийм хэрэглэгч аль хэдийн байна</translation>
+<translation id="876287961468788565">Таныг сайт дээрх текст сонгоход Chrome үйлдлүүдтэй хөвөгч цэсийг харуулах боломжтой.</translation>
 <translation id="8762886931014513155">Таны <ph name="DEVICE_TYPE" />-г шинэчлэх шаардлагатай байна</translation>
 <translation id="8763927697961133303">USB төхөөрөмж</translation>
 <translation id="8765940060470412555">Унших горимыг бэхэлснийг болиулах</translation>

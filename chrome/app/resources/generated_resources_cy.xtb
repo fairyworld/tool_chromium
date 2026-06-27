@@ -1144,6 +1144,7 @@ Gwiriwch eich cyfrineiriau unrhyw bryd yn y <ph name="GOOGLE_PASSWORD_MANAGER" /
 <translation id="1843048149176045210">Copïo dolen lawrlwytho</translation>
 <translation id="1845060436536902492">Mae'r darllenydd sgrîn ar ChromeOS Flex, ChromeVox, yn cael ei ddefnyddio'n bennaf gan bobl â dallineb neu olwg gwan i ddarllen testun sy'n cael ei arddangos ar y sgrîn gyda syntheseisydd lleferydd neu arddangosfa braille. Pwyswch Space i droi ChromeVox ymlaen. Pan fydd ChromeVox wedi'i weithredu, byddwch yn mynd trwy daith gyflym.</translation>
 <translation id="1845727111305721124">Caniateir i chwarae sain</translation>
+<translation id="1846100293138248204">Cadw i'r Cof</translation>
 <translation id="1846308012215045257">Pwyswch CTRL a chliciwch i redeg <ph name="PLUGIN_NAME" /></translation>
 <translation id="1848219224579402567">Allgofnodi pan fydd y caead ar gau</translation>
 <translation id="184862733444771842">Cais am Nodwedd</translation>
@@ -5234,7 +5235,6 @@ Defnyddiwch Ctrl + Alt + Lleihau disgleirdeb i bellhau.</translation>
 <translation id="486505726797718946">Cof a Arbedwyd</translation>
 <translation id="486635084936119914">Agorwch rai mathau o ffeiliau yn awtomatig ar ôl eu lawrlwytho</translation>
 <translation id="4867272607148176509">Gall rhieni gymeradwyo neu rwystro apiau, gosod terfynau amser, a rheoli pori gwe. Gellir ychwanegu cyfrif ysgol yn ddiweddarach i gael mynediad at y rhan fwyaf o adnoddau ysgol.</translation>
-<translation id="486796517585164369">· Tab diweddar</translation>
 <translation id="4868284252360267853">Nid ydych yn ffocysu deialog hwn ar hyn o bryd Pwyswch Command-Shift-Option A i ffocysu ar y deialog hwn.</translation>
 <translation id="4869170227080975044">Darllen gwybodaeth rhwydwaith ChromeOS</translation>
 <translation id="4870724079713069532">Gallwch agor a golygu ffeiliau a gefnogir gyda'r ap hwn o'r File Explorer ac apiau eraill. I reoli pa ffeiliau sy'n agor yn yr ap hwn yn ddiofyn, ewch i <ph name="BEGIN_LINK" />osodiadau Windows<ph name="END_LINK" /></translation>
@@ -6154,6 +6154,7 @@ Gallwch aseinio sawl switsh i'r weithred hon.</translation>
 <translation id="5562588178647493983">Cysylltwch â'ch gweinyddwr i gael rhagor o wybodaeth</translation>
 <translation id="556321030400250233">ffeil leol neu a rennir</translation>
 <translation id="5563234215388768762">Chwiliwch Google neu teipiwch URL</translation>
+<translation id="5563460629751333413">Rydym yn cael trafferth cysylltu â'r gweinydd. Rhowch gynnig arall arni'n nes ymlaen.</translation>
 <translation id="5563698194918415761">Cafodd y diweddariad ei rwystro gan bolisi rhwydwaith neu ddirprwy weinydd.</translation>
 <translation id="5563824734298958390">Gadael Grŵp Tabiau?</translation>
 <translation id="5565735124758917034">Gweithredol</translation>
@@ -8200,6 +8201,7 @@ Mae gennych # cyfrinair arall sydd wedi'u darganfod. Mae Rheolwr Cyfrineiriau Go
 <translation id="7109543803214225826">Tynnwyd llwybr byr</translation>
 <translation id="7110644433780444336">{NUM_TABS,plural, =1{Ychwanegu Tab at Grŵp}zero{Ychwanegu Tabiau at Grŵp}two{Ychwanegu Tabiau at Grŵp}few{Ychwanegu Tabiau at Grŵp}many{Ychwanegu Tabiau at Grŵp}other{Ychwanegu Tabiau at Grŵp}}</translation>
 <translation id="7111822978084196600">Enwch y ffenestr hon</translation>
+<translation id="7113314569799918830">Mae Gemini yn Chrome yn ehangu i wahanol leoliadau ond nid yw ar gael ym mhobman</translation>
 <translation id="7113502843173351041">Gwybod eich cyfeiriad e-bost</translation>
 <translation id="7115361495406486998">Dim cysylltiadau y gellir eu cyrraedd</translation>
 <translation id="7117228822971127758">Rhowch gynnig arall arni'n nes ymlaen</translation>

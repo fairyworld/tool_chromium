@@ -32,6 +32,7 @@
 <translation id="126567311906253476"><ph name="USER_EMAIL" /> менен Gmail же YouTube сыяктуу Google кызматтарына киргенде, Chromium'га ошол эле аккаунт менен автоматтык түрдө кире аласыз</translation>
 <translation id="1287534462498555020">Chromium'ду телефонуңузга жүктөп алыңыз</translation>
 <translation id="1290883685122687410">Тууралоо катасы: <ph name="METAINSTALLER_EXIT_CODE" />. <ph name="WINDOWS_ERROR" /></translation>
+<translation id="1312200348844120300">Сүрөт издөө аркылуу товарды кантип издөөгө болорун көрсөткөн сүрөт</translation>
 <translation id="1315551408014407711">Жаңы Chromium профилин жөндөп алыңыз</translation>
 <translation id="132092532143527429">Chromium'да Gemini менен колдонуп көрүңүз</translation>
 <translation id="1324107359134968521">Chromium 
@@ -94,6 +95,7 @@ Bluetooth түзмөктөрүн изилдөө үчүн Bluetooth'ду пайд
 <translation id="1951406923938785464">Файл түрү аз жүктөлүп алынып, кооптуу болушу мүмкүн болгондуктан, Chromium бул жүктөп алууну бөгөттөдү</translation>
 <translation id="1953553007165777902">Жүктөлүп алынууда... <ph name="MINUTE" /> мүнөт калды</translation>
 <translation id="1966382378801805537">Chromium демейки серепчини аныктап же коё албай жатат</translation>
+<translation id="197326043290947695">Сүрөт издөө функциясы менен акылдуураак карап чыгыңыз</translation>
 <translation id="1990262977744080398">Chromium эмне үчүн айрым файлдарды бөгөттөгөнүн билип алыңыз, жаңы өтмөктө ачылат</translation>
 <translation id="1999715455684970349">Chromium программасын жаңыртып турат. Эгер бул кызмат өчүрүлүп же токтотулса, Chromium программаңыз жаңыртылбайт, ал эми коопсуздукка коркунуч жаралса, ал оңдолбой жана функциялар иштебеши мүмкүн. Chromium программасы бул кызматты колдонбосо, ал өзү эле чыгарылып салынат.</translation>
 <translation id="2008474315282236005">Ушуну менен түзмөктөгү 1 нерсе өчүрүлөт. Дайын-даректериңизди кийинчерээк чыгарып алуу үчүн Chromium'га <ph name="USER_EMAIL" /> аккаунту менен кириңиз.</translation>
@@ -236,6 +238,7 @@ Bluetooth түзмөктөрүн изилдөө үчүн Bluetooth'ду пайд
 <translation id="3387527074123400161">ChromiumOS</translation>
 <translation id="3406848076815591792">Учурдагы Chromium профилине өтөсүзбү?</translation>
 <translation id="3412460710772753638">Ушул түзмөктөгү Сырсөздөр бөлүмүндө</translation>
+<translation id="3423442168617177595">Chromium'га алдын ала орнотулган жана татаал сырсөздөрдү түзүүгө, сактоого жана автотолтурууга жардам берет. Оңой кирүү үчүн ыкчам баскычты кошуңуз</translation>
 <translation id="3455907671758333080">Телефонуңуздагы Chromium менен Өркүндөтүлгөн коопсуз серептөөнү колдонуңуз</translation>
 <translation id="3461644266919055473">Chromium'ду тууралап алуу...</translation>
 <translation id="3474745554856756813">Ушуну менен түзмөктөгү <ph name="ITEMS_COUNT" /> нерсе өчүрүлөт. Дайын-даректериңизди кийинчерээк чыгарып алуу үчүн Chromium'га <ph name="USER_EMAIL" /> аккаунту менен кириңиз.</translation>
@@ -285,6 +288,7 @@ Bluetooth түзмөктөрүн изилдөө үчүн Bluetooth'ду пайд
 <translation id="3975724895399328945">&amp;Google Chrome for Testing жөнүндө</translation>
 <translation id="3997429360543082038">ChromiumOS жөнүндө</translation>
 <translation id="4010059961270896984">Сайтка киргениңизде, Chromium <ph name="BEGIN_LINK" />Google Коопсуз серептөө<ph name="END_LINK" /> функциясына IP дарегиңизди жашырган купуялык сервери аркылуу URL'дин обфускацияланган бөлүгүн жөнөтөт. Эгер сайтта шектүү аракет болсо, анын толук URL даректери жана барак контентинин үлгүлөрү да жөнөтүлөт.</translation>
+<translation id="4016217212818346953">Сырсөздөрдү башкаргыч менен коопсуздугуңузду коргоңуз</translation>
 <translation id="4019629340646866719">ChromiumOS тутуму, <ph name="BEGIN_LINK_LINUX_OSS" />Linux'ту өнүктүрүү чөйрөсү<ph name="END_LINK_LINUX_OSS" /> сыяктуу, кошумча <ph name="BEGIN_LINK_CROS_OSS" />баштапкы коду ачык программалык камсыздоонун<ph name="END_LINK_CROS_OSS" /> жардамы менен иштейт.</translation>
 <translation id="4022972681110646219">Экрандагы нерсени которуу</translation>
 <translation id="4023601594785368013">Баштапкы тил: <ph name="LANGUAGE" /></translation>
@@ -504,6 +508,7 @@ Bluetooth түзмөктөрүн изилдөө үчүн Bluetooth'ду пайд
 <translation id="6400112897226594999">Компьютердин экранындагы Chromium логотиби.</translation>
 <translation id="6403826409255603130">Chromium – веб-баракчалар жана колдонмолорду чагылгандай тездик менен иштеткен желе серепчиси. Ал оңой, тез жана туруктуу иштеген курал. Chromium кесепеттүү программалар менен фишингден коргоп тургандыктан, желени эч нерседен коркпостон серептей берсеңиз болот.</translation>
 <translation id="6414624068245092115">Chromium'дагы маалыматты Google аккаунтуңузга сактап жана колдонуу үчүн өзүңүздү ырастаңыз</translation>
+<translation id="6417332166651156371">Chromium'дагы Сырсөздөрдү башкаргычтын кирүү чекитин көрсөткөн жөнөкөйлөтүлгөн сүрөт</translation>
 <translation id="642132557830635295">Chromium ылдамыраак иштейт жана JavaScript'ти колдонгон функциялар туура иштеши керек</translation>
 <translation id="6436260184216827876">Сүрөт издөө функциясы жеткиликсиз. Кийинчерээк кайталап көрүңүз.</translation>
 <translation id="6442900851116057561">ChromiumOS'ту өчүрүп-күйгүзүңүз</translation>
@@ -595,6 +600,7 @@ Bluetooth түзмөктөрүн изилдөө үчүн Bluetooth'ду пайд
 <translation id="7196312274710523067">Chromium иштетилбей койду. Кайталап көрүңүз.</translation>
 <translation id="7213008767289637091">Каалаган убакта тез ачуу үчүн Chromium'ду Dock панелине кадап коюңуз</translation>
 <translation id="7213407614656404070">Эми билдирүүлөрдөгү шилтемелерди, документтерди жана башка колдонмолорду Chromium'да ача аласыз.</translation>
+<translation id="7216228761061470870">Сүрөт издөө функциясын иш тактада колдонгонуңузда беттин аталышы, URL жана андагы нерселер, ошондой эле PDF файлдары серверге жөнөтүлөт</translation>
 <translation id="7223968959479464213">Тапшырмаларды башкаргыч – Chromium</translation>
 <translation id="7252276985725323153">Дароо серептөө: Эми Windows иштегенде Chromium'ду да иштетсе болот.</translation>
 <translation id="7274695763216404502">Кадалды! Эми Сүрөт издөө функциясын куралдар тилкесинен колдоно аласыз</translation>

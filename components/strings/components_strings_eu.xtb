@@ -477,6 +477,7 @@ Bestela, pribatutasun-ezarpenek blokeatu egingo dute baimen hori. Baimen honekin
 <translation id="173080396488393970">Ez dira onartzen mota horretako txartelak</translation>
 <translation id="1731563515262205847">ML-DSA-65</translation>
 <translation id="1732445923934584865">Galdetu aurrez aurre</translation>
+<translation id="1732796940245838248">Eguneratu zuzenketa-zenbakia Google Diru-zorroa zerbitzuan</translation>
 <translation id="1733064249834771892">letrak</translation>
 <translation id="1733631169686303142">Audio-ekipamendua</translation>
 <translation id="1733762317901693627">Normalean seguruak diren webguneak ere kutsatzen dituzte erasotzaileek. Arriskuak ulertzen dituzula ziur bazaude soilik bisitatu beharko zenuke <ph name="BEGIN_LINK" />webgune ez-seguru hau<ph name="END_LINK" />.</translation>
@@ -712,6 +713,7 @@ Bestela, pribatutasun-ezarpenek blokeatu egingo dute baimen hori. Baimen honekin
 <translation id="2122165854541876335">Kontsumo-baliabideak</translation>
 <translation id="2122214041802369259">Prezioa altua da</translation>
 <translation id="2122719317867821810">Gidalerroak espero bezala funtzionatzen du, baina gatazka sortzen duen balio bat beste nonbait dago ezarrita, eta gidalerro honek hura ordezten du.</translation>
+<translation id="2124081665399116863">Eguneratu ibilgailua Google Diru-zorroa zerbitzuan</translation>
 <translation id="2126374524350484896">PDFaren egilea:</translation>
 <translation id="2127090458081644412">Gorde da pasahitza gailuan</translation>
 <translation id="2127747486437921899">Etzana</translation>
@@ -1546,6 +1548,7 @@ Geroago ordaintzeko aukerak ezkutatzeko, joan <ph name="BEGIN_LINK" />Ordainketa
 <translation id="3422472998109090673">Une honetan ezin gara konektatu <ph name="HOST_NAME" /> webgunera.</translation>
 <translation id="3422794267539320056">Jokatzeko, sakatu dinosauroa edo zuriune-barra</translation>
 <translation id="3423742043356668186">Zehaztutako sistema</translation>
+<translation id="3426672782316020729">Eguneratu pasaportea Google Diru-zorroa zerbitzuan</translation>
 <translation id="3427342743765426898">&amp;Berregin editatzea</translation>
 <translation id="342781501876943858">Pasahitza beste webgune batzuetan ere erabili baduzu, hura berrezartzea gomendatzen du Chromium-ek.</translation>
 <translation id="3428151540071562330">DnsOverHttpsTemplates aukeraren zerbitzariko txantiloien URI batek edo gehiagok ez dute balio, eta ez dira erabiliko.</translation>
@@ -2405,6 +2408,7 @@ Geroago ordaintzeko aukerak ezkutatzeko, joan <ph name="BEGIN_LINK" />Ordainketa
 <translation id="4766713847338118463">Bi grapa behean</translation>
 <translation id="4768816584204270288">Epeka ordaintzen baduzu, erabilera bakarreko txartel birtualaren zenbaki bat beteko da. Erosketa honetarako txartelaren xehetasunak kopiatzeko eta itsasteko, sakatu hau.</translation>
 <translation id="4768864802656530630">Sistemaren erregistro xehatuak. <ph name="BEGIN_LINK" />Lortu informazio gehiago<ph name="END_LINK" /></translation>
+<translation id="4770909831299304090">Eguneratu KTN zenbakia Google Diru-zorroa zerbitzuan</translation>
 <translation id="4771249073710170730">Irratiz kontrolatutako ibilgailuak eta modelismoa</translation>
 <translation id="4771973620359291008">Errore ezezagun bat gertatu da.</translation>
 <translation id="4774055414220872623">Arte- eta artisautza-hornigaiak</translation>
@@ -4218,6 +4222,7 @@ Xehetasun gehiago:
 <translation id="7569490014721427265">Golfa</translation>
 <translation id="7569952961197462199">Kreditu-txartela Chrome-tik kendu nahi duzu?</translation>
 <translation id="7569983096843329377">Beltza</translation>
+<translation id="7570524564113479209">Eguneratu nortasun-agiria Google Diru-zorroa zerbitzuan</translation>
 <translation id="7570862164055912832">Redress zenbakiak</translation>
 <translation id="7571813784389228510">Google-ren AA modua</translation>
 <translation id="7574998639136359461">Neguko kirolen ekipamendua</translation>
@@ -4739,6 +4744,7 @@ Xehetasun gehiago:
 <translation id="8389940864052787379">Ibilgailu pertsonalizatuak eta errendimendu handiko ibilgailuak</translation>
 <translation id="8390725133630534698">Administratzailearen gidalerroek blokeatu egin dute <ph name="ORIGIN_NAME" /> domeinuko edukia <ph name="VM_NAME" /> makinara partekatzeko aukera</translation>
 <translation id="8392783408127179588">Gidalerroak berriro kargatzen</translation>
+<translation id="8393948304336153065">Eguneratu gidabaimena Google Diru-zorroa zerbitzuan</translation>
 <translation id="8396522675989118466"><ph name="NUMBER_OF_DIGITS" /> digituko kodea da (<ph name="SIDE_OF_CARD" /> dago)</translation>
 <translation id="8398335999901363925">Haien eremuak sakatzean automatikoki beteko diren ordainketa-metodoen zerrenda altuera osoan irekita dago.</translation>
 <translation id="8398446215576328011">Leheneratu aplikatutako gidalerroak</translation>

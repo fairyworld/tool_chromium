@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{1 salasana tuotu tänne: <ph name="BRAND" /> tällä laitteella}other{{NUM_PASSWORDS} salasana tuotu tänne: <ph name="BRAND" /> tällä laitteella}}</translation>
 <translation id="1046572983040892965">Ikkuna siirretty ylös vasemmalle</translation>
 <translation id="1047431265488717055">Kopioi linkin te&amp;ksti</translation>
+<translation id="1048350929895890054">Sivustot, joilla kelluva valikko on estetty</translation>
 <translation id="1048986595386481879">Dynaamisesti jaettu</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{Laitteelta (<ph name="DEVICE_NAME" />) vastaanotetaan <ph name="ATTACHMENTS" />}other{Laitteelta (<ph name="DEVICE_NAME" />) vastaanotetaan <ph name="ATTACHMENTS" />}}</translation>
 <translation id="1049743911850919806">Incognito</translation>
@@ -937,6 +938,7 @@
 <translation id="1695510246756136088">Internetyhteyttä ei voi muodostaa. Yritä uudelleen.</translation>
 <translation id="1696555181932908973">Voit kokeilla muita tapoja jatkaa tämän käyttöä: <ph name="SITE_ETLD_PLUS_ONE" />.</translation>
 <translation id="1696685050160038195">Käytä ja asenna vain luotetuista lähteistä ja luotetuilta kehittäjiltä peräisin olevia ohjelmistoja, jotta laitteesi pysyy suojattuna.</translation>
+<translation id="1696832149095851409">kelluva valikko valitussa tekstissä</translation>
 <translation id="1697122132646041614">En tykkää ‑painike avaa lomakkeen, jolla voit antaa yksityiskohtaista palautetta siitä, miksi et pidä näistä tuloksista.</translation>
 <translation id="1697532407822776718">Kaikki on valmista.</translation>
 <translation id="1698796500103229697">&amp;Maksutavat</translation>
@@ -2511,6 +2513,7 @@ Voit ylläpitää tilin asetuksia asentamalla laitteellesi Family Link ‑sovell
 <translation id="2845276301195220700">Lisää Google Kalenteriin liittyviä toimintoja</translation>
 <translation id="2845382757467349449">Näytä kirjanmerkkipalkki aina</translation>
 <translation id="284581348330507117">Luo yksilöllisiä salasanoja</translation>
+<translation id="2846345106886298325">Tehtävä suoritettu ja palautettu Gemini Sparkiin</translation>
 <translation id="284884486564166077">Hae mitä tahansa kuvaa Lensillä</translation>
 <translation id="2849035674501872372">Hae</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3014,6 +3017,7 @@ Voit ylläpitää tilin asetuksia asentamalla laitteellesi Family Link ‑sovell
 <translation id="3223109931751684474">Poista pääsy avainkoodeihin tältä laitteelta</translation>
 <translation id="3223531857777746191">Palautuspainike</translation>
 <translation id="3225084153129302039">Violetti oletusavatar</translation>
+<translation id="3226249862705569834">Käytössä olevat anturit</translation>
 <translation id="3226487301970807183">Näytä/piilota vasemmalle tasattu sivupaneeli</translation>
 <translation id="322708765617468434">Voit lisätä laitteelle toisen henkilön milloin tahansa käyttöönoton jälkeen. Jokainen henkilö voi personoida kokemuksensa ja pitää datan yksityisenä.</translation>
 <translation id="3227137524299004712">Mikrofoni</translation>
@@ -5230,7 +5234,6 @@ Loitonna painamalla Ctrl + Alt + kirkkauden vähennys.</translation>
 <translation id="486505726797718946">Muisto tallennettu</translation>
 <translation id="486635084936119914">Avaa tietyn tyyppiset tiedostot automaattisesti latauksen jälkeen.</translation>
 <translation id="4867272607148176509">Vanhemmat voivat hyväksyä tai estää sovelluksia, asettaa aikarajoituksia ja hallita selaamista. Oppilaitoksen tili voidaan lisätä myöhemmin, jotta voit käyttää useimpia koulumateriaaleja.</translation>
-<translation id="486796517585164369">· Viimeisimmät-välilehti</translation>
 <translation id="4868284252360267853">Valintaikkuna ei ole tällä hetkellä kohdistettuna. Kohdista valintaikkunaan painamalla Komento Vaihto A.</translation>
 <translation id="4869170227080975044">Lukea ChromeOS:n verkkotiedot.</translation>
 <translation id="4870724079713069532">Tällä sovelluksella voit avata ja muokata tuettuja tiedostoja Resurssienhallinnasta tai muista sovelluksista. Jos haluat valita, mitkä tiedostot avautuvat oletuksena tässä sovelluksessa, avaa <ph name="BEGIN_LINK" />Windows-asetukset<ph name="END_LINK" />.</translation>
@@ -6124,6 +6127,7 @@ Voit määrittää samalle toiminnolle useita kytkimiä.</translation>
 <translation id="5546865291508181392">Haku</translation>
 <translation id="5547868626772433490">Kysy Geminiltä</translation>
 <translation id="5548075230008247516">Kaikkien kohteiden valinnat on poistettu ja valintatilasta on poistuttu.</translation>
+<translation id="554810465530189549">Älä näytä kelluvaa valikkoa, kun tekstiä on valittu</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{<ph name="TAB_TITLE" />}=1{<ph name="TAB_TITLE" /> ja yksi muu välilehti}other{<ph name="TAB_TITLE" /> ja # muuta välilehteä}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">Valitse asetuksesi</translation>
@@ -6289,6 +6293,7 @@ Voit määrittää samalle toiminnolle useita kytkimiä.</translation>
 <translation id="5678955352098267522">Lukea tietojasi sivustossa <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">Poistetaanko <ph name="ESIM_PROFILE_NAME" />?</translation>
 <translation id="5681586175480958839">Tiedostoa avataan jo</translation>
+<translation id="5682950763196110705">Näytä kelluva valikko, kun tekstiä on valittu</translation>
 <translation id="5684110242705861346">Organisaation käytäntö lisäsi laajennuksen "<ph name="NAME" />", ja se hallinnoi tätä asetusta. <ph name="BEGIN_LINK" />Katso tiedot<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Wi-Fi-tiedot</translation>
 <translation id="5684661240348539843">Laitteen tunnus</translation>
@@ -10063,6 +10068,7 @@ Tallenna avaintiedosto suojattuun sijaintiin. Tarvitset sitä, jos haluat luoda 
 <translation id="8505669004895429027">Pienet säästöt</translation>
 <translation id="8507052544157927817">Alleviivauksen tyyli</translation>
 <translation id="8507227974644337342">Näytön resoluutio</translation>
+<translation id="8507443886219296894">Piilota tällä sivustolla</translation>
 <translation id="850763987657366362">Varmenteen tuonti ei onnistu</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> haluaa tallentaa tietoja Android-laitteelle</translation>
 <translation id="8509177919508253835">Nollaa suojausavaimet ja luo PIN-koodit</translation>
@@ -10123,6 +10129,7 @@ Tallenna avaintiedosto suojattuun sijaintiin. Tarvitset sitä, jos haluat luoda 
 <translation id="8552102814346875916">Tallenna "Pidä nämä sivustot aina aktiivisina" ‐listaan</translation>
 <translation id="8552947739661397736">Ota tehtävä haltuun, Gemini ohjaa tällä hetkellä</translation>
 <translation id="8553342806078037065">Hallinnoi muita käyttäjiä</translation>
+<translation id="8554642222921881444">Kelluva valikko valitussa tekstissä</translation>
 <translation id="8554899698005018844">Ei kieltä</translation>
 <translation id="8555444629041783356">Automaattinen käytöstäpoistoaikataulu</translation>
 <translation id="8557022314818157177">Jatka suojausavaimen koskettamista, kunnes sormenjälki tallennetaan</translation>
@@ -10419,6 +10426,7 @@ Tallenna avaintiedosto suojattuun sijaintiin. Tarvitset sitä, jos haluat luoda 
 <translation id="8759753423332885148">Lisätietoja</translation>
 <translation id="876161309768861172">Kirjautuminen ei onnistunut, yritä uudelleen</translation>
 <translation id="8761945298804995673">Tämä käyttäjä on jo olemassa</translation>
+<translation id="876287961468788565">Chrome voi näyttää kelluvan valikon, jossa on toimintoja, kun valitset tekstiä sivustolla.</translation>
 <translation id="8762886931014513155"><ph name="DEVICE_TYPE" /> on päivitettävä</translation>
 <translation id="8763927697961133303">USB-laite</translation>
 <translation id="8765940060470412555">Poista lukutilan kiinnitys</translation>

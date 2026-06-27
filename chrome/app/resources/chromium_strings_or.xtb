@@ -32,6 +32,7 @@
 <translation id="126567311906253476"><ph name="USER_EMAIL" /> ମାଧ୍ୟମରେ Gmail କିମ୍ବା YouTube ପରି Google ସେବାଗୁଡ଼ିକରେ ସାଇନ ଇନ କରିବା ସମୟରେ, ଆପଣ ସମାନ ଆକାଉଣ୍ଟ ମାଧ୍ୟମରେ ସ୍ୱତଃ Chromiumରେ ସାଇନ ଇନ କରିପାରିବେ</translation>
 <translation id="1287534462498555020">ଆପଣଙ୍କ ଫୋନରେ Chromium ପାଆନ୍ତୁ</translation>
 <translation id="1290883685122687410">ସେଟଅପ ତ୍ରୁଟି: <ph name="METAINSTALLER_EXIT_CODE" />। <ph name="WINDOWS_ERROR" /></translation>
+<translation id="1312200348844120300">ଏକ ପ୍ରଡକ୍ଟକୁ ଖୋଜିବା ପାଇଁ ଆପଣ କିପରି ଇମେଜ ସର୍ଚ୍ଚ ବ୍ୟବହାର କରିପାରିବେ, ତାହା ଦେଖାଉଥିବା ଏକ ଇଲୁଷ୍ଟ୍ରେସନ</translation>
 <translation id="1315551408014407711">ଆପଣଙ୍କର ନୂଆ Chromium ପ୍ରୋଫାଇଲ୍ ସେଟ୍ ଅପ୍ କରନ୍ତୁ</translation>
 <translation id="132092532143527429">Chromiumରେ Gemini ସହ ଚେଷ୍ଟା କରନ୍ତୁ</translation>
 <translation id="1324107359134968521">ବ୍ଲୁଟୁଥ ଡିଭାଇସଗୁଡ଼ିକୁ ଏକ୍ସପ୍ଲୋର କରିବା ପାଇଁ Chromium ବ୍ଲୁଟୁଥ ଆକ୍ସେସ ଆବଶ୍ୟକ କରେ। <ph name="IDS_SERIAL_DEVICE_CHOOSER_AUTHORIZE_BLUETOOTH_LINK" /></translation>
@@ -93,6 +94,7 @@
 <translation id="1951406923938785464">Chromium ଏହି ଡାଉନଲୋଡକୁ ବ୍ଲକ କରିଛି କାରଣ ଏହି ଫାଇଲ ପ୍ରକାରକୁ ସାଧାରଣତଃ ଡାଉନଲୋଡ କରାଯାଇନଥାଏ ଏବଂ ଏହା ବିପଦଜନକ ହୋଇପାରେ</translation>
 <translation id="1953553007165777902">ଡାଉନଲୋଡ ହେଉଛି… <ph name="MINUTE" /> ମିନିଟ ବାକି ଅଛି</translation>
 <translation id="1966382378801805537">Chromium ଡିଫଲ୍ଟ ବ୍ରାଉଜର୍ ନିର୍ଦ୍ଧାରଣ କିମ୍ବା ସେଟ୍ କରିପାରିବ ନାହିଁ</translation>
+<translation id="197326043290947695">ଇମେଜ ସର୍ଚ୍ଚ ସହ ସ୍ମାର୍ଟ ଭାବେ ବ୍ରାଉଜ କରନ୍ତୁ</translation>
 <translation id="1990262977744080398">Chromium କାହିଁକି କିଛି ଫାଇଲକୁ ବ୍ଲକ କରେ ତାହା ଜାଣନ୍ତୁ, ନୂଆ ଟାବରେ ଖୋଲେ</translation>
 <translation id="1999715455684970349">ଆପଣଙ୍କ Chromium ସଫ୍ଟୱେରକୁ ଅପଟୁଡେଟ ରଖନ୍ତୁ। ଯଦି ଏହି ସେବା ଅକ୍ଷମ କିମ୍ବା ବନ୍ଦ ହୋଇଯାଇଥାଏ, ତେବେ ଆପଣଙ୍କ Chromium ସଫ୍ଟୱେରକୁ ଅପଟୁଡେଟ ରଖାଯିବ ନାହିଁ, ସୃଷ୍ଟି ହେଉଥିବା ଅର୍ଥ ସୁରକ୍ଷା ଆଶଙ୍କା ଠିକ କରାଯାଇପାରିବ ନାହିଁ ଏବଂ ଫିଚରଗୁଡ଼ିକ କାର୍ଯ୍ୟ କରିନପାରେ। କୌଣସି Google ସଫ୍ଟୱେର ଏହାକୁ ବ୍ୟବହାର କରୁନଥିବା ସମୟରେ ଏହି ସେବା ନିଜେ ଅନଇନଷ୍ଟଲ ହୋଇଯାଏ।</translation>
 <translation id="2008474315282236005">ଏହାଦ୍ବାରା ଏହି ଡିଭାଇସ୍‌ରୁ 1ଟି ଆଇଟମ୍ ଡିଲିଟ୍ ହୋଇଯିବ। ପରେ ଆପଣଙ୍କ ଡାଟାକୁ ପୁନଃପ୍ରାପ୍ତ କରିବାକୁ, Chromiumକୁ <ph name="USER_EMAIL" />ରେ ସାଇନ୍ ଇନ୍ କରନ୍ତୁ।</translation>
@@ -235,6 +237,7 @@
 <translation id="3387527074123400161">ChromiumOS</translation>
 <translation id="3406848076815591792">ପୂର୍ବରୁ ଥିବା Chromium ପ୍ରୋଫାଇଲକୁ ସ୍ୱିଚ୍ କରିବେ?</translation>
 <translation id="3412460710772753638">ଏହି ଡିଭାଇସରେ Password Managerରେ</translation>
+<translation id="3423442168617177595">କଠିନ ପାସୱାର୍ଡଗୁଡ଼ିକ ତିଆରି କରିବା, ସେଭ କରିବା ଏବଂ ଅଟୋଫିଲ କରିବାରେ ଆପଣଙ୍କୁ ସାହାଯ୍ୟ କରିବା ପାଇଁ Chromiumରେ ବିଲ୍ଟ ଇନ ଅଛି। ସହଜରେ ଆକ୍ସେସ କରିବା ପାଇଁ ସର୍ଟକଟ ଯୋଗ କରନ୍ତୁ</translation>
 <translation id="3455907671758333080">ଆପଣଙ୍କ ଫୋନରେ Chromium ସହ ଉନ୍ନତ ସୁରକ୍ଷିତ ବ୍ରାଉଜିଂକୁ ବିସ୍ତାର କରନ୍ତୁ</translation>
 <translation id="3461644266919055473">ଆପଣଙ୍କ ପସନ୍ଦ ଅନୁଯାୟୀ Chromiumକୁ ପ୍ରସ୍ତୁତ କରାଯାଉଛି...</translation>
 <translation id="3474745554856756813">ଏହା, ଏହି ଡିଭାଇସ୍‍ରୁ <ph name="ITEMS_COUNT" />ଟି ଆଇଟମ୍‍କୁ ଡିଲିଟ୍ କରିଦେବ। ପରବର୍ତ୍ତୀ ସମୟରେ ଆପଣଙ୍କର ଡାଟାକୁ ପୁନରୁଦ୍ଧାର କରିବା ପାଇଁ <ph name="USER_EMAIL" /> ଭାବେ Chromium‍ରେ ସାଇନ୍ ଇନ୍ କରନ୍ତୁ।</translation>
@@ -284,6 +287,7 @@
 <translation id="3975724895399328945">&amp;Google Chrome for Testing ବିଷୟରେ</translation>
 <translation id="3997429360543082038">ChromiumOS ବିଷୟରେ</translation>
 <translation id="4010059961270896984">ଆପଣ ଏକ ସାଇଟକୁ ଭିଜିଟ କଲେ, Chromium ଆପଣଙ୍କ IP ଠିକଣାକୁ ଲୁଚାଉଥିବା ଗୋଟିଏ ଗୋପନୀୟତା ସର୍ଭର ମାଧ୍ୟମରେ URLର ଏକ ଅସ୍ପଷ୍ଟ ଅଂଶ <ph name="BEGIN_LINK" />Google ସୁରକ୍ଷିତ ବ୍ରାଉଜିଂ<ph name="END_LINK" />କୁ ପଠାଏ। ଯଦି ଏକ ପୃଷ୍ଠା କିଛି ସନ୍ଦେହଜନକ କାର୍ଯ୍ୟ କରେ, ତେବେ ସମ୍ପୂର୍ଣ୍ଣ URL ଏବଂ ପୃଷ୍ଠାର କିଛି ବିଷୟବସ୍ତୁ ମଧ୍ୟ ପଠାଯାଏ।</translation>
+<translation id="4016217212818346953">Password Manager ସହ ସୁରକ୍ଷିତ ରୁହନ୍ତୁ</translation>
 <translation id="4019629340646866719">ChromiumOS <ph name="BEGIN_LINK_LINUX_OSS" />Linux ଡେଭେଲପମେଣ୍ଟ ପରିବେଶ<ph name="END_LINK_LINUX_OSS" /> ପରି ଅତିରିକ୍ତ <ph name="BEGIN_LINK_CROS_OSS" />ଓପନ ସୋର୍ସ ସଫ୍ଟୱେର<ph name="END_LINK_CROS_OSS" /> ଦ୍ୱାରା ସମ୍ଭବପର ହୋଇଛି।</translation>
 <translation id="4022972681110646219">ସ୍କ୍ରିନକୁ ଅନୁବାଦ କରନ୍ତୁ</translation>
 <translation id="4023601594785368013">ମୂଳ ଭାଷା: <ph name="LANGUAGE" /></translation>
@@ -503,6 +507,7 @@
 <translation id="6400112897226594999">କମ୍ପ୍ୟୁଟର ସ୍କ୍ରିନରେ Chromium ଲୋଗୋ।</translation>
 <translation id="6403826409255603130">Chromium ଗୋଟିଏ ୱେବ୍ ବ୍ରାଉଜର୍ ଅଟେ ଯାହା ଦ୍ରୁତତର ବେଗରେ ୱେ୍ବ୍‌ପୃଷ୍ଠା ଏବଂ ଆପ୍ଲିକେସନ୍‌ଗୁଡ଼ିକ ଚଲାଏ। ଏହା ଦ୍ରୁତ, ସ୍ଥିର ଏବଂ ବ୍ୟବହାର କରିବା ପାଇଁ ସହଜ ଅଟେ। Chromiumରେ ନିର୍ମିତ ମାଲ୍‌ୱାର୍ ଏବଂ ଫିସିଂ ସୁରକ୍ଷା ସହ ୱେବ୍‌କୁ ଅଧିକ ସୁରକ୍ଷିତ ଢଙ୍ଗରେ ବ୍ରାଉଜ୍ କରନ୍ତୁ।</translation>
 <translation id="6414624068245092115">ଆପଣ ସର୍ବଦା ଆପଣଙ୍କ Google ଆକାଉଣ୍ଟରେ Chromium ଡାଟା ବ୍ୟବହାର ଏବଂ ସେଭ କରିପାରିବେ ବୋଲି ସୁନିଶ୍ଚିତ କରିବାକୁ ଏହା ଆପଣ ବୋଲି ଯାଞ୍ଚ କରନ୍ତୁ</translation>
+<translation id="6417332166651156371">Chromiumରେ Password Managerର ଏଣ୍ଟ୍ରି ପଏଣ୍ଟକୁ ଦେଖାଉଥିବା ଏକ ସରଳୀକୃତ ଇମେଜ</translation>
 <translation id="642132557830635295">ଚାଲୁ ଥିଲେ, Chromium ଆହୁରି ଦ୍ରୁତ ଭାବରେ ଚାଲେ ଏବଂ JavaScript ବ୍ୟବହାର କରୁଥିବା ଫିଚରଗୁଡ଼ିକ ଡିଜାଇନ କରାଯାଇଥିବା ଅନୁଯାୟୀ କାମ କରିବା ଉଚିତ</translation>
 <translation id="6436260184216827876">ଇମେଜ ସର୍ଚ୍ଚ ଉପଲବ୍ଧ ନାହିଁ। ପରେ ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।</translation>
 <translation id="6442900851116057561">ChromiumOSକୁ ରିଷ୍ଟାର୍ଟ କରନ୍ତୁ</translation>
@@ -594,6 +599,7 @@
 <translation id="7196312274710523067">Chromium ଲଞ୍ଚ କରାଯାଇପାରିଲା ନାହିଁ। ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।</translation>
 <translation id="7213008767289637091">ଯେ କୌଣସି ସମୟରେ Chromiumକୁ ଶୀଘ୍ର ଆକ୍ସେସ କରିବା ପାଇଁ ଏହାକୁ ଆପଣଙ୍କ ଡକରେ ରଖନ୍ତୁ</translation>
 <translation id="7213407614656404070">ଆପଣ ମେସେଜ, ଡକ୍ୟୁମେଣ୍ଟ ଏବଂ ଅନ୍ୟ ଆପ୍ସରେ ଥିବା ଲିଙ୍କଗୁଡ଼ିକରେ କ୍ଲିକ କରି ଯେ କୌଣସି ସମୟରେ Chromium ବ୍ୟବହାର କରନ୍ତୁ</translation>
+<translation id="7216228761061470870">ଆପଣ ଡେସ୍କଟପରେ ଇମେଜ ସର୍ଚ୍ଚ ବ୍ୟବହାର କଲେ, PDFଗୁଡ଼ିକ ସମେତ ପୃଷ୍ଠାର ଟାଇଟେଲ, URL ଏବଂ ବିଷୟବସ୍ତୁ ସର୍ଭରକୁ ପଠାଯାଏ</translation>
 <translation id="7223968959479464213">ଟାସ୍କ ପରିଚାଳକ - Chromium</translation>
 <translation id="7252276985725323153">ତୁରନ୍ତ ବ୍ରାଉଜ କରିବା ଆରମ୍ଭ କରନ୍ତୁ: Windows ଆରମ୍ଭ ହେଲେ Chromium ବର୍ତ୍ତମାନ ଲଞ୍ଚ ହୋଇପାରିବ।</translation>
 <translation id="7274695763216404502">ପିନ କରାଯାଇଛି! ଟୁଲବାରରୁ ଇମେଜ ସର୍ଚ୍ଚକୁ ପୁଣି ବ୍ୟବହାର କରନ୍ତୁ</translation>

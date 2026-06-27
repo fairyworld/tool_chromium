@@ -184,6 +184,7 @@ Only someone with your passphrase can read your encrypted data. The passphrase i
 <translation id="1792959175193046959">Change the default download location at any time</translation>
 <translation id="1796666869097395659">Minimise tab to return to it later</translation>
 <translation id="1799920918471566157">Chrome tips</translation>
+<translation id="1803799720926799756">File size</translation>
 <translation id="1807246157184219062">Light</translation>
 <translation id="1807709131360304325">Open a new window</translation>
 <translation id="1812027881030482584"><ph name="SITE_ETLD_PLUS_ONE" /> can't continue using <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /></translation>
@@ -2038,7 +2039,6 @@ To change this setting, <ph name="BEGIN_LINK" />delete the Chrome data in your a
 <translation id="939598580284253335">Enter passphrase</translation>
 <translation id="94161319503679839"><ph name="TAB_TITLE" />, pinned picture-in-picture Incognito tab</translation>
 <translation id="945522503751344254">Send feedback</translation>
-<translation id="949667118776341807">Rotate</translation>
 <translation id="95817756606698420">Chrome can use <ph name="BEGIN_BOLD" />Sogou<ph name="END_BOLD" /> for search in China. You can change this in <ph name="BEGIN_LINK" />Settings<ph name="END_LINK" />.</translation>
 <translation id="961856697154696964">Delete browsing data</translation>
 <translation id="963246339335003378">Open task manager</translation>

@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{O parolă importată în <ph name="BRAND" /> pe acest dispozitiv}few{{NUM_PASSWORDS} parole importate în <ph name="BRAND" /> pe acest dispozitiv}other{{NUM_PASSWORDS} de parole importate în <ph name="BRAND" /> pe acest dispozitiv}}</translation>
 <translation id="1046572983040892965">Fereastra a fost mutată în sus și spre stânga</translation>
 <translation id="1047431265488717055">Copiază te&amp;xtul linkului</translation>
+<translation id="1048350929895890054">Site-uri pe care este blocat meniul flotant</translation>
 <translation id="1048986595386481879">Alocată dinamic</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{Se primește <ph name="ATTACHMENTS" /> de la <ph name="DEVICE_NAME" />}few{Se primesc <ph name="ATTACHMENTS" /> de la <ph name="DEVICE_NAME" />}other{Se primesc <ph name="ATTACHMENTS" /> de la <ph name="DEVICE_NAME" />}}</translation>
 <translation id="1049743911850919806">Incognito</translation>
@@ -936,6 +937,7 @@ Verifică parolele oricând în <ph name="GOOGLE_PASSWORD_MANAGER" />.</translat
 <translation id="1695510246756136088">Nu se poate conecta la internet. Încearcă din nou.</translation>
 <translation id="1696555181932908973">Poți încerca alte metode pentru a accesa <ph name="SITE_ETLD_PLUS_ONE" />.</translation>
 <translation id="1696685050160038195">Pentru a-ți păstra dispozitivul în siguranță, trebuie să rulezi și să instalezi numai software de la surse și dezvoltatori de încredere.</translation>
+<translation id="1696832149095851409">meniu flotant pentru textul selectat</translation>
 <translation id="1697122132646041614">Nu îmi place deschide un formular pentru a trimite feedback detaliat despre motivele pentru care nu apreciezi aceste rezultate.</translation>
 <translation id="1697532407822776718">Ești gata!</translation>
 <translation id="1698796500103229697">&amp;Metode de plată</translation>
@@ -2499,6 +2501,7 @@ Poți gestiona setările contului dacă instalezi aplicația Family Link pe disp
 <translation id="2845276301195220700">Mai multe acțiuni pentru Google Calendar</translation>
 <translation id="2845382757467349449">Afișează mereu bara de marcaje</translation>
 <translation id="284581348330507117">Creează parole unice</translation>
+<translation id="2846345106886298325">Activitatea a fost finalizată și s-a revenit la Gemini Spark</translation>
 <translation id="284884486564166077">Caută orice imagine cu Lens</translation>
 <translation id="2849035674501872372">Ridică privirea</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3001,6 +3004,7 @@ Mesaj de la server: <ph name="SERVER_MSG" /></translation>
 <translation id="3223109931751684474">Elimină accesul la cheile de acces de pe acest dispozitiv</translation>
 <translation id="3223531857777746191">Butonul Resetează</translation>
 <translation id="3225084153129302039">Avatar violet prestabilit</translation>
+<translation id="3226249862705569834">Senzori în uz</translation>
 <translation id="3226487301970807183">Activează / dezactivează panoul lateral aliniat la stânga</translation>
 <translation id="322708765617468434">După configurare, poți oricând să adaugi altă persoană pe dispozitiv. Fiecare persoană poate să-și personalizeze experiența și să-și păstreze datele private.</translation>
 <translation id="3227137524299004712">Microfon</translation>
@@ -5219,7 +5223,6 @@ Folosește Ctrl + Alt + tasta de reducere a luminozității pentru a micșora.</
 <translation id="486505726797718946">Amintirea a fost salvată</translation>
 <translation id="486635084936119914">Deschide automat anumite tipuri de fișiere după descărcare</translation>
 <translation id="4867272607148176509">Părinții pot să aprobe sau să blocheze aplicații, să seteze limite privind durata de folosire și să controleze navigarea pe web. Mai târziu se poate adăuga un cont de la școală pentru a accesa majoritatea resurselor de la școală.</translation>
-<translation id="486796517585164369">· Fila Recente</translation>
 <translation id="4868284252360267853">Acest dialog nu este focalizat. Apasă pe Command-Shift-Option A pentru a focaliza dialogul.</translation>
 <translation id="4869170227080975044">Citește informațiile despre rețeaua ChromeOS</translation>
 <translation id="4870724079713069532">Poți să deschizi și să editezi fișierele acceptate în această aplicație din Exploratorul de fișiere sau din alte aplicații. Pentru a alege fișierele care deschid aplicația în mod prestabilit, accesează <ph name="BEGIN_LINK" />setările Windows<ph name="END_LINK" />.</translation>
@@ -6112,6 +6115,7 @@ Poți atribui mai multe comutatoare acestei acțiuni.</translation>
 <translation id="5546865291508181392">Caută</translation>
 <translation id="5547868626772433490">Întreabă Gemini</translation>
 <translation id="5548075230008247516">Toate elementele sunt deselectate, modul de selectare a fost părăsit.</translation>
+<translation id="554810465530189549">Nu afișa meniul flotant când este selectat text</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{„<ph name="TAB_TITLE" />”}=1{„<ph name="TAB_TITLE" />” și încă o filă}few{„<ph name="TAB_TITLE" />” și încă # file}other{„<ph name="TAB_TITLE" />” și încă # de file}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">Alege configurația</translation>
@@ -6277,6 +6281,7 @@ Poți atribui mai multe comutatoare acestei acțiuni.</translation>
 <translation id="5678955352098267522">Citește datele de pe <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">Elimini „<ph name="ESIM_PROFILE_NAME" />”?</translation>
 <translation id="5681586175480958839">Fișierul este deja în curs de deschidere</translation>
+<translation id="5682950763196110705">Afișează meniul flotant când este selectat text</translation>
 <translation id="5684110242705861346">Extensia <ph name="NAME" /> a fost adăugată conform politicii organizației și gestionează această setare. <ph name="BEGIN_LINK" />Vezi detaliile<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Detalii despre Wi-Fi</translation>
 <translation id="5684661240348539843">Identificator articol</translation>
@@ -10053,6 +10058,7 @@ Păstrează fișierul cu cheia într-un loc sigur. Acesta va fi necesar la crear
 <translation id="8505669004895429027">Economii mici de memorie</translation>
 <translation id="8507052544157927817">Stil de subliniere</translation>
 <translation id="8507227974644337342">Rezoluția ecranului</translation>
+<translation id="8507443886219296894">Ascunde pentru acest site</translation>
 <translation id="850763987657366362">Certificatul nu s-a putut importa</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> dorește să salveze informații pe dispozitivul tău Android</translation>
 <translation id="8509177919508253835">Resetează cheile de securitate și creează coduri PIN</translation>
@@ -10113,6 +10119,7 @@ Păstrează fișierul cu cheia într-un loc sigur. Acesta va fi necesar la crear
 <translation id="8552102814346875916">Adaugă în lista Menține întotdeauna active aceste site-uri</translation>
 <translation id="8552947739661397736">Preia activitatea. Momentan, Gemini deține controlul.</translation>
 <translation id="8553342806078037065">Gestionează alte persoane</translation>
+<translation id="8554642222921881444">Meniu flotant pentru textul selectat</translation>
 <translation id="8554899698005018844">Nicio limbă</translation>
 <translation id="8555444629041783356">Program automat de retragere</translation>
 <translation id="8557022314818157177">Atinge cheia de securitate până când ți se capturează amprenta</translation>
@@ -10409,6 +10416,7 @@ Păstrează fișierul cu cheia într-un loc sigur. Acesta va fi necesar la crear
 <translation id="8759753423332885148">Află mai multe.</translation>
 <translation id="876161309768861172">Conectare nereușită. Încearcă din nou.</translation>
 <translation id="8761945298804995673">Acest utilizator există deja</translation>
+<translation id="876287961468788565">Chrome poate afișa un meniu flotant cu acțiuni când selectezi text pe un site.</translation>
 <translation id="8762886931014513155">Dispozitivul <ph name="DEVICE_TYPE" /> are nevoie de actualizare</translation>
 <translation id="8763927697961133303">Dispozitiv USB</translation>
 <translation id="8765940060470412555">Anulează fixarea modului de lectură</translation>

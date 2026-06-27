@@ -1214,6 +1214,7 @@
 <translation id="1897120393475391208">使用安全性強的密碼</translation>
 <translation id="1897860317037652061">掃瞄失敗</translation>
 <translation id="1898804291554630487">提出關於此頁的問題</translation>
+<translation id="1899172684246105747">使用主題和深色模式等選項自訂瀏覽器。</translation>
 <translation id="1900305421498694955">Google Play 應用程式可能會要求取得檔案系統的完整存取權，以讀取和寫入外部儲存裝置上的檔案。外置磁碟的任何使用者都能見到在此裝置上建立的檔案和資料夾。<ph name="LINK_BEGIN" />瞭解詳情<ph name="LINK_END" /></translation>
 <translation id="1901213235765457754">要求管理員更新此應用程式</translation>
 <translation id="1901303067676059328">全部選取(&amp;A)</translation>
@@ -5229,7 +5230,6 @@
 <translation id="486505726797718946">已釋出記憶體</translation>
 <translation id="486635084936119914">下載特定類型的檔案後自動開啟</translation>
 <translation id="4867272607148176509">家長可核准或封鎖應用程式、設定使用時間限制，以及控制網絡瀏覽內容。你可稍後新增學校帳戶，以便存取大部分學校資源。</translation>
-<translation id="486796517585164369">· 最近開啟的分頁</translation>
 <translation id="4868284252360267853">目前冇突顯到呢個對話框。㩒一下 Command + Shift + Option + A 鍵就可以突顯呢個對話框。</translation>
 <translation id="4869170227080975044">讀取 ChromeOS 網絡資料</translation>
 <translation id="4870724079713069532">您可在「檔案總管」或其他應用程式中，透過此應用程式開啟及編輯支援的檔案。如要控制在此應用程式預設開啟哪些檔案，請前往「<ph name="BEGIN_LINK" />Windows 設定<ph name="END_LINK" />」。</translation>
@@ -8412,6 +8412,7 @@
 <translation id="7289303553784750393">如果已連接網絡，但此問題持續發生，你可嘗試在「<ph name="SITE_ETLD_PLUS_ONE" />」上透過其他方法繼續操作。</translation>
 <translation id="7289386924227731009"><ph name="WINDOW_TITLE" /> - 要求咗權限，㩒 F6 掣就可以回覆</translation>
 <translation id="7290005709287747471">停用</translation>
+<translation id="7290139233643258082">套用主題</translation>
 <translation id="7292067737327289208">你的<ph name="BEGIN_LINK" />瀏覽器<ph name="END_LINK" />由機構管理，<ph name="BEGIN_LINK" />個人檔案<ph name="END_LINK" />則由 <ph name="PROFILE_DOMAIN" /> 管理</translation>
 <translation id="7292147651179697920">請家長前往「設定」授予存取權</translation>
 <translation id="7292195267473691167"><ph name="LOCALE" /> (<ph name="VARIANT" />)</translation>

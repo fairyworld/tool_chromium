@@ -327,6 +327,7 @@
 <translation id="2411239243988279592">‫<ph name="TAB_TITLE" />، زبانه شنیداری انتخابی</translation>
 <translation id="2413014528833954543">گذرواژه‌های ذخیره‌شده در این دستگاه بررسی نشد</translation>
 <translation id="2414886740292270097">تاریک</translation>
+<translation id="2415037988255164008">پنجره ها بازیابی شوند؟</translation>
 <translation id="2421705177906985956">درحال‌حاضر سایتی برای نمایش نیست</translation>
 <translation id="2426805022920575512">انتخاب یک حساب دیگر</translation>
 <translation id="2427025860753516072">{FILE_COUNT,plural, =1{ویدیوها، ۱ ویدیو در فهرست}one{ویدیوها، # ویدیو در فهرست}other{ویدیوها، # ویدیو در فهرست}}</translation>
@@ -1338,6 +1339,7 @@
 <translation id="6556501700899673703">Lexend</translation>
 <translation id="6560414384669816528">‏جستجو با Sogou</translation>
 <translation id="656065428026159829">بیشتر دیدن</translation>
+<translation id="6565781844089373403">بازگرداندن پنجره‌ها</translation>
 <translation id="6565959834589222080">‏استفاده از Wi-Fi هنگام دردسترس بودن</translation>
 <translation id="657177046675873214">برای اینکه نشانک‌ها را در همه دستگاه‌هایتان دریافت کنید، «نشانک‌ها» را در تنظیمات روشن کنید</translation>
 <translation id="6573096386450695060">همیشه اجازه دادن</translation>
@@ -2039,7 +2041,6 @@
 <translation id="939598580284253335">گذرعبارت را وارد کنید</translation>
 <translation id="94161319503679839">‫<ph name="TAB_TITLE" />، زبانه ناشناس سنجاق‌شده تصویردرتصویر</translation>
 <translation id="945522503751344254">ارسال بازخورد</translation>
-<translation id="949667118776341807">چرخاندن</translation>
 <translation id="95817756606698420">‏Chrome می‌تواند از <ph name="BEGIN_BOLD" />Sogou<ph name="END_BOLD" /> برای جستجو در چین استفاده کند. در <ph name="BEGIN_LINK" />تنظیمات<ph name="END_LINK" /> می‌توانید این را تغییر دهید.</translation>
 <translation id="961856697154696964">حذف کردن داده‌های مرور</translation>
 <translation id="963246339335003378">باز کردن «مدیر وظایف»</translation>

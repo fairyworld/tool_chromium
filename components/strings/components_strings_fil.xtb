@@ -1237,6 +1237,7 @@ Kung ayaw mo, iba-block ito ng iyong mga setting ng privacy. Papayagan nito ang 
 <translation id="2929525460561903222">{SHIPPING_ADDRESS,plural, =0{<ph name="SHIPPING_ADDRESS_PREVIEW" />}=1{<ph name="SHIPPING_ADDRESS_PREVIEW" /> at <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> pa}one{<ph name="SHIPPING_ADDRESS_PREVIEW" /> at <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> pa}other{<ph name="SHIPPING_ADDRESS_PREVIEW" /> at <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> pa}}</translation>
 <translation id="2930531075747147366">Tab mula sa Iba Mo Pang Device</translation>
 <translation id="2930577230479659665">Paikliin pagkatapos ng bawat pagkopya</translation>
+<translation id="2931453528659195355">Pamahalaan ang impormasyon sa pamimili</translation>
 <translation id="2933624813161016821">Embossing Foil</translation>
 <translation id="2935726091208500473">pag-share ng iyong mga tab</translation>
 <translation id="293796669683825859">Mga Komento</translation>
@@ -1729,6 +1730,7 @@ Para i-hide ang mga opsyon sa pay later, pumunta sa <ph name="BEGIN_LINK" />mga 
 <translation id="3681841880472207951">QuickTime Video</translation>
 <translation id="3687920599421452763">Mga Van at Minivan</translation>
 <translation id="3693327506115126094">Piliin kung paano mo ive-verify na ikaw ito</translation>
+<translation id="3693516565203081475">Pumili ng paraan ng pagbabayad</translation>
 <translation id="3698353241727597930">Nag-configure ang iyong administrator para i-save ang <ph name="FILES" /> sa iyong storage ng <ph name="CLOUD_STORAGE" /> na pinapamahalaan ng enterprise. Posibleng subaybayan, i-audit, at panatilihin ang mga file na ito kapag na-delete mo ang mga ito.</translation>
 <translation id="3698629142018988477">Button na Gumawa ng site, i-activate para mabilis na makagawa ng bagong site sa Google Sites</translation>
 <translation id="3700094625653511150">Para i-hide ang mga opsyon sa pay later, pumunta sa <ph name="IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_FOOTNOTE_HIDE_OPTION_PAYMENT_SETTINGS_LINK_TEXT" /></translation>
@@ -3537,6 +3539,7 @@ Para i-hide ang mga opsyon sa pay later, pumunta sa <ph name="BEGIN_LINK" />mga 
 <translation id="6494750904506170417">mga pop-up at pag-redirect</translation>
 <translation id="6495664197699704593">Mase-save lang ang password na ito sa device na ito. Para magamit ito sa iba mo pang device, <ph name="GOOGLE_PASSWORD_MANAGER" />.</translation>
 <translation id="649611364763911650">Para gumamit ng ibang serbisyo ng autofill sa Chrome, piliin ang iyong provider ng autofill sa mga setting ng Android</translation>
+<translation id="6496531801333278234">Nahanap ng Personal Intelligence. Puwede mong pamahalaan ang iyong impormasyon sa mga setting.</translation>
 <translation id="6499038740797743453">I-reset ang password?</translation>
 <translation id="6502510275417601303">Isinara na ang alerto tungkol sa bagong setting ng pagbabayad</translation>
 <translation id="6502991525169604759">Hindi kasama ang iyong mga pagbabago</translation>
@@ -5152,6 +5155,7 @@ Mga karagdagang detalye:
 <translation id="9063800855227801443">Hindi puwedeng mag-capture ng kumpidensyal na content</translation>
 <translation id="9065203028668620118">I-edit</translation>
 <translation id="9065745800631924235">Paghahanap para sa <ph name="TEXT" /> mula sa history</translation>
+<translation id="9066116644715286230">{NUM_TABS,plural, =1{Mga detalye ng pag-share ng tab. Nagse-share ng 1 tab mula sa {WEBSITE_LIST_STR}}one{Mga detalye ng pag-share ng tab. Nagse-share ng {NUM_TABS} tab mula sa {WEBSITE_LIST_STR}}other{Mga detalye ng pag-share ng tab. Nagse-share ng {NUM_TABS} na tab mula sa {WEBSITE_LIST_STR}}}</translation>
 <translation id="90695670378604968">Plastic (Matte)</translation>
 <translation id="9069693763241529744">Na-block ng isang extension</translation>
 <translation id="9073799351042754113">Pinili mong i-off ang mga babala sa seguridad para sa site na ito.</translation>

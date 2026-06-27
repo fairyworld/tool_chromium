@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{આ ડિવાઇસ પર <ph name="BRAND" /> પર 1 પાસવર્ડની આયાત કરી}one{આ ડિવાઇસ પર <ph name="BRAND" /> પર {NUM_PASSWORDS} પાસવર્ડની આયાત કરી}other{આ ડિવાઇસ પર <ph name="BRAND" /> પર {NUM_PASSWORDS} પાસવર્ડની આયાત કરી}}</translation>
 <translation id="1046572983040892965">વિન્ડોને ઉપરની તરફ અને ડાબી બાજુ ખસેડવામાં આવી</translation>
 <translation id="1047431265488717055">લિંક ટે&amp;ક્સ્ટને કૉપિ કરો</translation>
+<translation id="1048350929895890054">સાઇટ જ્યાં ફ્લોટિંગ મેનૂ બ્લૉક કરવામાં આવ્યું છે</translation>
 <translation id="1048986595386481879">ગતિશીલ રીતે ફાળવેલી</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{<ph name="DEVICE_NAME" /> પરથી <ph name="ATTACHMENTS" /> મેળવી રહ્યાં છીએ}one{<ph name="DEVICE_NAME" /> પરથી <ph name="ATTACHMENTS" /> મેળવી રહ્યાં છીએ}other{<ph name="DEVICE_NAME" /> પરથી <ph name="ATTACHMENTS" /> મેળવી રહ્યાં છીએ}}</translation>
 <translation id="1049743911850919806">છૂપી</translation>
@@ -936,6 +937,7 @@
 <translation id="1695510246756136088">ઇન્ટરનેટ સાથે કનેક્ટ કરી શકાતું નથી. ફરી પ્રયાસ કરો.</translation>
 <translation id="1696555181932908973"><ph name="SITE_ETLD_PLUS_ONE" /> પર ચાલુ રાખવા માટે અન્ય રીતો અજમાવી શકો છો.</translation>
 <translation id="1696685050160038195">તમારું ડિવાઇસ સુરક્ષિત રાખવા માટે, તમારે માત્ર વિશ્વસનીય સૉર્સ અને ડેવલપરના સૉફ્ટવેર ઇન્સ્ટૉલ કરવા અને તેનો ઉપયોગ કરવો જોઈએ.</translation>
+<translation id="1696832149095851409">પસંદ કરેલી ટેક્સ્ટ પર ફ્લોટિંગ મેનૂ</translation>
 <translation id="1697122132646041614">થમ્બ્સ ડાઉન તમને શા માટે આ પરિણામો નાપસંદ છે તે વિશેનો વિગતવાર પ્રતિસાદ સબમિટ કરવા માટેનું ફોર્મ ખોલે છે.</translation>
 <translation id="1697532407822776718">તમારું બધું સેટ છે!</translation>
 <translation id="1698796500103229697">ચુકવણી પદ્ધતિઓ</translation>
@@ -2500,6 +2502,7 @@
 <translation id="2845276301195220700">Google Calendar માટે વધુ ક્રિયાઓ</translation>
 <translation id="2845382757467349449">હંમેશાં બુકમાર્ક બાર બતાવો</translation>
 <translation id="284581348330507117">વિશિષ્ટ પાસવર્ડ બનાવો</translation>
+<translation id="2846345106886298325">ટાસ્ક પૂર્ણ થયો અને Gemini Sparkને પરત કરવામાં આવ્યો</translation>
 <translation id="284884486564166077">Lens વડે કોઈપણ છબી શોધો</translation>
 <translation id="2849035674501872372">શોધો</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3003,6 +3006,7 @@
 <translation id="3223109931751684474">આ ડિવાઇસ પર તમારી પાસકીનો ઍક્સેસ કાઢી નાખો</translation>
 <translation id="3223531857777746191">રીસેટ કરો બટન</translation>
 <translation id="3225084153129302039">ડિફૉલ્ટ જાંબલી અવતાર</translation>
+<translation id="3226249862705569834">સેન્સરનો ઉપયોગમાં છે</translation>
 <translation id="3226487301970807183">ડાબેથી સંરેખિત બાજુની પૅનલ ટૉગલ કરો</translation>
 <translation id="322708765617468434">સેટઅપ કર્યા પછી તમે હંમેશા અન્ય કોઈપણ વ્યક્તિને ડિવાઇસમાં ઉમેરી શકો છો. દરેક વ્યક્તિ તેમનો અનુભવ મનગમતો બનાવી શકે છે અને ડેટા ખાનગી રાખી શકે છે.</translation>
 <translation id="3227137524299004712">માઇક્રોફોન</translation>
@@ -5222,7 +5226,6 @@
 <translation id="486505726797718946">મેમરી સાચવી</translation>
 <translation id="486635084936119914">ડાઉનલોડ કર્યા પછી કેટલાક ફાઇલ પ્રકારોને ઑટોમૅટિક રીતે ખોલો</translation>
 <translation id="4867272607148176509">માતાપિતા ઍપને મંજૂરી આપી શકે છે કે તેને બ્લૉક કરી શકે છે, સમય મર્યાદા સેટ કરી શકે છે તેમજ વેબ બ્રાઉઝિંગ પર નિયંત્રણ મૂકી શકે છે. સ્કૂલના મોટા ભાગના સંસાધનો ઍક્સેસ કરવા માટે પછીથી સ્કૂલનું એકાઉન્ટ ઉમેરી શકાશે.</translation>
-<translation id="486796517585164369">· તાજેતરનું ટૅબ</translation>
 <translation id="4868284252360267853">હાલમાં આ સંવાદ ફોકસમાં નથી. આ સંવાદને ફોકસમાં લાવવા માટે Command-Shift-Option A દબાવો.</translation>
 <translation id="4869170227080975044">ChromeOS નેટવર્કની માહિતી વાંચો</translation>
 <translation id="4870724079713069532">તમે File Explorer અથવા અન્ય ઍપમાં, આ ઍપ વડે સપોર્ટેડ ફાઇલો ખોલી શકો છો અને તેમાં ફેરફાર કરી શકો છો. આ ઍપમાં ડિફૉલ્ટ તરીકે ખોલવામાં આવે તેવી ફાઇલોને નિયંત્રિત કરવા માટે, <ph name="BEGIN_LINK" />Windowsના સેટિંગ<ph name="END_LINK" /> પર જાઓ.</translation>
@@ -6116,6 +6119,7 @@
 <translation id="5546865291508181392">શોધો</translation>
 <translation id="5547868626772433490">Geminiને પૂછો</translation>
 <translation id="5548075230008247516">બધી આઇટમ નાપસંદ કરી, પસંદગી મોડમાંથી બહાર નીકળ્યાં.</translation>
+<translation id="554810465530189549">જ્યારે ટેક્સ્ટ પસંદ કરવામાં આવે ત્યારે ફ્લોટિંગ મેનૂ બતાવશો નહીં</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{"<ph name="TAB_TITLE" />"}=1{"<ph name="TAB_TITLE" />" અને 1 અન્ય ટૅબ}one{"<ph name="TAB_TITLE" />" અને # અન્ય ટૅબ}other{"<ph name="TAB_TITLE" />" અને # અન્ય ટૅબ}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">તમારું સેટઅપ પસંદ કરો</translation>
@@ -6282,6 +6286,7 @@
 <translation id="5678955352098267522"><ph name="WEBSITE_1" /> પર તમારો ડેટા વાંચી શકે છે</translation>
 <translation id="5680050361008726776">"<ph name="ESIM_PROFILE_NAME" />"ને કાઢી નાખીએ?</translation>
 <translation id="5681586175480958839">ફાઇલ પહેલેથી ખોલવામાં આવી રહી છે</translation>
+<translation id="5682950763196110705">જ્યારે ટેક્સ્ટ પસંદ કરવામાં આવે ત્યારે ફ્લોટિંગ મેનૂ બતાવો</translation>
 <translation id="5684110242705861346">"<ph name="NAME" />" એક્સ્ટેન્શન તમારી સંસ્થાની પૉલિસી દ્વારા ઉમેરવામાં આવ્યું હતું અને તે આ સેટિંગને નિયંત્રિત કરી રહ્યું છે. <ph name="BEGIN_LINK" />વિગતો જુઓ<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">વાઇ-ફાઇની વિગતો</translation>
 <translation id="5684661240348539843">સંપત્તિ ઓળખકર્તા</translation>
@@ -10054,6 +10059,7 @@ USB ડિવાઇસ</translation>
 <translation id="8505669004895429027">ઓછા પ્રમાણમાં મેમરી બચત</translation>
 <translation id="8507052544157927817">અન્ડરલાઇન શૈલી</translation>
 <translation id="8507227974644337342">સ્ક્રીન રિઝોલ્યુશન</translation>
+<translation id="8507443886219296894">આ સાઇટ માટે છુપાવો</translation>
 <translation id="850763987657366362">સર્ટિફિકેટ આયાત કરી શકતા નથી</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> તમારા Android ડિવાઇસ પર માહિતી સાચવવા માગે છે</translation>
 <translation id="8509177919508253835">સુરક્ષા કોડ રીસેટ કરો અને પિન બનાવો</translation>
@@ -10114,6 +10120,7 @@ USB ડિવાઇસ</translation>
 <translation id="8552102814346875916">"આ સાઇટને હંમેશાં સક્રિય રાખો" સૂચિમાં સાચવો</translation>
 <translation id="8552947739661397736">કાર્યનું નિયંત્રણ લો, Gemini હાલમાં નિયંત્રણમાં છે</translation>
 <translation id="8553342806078037065">અન્ય લોકોને મેનેજ કરો</translation>
+<translation id="8554642222921881444">પસંદ કરેલી ટેક્સ્ટ પર ફ્લોટિંગ મેનૂ</translation>
 <translation id="8554899698005018844">કોઈ ભાષા નથી</translation>
 <translation id="8555444629041783356">ઑટોમૅટિક રીતે બંધ કરવા માટેનું શેડ્યૂલ</translation>
 <translation id="8557022314818157177">જ્યાં સુધી તમારી ફિંગરપ્રિન્ટ કૅપ્ચર ન થાય, ત્યાં સુધી તમારી સિક્યુરિટી કીનો સ્પર્શ કરતા રહો</translation>
@@ -10410,6 +10417,7 @@ USB ડિવાઇસ</translation>
 <translation id="8759753423332885148">વધુ જાણો.</translation>
 <translation id="876161309768861172">સાઇન ઇન કરી શકાયું નથી, કૃપા કરીને ફરી પ્રયાસ કરો</translation>
 <translation id="8761945298804995673">આ વપરાશકર્તા પહેલેથી જ અસ્તિત્વમાં છે</translation>
+<translation id="876287961468788565">જ્યારે તમે કોઈ સાઇટ પર ટેક્સ્ટ પસંદ કરો, ત્યારે Chrome વિવિધ ઍક્શન સાથેનું એક ફ્લોટિંગ મેનૂ બતાવી શકે છે.</translation>
 <translation id="8762886931014513155">તમારા <ph name="DEVICE_TYPE" />ને અપડેટની જરૂર છે</translation>
 <translation id="8763927697961133303">USB ઉપકરણ</translation>
 <translation id="8765940060470412555">વાંચન મોડ અનપિન કરો</translation>

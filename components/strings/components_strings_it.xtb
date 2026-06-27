@@ -3358,7 +3358,7 @@ Per nascondere le opzioni di pagamento posticipato, vai alle <ph name="BEGIN_LIN
 <translation id="6246316216123107851"><ph name="NUM_DAYS" /> giorni fa</translation>
 <translation id="6246382863801034910">Veicolo</translation>
 <translation id="6246868321321344665">La tua organizzazione può vedere i dati di navigazione, ad esempio le password e la cronologia, sia nel profilo di lavoro sia in quello personale</translation>
-<translation id="6248479108671123143"><ph name="MEMBER_FIRST_NAME" /> ha modificato questa scheda <ph name="TAB_TITLE" /></translation>
+<translation id="6248479108671123143"><ph name="MEMBER_FIRST_NAME" /> ha modificato questa scheda, <ph name="TAB_TITLE" /></translation>
 <translation id="6248988683584659830">Cerca nelle impostazioni</translation>
 <translation id="6250932670816326647">Prodotti per il corpo e per il bagno</translation>
 <translation id="6251906504834538140">{0,plural, =1{Spostamento del file bloccato}other{Spostamento di <ph name="FILE_COUNT" /> file bloccato}}</translation>
@@ -3716,7 +3716,7 @@ Per nascondere le opzioni di pagamento posticipato, vai alle <ph name="BEGIN_LIN
 <translation id="6798066466127540426">L'elenco non contiene un provider di ricerca valido.</translation>
 <translation id="6798460514924505775">Busta Chou 3</translation>
 <translation id="6799145206637008376">Inserisci il CVC della carta virtuale</translation>
-<translation id="6800773453940486492"><ph name="MEMBER_FIRST_NAME" /> ha aggiunto questa scheda <ph name="TAB_TITLE" /></translation>
+<translation id="6800773453940486492"><ph name="MEMBER_FIRST_NAME" /> ha aggiunto questa scheda, <ph name="TAB_TITLE" /></translation>
 <translation id="6801920212017470190">Tieni sotto controllo tutti i cali di prezzo ovunque ti trovi</translation>
 <translation id="6805030849054648206">Busta B6/C4</translation>
 <translation id="6807791860691150411">Istruzione</translation>

@@ -98,6 +98,7 @@ Some features may be unavailable and changes to preferences won't be saved.</tra
 <translation id="1838374766361614909">Clear search</translation>
 <translation id="1843347690926158494">Search this tab with Google Lens</translation>
 <translation id="1849248141818021764">Only someone with your passphrase can read your encrypted data. The passphrase is not sent to or stored by Google. If you forget your passphrase or want to change this setting, you'll need to <ph name="BEGIN_LINK" />delete the Chrome data in your account<ph name="END_LINK" />.</translation>
+<translation id="1856809424654973980">Use the Chrome app to keep browsing on the go</translation>
 <translation id="1860536484129686729">Chrome needs permission to access your camera for this site</translation>
 <translation id="1867503717113754604">Sign in to Chrome with your Google Account to use <ph name="START_GLIC_STYLING" />Gemini<ph name="END_GLIC_STYLING" /></translation>
 <translation id="1873233029667955273">Google Chrome isn't your default browser</translation>
@@ -107,8 +108,10 @@ Some features may be unavailable and changes to preferences won't be saved.</tra
 <translation id="1896602904211344018">Get the Chrome app</translation>
 <translation id="1919130412786645364">Allow Chrome sign-in</translation>
 <translation id="1953553007165777902">Downloading… <ph name="MINUTE" /> minute(s) remaining</translation>
+<translation id="1975400514743766362">Take the safety of Google on the go with the Chrome app on your <ph name="DEVICE_TYPE" /></translation>
 <translation id="1979600810166324878">Stay safer on the go with Enhanced Safe Browsing on Chrome for iOS</translation>
 <translation id="2001586581944147178">Make it harder for people with access to your Internet traffic to see which sites you visit. Chrome uses a secure connection to look up a site's IP address in the DNS (Domain Name System).</translation>
+<translation id="2005658457661191636">Use the Chrome app to take the best shopping tools on the go</translation>
 <translation id="2018528049276128029">Each profile holds its own Chrome info, like bookmarks, history, passwords and more</translation>
 <translation id="2018879682492276940">Installation failed. Please try again.</translation>
 <translation id="2024959665595762054">To use and save Chrome data in your Google Account, verify that it's you</translation>
@@ -240,6 +243,7 @@ If this page isn't working as expected, try allowing optimisation.</translation>
 <translation id="3222857603094643834">Search anything on this page with Google Lens</translation>
 <translation id="3226612997184048185">If you also save your bookmarks in your Google Account, you can track product prices in Chrome and get notified when the price drops</translation>
 <translation id="3242123554343253302">Add Chrome profile</translation>
+<translation id="3242486428260808857">Get more out of online shopping when you use the Chrome app on your <ph name="DEVICE_TYPE" /></translation>
 <translation id="3245429137663807393">If you also share Chrome usage reports, those reports include the URLs that you visit</translation>
 <translation id="3259748324892322072">Get the Chrome app</translation>
 <translation id="3282568296779691940">Sign in to Chrome</translation>
@@ -263,6 +267,7 @@ If this page isn't working as expected, try allowing optimisation.</translation>
 <translation id="3503306920980160878">Chrome needs access to your location to share your location with this site</translation>
 <translation id="3512495006767217696">Built into Chrome to help you create, save and autofill strong passwords. Add the shortcut for easy access</translation>
 <translation id="3539955434060988644">Open link in Chrome Inco&amp;gnito window</translation>
+<translation id="354621070532799440">Reminder: Google's best safety features in your pocket</translation>
 <translation id="3576528680708590453">Your system administrator has configured Google Chrome to open an alternative browser to access <ph name="TARGET_URL_HOSTNAME" />.</translation>
 <translation id="3582972582564653026">Sync and personalise Chrome across your devices</translation>
 <translation id="3583751698304738917">You're already signed in as <ph name="USER_EMAIL_ADDRESS" /> in another Chrome profile</translation>
@@ -301,6 +306,7 @@ If this page isn't working as expected, try allowing optimisation.</translation>
 <translation id="3885770153807205175">Language picker</translation>
 <translation id="3889417619312448367">Uninstall Google Chrome</translation>
 <translation id="3892148308691398805">Copy text</translation>
+<translation id="3893650521827656233">Get Google's best safety features on the go with Chrome.</translation>
 <translation id="3941890832296813527">Install error: The installer filename is invalid or unsupported.</translation>
 <translation id="395904275706073188">Protected pages can't be read. Try a different page.</translation>
 <translation id="3965532487635448963">Show Gemini in Chrome in system tray and turn on keyboard shortcut</translation>
@@ -333,6 +339,7 @@ If this page isn't working as expected, try allowing optimisation.</translation>
 <translation id="4242034826641750751">Chrome needs camera and microphone permissions for this site</translation>
 <translation id="424864128008805179">Sign out of Chrome?</translation>
 <translation id="4251615635259297716">Link my Chrome data to this account</translation>
+<translation id="4252262470181310206">Seamlessly work with your favourite apps like Google Drive and YouTube on the go with Chrome.</translation>
 <translation id="4266456958461406346">Open the more <ph name="THREE_DOTS_ICON" /> menu</translation>
 <translation id="4280647692742956593">Download Chrome on your phone to open or create new tab groups on the go.</translation>
 <translation id="4281844954008187215">Terms of Service</translation>
@@ -438,6 +445,7 @@ Some features may be unavailable. Please specify a different profile directory o
 <translation id="5386244825306882791">It also controls what page is shown when you start Chrome or search from the Omnibox.</translation>
 <translation id="5394833366792865639">Share a Chrome tab</translation>
 <translation id="5402307365844630024">Toggle Gemini in Chrome Beta</translation>
+<translation id="541844421954567481">Take your passwords, tabs and more on the go with the Chrome app on your <ph name="DEVICE_TYPE" /></translation>
 <translation id="5430073640787465221">Your preferences file is corrupt or invalid.
 
 Google Chrome is unable to recover your settings.</translation>
@@ -455,6 +463,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="5602351063754773347">Chrome recommends that you remove it. <ph name="BEGIN_LINK" />Learn more about supported extensions<ph name="END_LINK" /></translation>
 <translation id="5610759359710387751">Make Chrome yours</translation>
 <translation id="5649156266046089790">With Chrome profiles, you can separate all your Chrome stuff. Create profiles for friends and family, or split between work and fun.</translation>
+<translation id="5655063652337498476">Discover products with your camera, track price drops and more on the go with Chrome on iOS.</translation>
 <translation id="565744775970812598"><ph name="FILE_NAME" /> may be dangerous, so Chrome has blocked it.</translation>
 <translation id="566040795510471729">C&amp;ustomize your Chrome</translation>
 <translation id="566568153320186256">Chrome conserves battery power by limiting background activity and visual effects, such as smooth scrolling and video frame rates. <ph name="BEGIN_LINK" />Learn more about Energy Saver<ph name="END_LINK" /></translation>
@@ -466,6 +475,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="5709557627224531708">Set Chrome as your default browser</translation>
 <translation id="5719246646468301581">Google Chrome and ChromeOS additional terms of service</translation>
 <translation id="5736850870166430177">If a site tries to steal your password, or when you download a harmful file, Chrome may also send URLs, including bits of page content, to Safe Browsing</translation>
+<translation id="5742003800414899269">Use the Chrome app to take the best AI tools on the go</translation>
 <translation id="5756509061973259733">A Chrome profile with this account already exists on this device</translation>
 <translation id="5759947850379142561">Select any text or image to search with Google Lens or press Escape to exit Google Lens</translation>
 <translation id="5779427581965287859">Set Chrome as default and pin it to taskbar</translation>
@@ -505,6 +515,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="6113794647360055231">Chrome just got better</translation>
 <translation id="6116004140911290070">Enable skills in Chrome</translation>
 <translation id="6116252277240876590">This language is used to display menus, settings, alerts and other text in Chrome</translation>
+<translation id="6117557075995890082">Use the Chrome app to take the safety of Google on the go</translation>
 <translation id="6127237283587442951">Use Chrome by default and get it pinned</translation>
 <translation id="6134085236017727171">To use your microphone, give Chrome access in <ph name="BEGIN_LINK" />system settings<ph name="END_LINK" /></translation>
 <translation id="6135456723633883042">These tabs are using extra resources. To improve your performance, let Chrome make them inactive.</translation>
@@ -592,6 +603,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="6881299373831449287">Updating Chrome</translation>
 <translation id="6885412569789873916">Chrome Beta apps</translation>
 <translation id="6893363893008038481">Remove account from Chrome</translation>
+<translation id="689368324615299626">Get the best of Google with the Chrome app on your <ph name="DEVICE_TYPE" /></translation>
 <translation id="6896758677409633944">Copy</translation>
 <translation id="6908182077349113099">Keep your passwords, bookmarks and history perfectly synced across devices. Easily access the features that you know and love by updating your default browser to Chrome.</translation>
 <translation id="6930294499209825">Keeps your Google software up to date. If this service is disabled or stopped, your Google software will not be kept up to date, meaning security vulnerabilities that may arise cannot be fixed and features may not work. This service uninstalls itself when there is no Google software using it.</translation>
@@ -615,6 +627,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="7071827361006050863">Chrome will soon delete browsing data</translation>
 <translation id="7085332316435785646">Choose whether to include Chrome history for more personalised experiences in Google services</translation>
 <translation id="7088681679121566888">Chrome is up to date</translation>
+<translation id="708972073591616506">Take your favourite Google AI tools on the go with Chrome on iOS.</translation>
 <translation id="7096221564931416126">Select any text or image to search with Google Lens</translation>
 <translation id="7098166902387133879">Google Chrome is using your microphone.</translation>
 <translation id="7099479769133613710">Relaunch to update &amp;Chrome OS</translation>
@@ -649,6 +662,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="7481213027396403996">Get Chrome's strongest security</translation>
 <translation id="749228101751499733">While you're signed in, you can use your passwords and more from your Google Account in Chrome. <ph name="SHORTCUT" /> can change your Google services settings.</translation>
 <translation id="7496017508659652909">Chrome preloads pages which makes browsing and searching faster. <ph name="BEGIN_LINK" />Learn more about preload pages<ph name="END_LINK" /></translation>
+<translation id="7510190804000607802">Reminder: The best of Google in your pocket</translation>
 <translation id="7514258452813684157">Google updater service</translation>
 <translation id="7515191208480168435">You can pin Google Lens for easy access</translation>
 <translation id="7535429826459677826">Google Chrome Dev</translation>
@@ -716,6 +730,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="8010081455002666927">Auto-detect</translation>
 <translation id="8013993649590906847">If an image doesn’t have a useful description, Chrome will try to provide one for you. To create descriptions, images are sent to Google.</translation>
 <translation id="8019103195866286235">This extension was unpublished by its developer and might be unsafe. Remove it from Chrome so that it can no longer see and change your data on sites that you visit, including your personal info.</translation>
+<translation id="8038678618803403071">Access all of your Google favourites with Chrome on your <ph name="DEVICE_TYPE" /></translation>
 <translation id="8040768861829554732">An extension wants you to sign in to Chrome</translation>
 <translation id="8041795619940733262">Ask Google<ph name="LINE_BREAK" />about this tab</translation>
 <translation id="80471789339884597">Thanks for installing. You must restart all your browsers before using <ph name="BUNDLE_NAME" />.</translation>
@@ -805,6 +820,7 @@ New bookmarks can't be saved in your account until you delete some. If you sign 
 <translation id="8865415417596392024">Chrome data in your account</translation>
 <translation id="8883862939660515976">Ask Google Lens about this image</translation>
 <translation id="8914504000324227558">Relaunch Chrome</translation>
+<translation id="8920304659326707347">Pick up right where you left off with Chrome on iOS.</translation>
 <translation id="8922193594870374009">To send a number from <ph name="ORIGIN" /> to your Android phone, sign in to Chrome on both devices.</translation>
 <translation id="8922998289262614701">Remove this app's data from Chrome</translation>
 <translation id="8925636929359899517">We use info to improve this service. See <ph name="BEGIN_LINK1" />Privacy Policy<ph name="END_LINK1" /> and <ph name="BEGIN_LINK2" />Terms of Service<ph name="END_LINK2" />.</translation>
@@ -836,6 +852,7 @@ New bookmarks can't be saved in your account until you delete some. If you sign 
 <translation id="9134482777260927479">Homework help</translation>
 <translation id="9138603949443464873">To apply your changes, relaunch Chrome</translation>
 <translation id="9148058034647219655">Exit</translation>
+<translation id="9150331942025550505">Get the power of AI when you use the Chrome app on your <ph name="DEVICE_TYPE" /></translation>
 <translation id="919706545465235479">Update Chrome to start sync</translation>
 <translation id="922152298093051471">Customise Chrome</translation>
 <translation id="93760716455950538">Restart Chrome OS Flex</translation>

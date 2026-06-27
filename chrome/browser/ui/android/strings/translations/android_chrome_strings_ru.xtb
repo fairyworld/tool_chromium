@@ -327,6 +327,7 @@
 <translation id="2411239243988279592">Выбранная вкладка "<ph name="TAB_TITLE" />" с включенным звуком</translation>
 <translation id="2413014528833954543">Не удалось проверить пароли на этом устройстве</translation>
 <translation id="2414886740292270097">Тёмная</translation>
+<translation id="2415037988255164008">Восстановить окна?</translation>
 <translation id="2421705177906985956">Пока сайтов нет.</translation>
 <translation id="2426805022920575512">Сменить аккаунт</translation>
 <translation id="2427025860753516072">{FILE_COUNT,plural, =1{Видео, 1 видео в списке}one{Видео, # видео в списке}few{Видео, # видео в списке}many{Видео, # видео в списке}other{Видео, # видео в списке}}</translation>
@@ -1338,6 +1339,7 @@
 <translation id="6556501700899673703">Lexend</translation>
 <translation id="6560414384669816528">Поиск в Sogou</translation>
 <translation id="656065428026159829">Ещё</translation>
+<translation id="6565781844089373403">Восстановить окна</translation>
 <translation id="6565959834589222080">Использовать сеть Wi-Fi, когда она доступна</translation>
 <translation id="657177046675873214">Чтобы закладки были доступны на всех устройствах, которые у вас есть, включите параметр "Закладки" в настройках.</translation>
 <translation id="6573096386450695060">Разрешать всегда</translation>
@@ -2039,7 +2041,6 @@
 <translation id="939598580284253335">Ввести кодовую фразу</translation>
 <translation id="94161319503679839">Закрепленная вкладка инкогнито "<ph name="TAB_TITLE" />" в режиме "Картинка в картинке"</translation>
 <translation id="945522503751344254">Отправить отзыв</translation>
-<translation id="949667118776341807">Повернуть</translation>
 <translation id="95817756606698420">В Китае Chrome может использовать для поиска <ph name="BEGIN_BOLD" />Sogou<ph name="END_BOLD" />. Это можно изменить в <ph name="BEGIN_LINK" />Настройках<ph name="END_LINK" />.</translation>
 <translation id="961856697154696964">Удалить данные о работе в браузере</translation>
 <translation id="963246339335003378">Открыть диспетчер задач</translation>

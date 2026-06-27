@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{1 jelszó importálva a(z) <ph name="BRAND" /> szolgáltatásba ezen az eszközön}other{{NUM_PASSWORDS} jelszó importálva a(z) <ph name="BRAND" /> szolgáltatásba ezen az eszközön}}</translation>
 <translation id="1046572983040892965">Ablak felfelé és balra mozgatva</translation>
 <translation id="1047431265488717055">Link szövegének má&amp;solása</translation>
+<translation id="1048350929895890054">Webhelyek, ahol a lebegő menü le van tiltva</translation>
 <translation id="1048986595386481879">Dinamikusan kiosztva</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{<ph name="ATTACHMENTS" /> fogadása innen: <ph name="DEVICE_NAME" />}other{<ph name="ATTACHMENTS" /> fogadása innen: <ph name="DEVICE_NAME" />}}</translation>
 <translation id="1049743911850919806">Inkognitó mód</translation>
@@ -937,6 +938,7 @@ Jelszavait bármikor ellenőrizheti itt: <ph name="GOOGLE_PASSWORD_MANAGER" />.<
 <translation id="1695510246756136088">Nem lehet csatlakozni az internethez. Próbálja újra.</translation>
 <translation id="1696555181932908973">Más módon is próbálkozhat a(z) <ph name="SITE_ETLD_PLUS_ONE" /> webhelyen való folytatással.</translation>
 <translation id="1696685050160038195">Az eszköz biztonságának megőrzése érdekében kizárólag megbízható forrásokból és fejlesztőktől származó szoftvereket futtasson és telepítsen.</translation>
+<translation id="1696832149095851409">lebegő menü a kijelölt szövegen</translation>
 <translation id="1697122132646041614">A „Nem tetszik” értékelésre kattintva megnyit egy űrlapot, amelyen részletes visszajelzést adhat arról, hogy miért nem tetszenek Önnek ezek a találatok.</translation>
 <translation id="1697532407822776718">Máris elkészült!</translation>
 <translation id="1698796500103229697">&amp;Fizetési módok</translation>
@@ -2510,6 +2512,7 @@ Ha kezelni szeretné a fiók beállításait, telepítse eszközére a Family Li
 <translation id="2845276301195220700">További műveletek a Google Naptárhoz</translation>
 <translation id="2845382757467349449">A könyvjelzők eszköztára mindig látható</translation>
 <translation id="284581348330507117">Hozzon létre egyedi jelszavakat</translation>
+<translation id="2846345106886298325">Feladat elvégezve és visszaküldve a Gemini Spark szolgáltatásba</translation>
 <translation id="284884486564166077">Bármilyen kép keresése a Lens segítségével</translation>
 <translation id="2849035674501872372">Nézzen fel</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3013,6 +3016,7 @@ Ha kezelni szeretné a fiók beállításait, telepítse eszközére a Family Li
 <translation id="3223109931751684474">Az azonosítókulcsaihoz való hozzáférés eltávolítása ezen az eszközön</translation>
 <translation id="3223531857777746191">Visszaállítás gomb</translation>
 <translation id="3225084153129302039">Alapértelmezett lila avatar</translation>
+<translation id="3226249862705569834">Használatban lévő érzékelők</translation>
 <translation id="3226487301970807183">Kapcsoló balra igazított oldalsó panelje</translation>
 <translation id="322708765617468434">A beállítás után bármikor hozzáadhat új személyt az eszközhöz. Bárki személyre szabhatja a saját élményét, és gondoskodhat adatainak biztonságáról.</translation>
 <translation id="3227137524299004712">Mikrofon</translation>
@@ -5231,7 +5235,6 @@ kicsinyítéshez pedig a Ctrl + Alt + Fényerő csökkentése billentyűpara
 <translation id="486505726797718946">Megtakarított memória</translation>
 <translation id="486635084936119914">Bizonyos fájltípusok automatikus megnyitása letöltés után</translation>
 <translation id="4867272607148176509">A szülők jóváhagyhatják vagy letilthatják az alkalmazásokat, időkorlátot állíthatnak be, és ellenőrizhetik a webböngészést. Iskolai fiók később is hozzáadható, hogy hozzá lehessen férni a legtöbb iskolai erőforráshoz.</translation>
-<translation id="486796517585164369">· Legutóbbi lap</translation>
 <translation id="4868284252360267853">Ez a párbeszédpanel jelenleg nincs fókuszban. Nyomja le a Command + Shift + Option billentyűparancsot, ha erre a párbeszédpanelre szeretne fókuszálni.</translation>
 <translation id="4869170227080975044">A ChromeOS hálózati adatainak olvasása</translation>
 <translation id="4870724079713069532">Ezzel az alkalmazással támogatott fájlokat nyithat meg és szerkeszthet a fájlkezelőben és más alkalmazásokban. Ha szabályozni szeretné, hogy mely fájlok nyíljanak meg alapértelmezés szerint ebben az alkalmazásban, lépjen a <ph name="BEGIN_LINK" />Windows-beállítások<ph name="END_LINK" /> oldalra.</translation>
@@ -6125,6 +6128,7 @@ Több kapcsolót is hozzárendelhet ehhez a művelethez.</translation>
 <translation id="5546865291508181392">Keresés</translation>
 <translation id="5547868626772433490">Utasítsa a Geminit</translation>
 <translation id="5548075230008247516">Az összes elem kijelölése megszüntetve; kilépett a kijelölési módból.</translation>
+<translation id="554810465530189549">Ne jelenjen meg a lebegő menü szöveg kijelölésekor</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{„<ph name="TAB_TITLE" />”}=1{„<ph name="TAB_TITLE" />” és 1 másik lap}other{„<ph name="TAB_TITLE" />” és # másik lap}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">Válassza ki a kívánt beállítást</translation>
@@ -6291,6 +6295,7 @@ Győződjön meg arról, hogy nem ad ki bizalmas adatokat.</translation>
 <translation id="5678955352098267522">Adatok beolvasása a következő webhelyen: <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">Eltávolítja a következőt: <ph name="ESIM_PROFILE_NAME" />?</translation>
 <translation id="5681586175480958839">Folyamatban van a fájl megnyitása</translation>
+<translation id="5682950763196110705">A lebegő menü megjelenítése szöveg kijelölésekor</translation>
 <translation id="5684110242705861346">A(z) „<ph name="NAME" />” bővítményt a szervezete házirendje adta hozzá, és ez a bővítmény szabályozza ezt a beállítást. <ph name="BEGIN_LINK" />Részletek megtekintése<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Wi-Fi-hálózat részletei</translation>
 <translation id="5684661240348539843">Tartalomazonosító</translation>
@@ -10064,6 +10069,7 @@ A kulcsfájlt tartsa biztonságos helyen. Szüksége lesz rá ahhoz, hogy új ve
 <translation id="8505669004895429027">Kis megtakarítás</translation>
 <translation id="8507052544157927817">Aláhúzás stílusa</translation>
 <translation id="8507227974644337342">Képernyőfelbontás</translation>
+<translation id="8507443886219296894">Elrejtés ennél a webhelynél</translation>
 <translation id="850763987657366362">Nem sikerült a tanúsítvány importálása</translation>
 <translation id="8508532351844333131">A(z) <ph name="WEBSITE_ORIGIN" /> információkat szeretne menteni az Ön Android-eszközére</translation>
 <translation id="8509177919508253835">Biztonsági hardverkulcsok visszaállítása és PIN-kódok létrehozása</translation>
@@ -10124,6 +10130,7 @@ A kulcsfájlt tartsa biztonságos helyen. Szüksége lesz rá ahhoz, hogy új ve
 <translation id="8552102814346875916">Mentés az „Ezek a webhelyek mindig legyenek aktívak” listára</translation>
 <translation id="8552947739661397736">Feladat átvétele, jelenleg a Gemini irányít</translation>
 <translation id="8553342806078037065">Más személyek kezelése</translation>
+<translation id="8554642222921881444">Lebegő menü a kijelölt szövegen</translation>
 <translation id="8554899698005018844">Nincs nyelv</translation>
 <translation id="8555444629041783356">Automatikus naplemente-ütemezés</translation>
 <translation id="8557022314818157177">Érintse meg többször a biztonsági kulcsot, amíg meg nem történik az ujjlenyomat rögzítése.</translation>
@@ -10420,6 +10427,7 @@ A kulcsfájlt tartsa biztonságos helyen. Szüksége lesz rá ahhoz, hogy új ve
 <translation id="8759753423332885148">További információ.</translation>
 <translation id="876161309768861172">Sikertelen bejelentkezés. Próbálja újra.</translation>
 <translation id="8761945298804995673">Már van ilyen felhasználó</translation>
+<translation id="876287961468788565">Amikor szöveget jelöl ki egy webhelyen, a Chrome lebegő menüt jeleníthet meg, rajta műveletekkel.</translation>
 <translation id="8762886931014513155"><ph name="DEVICE_TYPE" /> eszközét frissíteni kell</translation>
 <translation id="8763927697961133303">USB-eszköz</translation>
 <translation id="8765940060470412555">Olvasási mód rögzítésének megszüntetése</translation>

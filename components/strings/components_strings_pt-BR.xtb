@@ -26,6 +26,7 @@
 <translation id="1038106730571050514">Exibir sugestões</translation>
 <translation id="1038168778161626396">Somente codificar</translation>
 <translation id="1038842779957582377">nome desconhecido</translation>
+<translation id="1039767473048604223"><ph name="DEVICE_NAME" /> <ph name="MODEL" /></translation>
 <translation id="1041998700806130099">Mensagem de página de tarefa</translation>
 <translation id="1044897699341250361">O que isso significa</translation>
 <translation id="1046350918013988591">Cupons e ofertas de desconto</translation>
@@ -314,6 +315,7 @@ Se não fizer isso, a permissão será bloqueada pelas configurações de privac
 <translation id="1463793142714244641">Propriedades de férias</translation>
 <translation id="1465457928007067810">IBAN salvo na sua Conta do Google</translation>
 <translation id="1467432559032391204">À esquerda</translation>
+<translation id="1471514598850585811">Laptop</translation>
 <translation id="1472675084647422956">Mostrar mais</translation>
 <translation id="1473183651233018052">JIS B10</translation>
 <translation id="1473495410389165587">Digite três palavras ou mais para receber ajuda com a escrita</translation>
@@ -1451,6 +1453,7 @@ Se quiser ocultar as opções para pagar depois, acesse as <ph name="BEGIN_LINK"
 <translation id="3237427677128462778">Não foi possível salvar na Carteira do Google</translation>
 <translation id="3238395604961564389">Abrir link em uma janela anônima</translation>
 <translation id="3240683217920639535"><ph name="MANAGE_CHROME_THEMES_FOCUSED_FRIENDLY_MATCH_TEXT" />. Pressione Tab e depois Enter para personalizar a aparência do navegador</translation>
+<translation id="3243131902823383230">Laptop <ph name="MANUFACTURER" /></translation>
 <translation id="3243650379537999343">Desenhar</translation>
 <translation id="3248329428895535435">Não mostrar neste site</translation>
 <translation id="3249102948665905108">O upload do arquivo para <ph name="CLOUD_PROVIDER" /> foi concluído com erros</translation>
@@ -2289,6 +2292,7 @@ Se quiser ocultar as opções para pagar depois, acesse as <ph name="BEGIN_LINK"
 <translation id="4557573143631562971">Seguro residencial</translation>
 <translation id="4558551763791394412">Tente desativar suas extensões.</translation>
 <translation id="4566017918361049074">Ao ar livre</translation>
+<translation id="4568572491321119037">Atualizar documento de identidade na Carteira do Google</translation>
 <translation id="4569155249847375786">Tudo certo</translation>
 <translation id="4570008401337135432">Alinhamento do texto</translation>
 <translation id="457875822857220463">Entrega</translation>
@@ -2763,6 +2767,7 @@ Se quiser ocultar as opções para pagar depois, acesse as <ph name="BEGIN_LINK"
 <translation id="5323501626199324454">Gerencie na sua Conta do Google</translation>
 <translation id="5327248766486351172">Nome</translation>
 <translation id="5329858041417644019">Seu navegador não é gerenciado</translation>
+<translation id="5330451136755214328">Computador <ph name="MANUFACTURER" /></translation>
 <translation id="5331585574693522196">Definir como padrão</translation>
 <translation id="5332219387342487447">Forma de envio</translation>
 <translation id="5332769172018416402">Pedir por mensagem</translation>
@@ -2801,6 +2806,7 @@ Se quiser ocultar as opções para pagar depois, acesse as <ph name="BEGIN_LINK"
 <translation id="5385857628869214740">Humor</translation>
 <translation id="5386426401304769735">A cadeia de certificados desse site contém um certificado assinado usando SHA-1.</translation>
 <translation id="5391010642126249196">Você visitou em</translation>
+<translation id="5391030615542642809">Dispositivo <ph name="MANUFACTURER" /></translation>
 <translation id="5391306025131596142">&amp;Abrir página de histórico</translation>
 <translation id="539203134595252721">Tênis de mesa</translation>
 <translation id="5392506727170022660">Metal (semibrilho)</translation>
@@ -3059,6 +3065,7 @@ Se quiser ocultar as opções para pagar depois, acesse as <ph name="BEGIN_LINK"
 <translation id="5765072501007116331">Para acessar métodos e requisitos de entrega, selecione um endereço</translation>
 <translation id="57689295674415555">O número do cartão virtual não foi preenchido?</translation>
 <translation id="5773286975255318081">Como nomes de usuário de perfil e versões do navegador</translation>
+<translation id="5774897849666641211">Faça perguntas sobre esta guia</translation>
 <translation id="5776313857861697733">Prioridade</translation>
 <translation id="577804500166306874">Carregando resultado</translation>
 <translation id="5781136890105823427">Experimento ativado</translation>
@@ -4118,6 +4125,7 @@ Mais detalhes:
 <translation id="7418620734632363981">Programação</translation>
 <translation id="7419091773564635591">Computadores e aparelhos eletrônicos</translation>
 <translation id="7419106976560586862">Caminho de perfil</translation>
+<translation id="742088698616475957">Desktop <ph name="MANUFACTURER" /></translation>
 <translation id="7421067045979951561">gerenciadores de protocolo</translation>
 <translation id="7422347648202898039">Rótulos (segurança)</translation>
 <translation id="7423283032694727565">Botão "Gerenciar cookies". Ative para gerenciar suas preferências de cookies nas configurações do Chrome</translation>
@@ -4235,6 +4243,7 @@ Mais detalhes:
 <translation id="7575207903026901870">Botão "Remover sugestão", pressione Enter para remover essa sugestão</translation>
 <translation id="7575800019233204241">"Sua conexão não é particular", "&lt;span class="error-code"&gt;NET::ERR_CERT_AUTHORITY_INVALID&lt;/span&gt;", "&lt;span class="error-code"&gt;ERR_CERT_COMMON_NAME_INVALID&lt;/span&gt;", "&lt;span class="error-code"&gt;NET::ERR_CERT_WEAK_SIGNATURE_ALGORITHM&lt;/span&gt;" ou "Erro de certificado SSL"</translation>
 <translation id="7575887283389198269">Smartphones</translation>
+<translation id="7579113844074980463">Tablet <ph name="MANUFACTURER" /></translation>
 <translation id="7579442726219254162">Variável "<ph name="VARIABLE" />" desconhecida na configuração gerenciada de "<ph name="APPLICATION_ID" />".</translation>
 <translation id="7581199239021537589">Mudança Y no lado 2 da imagem</translation>
 <translation id="7582602800368606489">Criar rapidamente um novo evento no Google Agenda</translation>
@@ -5155,6 +5164,7 @@ Mais detalhes:
 <translation id="90695670378604968">Plástico (fosco)</translation>
 <translation id="9069693763241529744">Bloqueada por uma extensão</translation>
 <translation id="9073799351042754113">Você escolheu desativar os avisos de segurança deste site.</translation>
+<translation id="907426083053157749">Celular <ph name="MANUFACTURER" /></translation>
 <translation id="9075717835386447447">Marrom-claro 1</translation>
 <translation id="9078170656887151974">Para o recurso dar sugestões e ser aprimorado, o URL e o conteúdo da página são compartilhados com o Google. Fique à vontade para mudar de ideia e <ph name="LEARN_MORE" />.</translation>
 <translation id="9078912659001679888">Liquidificadores e centrífugas</translation>

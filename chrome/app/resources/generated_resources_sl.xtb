@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{1 geslo je bilo uvoženo v storitev <ph name="BRAND" /> v tej napravi.}one{{NUM_PASSWORDS} geslo je bilo uvoženo v storitev <ph name="BRAND" /> v tej napravi.}two{{NUM_PASSWORDS} gesli sta bili uvoženi v storitev <ph name="BRAND" /> v tej napravi.}few{{NUM_PASSWORDS} gesla so bila uvožena v storitev <ph name="BRAND" /> v tej napravi.}other{{NUM_PASSWORDS} gesel je bilo uvoženih v storitev <ph name="BRAND" /> v tej napravi.}}</translation>
 <translation id="1046572983040892965">Okno je premaknjeno navzgor in levo</translation>
 <translation id="1047431265488717055">&amp;Kopiraj besedilo povezave</translation>
+<translation id="1048350929895890054">Spletna mesta, kjer je plavajoči meni blokiran</translation>
 <translation id="1048986595386481879">Dinamično dodeljeno</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{Prejemanje prilog (<ph name="ATTACHMENTS" />) iz naprave <ph name="DEVICE_NAME" />}one{Prejemanje prilog (<ph name="ATTACHMENTS" />) iz naprave <ph name="DEVICE_NAME" />}two{Prejemanje prilog (<ph name="ATTACHMENTS" />) iz naprave <ph name="DEVICE_NAME" />}few{Prejemanje prilog (<ph name="ATTACHMENTS" />) iz naprave <ph name="DEVICE_NAME" />}other{Prejemanje prilog (<ph name="ATTACHMENTS" />) iz naprave <ph name="DEVICE_NAME" />}}</translation>
 <translation id="1049743911850919806">Anonimni način</translation>
@@ -937,6 +938,7 @@ Svoja gesla lahko kadar koli preverite v storitvi <ph name="GOOGLE_PASSWORD_MANA
 <translation id="1695510246756136088">Internetne povezave ni mogoče vzpostaviti. Poskusite znova.</translation>
 <translation id="1696555181932908973">Na <ph name="SITE_ETLD_PLUS_ONE" /> lahko poskusite nadaljevati na druge načine.</translation>
 <translation id="1696685050160038195">Če želite poskrbeti za varnost naprave, uporabljajte in nameščajte samo programsko opremo iz zaupanja vrednih virov in zaupanja vrednih razvijalcev.</translation>
+<translation id="1696832149095851409">plavajoči meni ob izbranem besedilu</translation>
 <translation id="1697122132646041614">S palcem dol odprete obrazec za pošiljanje podrobnih povratnih informacij glede tega, zakaj vam ti rezultati niso všeč.</translation>
 <translation id="1697532407822776718">Pripravljeni ste.</translation>
 <translation id="1698796500103229697">&amp;Plačilna sredstva</translation>
@@ -2511,6 +2513,7 @@ Nastavitve tega računa je mogoče upravljati z namestitvijo aplikacije Family L
 <translation id="2845276301195220700">Več dejanj za Google Koledar</translation>
 <translation id="2845382757467349449">Vedno pokaži vrstico z zaznamki</translation>
 <translation id="284581348330507117">Ustvarite edinstvena gesla.</translation>
+<translation id="2846345106886298325">Opravilo je končano in vrnjeno Geminiju Spark</translation>
 <translation id="284884486564166077">Iskanje po kateri koli sliki z Googlom Lens</translation>
 <translation id="2849035674501872372">Iskanje</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3014,6 +3017,7 @@ Nastavitve tega računa je mogoče upravljati z namestitvijo aplikacije Family L
 <translation id="3223109931751684474">Odstranite dostop do ključev za dostop v tej napravi</translation>
 <translation id="3223531857777746191">Gumb za ponastavitev</translation>
 <translation id="3225084153129302039">Privzeti vijoličasti avatar</translation>
+<translation id="3226249862705569834">Tipala v uporabi</translation>
 <translation id="3226487301970807183">Preklop levo poravnanega stranskega podokna</translation>
 <translation id="322708765617468434">Po nastavitvi lahko v napravo kadar koli dodate drugo osebo. Vsak si lahko individualno prilagodi izkušnjo in poskrbi za zasebnost podatkov.</translation>
 <translation id="3227137524299004712">Mikrofon</translation>
@@ -5233,7 +5237,6 @@ Za pomanjšavo pritisnite Ctrl + Alt + tipko za zmanjšanje svetlosti.</translat
 <translation id="486505726797718946">Prihranjeno pomnilnika</translation>
 <translation id="486635084936119914">Samodejno odpiranje nekaterih vrst datotek po prenosu</translation>
 <translation id="4867272607148176509">Starši lahko odobrijo ali blokirajo aplikacije, nastavijo časovne omejitve in upravljajo brskanje po spletu. Če želite dostopati do večine šolskih virov, lahko pozneje dodate šolski račun.</translation>
-<translation id="486796517585164369">· Zavihek »Nedavno«</translation>
 <translation id="4868284252360267853">To pogovorno okno trenutno ni izbrano. Pritisnite Command + Shift + Option A, če ga želite izbrati.</translation>
 <translation id="4869170227080975044">Branje omrežnih podatkov za ChromeOS.</translation>
 <translation id="4870724079713069532">Podprte datoteke lahko s to aplikacijo odpirate in urejate v raziskovalcu datotek ali drugih aplikacijah. Če želite upravljati, katere datoteke se v tej aplikaciji privzeto odprejo, odprite <ph name="BEGIN_LINK" />nastavitve sistema Windows<ph name="END_LINK" />.</translation>
@@ -6127,6 +6130,7 @@ Temu dejanju lahko dodelite več stikal.</translation>
 <translation id="5546865291508181392">Iskanje</translation>
 <translation id="5547868626772433490">Vprašajte Geminija</translation>
 <translation id="5548075230008247516">Preklican je izbor vseh elementov in zaprt je način izbire.</translation>
+<translation id="554810465530189549">Ne prikaži plavajočega menija ob izbiri besedila</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{»<ph name="TAB_TITLE" />«}=1{»<ph name="TAB_TITLE" />« in še 1 zavihek}one{»<ph name="TAB_TITLE" />« in še # zavihek}two{»<ph name="TAB_TITLE" />« in še # zavihka}few{»<ph name="TAB_TITLE" />« in še # zavihki}other{»<ph name="TAB_TITLE" />« in še # zavihkov}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">Izberite nastavitev</translation>
@@ -6293,6 +6297,7 @@ Poskrbite, da ne boste razkrili morebitnih občutljivih podatkov.</translation>
 <translation id="5678955352098267522">Branje vaših podatkov na spletnem mestu <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">Želite odstraniti »<ph name="ESIM_PROFILE_NAME" />«?</translation>
 <translation id="5681586175480958839">Datoteka se že odpira</translation>
+<translation id="5682950763196110705">Prikaži plavajoči meni ob izbiri besedila</translation>
 <translation id="5684110242705861346">Razširitev »<ph name="NAME" />« je dodal pravilnik vaše organizacije in nadzira to nastavitev. <ph name="BEGIN_LINK" />Ogled podrobnosti<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Podrobnosti omrežja Wi-Fi</translation>
 <translation id="5684661240348539843">ID sredstva</translation>
@@ -10073,6 +10078,7 @@ Datoteko s ključem shranite na varnem. Potrebovali jo boste za izdelavo novih r
 <translation id="8505669004895429027">Majhni prihranki</translation>
 <translation id="8507052544157927817">Slog podčrtavanja</translation>
 <translation id="8507227974644337342">Ločljivost zaslona</translation>
+<translation id="8507443886219296894">Skrij za to spletno mesto</translation>
 <translation id="850763987657366362">Potrdila ni mogoče uvoziti</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> želi shraniti podatke v vaši mobilni napravi Android</translation>
 <translation id="8509177919508253835">Ponastavitev varnostnih ključev in ustvarjanje kod PIN</translation>
@@ -10133,6 +10139,7 @@ Datoteko s ključem shranite na varnem. Potrebovali jo boste za izdelavo novih r
 <translation id="8552102814346875916">Shrani na seznam »Ta spletna mesta naj bodo vedno aktivna«</translation>
 <translation id="8552947739661397736">Prevzem opravila, Gemini je prevzel nadzor</translation>
 <translation id="8553342806078037065">Upravljanje drugih oseb</translation>
+<translation id="8554642222921881444">Plavajoči meni ob izbranem besedilu</translation>
 <translation id="8554899698005018844">Brez jezika</translation>
 <translation id="8555444629041783356">Samodejni razpored sončnega zahoda</translation>
 <translation id="8557022314818157177">Varnostnega ključa se dotikajte, dokler ne bo prstni odtis zabeležen</translation>
@@ -10429,6 +10436,7 @@ Datoteko s ključem shranite na varnem. Potrebovali jo boste za izdelavo novih r
 <translation id="8759753423332885148">Več o tem</translation>
 <translation id="876161309768861172">Prijava ni bila mogoča. Poskusite znova.</translation>
 <translation id="8761945298804995673">Ta uporabnik že obstaja</translation>
+<translation id="876287961468788565">Chrome lahko pri izbiri besedila na spletnem mestu prikaže plavajoči meni z dejanji.</translation>
 <translation id="8762886931014513155">Naprava <ph name="DEVICE_TYPE" /> potrebuje posodobitev</translation>
 <translation id="8763927697961133303">Naprava USB</translation>
 <translation id="8765940060470412555">Odpni način za branje</translation>

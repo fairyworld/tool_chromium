@@ -30,6 +30,7 @@
 <translation id="126567311906253476">Gmail yoki YouTube kabi Google xizmatlariga <ph name="USER_EMAIL" /> hisobidan avtomatik kirganda Chromeʼga ham shu hisobdan kirishingiz mumkin</translation>
 <translation id="1287534462498555020">Telefoningizda Chromium oʻrnating</translation>
 <translation id="1290883685122687410">Sozlash xatosi: <ph name="METAINSTALLER_EXIT_CODE" />. <ph name="WINDOWS_ERROR" /></translation>
+<translation id="1312200348844120300">Rasm orqali qidiruv yordamida mahsulotlarni topish tartibi aks etgan tasvir</translation>
 <translation id="1315551408014407711">Yangi Chromium profilini sozlang</translation>
 <translation id="132092532143527429">Chromium ichida Gemini bilan sinang</translation>
 <translation id="1324107359134968521">Qurilmalarni topish uchun Chromium Bluetooth aloqadan foydalanishiga ruxsat bering. <ph name="IDS_SERIAL_DEVICE_CHOOSER_AUTHORIZE_BLUETOOTH_LINK" /></translation>
@@ -91,6 +92,7 @@
 <translation id="1951406923938785464">Chromium bu yuklamani blokladi, chunki bunday turdagi fayl odatda yuklab olinmaydi va xavfli boʻlishi mumkin</translation>
 <translation id="1953553007165777902">Yuklab olinmoqda... <ph name="MINUTE" /> daqiqa qoldi</translation>
 <translation id="1966382378801805537">Chromium asosiy brauzerni aniqlay olmadi yoki tayinlay olmadi.</translation>
+<translation id="197326043290947695">Rasm orqali qidiruv bilan internetni yanada oqilona kezing</translation>
 <translation id="1990262977744080398">Chromium ayrim fayllarni nega bloklashi haqida batafsil. Yangi varaqda ochiladi</translation>
 <translation id="1999715455684970349">Chromium dasturini yangilab turadi. Bu xizmat faolsizlantirilsa yoki toʻxtatilsa, Chromium dasturi yangilanmasligi, tuzatilmas zaifliklarni keltirib chiqarishi va ayrim funksiyalar ishlamay qolishi mumkin. Xizmat ishlatadigan Chromium dasturi mavjud boʻlmasa, xizmat avtomatik oʻchirib tashlanadi.</translation>
 <translation id="2008474315282236005">Bu qurilmadagi 1 elementni tozalaydi. Ma’lumotlaringizni keyinroq olish uchun Chromium brauzeriga <ph name="USER_EMAIL" /> sifatida kiring.</translation>
@@ -231,6 +233,7 @@
 <translation id="3387527074123400161">ChromiumOS</translation>
 <translation id="3406848076815591792">Mavjud Chromium profiliga almashilsinmi?</translation>
 <translation id="3412460710772753638">Bu qurilmada Parollar menejeriga</translation>
+<translation id="3423442168617177595">Kuchli parollarni yaratish, saqlash va avtomatik kiritishda yordam berish uchun Chromeda oldindan oʻrnatilgan. Tezkor ruxsat olish uchun yorliq qoʻshing</translation>
 <translation id="3455907671758333080">Telefonda Chromium orqali Saytlarni kuchaytirilgan rejimda xavfsiz kezish imkoniyatini kengaytiring</translation>
 <translation id="3461644266919055473">Chromiumni moslab oling...</translation>
 <translation id="3474745554856756813">Ushbu qurilmadagi <ph name="ITEMS_COUNT" /> ta element butunlay o‘chiriladi. Ma’lumotlaringizni keyinroq olish uchun Chromium brauzeriga <ph name="USER_EMAIL" /> sifatida kiring.</translation>
@@ -280,6 +283,7 @@
 <translation id="3975724895399328945">Google Chrome for Testing haqida</translation>
 <translation id="3997429360543082038">ChromiumOS haqida</translation>
 <translation id="4010059961270896984">Sayt ochilganda Chromium himoyalangan URL parchasini IP manzilni yashiruvchi maxfiy server orqali <ph name="BEGIN_LINK" />Google Saytlarni xavfsiz kezish<ph name="END_LINK" /> tizimiga yuboradi. Saytda shubhali harakatlar aniqlansa, toʻliq URL manzillar va sahifa kontentidan parcha ham yuboriladi.</translation>
+<translation id="4016217212818346953">Parollar menejeri bilan xavfsizligingizni taʼminlang</translation>
 <translation id="4019629340646866719">ChromiumOS tizimini ishlab chiqishda <ph name="BEGIN_LINK_LINUX_OSS" />Linux dasturlash muhiti<ph name="END_LINK_LINUX_OSS" /> <ph name="BEGIN_LINK_CROS_OSS" />ochiq kodli DT<ph name="END_LINK_CROS_OSS" /> vositalaridan foydalanilgan.</translation>
 <translation id="4022972681110646219">Ekrandagi matnni tarjima qilish</translation>
 <translation id="4023601594785368013">Asl tili: <ph name="LANGUAGE" /></translation>
@@ -499,6 +503,7 @@ Bu sahifa kutilganidek ishlamasa, optimallashga ruxsat bering.</translation>
 <translation id="6400112897226594999">Kompyuter ekranida Chromium logotipi aks etgan tasvir</translation>
 <translation id="6403826409255603130">Chromium - veb sahifalarni va ilovalarni bir necha soniyada ochadigan brauzer. U tez, barqaror va undan foydalanish oson. Chromium brauzerining firibgarlik va zararli dasturlardan saqlovchi ichki o‘rnatilgan himoya vositasi Internetdagi faoliyatni maksimal havfsizlik bilan ta’minlaydi.</translation>
 <translation id="6414624068245092115">Chromium maʼlumotlarini Google hisobida saqlash va ulardan foydalanish uchun shaxsingizni tasdiqlang</translation>
+<translation id="6417332166651156371">Chromiumda Parollar menejeriga kirish qismi aks ettirilgan sodda tasvir</translation>
 <translation id="642132557830635295">Chromium tezroq ishlaydi va JavaScript ishlatadigan funksiyalar bexato ishlaydi (tavsiya etiladi)</translation>
 <translation id="6436260184216827876">Rasm orqali qidiruv ishlamayapti. Keyinroq qayta urining.</translation>
 <translation id="6442900851116057561">ChromiumOS tizimini ishga tushirish</translation>
@@ -590,6 +595,7 @@ Ayrim bukmarklar hisobingizdan oʻchirilmaguncha yangilari saqlanmaydi. Hozir hi
 <translation id="7196312274710523067">Chromium ishga tushmadi. Qayta urining.</translation>
 <translation id="7213008767289637091">Istalganda tez ochish uchun Chromiumni Dokda qoldiring</translation>
 <translation id="7213407614656404070">Xabarlar, hujjatlar va boshqa ilovalardagi havolalarni har doim Chromium orqali ochish</translation>
+<translation id="7216228761061470870">Kompyuterda Rasm orqali qidiruv ishlatilganda sahifa sarlavhasi, URL manzili va kontent (jumladan, PDF fayllar) serverga yuboriladi.</translation>
 <translation id="7223968959479464213">Vazifalar menejeri – Chromium</translation>
 <translation id="7252276985725323153">Darhol kezishni boshlang: Chromium endi Windows ishga tushirilganda ochiladi.</translation>
 <translation id="7274695763216404502">Mahkamlandi! Endi uni asboblar panelidan ochish mumkin</translation>

@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{اس آلے پر <ph name="BRAND" /> میں 1 پاس ورڈ در آمد کیا گیا}other{اس آلے پر <ph name="BRAND" /> میں {NUM_PASSWORDS} پاس ورڈز در آمد کیے گئے}}</translation>
 <translation id="1046572983040892965">ونڈو اوپر اور بائیں طرف چلی گئی</translation>
 <translation id="1047431265488717055">لنک کا مت&amp;ن کاپی کریں</translation>
+<translation id="1048350929895890054">وہ سائٹس جہاں فلوٹنگ مینیو بلاک ہے</translation>
 <translation id="1048986595386481879">ڈائنیمک طور پر مختص</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{<ph name="DEVICE_NAME" /> سے <ph name="ATTACHMENTS" /> موصول ہو رہی ہیں}other{<ph name="DEVICE_NAME" /> سے <ph name="ATTACHMENTS" /> موصول ہو رہی ہیں}}</translation>
 <translation id="1049743911850919806">پوشیدگی</translation>
@@ -936,6 +937,7 @@
 <translation id="1695510246756136088">انٹرنیٹ سے منسلک نہیں کیا جا سکتا۔ دوبارہ کوشش کریں۔</translation>
 <translation id="1696555181932908973">آپ <ph name="SITE_ETLD_PLUS_ONE" /> پر جاری رکھنے کے لیے دوسرے طریقے آزما سکتے ہیں۔</translation>
 <translation id="1696685050160038195">اپنے آلے کو محفوظ رکھنے کے لیے، آپ کو صرف قابل اعتماد ذرائع اور ڈویلپرز سے سافٹ ویئر چلانا اور انسٹال کرنا چاہیے۔</translation>
+<translation id="1696832149095851409">منتخب کردہ ٹیکسٹ پر فلوٹنگ مینیو</translation>
 <translation id="1697122132646041614">اظہار ناپسندیدگی آپ کو ان نتائج کو ناپسند کرنے کے بارے میں تفصیلی تاثرات جمع کرانے کے لیے ایک فارم کھولتا ہے۔</translation>
 <translation id="1697532407822776718">آپ بالکل ٹھیک ہیں!</translation>
 <translation id="1698796500103229697">&amp;ادائیگی کے طریقے</translation>
@@ -2499,6 +2501,7 @@
 <translation id="2845276301195220700">‏‫Google کیلنڈر کے لیے مزید کارروائیاں</translation>
 <translation id="2845382757467349449">ہمیشہ بُک مارکس بار دکھائیں</translation>
 <translation id="284581348330507117">منفرد پاس ورڈز تخلیق کریں</translation>
+<translation id="2846345106886298325">‏ٹاسک مکمل ہو گیا اور Gemini Spark پر واپس آ گیا</translation>
 <translation id="284884486564166077">لینز کے ساتھ کوئی بھی تصویر تلاش کریں</translation>
 <translation id="2849035674501872372">اوپر دیکھیں</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3000,6 +3003,7 @@
 <translation id="3223109931751684474">اس آلہ پر اپنی پاس کیز تک رسائی کو ہٹا دیں</translation>
 <translation id="3223531857777746191">ری سیٹ بٹن</translation>
 <translation id="3225084153129302039">ڈیفالٹ جامنی اوتار</translation>
+<translation id="3226249862705569834">سینسرز زیر استعمال ہیں</translation>
 <translation id="3226487301970807183">بائیں جانب موافق کردہ سائیڈ پینل کو ٹوگل کریں</translation>
 <translation id="322708765617468434">سیٹ اپ کے بعد آپ کبھی بھی کسی دوسرے شخص کو آلہ میں شامل کر سکتے ہیں۔ ہر فرد اپنے تجربہ کو ذاتی نوعیت کا بنا سکتا ہے اور ڈیٹا کو نجی رکھ سکتا ہے۔</translation>
 <translation id="3227137524299004712">مائیکروفون</translation>
@@ -5218,7 +5222,6 @@
 <translation id="486505726797718946">میموری محفوظ ہو گئی</translation>
 <translation id="486635084936119914">ڈاؤن لوڈ کرنے کے بعد مخصوص فائل کی قسموں کو کھولیں</translation>
 <translation id="4867272607148176509">والدین ایپس کو منظور یا مسدود کر سکتے ہیں، وقت کی حدود سیٹ کر سکتے ہیں اور ویب براؤزنگ کو کنٹرول کر سکتے ہیں۔ اسکول کے زیادہ تر وسائل تک رسائی کے لیے بعد میں اسکول اکاؤنٹ شامل کیا جا سکتا ہے۔</translation>
-<translation id="486796517585164369">· حالیہ ٹیب</translation>
 <translation id="4868284252360267853">‏فی الحال اس ڈائیلاگ پر فوکس نہیں کیا گیا۔ اس ڈائیلاگ پر فوکس کرنے کے لیے Command-Shift-Option A دبائیں۔</translation>
 <translation id="4869170227080975044">‏ChromeOS نیٹ ورک کی معلومات پڑھیں</translation>
 <translation id="4870724079713069532">‏آپ اس ایپ کے ساتھ File Explorer یا دیگر ایپس سے تعاون یافتہ فائلز کو کھول اور ان میں ترمیم کر سکتے ہیں۔ جو فائلز بطور ڈیفالٹ اس ایپ میں کھلتی ہیں انہیں کنٹرول کرنے کے لیے، <ph name="BEGIN_LINK" />ونڈوز کی ترتیبات<ph name="END_LINK" /> پر جائیں۔</translation>
@@ -6110,6 +6113,7 @@
 <translation id="5546865291508181392">تلاش کریں</translation>
 <translation id="5547868626772433490">‏‫Gemini سے پوچھیں</translation>
 <translation id="5548075230008247516">سبھی آئٹمز غیر منتخب ہو گئے، انتخاب موڈ سے باہر نکل گئے۔</translation>
+<translation id="554810465530189549">ٹیکسٹ منتخب ہونے پر فلوٹنگ مینیو نہ دکھائیں</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{"<ph name="TAB_TITLE" />"}=1{"<ph name="TAB_TITLE" />" اور 1 دوسرا ٹیب}other{"<ph name="TAB_TITLE" />" اور # دیگر ٹیبز}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">اپنا سیٹ اپ منتخب کریں</translation>
@@ -6275,6 +6279,7 @@
 <translation id="5678955352098267522">اپنا ڈیٹا <ph name="WEBSITE_1" /> پر پڑھیں</translation>
 <translation id="5680050361008726776">"<ph name="ESIM_PROFILE_NAME" />" کو ہٹائیں؟</translation>
 <translation id="5681586175480958839">فائل پہلے ہی کھولی جا رہی ہے</translation>
+<translation id="5682950763196110705">ٹیکسٹ منتخب ہونے پر فلوٹنگ مینیو دکھائیں</translation>
 <translation id="5684110242705861346">"<ph name="NAME" />" ایکسٹینشن کو آپ کی تنظیم کی پالیسی کے تحت شامل کیا گیا تھا اور اس کے تحت اس ترتیب کو کنٹرول کیا جا رہا ہے۔ <ph name="BEGIN_LINK" />تفصیلات دیکھیں<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">‏Wi-Fi کی تفصیلات</translation>
 <translation id="5684661240348539843">اثاثہ شناخت کنندہ</translation>
@@ -10048,6 +10053,7 @@
 <translation id="8505669004895429027">چھوٹی بچتیں</translation>
 <translation id="8507052544157927817">خط کشیدہ اسٹائل</translation>
 <translation id="8507227974644337342">اسکرین ریزولیوشن</translation>
+<translation id="8507443886219296894">اس سائٹ کے لیے چھپائیں</translation>
 <translation id="850763987657366362">سرٹیفکیٹ درآمد کرنے سے قاصر</translation>
 <translation id="8508532351844333131">‏‫<ph name="WEBSITE_ORIGIN" /> آپ کے Android آلے پر معلومات کو محفوظ کرنا چاہتا ہے</translation>
 <translation id="8509177919508253835">‏سیکیورٹی کلیدوں کو دوبارہ ترتیب دیں اور PINs تخلیق کریں</translation>
@@ -10108,6 +10114,7 @@
 <translation id="8552102814346875916">"ان سائٹس کو ہمیشہ فعال رکھیں" کی فہرست میں محفوظ کریں</translation>
 <translation id="8552947739661397736">‏ٹاسک کو کنٹرول کریں، Gemini فی الحال کنٹرول میں ہے</translation>
 <translation id="8553342806078037065">دوسرے لوگوں کا نظم کریں</translation>
+<translation id="8554642222921881444">منتخب کردہ ٹیکسٹ پر فلوٹنگ مینیو</translation>
 <translation id="8554899698005018844">کوئی زبان نہیں</translation>
 <translation id="8555444629041783356">غروب آفتاب کا خودکار شیڈول</translation>
 <translation id="8557022314818157177">آپ کے فنگر پرنٹ کیپچر ہو جانے تک اپنی سیکیورٹی کلید کو ٹچ کرتے رہیں</translation>
@@ -10404,6 +10411,7 @@
 <translation id="8759753423332885148">مزید جانیں۔</translation>
 <translation id="876161309768861172">آپ کو سائن ان نہیں کیا جا سکا، براہ کرم دوبارہ کوشش کریں</translation>
 <translation id="8761945298804995673">یہ صارف پہلے سے موجود ہے</translation>
+<translation id="876287961468788565">‏جب آپ کسی سائٹ پر ٹیکسٹ منتخب کرتے ہیں تو Chrome کارروائیوں کے ساتھ ایک فلوٹنگ مینو دکھا سکتا ہے۔</translation>
 <translation id="8762886931014513155">آپ کے <ph name="DEVICE_TYPE" /> کو اپ ڈیٹ کی ضرورت ہے</translation>
 <translation id="8763927697961133303">‏USB آلہ</translation>
 <translation id="8765940060470412555">ریڈنگ موڈ سے پن ہٹائیں</translation>

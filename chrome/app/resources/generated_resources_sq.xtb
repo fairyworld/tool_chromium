@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{1 fjalëkalim u importua te "<ph name="BRAND" />" në këtë pajisje}other{{NUM_PASSWORDS} fjalëkalime u importuan te "<ph name="BRAND" />" në këtë pajisje}}</translation>
 <translation id="1046572983040892965">Dritarja u zhvendos lart dhe në të majtë</translation>
 <translation id="1047431265488717055">Kopjo tekstin e lidhjes</translation>
+<translation id="1048350929895890054">Sajtet ku është bllokuar menyja pluskuese</translation>
 <translation id="1048986595386481879">Caktuar në mënyrë dinamike</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{Po merr <ph name="ATTACHMENTS" /> nga <ph name="DEVICE_NAME" />}other{Po merr <ph name="ATTACHMENTS" /> nga <ph name="DEVICE_NAME" />}}</translation>
 <translation id="1049743911850919806">I fshehtë</translation>
@@ -936,6 +937,7 @@ Kontrolloji fjalëkalimet e tua në çdo kohë te <ph name="GOOGLE_PASSWORD_MANA
 <translation id="1695510246756136088">Nuk mund të lidhet me internetin. Provo përsëri.</translation>
 <translation id="1696555181932908973">Mund të provosh mënyra të tjera për të vazhduar në <ph name="SITE_ETLD_PLUS_ONE" />.</translation>
 <translation id="1696685050160038195">Për ta mbajtur të sigurt pajisjen tënde, duhet të ekzekutosh dhe të instalosh vetëm softuerë nga burime dhe zhvillues të besuar.</translation>
+<translation id="1696832149095851409">menyja pluskuese në tekstin e zgjedhur</translation>
 <translation id="1697122132646041614">Opsioni i gishtave poshtë hap një formular për dërgimin e komenteve të detajuara se pse nuk të pëlqejnë këto rezultate.</translation>
 <translation id="1697532407822776718">Je gati!</translation>
 <translation id="1698796500103229697">&amp;Mënyrat e pagesës</translation>
@@ -2499,6 +2501,7 @@ Për ndihmë lidhur me zgjidhjen e problemeve të transmetimit, drejtohu te <ph 
 <translation id="2845276301195220700">Më shumë veprime për "Kalendarin e Google"</translation>
 <translation id="2845382757467349449">Shfaq gjithmonë shiritin e faqeshënuesve</translation>
 <translation id="284581348330507117">Krijo fjalëkalime unike</translation>
+<translation id="2846345106886298325">Detyra u krye dhe u kthye te Gemini Spark</translation>
 <translation id="284884486564166077">Kërko për çdo imazh me "Lenten"</translation>
 <translation id="2849035674501872372">Shiko</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3002,6 +3005,7 @@ Për ndihmë lidhur me zgjidhjen e problemeve të transmetimit, drejtohu te <ph 
 <translation id="3223109931751684474">Hiq qasjen te çelësat e tu të kalimit në këtë pajisje</translation>
 <translation id="3223531857777746191">Butoni i rivendosjes</translation>
 <translation id="3225084153129302039">Avatari i parazgjedhur i purpurt</translation>
+<translation id="3226249862705569834">Sensorët në përdorim</translation>
 <translation id="3226487301970807183">Kalo te paneli anësor i bashkërenditur majtas</translation>
 <translation id="322708765617468434">Mund të shtosh gjithmonë një person tjetër te pajisja pas konfigurimit. Çdo person mund ta personalizojë përvojën e vet dhe t'i mbajë të dhënat private.</translation>
 <translation id="3227137524299004712">Mikrofoni</translation>
@@ -5220,7 +5224,6 @@ Përdor Ctrl + Alt + "Ul ndriçimin" për ta zvogëluar.</translation>
 <translation id="486505726797718946">Memoria e kursyer</translation>
 <translation id="486635084936119914">Hap automatikisht lloje të caktuara të skedarëve pas shkarkimit</translation>
 <translation id="4867272607148176509">Prindërit mund të miratojnë ose të bllokojnë aplikacionet, të caktojnë kufijtë kohorë dhe të kontrollojnë shfletimin në ueb. Mund të shtohet më vonë një llogari shkolle për t'u qasur në shumicën e burimeve të shkollës.</translation>
-<translation id="486796517585164369">· Skeda e fundit</translation>
 <translation id="4868284252360267853">Ky dialog nuk është aktualisht në fokus. Shtyp Command-Shift-Option dhe A për të fokusuar këtë dialog.</translation>
 <translation id="4869170227080975044">Të lexojë informacionet e rrjetit të ChromeOS</translation>
 <translation id="4870724079713069532">Mund të hapësh dhe të modifikosh skedarët e mbështetur me këtë aplikacion nga "Eksploruesi i skedarëve" ose aplikacione të tjera. Për të kontrolluar se cilët skedarë hapin këtë aplikacion si parazgjedhje, shko te <ph name="BEGIN_LINK" />Cilësimet e Windows<ph name="END_LINK" />.</translation>
@@ -6113,6 +6116,7 @@ Mund të caktosh shumë çelësa për këtë veprim.</translation>
 <translation id="5546865291508181392">Gjej</translation>
 <translation id="5547868626772433490">Pyet Gemini</translation>
 <translation id="5548075230008247516">Të gjithë artikujve u është anuluar zgjedhja, është dalë nga modaliteti i zgjedhjes.</translation>
+<translation id="554810465530189549">Mos e shfaq menynë pluskuese kur zgjidhet teksti</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{"<ph name="TAB_TITLE" />"}=1{"<ph name="TAB_TITLE" />" dhe 1 skedë tjetër}other{"<ph name="TAB_TITLE" />" dhe # skeda të tjera}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">Zgjidh konfigurimin tënd</translation>
@@ -6278,6 +6282,7 @@ Mund të caktosh shumë çelësa për këtë veprim.</translation>
 <translation id="5678955352098267522">Lexo të dhënat e tua në <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">Të hiqet "<ph name="ESIM_PROFILE_NAME" />"?</translation>
 <translation id="5681586175480958839">Skedari është hapur tashmë</translation>
+<translation id="5682950763196110705">Shfaq menynë pluskuese kur zgjidhet teksti</translation>
 <translation id="5684110242705861346">Shtesa "<ph name="NAME" />" është shtuar nga politika e organizatës sate dhe po e kontrollon këtë cilësim. <ph name="BEGIN_LINK" />Shiko detajet<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Detajet e Wi-Fi</translation>
 <translation id="5684661240348539843">Identifikuesi i aseteve</translation>
@@ -10051,6 +10056,7 @@ Mbaje skedarin e çelësit tënd në një vend të sigurt. Do të të duhet për
 <translation id="8505669004895429027">Kursime të vogla</translation>
 <translation id="8507052544157927817">Stili me nënvizim</translation>
 <translation id="8507227974644337342">Rezolucioni i ekranit</translation>
+<translation id="8507443886219296894">Fshihe për këtë sajt</translation>
 <translation id="850763987657366362">Certifikata nuk mund të importohet</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> dëshiron të ruajë informacione në pajisjen tënde Android</translation>
 <translation id="8509177919508253835">Rivendos çelësat e sigurisë dhe krijo kodet PIN</translation>
@@ -10111,6 +10117,7 @@ Mbaje skedarin e çelësit tënd në një vend të sigurt. Do të të duhet për
 <translation id="8552102814346875916">Ruaj te lista "Mbaji gjithmonë aktive këto sajte"</translation>
 <translation id="8552947739661397736">Merr kontrollin mbi detyrën, Gemini është aktualisht në kontroll</translation>
 <translation id="8553342806078037065">Menaxho kontaktet e tjera</translation>
+<translation id="8554642222921881444">Menyja pluskuese në tekstin e zgjedhur</translation>
 <translation id="8554899698005018844">Nuk ka gjuhë</translation>
 <translation id="8555444629041783356">Programi automatik i perëndimit të diellit</translation>
 <translation id="8557022314818157177">Vazhdo të prekësh çelësin e sigurisë deri sa gjurma e gishtit tënd të regjistrohet</translation>
@@ -10407,6 +10414,7 @@ Mbaje skedarin e çelësit tënd në një vend të sigurt. Do të të duhet për
 <translation id="8759753423332885148">Mëso më shumë.</translation>
 <translation id="876161309768861172">Nuk mund të të identifikonim. Provo përsëri</translation>
 <translation id="8761945298804995673">Ky përdorues ekziston tashmë</translation>
+<translation id="876287961468788565">Chrome mund të shfaqë një meny pluskuese me veprime kur zgjedh tekstin në një sajt.</translation>
 <translation id="8762886931014513155">Pajisja jote <ph name="DEVICE_TYPE" /> ka nevojë për një përditësim</translation>
 <translation id="8763927697961133303">Pajisja USB</translation>
 <translation id="8765940060470412555">Zhgozhdo modalitetin e leximit</translation>

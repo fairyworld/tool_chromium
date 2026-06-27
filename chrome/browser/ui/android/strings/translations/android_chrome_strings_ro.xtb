@@ -327,6 +327,7 @@ Numai un utilizator care deține expresia ta de acces îți poate citi datele cr
 <translation id="2411239243988279592"><ph name="TAB_TITLE" />, filă cu sunet selectată</translation>
 <translation id="2413014528833954543">Nu se pot verifica parolele pe acest dispozitiv</translation>
 <translation id="2414886740292270097">Întunecat</translation>
+<translation id="2415037988255164008">Restabilești ferestrele?</translation>
 <translation id="2421705177906985956">Momentan, nu există site-uri de afișat</translation>
 <translation id="2426805022920575512">Alege alt cont</translation>
 <translation id="2427025860753516072">{FILE_COUNT,plural, =1{Videoclipuri, un videoclip în listă}few{Videoclipuri, # videoclipuri în listă}other{Videoclipuri, # de videoclipuri în listă}}</translation>
@@ -1338,6 +1339,7 @@ De exemplu, unele site-uri pot răspunde la această solicitare afișând anunț
 <translation id="6556501700899673703">Lexend</translation>
 <translation id="6560414384669816528">Caută cu Sogou</translation>
 <translation id="656065428026159829">Vezi mai multe</translation>
+<translation id="6565781844089373403">Restabilește ferestrele</translation>
 <translation id="6565959834589222080">Conexiunea Wi-Fi este folosită când este disponibilă</translation>
 <translation id="657177046675873214">Pentru a accesa marcajele de pe toate dispozitivele, activează Marcaje în setări</translation>
 <translation id="6573096386450695060">Permite întotdeauna</translation>
@@ -2039,7 +2041,6 @@ Pentru a modifica această setare, <ph name="BEGIN_LINK" />șterge datele Chrome
 <translation id="939598580284253335">Introdu expresia de acces</translation>
 <translation id="94161319503679839"><ph name="TAB_TITLE" />, filă incognito picture-in-picture fixată</translation>
 <translation id="945522503751344254">Trimite feedback</translation>
-<translation id="949667118776341807">Rotește</translation>
 <translation id="95817756606698420">Chrome poate să folosească <ph name="BEGIN_BOLD" />Sogou<ph name="END_BOLD" /> pentru căutare în China. Poți să schimbi acest lucru din <ph name="BEGIN_LINK" />Setări<ph name="END_LINK" />.</translation>
 <translation id="961856697154696964">Șterge datele de navigare</translation>
 <translation id="963246339335003378">Deschide managerul de activități</translation>

@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{ამ მოწყობილობაში <ph name="BRAND" />-ში იმპორტირებულია 1 პაროლი}other{ამ მოწყობილობაში <ph name="BRAND" />-ში იმპორტირებულია {NUM_PASSWORDS} პაროლი}}</translation>
 <translation id="1046572983040892965">ფანჯარამ გადაინაცვლა ზემოთ და მარჯვნივ</translation>
 <translation id="1047431265488717055">ბმულის ტე&amp;ქსტის კოპირება</translation>
+<translation id="1048350929895890054">საიტები, სადაც დაბლოკილია მცურავი მენიუ</translation>
 <translation id="1048986595386481879">გამოყოფა დინამიკურად</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{მიმდინარეობს მიღება (<ph name="ATTACHMENTS" />) <ph name="DEVICE_NAME" />-დან}other{მიმდინარეობს მიღება (<ph name="ATTACHMENTS" />) <ph name="DEVICE_NAME" />-დან}}</translation>
 <translation id="1049743911850919806">ინკოგნიტო</translation>
@@ -936,6 +937,7 @@
 <translation id="1695510246756136088">ინტერნეტთან დაკავშირება ვერ ხერხდება. ცადეთ ხელახლა.</translation>
 <translation id="1696555181932908973"><ph name="SITE_ETLD_PLUS_ONE" />-თან მუშაობის გაგრძელების სხვა ხერხების ცდა შეგიძლიათ.</translation>
 <translation id="1696685050160038195">თქვენი მოწყობილობის უსაფრთხოება რომ შეინარჩუნოთ, მხოლოდ სანდო წყაროებისა და დეველოპერების პროგრამული უზრუნველყოფა უნდა გაუშვათ და დააინსტალიროთ.</translation>
+<translation id="1696832149095851409">მცურავი მენიუ არჩეულ ტექსტზე</translation>
 <translation id="1697122132646041614">ქვემოთ დაწეული ცერის არჩევის შემთხვევაში გაიხსნება ფორმა, რომელშიც დეტალურად უნდა მიუთითოთ, რატომ არ მოგწონთ ეს შედეგები.</translation>
 <translation id="1697532407822776718">ყველაფერი დაყენებულია!</translation>
 <translation id="1698796500103229697">&amp;გადახდის მეთოდები</translation>
@@ -2500,6 +2502,7 @@
 <translation id="2845276301195220700">მეტი მოქმედება Google Calendar-ისთვის</translation>
 <translation id="2845382757467349449">ყოველთვის გამოჩნდეს სანიშნეების ზოლი</translation>
 <translation id="284581348330507117">შექმენით უნიკალური პაროლები</translation>
+<translation id="2846345106886298325">დავალება შესრულებულია და დაბრუნდა Gemini Spark-ში</translation>
 <translation id="284884486564166077">მოძებნეთ ნებისმიერი სურათი Lens-ით</translation>
 <translation id="2849035674501872372">ზევით აიხედეთ</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3003,6 +3006,7 @@
 <translation id="3223109931751684474">ამოშალეთ წვდომა თქვენს წვდომის გასაღებებზე ამ მოწყობილობიდან</translation>
 <translation id="3223531857777746191">გადაყენების ღილაკი</translation>
 <translation id="3225084153129302039">ნაგულისხმევი იასამნისფერი ავატარი</translation>
+<translation id="3226249862705569834">გამოყენებული სენსორები</translation>
 <translation id="3226487301970807183">მარცხნივი სწორების გვერდითა პანელზე გადართვა</translation>
 <translation id="322708765617468434">სხვა პიროვნების დამატებას მოწყობილობის დაყენების შემდეგ ნებისმიერ დროს შეძლებთ. თითოეულ ადამიანს შეეძლება ფუნქციების პერსონალიზება და მონაცემების განცალკევებით შენახვა.</translation>
 <translation id="3227137524299004712">მიკროფონი</translation>
@@ -5222,7 +5226,6 @@
 <translation id="486505726797718946">მეხსიერების დაზოგილია</translation>
 <translation id="486635084936119914">კონკრეტული ტიპის ფაილების ავტომატური გახსნა ჩამოტვირთვის შემდეგ</translation>
 <translation id="4867272607148176509">მშობლებს შეუძლიათ აპების დაშვება ან დაბლოკვა, დროის კუთხით ლიმიტების დაწესება და ვების დათვალიერების კონტროლი. მოგვიანებით შესაძლებელი იქნება სასწავლებლის ანგარიშის დამატება, სასწავლებლის რესურსების უმეტესობაზე წვდომისთვის.</translation>
-<translation id="486796517585164369">· ჩანართი „ბოლოდროინდელი“</translation>
 <translation id="4868284252360267853">ეს დიალოგი ამჟამად არ არის მოქცეული ფოკუსში. ამ დიალოგის ფოკუსში მოსაქცევად დააჭირეთ კლავიშთა კომბინაციას Command+Shift+Option+A.</translation>
 <translation id="4869170227080975044">ChromeOS ქსელის ინფორმაციის წაკითხვა</translation>
 <translation id="4870724079713069532">ამ აპის მეშვეობით შეგიძლიათ გახსნათ და დაარედაქტიროთ მხარდაჭერილი ფაილები File Explorer-იდან ან სხვა აპებიდან. იმისთვის, რომ გააკონტროლოთ, ნაგულისხმევად რომელმა ფაილებმა გახსნას ეს აპი, გადადით <ph name="BEGIN_LINK" />Windows-ის პარამეტრებზე<ph name="END_LINK" />.</translation>
@@ -6116,6 +6119,7 @@
 <translation id="5546865291508181392">ძებნა</translation>
 <translation id="5547868626772433490">ჰკითხეთ Gemini-ს</translation>
 <translation id="5548075230008247516">ყველა ერთეულის არჩევა გაუქმდა, არჩევის რეჟიმიდან გახვედით.</translation>
+<translation id="554810465530189549">არ გამოჩნდეს მცურავი მენიუ ტექსტის არჩევისას</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{„<ph name="TAB_TITLE" />“}=1{„<ph name="TAB_TITLE" />“ და 1 სხვა ჩანართი}other{„<ph name="TAB_TITLE" />“ და # სხვა ჩანართი}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">აირჩიეთ დასაყენებელი პარამეტრები</translation>
@@ -6281,6 +6285,7 @@
 <translation id="5678955352098267522">წაიკითხეთ თქვენი მონაცემები ვებსაიტზე <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">გსურთ, ამოშალოთ „<ph name="ESIM_PROFILE_NAME" />“?</translation>
 <translation id="5681586175480958839">ფაილი უკვე იხსნება</translation>
+<translation id="5682950763196110705">ტექსტის არჩევისას მცურავი მენიუს ჩვენება</translation>
 <translation id="5684110242705861346">გაფართოება „<ph name="NAME" />“ დაემატა თქვენი ორგანიზაციის წესების მიხედვით და მართავს ამ პარამეტრს. <ph name="BEGIN_LINK" />დეტალების ნახვა<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Wi‑Fi ქსელის დეტალები</translation>
 <translation id="5684661240348539843">საინვენტარო იდენტიფიკატორი</translation>
@@ -10054,6 +10059,7 @@
 <translation id="8505669004895429027">მცირე დანაზოგი</translation>
 <translation id="8507052544157927817">ხაზგასმის სტილი</translation>
 <translation id="8507227974644337342">ეკრანის გარჩევადობა</translation>
+<translation id="8507443886219296894">ამ საიტისთვის დამალვა</translation>
 <translation id="850763987657366362">სერტიფიკატის დაიმპორტება შეუძლებელია</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" />-ს სურს ინფორმაციის შენახვა თქვენს Android მოწყობილობაზე</translation>
 <translation id="8509177919508253835">უსაფრთხოების გასაღებების გადაყენება და PIN-კოდების შექმნა</translation>
@@ -10114,6 +10120,7 @@
 <translation id="8552102814346875916">შეინახეთ სიაში „ამ საიტების ყოველთვის აქტიურად შენარჩუნება“</translation>
 <translation id="8552947739661397736">ამოცანის მართვის გადაცემა, ამჟამად Gemini მართავს</translation>
 <translation id="8553342806078037065">სხვა ადამიანების მართვა</translation>
+<translation id="8554642222921881444">მცურავი მენიუ არჩეულ ტექსტზე</translation>
 <translation id="8554899698005018844">ენის გარეშე</translation>
 <translation id="8555444629041783356">მზის ჩასვლის ავტომატური განრიგი</translation>
 <translation id="8557022314818157177">გეჭიროთ თითი უსაფრთხოების გასაღებზე თითის ანაბეჭდის აღბეჭდვამდე</translation>
@@ -10410,6 +10417,7 @@
 <translation id="8759753423332885148">დეტალური ინფორმაცია.</translation>
 <translation id="876161309768861172">სისტემაში თქვენი შეყვანა ვერ მოხერხდა. სცადეთ ხელახლა.</translation>
 <translation id="8761945298804995673">ეს მომხმარებელი უკვე არსებობს</translation>
+<translation id="876287961468788565">Chrome-ს შეუძლია მცურავი მენიუს ჩვენება მოქმედებებით, როდესაც ტექსტს აირჩევთ საიტზე.</translation>
 <translation id="8762886931014513155">თქვენი <ph name="DEVICE_TYPE" /> საჭიროებს განახლებას</translation>
 <translation id="8763927697961133303">USB მოწყობილობა</translation>
 <translation id="8765940060470412555">წაკითხვის რეჟიმის ჩამაგრების გაუქმება</translation>

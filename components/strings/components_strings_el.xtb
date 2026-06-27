@@ -1236,6 +1236,7 @@
 <translation id="2929525460561903222">{SHIPPING_ADDRESS,plural, =0{<ph name="SHIPPING_ADDRESS_PREVIEW" />}=1{<ph name="SHIPPING_ADDRESS_PREVIEW" /> και <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> ακόμη}other{<ph name="SHIPPING_ADDRESS_PREVIEW" /> και <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> ακόμη}}</translation>
 <translation id="2930531075747147366">Καρτέλα από την άλλη συσκευή σας</translation>
 <translation id="2930577230479659665">Περικοπή μετά από κάθε αντίγραφο</translation>
+<translation id="2931453528659195355">Διαχείριση πληροφοριών αγορών</translation>
 <translation id="2933624813161016821">Ανάγλυφο φύλλο αλουμινίου</translation>
 <translation id="2935726091208500473">κοινοποίηση των καρτελών σας</translation>
 <translation id="293796669683825859">Σχόλια</translation>
@@ -1728,6 +1729,7 @@
 <translation id="3681841880472207951">Βίντεο QuickTime</translation>
 <translation id="3687920599421452763">Φορτηγάκια και μίνιβαν</translation>
 <translation id="3693327506115126094">Επιλέξτε τον τρόπο επαλήθευσης της ταυτότητάς σας</translation>
+<translation id="3693516565203081475">Επιλογή τρόπου πληρωμής</translation>
 <translation id="3698353241727597930">Ο διαχειριστής σας έχει πραγματοποιήσει μια διαμόρφωση, έτσι ώστε τα αρχεία <ph name="FILES" /> να αποθηκεύονται στον αποθηκευτικό χώρο <ph name="CLOUD_STORAGE" /> που διαχειρίζεται η επιχείρηση. Αυτά τα αρχεία ενδέχεται να παρακολουθούνται, να ελέγχονται και να διατηρούνται όταν τα διαγράφετε.</translation>
 <translation id="3698629142018988477">Κουμπί Δημιουργία ιστοτόπου, ενεργοποιήστε το για να δημιουργήσετε γρήγορα έναν νέο ιστότοπο στους Ιστοτόπους Google</translation>
 <translation id="3700094625653511150">Για να αποκρύψετε τις επιλογές πληρωμής αργότερα, μεταβείτε στις <ph name="IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_FOOTNOTE_HIDE_OPTION_PAYMENT_SETTINGS_LINK_TEXT" /></translation>
@@ -5154,6 +5156,7 @@
 <translation id="9063800855227801443">Δεν είναι δυνατή η λήψη εμπιστευτικού περιεχομένου</translation>
 <translation id="9065203028668620118">Επεξεργασία</translation>
 <translation id="9065745800631924235">Αναζήτηση <ph name="TEXT" /> από το ιστορικό</translation>
+<translation id="9066116644715286230">{NUM_TABS,plural, =1{Λεπτομέρειες κοινής χρήσης καρτέλας. Κοινή χρήση 1 καρτέλας από {WEBSITE_LIST_STR}}other{Λεπτομέρειες κοινής χρήσης καρτελών. Κοινή χρήση {NUM_TABS} καρτελών από {WEBSITE_LIST_STR}}}</translation>
 <translation id="90695670378604968">Πλαστικό (Ματ)</translation>
 <translation id="9069693763241529744">Αποκλείστηκε από μια επέκταση</translation>
 <translation id="9073799351042754113">Έχετε επιλέξει να απενεργοποιήσετε τις ειδοποιήσεις ασφάλειας για αυτόν τον ιστότοπο.</translation>

@@ -1205,6 +1205,7 @@
 <translation id="1897120393475391208">使用高強度密碼</translation>
 <translation id="1897860317037652061">掃描失敗</translation>
 <translation id="1898804291554630487">詢問這個網頁的內容</translation>
+<translation id="1899172684246105747">使用主題和深色模式等選項自訂瀏覽器。</translation>
 <translation id="1900305421498694955">透過 Google Play 下載的應用程式可能會要求取得檔案系統的完整存取權，以讀取和寫入外部儲存裝置上的檔案。外接式磁碟的任何使用者都能看見在此裝置上建立的檔案和資料夾。<ph name="LINK_BEGIN" />瞭解詳情<ph name="LINK_END" /></translation>
 <translation id="1901213235765457754">要求管理員更新這個應用程式</translation>
 <translation id="1901303067676059328">選取全部(&amp;A)</translation>
@@ -5213,7 +5214,6 @@
 <translation id="486505726797718946">已釋出記憶體</translation>
 <translation id="486635084936119914">下載特定類型的檔案後自動開啟</translation>
 <translation id="4867272607148176509">家長可以核准或封鎖應用程式、設定使用時間限制，以及控管網路瀏覽內容。如要存取大多數的學校資源，之後可以新增學校帳戶。</translation>
-<translation id="486796517585164369">· 最近開啟的分頁</translation>
 <translation id="4868284252360267853">這個對話方塊未處於聚焦狀態。按下 Command + Shift + Option + A 鍵即可聚焦這個對話方塊。</translation>
 <translation id="4869170227080975044">讀取 ChromeOS 網路資訊</translation>
 <translation id="4870724079713069532">你可以在檔案總管或其他應用程式中，透過這個應用程式開啟及編輯支援的檔案。如要控管要在這個應用程式預設開啟哪些檔案，請前往 <ph name="BEGIN_LINK" />Windows 設定<ph name="END_LINK" />。</translation>
@@ -8394,6 +8394,7 @@
 <translation id="7289303553784750393">如果已連上網路，但這個問題持續發生，可以在「<ph name="SITE_ETLD_PLUS_ONE" />」上試著透過其他方法繼續操作。</translation>
 <translation id="7289386924227731009"><ph name="WINDOW_TITLE" /> - 已要求權限，按下 F6 鍵即可回覆</translation>
 <translation id="7290005709287747471">停用</translation>
+<translation id="7290139233643258082">套用主題</translation>
 <translation id="7292067737327289208">你的<ph name="BEGIN_LINK" />瀏覽器是由貴機構管理<ph name="END_LINK" />，<ph name="BEGIN_LINK" />設定檔則是由 <ph name="PROFILE_DOMAIN" /> 管理<ph name="END_LINK" /></translation>
 <translation id="7292147651179697920">請家長前往「設定」授予存取權</translation>
 <translation id="7292195267473691167"><ph name="LOCALE" /> (<ph name="VARIANT" />)</translation>

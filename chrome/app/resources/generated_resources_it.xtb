@@ -5030,7 +5030,7 @@ Puoi gestire le impostazioni dell'account installando l'app Family Link su quest
 Premi Ctrl + Alt + Diminuisci luminosità per diminuire lo zoom.</translation>
 <translation id="4726710629007580002">Sono stati visualizzati degli avvisi durante il tentativo di installazione dell'estensione:</translation>
 <translation id="4728558894243024398">Piattaforma</translation>
-<translation id="4730254775893450875">Se l'opzione è attiva, i dati vengono salvati nel tuo Account Google e possono essere utilizzati su tutti i tuoi dispositivi. In caso di disattivazione, i dati vengono salvati solo su questo dispositivo. Per le opzioni di sincronizzazione di ChromeOS, vai alle <ph name="LINK_BEGIN" />impostazioni di ChromeOS<ph name="LINK_END" />.</translation>
+<translation id="4730254775893450875">Se l'opzione è attivata, i dati vengono salvati nel tuo Account Google e possono essere utilizzati su tutti i tuoi dispositivi. Se è disattivata, i dati vengono salvati solo su questo dispositivo. Per le opzioni di sincronizzazione di ChromeOS, vai alle <ph name="LINK_BEGIN" />impostazioni di ChromeOS<ph name="LINK_END" />.</translation>
 <translation id="4730888769809690665">Notifiche consentite per <ph name="SITE" /></translation>
 <translation id="4732799736617504962">Il microfono collegato può supportare solo la cancellazione del rumore</translation>
 <translation id="4733161265940833579"><ph name="BATTERY_PERCENTAGE" />% (sinistro)</translation>
@@ -5219,7 +5219,6 @@ Premi Ctrl + Alt + Diminuisci luminosità per diminuire lo zoom.</translation>
 <translation id="486505726797718946">Ricordo salvato</translation>
 <translation id="486635084936119914">Apri automaticamente determinati tipi di file dopo il download</translation>
 <translation id="4867272607148176509">I genitori possono approvare o bloccare le app, impostare limiti di tempo e controllare la navigazione sul web. Un account della scuola può essere aggiunto in un secondo momento per accedere alla maggior parte delle risorse scolastiche.</translation>
-<translation id="486796517585164369">· Scheda recente</translation>
 <translation id="4868284252360267853">Questa finestra di dialogo non è attualmente attiva. Premi Comando+Maiusc+Opzione+A per attivarla.</translation>
 <translation id="4869170227080975044">Lettura di informazioni di rete di ChromeOS</translation>
 <translation id="4870724079713069532">Puoi aprire e modificare i file supportati con questa app da Esplora file o con altre app. Per stabilire quali file aprire per impostazione predefinita in questa app, vai alle <ph name="BEGIN_LINK" />impostazioni di Windows<ph name="END_LINK" />.</translation>

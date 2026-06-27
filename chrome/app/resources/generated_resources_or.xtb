@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{ଏହି ଡିଭାଇସରେ <ph name="BRAND" />କୁ 1ଟି ପାସୱାର୍ଡ ଇମ୍ପୋର୍ଟ କରାଯାଇଛି}other{ଏହି ଡିଭାଇସରେ <ph name="BRAND" />କୁ {NUM_PASSWORDS}ଟି ପାସୱାର୍ଡ ଇମ୍ପୋର୍ଟ କରାଯାଇଛି}}</translation>
 <translation id="1046572983040892965">ୱିଣ୍ଡୋକୁ ଉପର ଆଡ଼କୁ ଏବଂ ବାମପଟକୁ ମୁଭ କରାଯାଇଛି</translation>
 <translation id="1047431265488717055">ଟେ&amp;କ୍ସଟ୍ ଲିଙ୍କ୍ କପି କରନ୍ତୁ</translation>
+<translation id="1048350929895890054">ଫ୍ଲୋଟିଂ ମେନୁକୁ ବ୍ଲକ କରାଯାଇଥିବା ସାଇଟ</translation>
 <translation id="1048986595386481879">ଗତିଶୀଳ ଭାବେ ଦିଆଯାଇଛି</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{<ph name="DEVICE_NAME" />ରୁ <ph name="ATTACHMENTS" /> ମିଳୁଛି}other{<ph name="DEVICE_NAME" />ରୁ <ph name="ATTACHMENTS" /> ମିଳୁଛି}}</translation>
 <translation id="1049743911850919806">ଇନ୍‌କଗ୍ନିଟୋ</translation>
@@ -937,6 +938,7 @@
 <translation id="1695510246756136088">ଇଣ୍ଟରନେଟ ସହ ସଂଯୋଗ କରାଯାଇପାରିବ ନାହିଁ। ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।</translation>
 <translation id="1696555181932908973"><ph name="SITE_ETLD_PLUS_ONE" />ରେ ଜାରି ରଖିବା ପାଇଁ ଆପଣ ଅନ୍ୟ ଉପାୟଗୁଡ଼ିକୁ ବ୍ୟବହାର କରି ଦେଖିପାରିବେ।</translation>
 <translation id="1696685050160038195">ଆପଣଙ୍କ ଡିଭାଇସକୁ ସୁରକ୍ଷିତ ରଖିବା ପାଇଁ ଆପଣ କେବଳ ବିଶ୍ୱସ୍ତ ସୋର୍ସ ଏବଂ ଡେଭଲପରମାନଙ୍କଠାରୁ ସଫ୍ଟୱେରକୁ ଚଲାଇ ଇନଷ୍ଟଲ କରିବା ଉଚିତ।</translation>
+<translation id="1696832149095851409">ଚୟନିତ ଟେକ୍ସଟରେ ଫ୍ଲୋଟିଂ ମେନୁ</translation>
 <translation id="1697122132646041614">ଆପଣ କାହିଁକି ଏହି ଫଳାଫଳକୁ ନାପସନ୍ଦ କରନ୍ତି ସେ ବିଷୟରେ ସବିଶେଷ ମତାମତ ଦାଖଲ କରିବା ପାଇଁ ଥମ୍ବସ ଡାଉନ ଏକ ଫର୍ମକୁ ଖୋଲିଥାଏ।</translation>
 <translation id="1697532407822776718">ଆପଣ ପୂରା ପ୍ରସ୍ତୁତ ଅଛନ୍ତି!</translation>
 <translation id="1698796500103229697">&amp;ପେମେଣ୍ଟ ପଦ୍ଧତିଗୁଡ଼ିକ</translation>
@@ -2501,6 +2503,7 @@
 <translation id="2845276301195220700">Google Calendar ପାଇଁ ଅଧିକ କାର୍ଯ୍ୟ</translation>
 <translation id="2845382757467349449">ସର୍ବଦା ବୁକମାର୍କ ବାର୍‍ ଦେଖାନ୍ତୁ</translation>
 <translation id="284581348330507117">ସ୍ୱତନ୍ତ୍ର ପାସୱାର୍ଡ ତିଆରି କରନ୍ତୁ</translation>
+<translation id="2846345106886298325">ଟାସ୍କ ସମ୍ପୂର୍ଣ୍ଣ ହୋଇଛି ଏବଂ Gemini Sparkକୁ ଫେରସ୍ତ କରାଯାଇଛି</translation>
 <translation id="284884486564166077">Lens ମାଧ୍ୟମରେ ଯେ କୌଣସି ଇମେଜ ସର୍ଚ୍ଚ କରନ୍ତୁ</translation>
 <translation id="2849035674501872372">ଉପରକୁ ଦେଖନ୍ତୁ</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3004,6 +3007,7 @@
 <translation id="3223109931751684474">ଏହି ଡିଭାଇସରେ ଥିବା ଆପଣଙ୍କ ପାସକୀକୁ ଆକ୍ସେସ କାଢ଼ି ଦିଅନ୍ତୁ</translation>
 <translation id="3223531857777746191">ବଟନ୍‌କୁ ରିସେଟ୍ କରନ୍ତୁ</translation>
 <translation id="3225084153129302039">ଡିଫଲ୍ଟ ପର୍ପଲ୍ ଅବତାର</translation>
+<translation id="3226249862705569834">ବ୍ୟବହାରରେ ଥିବା ସେନ୍ସର</translation>
 <translation id="3226487301970807183">ବାମକୁ ଆଲାଇନ୍ କରାଯାଇଥିବା ସାଇଡ୍ ପ୍ୟାନେଲକୁ ଟୋଗଲ୍ କରନ୍ତୁ</translation>
 <translation id="322708765617468434">ସେଟଅପ ପରେ ଆପଣ ସର୍ବଦା ଅନ୍ୟ ଜଣେ ବ୍ୟକ୍ତିଙ୍କୁ ଡିଭାଇସରେ ଯୋଗ କରିପାରିବେ। ପ୍ରତ୍ୟେକ ବ୍ୟକ୍ତି ତାଙ୍କ ଅନୁଭୂତିକୁ ପର୍ସନାଲାଇଜ କରିପାରିବେ ଏବଂ ଡାଟାକୁ ପ୍ରାଇଭେଟ ରଖିପାରିବେ।</translation>
 <translation id="3227137524299004712">ମାଇକ୍ରୋଫୋନ୍</translation>
@@ -5221,7 +5225,6 @@
 <translation id="486505726797718946">ମେମୋରୀ ସେଭ କରାଯାଇଛି</translation>
 <translation id="486635084936119914">ଡାଉନ୍‌ଲୋଡ୍ ହୋଇସାରିବା ପରେ କିଛି ନିର୍ଦ୍ଦିଷ୍ଟ ପ୍ରକାରର ଫାଇଲ୍, ସ୍ୱଚାଳିତରୂପେ ଖୋଲନ୍ତୁ</translation>
 <translation id="4867272607148176509">ବାପାମା ଆପ୍ସକୁ ଅନୁମୋଦନ ଦେଇପାରିବେ କିମ୍ବା ବ୍ଲକ କରିପାରିବେ, ଏଥିରେ ସମୟ ସୀମା ସେଟ କରିପାରିବେ ଏବଂ ୱେବ ବ୍ରାଉଜିଂ ନିୟନ୍ତ୍ରଣ କରିପାରିବେ। ଅଧିକ ସ୍କୁଲ ରିସୋର୍ସକୁ ଆକ୍ସେସ କରିବା ପାଇଁ ପରେ ଏକ ସ୍କୁଲ ଆକାଉଣ୍ଟକୁ ଯୋଗ କରାଯାଇପାରିବ।</translation>
-<translation id="486796517585164369">· ବର୍ତ୍ତମାନର ଟାବ</translation>
 <translation id="4868284252360267853">ବର୍ତ୍ତମାନ ଏହି ଡାଏଲଗକୁ ଫୋକସ୍ କରାଯାଇନାହିଁ। ଏହି ଡାଏଲଗକୁ ଫୋକସ୍ କରିବା ପାଇଁ Command-Shift-Option A ଦବାନ୍ତୁ।</translation>
 <translation id="4869170227080975044">ChromeOS ନେଟୱାର୍କ ସୂଚନା ପଢ଼ନ୍ତୁ</translation>
 <translation id="4870724079713069532">ଆପଣ ଏହି ଆପ ମାଧ୍ୟମରେ ଫାଇଲ ଏକ୍ସପ୍ଲୋରର କିମ୍ବା ଅନ୍ୟ ଆପ୍ସରୁ ସମର୍ଥିତ ଫାଇଲଗୁଡ଼ିକୁ ଖୋଲିପାରିବେ ଏବଂ ଏଡିଟ କରିପାରିବେ। କେଉଁ ଫାଇଲଗୁଡ଼ିକ ଡିଫଲ୍ଟ ଭାବେ ଏହି ଆପରେ ଖୋଲିବ ତାହା ନିୟନ୍ତ୍ରଣ କରିବା ପାଇଁ, <ph name="BEGIN_LINK" />Windows ସେଟିଂସ<ph name="END_LINK" />କୁ ଯାଆନ୍ତୁ।</translation>
@@ -6115,6 +6118,7 @@
 <translation id="5546865291508181392">ଖୋଜନ୍ତୁ</translation>
 <translation id="5547868626772433490">Geminiକୁ ପଚାରନ୍ତୁ</translation>
 <translation id="5548075230008247516">ସମସ୍ତ ଆଇଟମକୁ ଅଚୟନ କରାଯାଇଛି, ଚୟନ ମୋଡରୁ ପ୍ରସ୍ଥାନ କରାଯାଇଛି।</translation>
+<translation id="554810465530189549">ଟେକ୍ସଟ ଚୟନ କରାଗଲେ ଫ୍ଲୋଟିଂ ମେନୁ ଦେଖାନ୍ତୁ ନାହିଁ</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{"<ph name="TAB_TITLE" />"}=1{"<ph name="TAB_TITLE" />" ଏବଂ ଅନ୍ୟ 1ଟି ଟାବ୍}other{"<ph name="TAB_TITLE" />" ଏବଂ ଅନ୍ୟ #ଟି ଟାବ୍}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">ଆପଣଙ୍କ ସେଟଅପ ବାଛନ୍ତୁ</translation>
@@ -6278,6 +6282,7 @@
 <translation id="5678955352098267522"><ph name="WEBSITE_1" />ରେ ଆପଣଙ୍କର ଡାଟା ପଢ଼ନ୍ତୁ</translation>
 <translation id="5680050361008726776">"<ph name="ESIM_PROFILE_NAME" />"କୁ କାଢ଼ିବେ?</translation>
 <translation id="5681586175480958839">ଫାଇଲ ପୂର୍ବରୁ ଖୋଲା ଯାଇଛି</translation>
+<translation id="5682950763196110705">ଟେକ୍ସଟ ଚୟନ କରାଗଲେ ଫ୍ଲୋଟିଂ ମେନୁ ଦେଖାନ୍ତୁ</translation>
 <translation id="5684110242705861346">"<ph name="NAME" />" ଏକ୍ସଟେନସନକୁ ଆପଣଙ୍କ ସଂସ୍ଥାର ନୀତି ଅନୁସାରେ ଯୋଗ କରାଯାଇଛି ଏବଂ ଏହା ଏହି ସେଟିଂକୁ ନିୟନ୍ତ୍ରଣ କରୁଛି। <ph name="BEGIN_LINK" />ବିବରଣୀ ଦେଖନ୍ତୁ<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Wi-Fi ବିବରଣୀ</translation>
 <translation id="5684661240348539843">ଆସେଟ୍ ଚିହ୍ନଟକାରୀ</translation>
@@ -10051,6 +10056,7 @@ Google Chrome ଆପଣଙ୍କ ମୋବାଇଲ୍ ଡାଟା ବ୍ୟବ
 <translation id="8505669004895429027">ଛୋଟ ସେଭିଂସ</translation>
 <translation id="8507052544157927817">ଅଣ୍ଡରଲାଇନ ଷ୍ଟାଇଲ</translation>
 <translation id="8507227974644337342">ସ୍କ୍ରିନ୍ ରିଜୋଲ୍ୟୁସନ୍</translation>
+<translation id="8507443886219296894">ଏହି ସାଇଟ ପାଇଁ ଲୁଚାନ୍ତୁ</translation>
 <translation id="850763987657366362">ସାର୍ଟିଫିକେଟ ଇମ୍ପୋର୍ଟ କରିବାରେ ଅସମର୍ଥ</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> ଆପଣଙ୍କ Android ଡିଭାଇସରେ ସୂଚନା ସେଭ କରିବାକୁ ଚାହେଁ</translation>
 <translation id="8509177919508253835">ସୁରକ୍ଷା କୀଗୁଡ଼ିକ ରିସେଟ୍ କରନ୍ତୁ ଏବଂ ପିନ୍‌ଗୁଡ଼ିକ ତିଆରି କରନ୍ତୁ</translation>
@@ -10111,6 +10117,7 @@ Google Chrome ଆପଣଙ୍କ ମୋବାଇଲ୍ ଡାଟା ବ୍ୟବ
 <translation id="8552102814346875916">"ଏହି ସାଇଟଗୁଡ଼ିକୁ ସର୍ବଦା ସକ୍ରିୟ ରଖନ୍ତୁ" ତାଲିକାରେ ସେଭ କରନ୍ତୁ</translation>
 <translation id="8552947739661397736">ଟାସ୍କକୁ ନିଜ ନିୟନ୍ତ୍ରଣକୁ ନିଅନ୍ତୁ, ବର୍ତ୍ତମାନ Gemini ନିୟନ୍ତ୍ରଣ କରୁଛି</translation>
 <translation id="8553342806078037065">ଅନ୍ୟ ଲୋକମାନଙ୍କୁ ପରିଚାଳନା କରନ୍ତୁ</translation>
+<translation id="8554642222921881444">ଚୟନିତ ଟେକ୍ସଟରେ ଫ୍ଲୋଟିଂ ମେନୁ</translation>
 <translation id="8554899698005018844">କୌଣସି ଭାଷା ନାହିଁ</translation>
 <translation id="8555444629041783356">ସ୍ୱତଃ ସୂର୍ଯ୍ୟାସ୍ତ ସିଡୁଲ</translation>
 <translation id="8557022314818157177">ଆପଣଙ୍କର ଟିପଚିହ୍ନ କ୍ୟାପଚର୍ ନହେବା ପର୍ଯ୍ୟନ୍ତ ଆପଣଙ୍କ ସୁରକ୍ଷା କୀକୁ ସ୍ପର୍ଶ କରି ଧରି ରଖନ୍ତୁ</translation>
@@ -10407,6 +10414,7 @@ Google Chrome ଆପଣଙ୍କ ମୋବାଇଲ୍ ଡାଟା ବ୍ୟବ
 <translation id="8759753423332885148">ଅଧିକ ଜାଣନ୍ତୁ।</translation>
 <translation id="876161309768861172">ଆପଣଙ୍କୁ ସାଇନ ଇନ କରାଯାଇପାରିଲା ନାହିଁ, ଦୟାକରି ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ</translation>
 <translation id="8761945298804995673">ଏହି ୟୁଜର ପୂର୍ବରୁ ଅଛନ୍ତି</translation>
+<translation id="876287961468788565">ଆପଣ ଏକ ସାଇଟରେ ଟେକ୍ସଟକୁ ଚୟନ କଲେ Chrome କାର୍ଯ୍ୟଗୁଡ଼ିକ ସହିତ ଏକ ଫ୍ଲୋଟିଂ ମେନୁ ଦେଖାଇପାରେ।</translation>
 <translation id="8762886931014513155">ଆପଣଙ୍କର <ph name="DEVICE_TYPE" /> ଏକ ଅପ୍‌ଡେଟ୍ ଆବଶ୍ୟକ କରୁଛି</translation>
 <translation id="8763927697961133303">USB ଡିଭାଇସ୍</translation>
 <translation id="8765940060470412555">ରିଡିଂ ମୋଡକୁ ଅନପିନ କରନ୍ତୁ</translation>

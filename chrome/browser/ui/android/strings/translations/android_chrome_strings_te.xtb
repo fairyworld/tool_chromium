@@ -327,6 +327,7 @@
 <translation id="2411239243988279592">ఎంచుకున్న <ph name="TAB_TITLE" /> ట్యాబ్, ఆడియోను ప్లే చేస్తుంది</translation>
 <translation id="2413014528833954543">ఈ పరికరంలో పాస్‌వర్డ్‌లను చెక్ చేయలేరు</translation>
 <translation id="2414886740292270097">ముదురు</translation>
+<translation id="2415037988255164008">విండోలను రీస్టోర్ చేయాలా?</translation>
 <translation id="2421705177906985956">ప్రస్తుతం చూపించడానికి సైట్‌లు ఏవీ లేవు</translation>
 <translation id="2426805022920575512">మరొక ఖాతాను ఎంచుకోండి</translation>
 <translation id="2427025860753516072">{FILE_COUNT,plural, =1{వీడియోలు, లిస్ట్‌లో 1 వీడియో ఉంది}other{వీడియోలు, లిస్ట్‌లో # వీడియోలు ఉన్నాయి}}</translation>
@@ -1336,6 +1337,7 @@
 <translation id="6556501700899673703">Lexend</translation>
 <translation id="6560414384669816528">Sogouతో వెతకండి</translation>
 <translation id="656065428026159829">మరిన్ని చూడండి</translation>
+<translation id="6565781844089373403">విండోలను రీస్టోర్ చేయండి</translation>
 <translation id="6565959834589222080">అందుబాటులో ఉన్నప్పుడు Wi-Fi ఉపయోగించబడుతుంది</translation>
 <translation id="657177046675873214">మీ పరికరాలన్నింటిలో ఉన్న మీ బుక్‌మార్క్‌లను పొందడానికి, సెట్టింగ్‌లలో “బుక్‌మార్క్‌లు” ఆప్షన్‌ను ఆన్ చేయండి</translation>
 <translation id="6573096386450695060">ఎల్లప్పుడూ అనుమతించండి</translation>
@@ -2037,7 +2039,6 @@
 <translation id="939598580284253335">రహస్య పదబంధాన్ని నమోదు చేయండి</translation>
 <translation id="94161319503679839"><ph name="TAB_TITLE" />, పిన్ చేసిన పిక్చర్-ఇన్-పిక్చర్ అజ్ఞాత ట్యాబ్</translation>
 <translation id="945522503751344254">ఫీడ్‌బ్యాక్ పంపండి</translation>
-<translation id="949667118776341807">రొటేట్</translation>
 <translation id="95817756606698420">చైనాలో వెతకడానికి <ph name="BEGIN_BOLD" />Sogou<ph name="END_BOLD" />ను Chrome ఉపయోగించవచ్చు. మీరు దీనిని <ph name="BEGIN_LINK" />సెట్టింగ్‌ల<ph name="END_LINK" />లో మార్చవచ్చు.</translation>
 <translation id="961856697154696964">బ్రౌజింగ్ డేటాను తొలగించండి</translation>
 <translation id="963246339335003378">టాస్క్ మేనేజర్‌ను తెరవండి</translation>

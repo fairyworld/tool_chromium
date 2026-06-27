@@ -1135,6 +1135,7 @@ Verifique as suas palavras-passe em qualquer altura no <ph name="GOOGLE_PASSWORD
 <translation id="1843048149176045210">Copiar link de transferência</translation>
 <translation id="1845060436536902492">O leitor de ecrã no ChromeOS Flex, ChromeVox, é usado principalmente por pessoas cegas ou com visão reduzida para ler texto apresentado no ecrã com um sintetizador de voz ou um ecrã em braille. Prima a barra de espaço para ativar o ChromeVox. Quando o ChromeVox for ativado, irá ver uma apresentação rápida.</translation>
 <translation id="1845727111305721124">Com autorização para reproduzir som</translation>
+<translation id="1846100293138248204">Guardar na memória</translation>
 <translation id="1846308012215045257">Clique e prima a tecla Ctrl em simultâneo para executar o <ph name="PLUGIN_NAME" /></translation>
 <translation id="1848219224579402567">Terminar sessão quando a tampa for fechada</translation>
 <translation id="184862733444771842">Pedido de funcionalidade</translation>
@@ -5223,7 +5224,6 @@ Use Ctrl + Alt + Diminuir o brilho para diminuir o zoom.</translation>
 <translation id="486505726797718946">Memória guardada</translation>
 <translation id="486635084936119914">Abrir determinados tipos de ficheiro automaticamente após a transferência</translation>
 <translation id="4867272607148176509">Os pais podem aprovar ou bloquear apps, definir limites de tempo e controlar a navegação na Web. É possível adicionar uma conta escolar mais tarde para aceder à maioria dos recursos da escola.</translation>
-<translation id="486796517585164369">· Separador recente</translation>
 <translation id="4868284252360267853">Atualmente, esta caixa de diálogo não está focada. Prima Comando + Shift + Opção + A para focar esta caixa de diálogo.</translation>
 <translation id="4869170227080975044">Ler informações da rede do ChromeOS</translation>
 <translation id="4870724079713069532">Pode abrir e editar ficheiros suportados com esta app a partir do Explorador de Ficheiros ou outras apps. Para controlar que ficheiros abrem esta app por predefinição, aceda a <ph name="BEGIN_LINK" />Definições do Windows<ph name="END_LINK" />.</translation>
@@ -6143,6 +6143,7 @@ Pode atribuir vários interruptores a esta ação.</translation>
 <translation id="5562588178647493983">Contacte o seu administrador para mais informações</translation>
 <translation id="556321030400250233">ficheiro local ou partilhado</translation>
 <translation id="5563234215388768762">Pesquise no Google ou escreva um URL</translation>
+<translation id="5563460629751333413">Estamos com problemas de ligação ao servidor. Tente mais tarde.</translation>
 <translation id="5563698194918415761">A atualização foi bloqueada pela política de rede ou por um servidor proxy.</translation>
 <translation id="5563824734298958390">Sair do grupo de separadores?</translation>
 <translation id="5565735124758917034">Ativo</translation>
@@ -8183,6 +8184,7 @@ Tem mais # palavras-passe comprometidas. O Gestor de Palavras-passe da Google re
 <translation id="7109543803214225826">Atalho removido</translation>
 <translation id="7110644433780444336">{NUM_TABS,plural, =1{Adicionar separador a grupo}other{Adicionar separadores a grupo}}</translation>
 <translation id="7111822978084196600">Dê um nome a esta janela</translation>
+<translation id="7113314569799918830">O Gemini no Chrome está a expandir-se para diferentes localizações, mas não está disponível em todos os locais</translation>
 <translation id="7113502843173351041">Saber o seu endereço de email</translation>
 <translation id="7115361495406486998">Nenhum contacto alcançável</translation>
 <translation id="7117228822971127758">Tente mais tarde.</translation>

@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{ఈ పరికరంలో <ph name="BRAND" />కి 1 పాస్‌వర్డ్ దిగుమతి చేయబడింది}other{ఈ పరికరంలో <ph name="BRAND" />కి {NUM_PASSWORDS} పాస్‌వర్డ్‌లు దిగుమతి చేయబడ్డాయి}}</translation>
 <translation id="1046572983040892965">విండో ఎగువ ఎడమ వైపుకు తరలించబడింది</translation>
 <translation id="1047431265488717055">లింక్ వచ&amp;నం కాపీ చేయి</translation>
+<translation id="1048350929895890054">ఫ్లోటింగ్ మెనూను బ్లాక్ చేసిన సైట్‌లు</translation>
 <translation id="1048986595386481879">డైనమిక్‌గా కేటాయించబడింది</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{<ph name="DEVICE_NAME" /> నుండి <ph name="ATTACHMENTS" />ని స్వీకరిస్తోంది}other{<ph name="DEVICE_NAME" /> నుండి <ph name="ATTACHMENTS" />ని స్వీకరిస్తోంది}}</translation>
 <translation id="1049743911850919806">అజ్ఞాత మోడ్</translation>
@@ -937,6 +938,7 @@
 <translation id="1695510246756136088">ఇంటర్నెట్‌కు కనెక్ట్ చేయడం సాధ్యపడదు. మళ్లీ ట్రై చేయండి.</translation>
 <translation id="1696555181932908973">మీరు <ph name="SITE_ETLD_PLUS_ONE" />లో కొనసాగించడానికి ఇతర మార్గాలను ట్రై చేయవచ్చు.</translation>
 <translation id="1696685050160038195">మీ డివైజ్‌ను సురక్షితంగా ఉంచడానికి, మీరు విశ్వసనీయ సోర్స్‌లు, డెవలపర్‌ల నుండి మాత్రమే సాఫ్ట్‌వేర్‌ను రన్ చేసి, ఇన్‌స్టాల్ చేయాలి.</translation>
+<translation id="1696832149095851409">ఎంచుకున్న టెక్స్ట్‌పై ఫ్లోటింగ్ మెనూ</translation>
 <translation id="1697122132646041614">మీరు ఈ ఫలితాలను ఎందుకు ఇష్టపడలేదు అనే దాని గురించి వివరణాత్మక ఫీడ్‌బ్యాక్‌ను పంపడానికి 'బాగా లేదు' ఆప్షన్ మీ కోసం ఫారమ్‌ను తెరుస్తుంది.</translation>
 <translation id="1697532407822776718">మీరు సిద్ధంగా ఉన్నారు!</translation>
 <translation id="1698796500103229697">&amp;పేమెంట్ ఆప్షన్‌లు</translation>
@@ -2510,6 +2512,7 @@
 <translation id="2845276301195220700">Google Calendar కోసం మరిన్ని చర్యలు</translation>
 <translation id="2845382757467349449">ఎల్లప్పుడూ బుక్‌మార్క్‌ల బార్‌ను చూపు</translation>
 <translation id="284581348330507117">భిన్నమైన పాస్‌వర్డ్‌లను క్రియేట్ చేయండి</translation>
+<translation id="2846345106886298325">టాస్క్ పూర్తయింది, Gemini Sparkకు తిరిగి వచ్చింది</translation>
 <translation id="284884486564166077">Lensతో ఏదైనా ఇమేజ్‌ను సెర్చ్ చేయండి</translation>
 <translation id="2849035674501872372">వెతకండి</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3013,6 +3016,7 @@
 <translation id="3223109931751684474">ఈ పరికరంలో మీ పాస్-కీలకు యాక్సెస్‌ను తీసివేయండి</translation>
 <translation id="3223531857777746191">రీసెట్ బటన్</translation>
 <translation id="3225084153129302039">డిఫాల్ట్ ఊదా రంగు అవతార్</translation>
+<translation id="3226249862705569834">ఉపయోగంలో ఉన్న సెన్సర్‌లు</translation>
 <translation id="3226487301970807183">ఎడమవైపు అమర్చబడిన సైడ్ ప్యానెల్‌ను టోగుల్ చేయండి</translation>
 <translation id="322708765617468434">సెటప్ తర్వాత మీరు ఎప్పుడైనా పరికరానికి మరొక వ్యక్తిని జోడించవచ్చు. ప్రతి వ్యక్తి వారి ఎక్స్‌పీరియన్స్‌ను వ్యక్తిగతీకరించుకోవచ్చు, వారి డేటాను ప్రైవేట్‌గా ఉంచుకోవచ్చు.</translation>
 <translation id="3227137524299004712">మైక్రోఫోన్</translation>
@@ -5232,7 +5236,6 @@
 <translation id="486505726797718946">మెమరీ ఆదా అయ్యింది</translation>
 <translation id="486635084936119914">డౌన్‌లోడ్ చేసిన తర్వాత ఆటోమేటిక్‌గా నిర్దిష్ట ఫైల్ రకాలను తెరువు</translation>
 <translation id="4867272607148176509">తల్లిదండ్రులు యాప్‌లను ఆమోదించగలరు లేదా బ్లాక్ చేయగలరు, సమయ పరిమితులను సెట్ చేయగలరు, వెబ్ బ్రౌజింగ్‌ను కంట్రోల్ చేయగలరు. అత్యధిక శాతం స్కూల్ రిసోర్స్‌లను యాక్సెస్ చేయడానికి, తర్వాత ఎప్పుడైనా ఒక స్కూల్ ఖాతాను జోడించవచ్చు.</translation>
-<translation id="486796517585164369">· ఇటీవలి ట్యాబ్</translation>
 <translation id="4868284252360267853">ప్రస్తుతానికి ఈ డైలాగ్ ఫోకస్ చేయబడలేదు. ఈ డైలాగ్‌ను ఫోకస్ చేయడానికి Command-Shift-A కీని నొక్కండి.</translation>
 <translation id="4869170227080975044">ChromeOS నెట్‌వర్క్ సమాచారాన్ని చదవండి</translation>
 <translation id="4870724079713069532">మీ File Explorer లేదా ఇతర యాప్‌ల నుండి ఈ యాప్‌తో, సపోర్ట్ ఉన్న ఫైల్స్‌ను మీరు తెరవవచ్చు, ఎడిట్ చేయవచ్చు. ఈ యాప్‌లో ఆటోమేటిక్‌గా ఏ ఫైల్స్ తెరుచుకోవాలి అనే దానిని కంట్రోల్ చేయడానికి, <ph name="BEGIN_LINK" />Windows సెట్టింగ్‌లకు<ph name="END_LINK" /> వెళ్లండి.</translation>
@@ -6125,6 +6128,7 @@
 <translation id="5546865291508181392">కనుగొనండి</translation>
 <translation id="5547868626772433490">Geminiని అడగండి</translation>
 <translation id="5548075230008247516">అన్ని ఐటెమ్‌ల ఎంపిక రద్దు చేయబడింది, ఎంపిక మోడ్ నుండి నిష్క్రమించారు.</translation>
+<translation id="554810465530189549">టెక్స్ట్‌ను సెలెక్ట్ చేసినప్పుడు ఫ్లోటింగ్ మెనూను చూపించవద్దు</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{"<ph name="TAB_TITLE" />"}=1{"<ph name="TAB_TITLE" />" ఇంకా 1 వేరే ట్యాబ్}other{"<ph name="TAB_TITLE" />" ఇంకా # వేరే ట్యాబ్‌లు}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">మీ సెటప్‌ను ఎంచుకోండి</translation>
@@ -6290,6 +6294,7 @@
 <translation id="5678955352098267522"><ph name="WEBSITE_1" />లోని మీ డేటాను చదవండి</translation>
 <translation id="5680050361008726776">"<ph name="ESIM_PROFILE_NAME" />"ను తీసివేయాలా?</translation>
 <translation id="5681586175480958839">ఫైల్ ఇప్పటికే తెరవబడుతోంది</translation>
+<translation id="5682950763196110705">టెక్స్ట్‌ను సెలెక్ట్ చేసినప్పుడు ఫ్లోటింగ్ మెనూను చూపండి</translation>
 <translation id="5684110242705861346">"<ph name="NAME" />" ఎక్స్‌టెన్షన్ మీ సంస్థ పాలసీ ద్వారా జోడించబడింది, ఈ సెట్టింగ్‌ను కంట్రోల్ చేస్తోంది. <ph name="BEGIN_LINK" />వివరాలను చూడండి<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Wi-Fi వివరాలు</translation>
 <translation id="5684661240348539843">అసెట్ ఐడెంటిఫైయర్</translation>
@@ -10061,6 +10066,7 @@
 <translation id="8505669004895429027">తక్కువ మెమరీ సేవింగ్స్</translation>
 <translation id="8507052544157927817">అండర్‌లైన్ స్టయిల్</translation>
 <translation id="8507227974644337342">స్క్రీన్ రిజల్యూషన్</translation>
+<translation id="8507443886219296894">ఈ సైట్ కోసం దాచండి</translation>
 <translation id="850763987657366362">సర్టిఫికెట్‌ను దిగుమతి చేయలేకపోయాము</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> మీ Android డివైజ్‌లో సమాచారాన్ని సేవ్ చేయాలనుకుంటోంది</translation>
 <translation id="8509177919508253835">సెక్యూరిటీ కీలు రీసెట్ చేసి, పిన్‌లను క్రియేట్ చేయండి</translation>
@@ -10121,6 +10127,7 @@
 <translation id="8552102814346875916">"ఈ సైట్‌లను ఎల్లప్పుడూ యాక్టివ్‌గా ఉంచండి" లిస్ట్‌కు సేవ్ చేయండి</translation>
 <translation id="8552947739661397736">టాస్క్‌ను టేక్ ఓవర్ చేయండి, Gemini ప్రస్తుతం కంట్రోల్‌లో ఉంది</translation>
 <translation id="8553342806078037065">ఇతర వ్యక్తులను మేనేజ్ చేయండి</translation>
+<translation id="8554642222921881444">ఎంచుకున్న టెక్స్ట్‌పై ఫ్లోటింగ్ మెనూ</translation>
 <translation id="8554899698005018844">భాష లేదు</translation>
 <translation id="8555444629041783356">ఆటోమేటిక్ సర్వీస్‌ల నిలిపివేత షెడ్యూల్</translation>
 <translation id="8557022314818157177">మీ వేలిముద్ర క్యాప్చర్ అయ్యేవరకు, మీ సెక్యూరిటీ కీని తాకుతూ ఉండండి</translation>
@@ -10417,6 +10424,7 @@
 <translation id="8759753423332885148">మరింత తెలుసుకోండి.</translation>
 <translation id="876161309768861172">మీరు సైన్ ఇన్ చేయలేరు, దయచేసి మళ్లీ ట్రై చేయండి</translation>
 <translation id="8761945298804995673">ఈ వినియోగదారు ఇప్పటికే ఉన్నారు.</translation>
+<translation id="876287961468788565">మీరు ఏదైనా సైట్‌లో టెక్స్ట్‌ను సెలెక్ట్ చేసినప్పుడు, చర్యలతో (యాక్షన్స్‌తో) కూడిన ఒక ఫ్లోటింగ్ మెనూను Chrome చూపగలదు.</translation>
 <translation id="8762886931014513155">మీ <ph name="DEVICE_TYPE" />ని అప్‌డేట్ చేయాలి</translation>
 <translation id="8763927697961133303">USB పరికరం</translation>
 <translation id="8765940060470412555">రీడింగ్ మోడ్‌ను అన్‌పిన్ చేయండి</translation>

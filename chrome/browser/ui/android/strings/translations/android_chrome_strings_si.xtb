@@ -327,6 +327,7 @@
 <translation id="2411239243988279592"><ph name="TAB_TITLE" />, තෝරා ගත් ශ්‍රව්‍ය පටිත්ත</translation>
 <translation id="2413014528833954543">මෙම උපාංගයෙහි මුරපද පරීක්ෂා කළ නොහැක</translation>
 <translation id="2414886740292270097">අඳුරු</translation>
+<translation id="2415037988255164008">කවුළු ප්‍රතිසාධනය කරන්න ද?</translation>
 <translation id="2421705177906985956">මේ මොහොතේ පෙන්වීමට අඩවි නැත</translation>
 <translation id="2426805022920575512">වෙනත් ගිණුමක් තෝරා ගන්න</translation>
 <translation id="2427025860753516072">{FILE_COUNT,plural, =1{වීඩියෝ, ලැයිස්තුවේ 1 වීඩියෝවක්}one{වීඩියෝ, ලැයිස්තුවේ වීඩියෝ #ක්}other{වීඩියෝ, ලැයිස්තුවේ වීඩියෝ #ක්}}</translation>
@@ -1338,6 +1339,7 @@
 <translation id="6556501700899673703">Lexend</translation>
 <translation id="6560414384669816528">Sogou සමගින් සොයන්න</translation>
 <translation id="656065428026159829">තවත් බලන්න</translation>
+<translation id="6565781844089373403">කවුළු ප්‍රතිසාධනය කරන්න</translation>
 <translation id="6565959834589222080">ලබා ගත හැකි විට Wi-Fi භාවිත කෙරේ</translation>
 <translation id="657177046675873214">ඔබේ සියලු උපාංගවල ඔබේ පිටුසන් ලබා ගැනීම සඳහා, සැකසීම් තුළ “පිටුසන්” ක්‍රියාත්මක කරන්න</translation>
 <translation id="6573096386450695060">සැමවිටම ඉඩ දෙන්න</translation>
@@ -2039,7 +2041,6 @@
 <translation id="939598580284253335">මුරවදන ඇතුළත් කරන්න</translation>
 <translation id="94161319503679839"><ph name="TAB_TITLE" />, අමුණන ලද පින්තූරය තුළ පින්තූරය අප්‍රකට පටිත්ත</translation>
 <translation id="945522503751344254">අදහස් හා යෝජනා යවන්න</translation>
-<translation id="949667118776341807">කරකවන්න</translation>
 <translation id="95817756606698420">Chrome හට චීනයෙහි සෙවීම සඳහා <ph name="BEGIN_BOLD" />Sogou<ph name="END_BOLD" /> භාවිතා කළ හැකිය. ඔබට <ph name="BEGIN_LINK" />සැකසීම්<ph name="END_LINK" /> තුළ මෙය වෙනස් කළ හැකිය.</translation>
 <translation id="961856697154696964">බ්‍රවුස් කිරීමේ දත්ත මකන්න</translation>
 <translation id="963246339335003378">කාර්ය කළමනාකරු විවෘත කරන්න</translation>

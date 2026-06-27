@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{Vienas slaptažodis importuotas į „<ph name="BRAND" />“ šiame įrenginyje}one{{NUM_PASSWORDS} slaptažodis importuotas į „<ph name="BRAND" />“ šiame įrenginyje}few{{NUM_PASSWORDS} slaptažodžiai importuoti į „<ph name="BRAND" />“ šiame įrenginyje}many{{NUM_PASSWORDS} slaptažodžio importuota į „<ph name="BRAND" />“ šiame įrenginyje}other{{NUM_PASSWORDS} slaptažodžių importuota į „<ph name="BRAND" />“ šiame įrenginyje}}</translation>
 <translation id="1046572983040892965">Langas perkeltas aukštyn ir į kairę</translation>
 <translation id="1047431265488717055">Kopijuoti nuorodos teks&amp;tą</translation>
+<translation id="1048350929895890054">Svetainės, kuriose blokuojamas slankusis meniu</translation>
 <translation id="1048986595386481879">Dinamiškai paskirstyta</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{Gaunamas turinys (<ph name="ATTACHMENTS" />) iš „<ph name="DEVICE_NAME" />“ įrenginio}one{Gaunamas turinys (<ph name="ATTACHMENTS" />) iš „<ph name="DEVICE_NAME" />“ įrenginio}few{Gaunamas turinys (<ph name="ATTACHMENTS" />) iš „<ph name="DEVICE_NAME" />“ įrenginio}many{Gaunamas turinys (<ph name="ATTACHMENTS" />) iš „<ph name="DEVICE_NAME" />“ įrenginio}other{Gaunamas turinys (<ph name="ATTACHMENTS" />) iš „<ph name="DEVICE_NAME" />“ įrenginio}}</translation>
 <translation id="1049743911850919806">Inkognito</translation>
@@ -937,6 +938,7 @@ Bet kuriuo metu patikrinkite slaptažodžius skiltyje „<ph name="GOOGLE_PASSWO
 <translation id="1695510246756136088">Nepavyksta prisijungti prie interneto. Bandykite dar kartą.</translation>
 <translation id="1696555181932908973">Galite išbandyti kitus būdus tęsti veiklą <ph name="SITE_ETLD_PLUS_ONE" />.</translation>
 <translation id="1696685050160038195">Kad užtikrintumėte įrenginio saugą, programinę įrangą turėtumėte paleisti ir įdiegti tik iš patikimų šaltinių ir kūrėjų.</translation>
+<translation id="1696832149095851409">slankusis meniu pasirinktame tekste</translation>
 <translation id="1697122132646041614">Spustelėjus mygtuką „Nepatinka“ atidaroma forma, kurią naudojant galima pateikti išsamų atsiliepimą apie tai, kodėl jums nepatinka šie rezultatai.</translation>
 <translation id="1697532407822776718">Viskas nustatyta!</translation>
 <translation id="1698796500103229697">&amp;Mokėjimo metodai</translation>
@@ -2513,6 +2515,7 @@ Jei nenorite, dabar atsijunkite, kad šios paskyros pakeitimai būtų matomi ši
 <translation id="2845276301195220700">Daugiau veiksmų su „Google“ kalendoriumi</translation>
 <translation id="2845382757467349449">Visada rodyti žymių juostą</translation>
 <translation id="284581348330507117">Kurkite unikalius slaptažodžius</translation>
+<translation id="2846345106886298325">Užduotis atlikta ir grįžta į „Gemini Spark“</translation>
 <translation id="284884486564166077">Ieškokite bet kokio vaizdo naudodami „Lens“</translation>
 <translation id="2849035674501872372">Pakelkite galvą</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3016,6 +3019,7 @@ Jei nenorite, dabar atsijunkite, kad šios paskyros pakeitimai būtų matomi ši
 <translation id="3223109931751684474">Pašalinkite prieigą prie prieigos raktų šiame įrenginyje</translation>
 <translation id="3223531857777746191">Nustatymo iš naujo mygtukas</translation>
 <translation id="3225084153129302039">Numatytasis violetinis pseudoportretas</translation>
+<translation id="3226249862705569834">Naudojami jutikliai</translation>
 <translation id="3226487301970807183">Perjunkite kairėje lygiuojamą šoninį skydelį</translation>
 <translation id="322708765617468434">Atlikę sąranką visada galite prie įrenginio pridėti kitą asmenį. Kiekvienas asmuo gali suasmeninti funkcijas ir saugoti duomenis privačiai.</translation>
 <translation id="3227137524299004712">Mikrofonas</translation>
@@ -5235,7 +5239,6 @@ Jei norite nutolinti, naudokite „Ctrl“ + „Alt“ + šviesumo mažinimo kla
 <translation id="486505726797718946">Atmintis išsaugota</translation>
 <translation id="486635084936119914">Automatiškai atidaryti tam tikrų tipų failus, kai jie atsisiunčiami</translation>
 <translation id="4867272607148176509">Tėvai gali patvirtinti arba blokuoti programas, nustatyti laiko apribojimus ir valdyti žiniatinklio naršymą. Mokyklos paskyrą galima pridėti vėliau, kad būtų galima pasiekti daugumą mokyklos šaltinių.</translation>
-<translation id="486796517585164369">· Skirtukas „Naujausi“</translation>
 <translation id="4868284252360267853">Šis dialogo langas šiuo metu nesuaktyvintas. Paspauskite „Command“ – „Shift“ – „Option A“, kad suaktyvintumėte šį dialogo langą.</translation>
 <translation id="4869170227080975044">Skaityti „ChromeOS“ tinklo informaciją</translation>
 <translation id="4870724079713069532">Galite atidaryti ir redaguoti palaikomus failus naudodami šią programą iš failų naršyklės arba kitų programų. Jei norite valdyti, kurie failai pagal numatytuosius nustatymus atidaromi šioje programoje, eikite į <ph name="BEGIN_LINK" />„Windows“ nustatymų“<ph name="END_LINK" /> skiltį.</translation>
@@ -6129,6 +6132,7 @@ Jei norite nutolinti, naudokite „Ctrl“ + „Alt“ + šviesumo mažinimo kla
 <translation id="5546865291508181392">Rasti</translation>
 <translation id="5547868626772433490">Klausti „Gemini“</translation>
 <translation id="5548075230008247516">Visų elementų pasirinkimas atšauktas, pasirinkimo režimas išjungtas.</translation>
+<translation id="554810465530189549">Nerodyti slankiojo meniu, kai pasirinktas tekstas</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{„<ph name="TAB_TITLE" />“}=1{„<ph name="TAB_TITLE" />“ ir dar 1 skirtukas}one{„<ph name="TAB_TITLE" />“ ir dar # skirtukas}few{„<ph name="TAB_TITLE" />“ ir dar # skirtukai}many{„<ph name="TAB_TITLE" />“ ir dar # skirtuko}other{„<ph name="TAB_TITLE" />“ ir dar # skirtukų}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">Sąrankos pasirinkimas</translation>
@@ -6295,6 +6299,7 @@ Jei norite nutolinti, naudokite „Ctrl“ + „Alt“ + šviesumo mažinimo kla
 <translation id="5678955352098267522">Skaityti duomenis svetainėje <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">Pašalinti „<ph name="ESIM_PROFILE_NAME" />“?</translation>
 <translation id="5681586175480958839">Failas jau atidaromas</translation>
+<translation id="5682950763196110705">Rodyti slankųjį meniu, kai pasirinktas tekstas</translation>
 <translation id="5684110242705861346">Plėtinys „<ph name="NAME" />“ pridėtas vadovaujantis jūsų organizacijos politika ir jis valdo šį nustatymą. <ph name="BEGIN_LINK" />Žr. išsamią informaciją<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Išsami „Wi-Fi“ informacija</translation>
 <translation id="5684661240348539843">Ištekliaus identifikatorius</translation>
@@ -10076,6 +10081,7 @@ Rakto failą laikykite saugioje vietoje. Jo reikės, kai norėsite sukurti nauja
 <translation id="8505669004895429027">Nedaug sutaupoma</translation>
 <translation id="8507052544157927817">Pabraukimo stilius</translation>
 <translation id="8507227974644337342">Ekrano skyra</translation>
+<translation id="8507443886219296894">Slėpti šioje svetainėje</translation>
 <translation id="850763987657366362">Nepavyko importuoti sertifikato</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> nori išsaugoti informaciją jūsų „Android“ įrenginyje</translation>
 <translation id="8509177919508253835">Iš naujo nustatomas saugos raktas ir sukuriami PIN kodai</translation>
@@ -10136,6 +10142,7 @@ Rakto failą laikykite saugioje vietoje. Jo reikės, kai norėsite sukurti nauja
 <translation id="8552102814346875916">Išsaugoti sąraše „Visada suaktyvinti šias svetaines“</translation>
 <translation id="8552947739661397736">Perimkite užduotį, kurią šiuo metu valdo „Gemini“</translation>
 <translation id="8553342806078037065">Tvarkyti kitus žmones</translation>
+<translation id="8554642222921881444">Slankusis meniu pasirinktame tekste</translation>
 <translation id="8554899698005018844">Kalbos nėra</translation>
 <translation id="8555444629041783356">Automatinis saulėlydžio tvarkaraštis</translation>
 <translation id="8557022314818157177">Lieskite saugos raktą, kol bus užfiksuotas kontrolinis kodas</translation>
@@ -10432,6 +10439,7 @@ Rakto failą laikykite saugioje vietoje. Jo reikės, kai norėsite sukurti nauja
 <translation id="8759753423332885148">Sužinokite daugiau.</translation>
 <translation id="876161309768861172">Nepavyko jūsų prijungti. Bandykite dar kartą.</translation>
 <translation id="8761945298804995673">Toks naudotojas jau yra</translation>
+<translation id="876287961468788565">„Chrome“ gali rodyti slankųjį meniu su veiksmais, kai svetainėje pasirenkate tekstą.</translation>
 <translation id="8762886931014513155">Reikia atnaujinti „<ph name="DEVICE_TYPE" />“</translation>
 <translation id="8763927697961133303">USB įrenginys</translation>
 <translation id="8765940060470412555">Atsegti skaitymo režimą</translation>

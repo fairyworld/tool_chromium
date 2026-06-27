@@ -32,6 +32,7 @@
 <translation id="126567311906253476">ເມື່ອເຂົ້າສູ່ລະບົບບໍລິການຕ່າງໆຂອງ Google ເຊັ່ນ: Gmail ຫຼື YouTube ດ້ວຍ <ph name="USER_EMAIL" />, ທ່ານສາມາດເຂົ້າສູ່ລະບົບ Chromium ດ້ວຍບັນຊີດຽວກັນໄດ້ໂດຍອັດຕະໂນມັດ</translation>
 <translation id="1287534462498555020">ດາວໂຫຼດ Chromium ຢູ່ໂທລະສັບຂອງທ່ານ</translation>
 <translation id="1290883685122687410">ຂໍ້ຜິດພາດໃນການຕັ້ງຄ່າ: <ph name="METAINSTALLER_EXIT_CODE" />. <ph name="WINDOWS_ERROR" /></translation>
+<translation id="1312200348844120300">ຮູບປະກອບສະແດງວິທີທີ່ທ່ານສາມາດໃຊ້ຄຸນສົມບັດຊອກຫາຮູບເພື່ອຊອກຫາຜະລິດຕະພັນໄດ້</translation>
 <translation id="1315551408014407711">ຕັ້ງຄ່າໂປຣໄຟລ໌ Chromium ໃໝ່ຂອງທ່ານ</translation>
 <translation id="132092532143527429">ລອງໃຊ້ Gemini ໃນ Chromium</translation>
 <translation id="1324107359134968521">Chromium ຕ້ອງການສິດເຂົ້າເຖິງ Bluetooth ເພື່ອສຳຫຼວດ 
@@ -94,6 +95,7 @@
 <translation id="1951406923938785464">Chromium ບລັອກການດາວໂຫຼດນີ້ ເນື່ອງຈາກໄຟລ໌ປະເພດນີ້ບໍ່ໄດ້ມີການດາວໂຫຼດໂດຍທົ່ວໄປ ແລະ ອາດເປັນອັນຕະລາຍ</translation>
 <translation id="1953553007165777902">ກຳລັງດາວໂຫຼດ... ຍັງເຫຼືອ <ph name="MINUTE" /> ນາທີ</translation>
 <translation id="1966382378801805537">Chromium ບໍ່ສາມາດກຳນົດ ຫຼື ຕັ້ງໂປຣແກຣມທ່ອງເວັບເລີ່ມຕົ້ນໄດ້</translation>
+<translation id="197326043290947695">ທ່ອງເວັບຢ່າງອັດສະລິຍະຂຶ້ນດ້ວຍຄຸນສົມບັດຊອກຫາຮູບ</translation>
 <translation id="1990262977744080398">ສຶກສາວ່າເປັນຫຍັງ Chromium ຈຶ່ງບລັອກບາງໄຟລ໌, ເປີດໃນແຖບໃໝ່</translation>
 <translation id="1999715455684970349">ກະລຸນາອັບເດດຊອບແວ Chromium ໃຫ້ເປັນເວີຊັນຫຼ້າສຸດຢູ່ສະເໝີ. ຫາກປິດການນຳໃຊ້ ຫຼື ຢຸດບໍລິການນີ້, ຊອບແວ Chromium ຂອງທ່ານຈະບໍ່ໄດ້ຮັບການອັບເດດ, ເຊິ່ງໝາຍຄວາມວ່າຊ່ອງຫວ່າງດ້ານຄວາມປອດໄພທີ່ອາດເກີດຂຶ້ນຈະບໍ່ສາມາດແກ້ໄຂໄດ້ ແລະ ຄຸນສົມບັດອາດບໍ່ເຮັດວຽກ. ບໍລິການນີ້ຈະຖອນການຕິດຕັ້ງຕົວເອງເມື່ອບໍ່ມີຊອບແວ Chromium ນຳໃຊ້ຢູ່.</translation>
 <translation id="2008474315282236005">ນີ້ຈະລຶບ 1 ລາຍການອອກຈາກອຸປະກອນນີ້. ເພື່ອກູ້ຂໍ້ມູນຂອງທ່ານຄືນໃນພາຍຫຼັງ, ກະລຸນາເຂົ້າສູ່ລະບົບ Chromium ເປັນ <ph name="USER_EMAIL" />.</translation>
@@ -236,6 +238,7 @@
 <translation id="3387527074123400161">ChromiumOS</translation>
 <translation id="3406848076815591792">ສະຫຼັບເປັນໂປຣໄຟລ໌ Chromium ທີ່ມີຢູ່ກ່ອນແລ້ວບໍ?</translation>
 <translation id="3412460710772753638">ໃນຕົວຈັດການລະຫັດຜ່ານຢູ່ອຸປະກອນນີ້</translation>
+<translation id="3423442168617177595">ຕິດຕັ້ງມາໃນ Chromium ເພື່ອຊ່ວຍທ່ານສ້າງ, ບັນທຶກ ແລະ ຕື່ມຂໍ້ມູນລະຫັດຜ່ານຍາກໂດຍອັດຕະໂນມັດ. ເພີ່ມທາງລັດເພື່ອໃຫ້ເຂົ້າເຖິງໄດ້ງ່າຍ</translation>
 <translation id="3455907671758333080">ຂະຫຍາຍ Safe Browsing ທີ່ປັບປຸງດີຂຶ້ນດ້ວຍ Chromium ຢູ່ໂທລະສັບຂອງທ່ານ</translation>
 <translation id="3461644266919055473">ກຳລັງປັບແຕ່ງ Chromium ໃນແບບຂອງທ່ານ...</translation>
 <translation id="3474745554856756813">ນີ້ຈະລຶບ <ph name="ITEMS_COUNT" /> ລາຍການອອກຈາກອຸປະກອນນີ້. ເພື່ອກູ້ຂໍ້ມູນຂອງທ່ານຄືນໃນພາຍຫຼັງ, ກະລຸນາເຂົ້າສູ່ລະບົບ Chromium ເປັນ <ph name="USER_EMAIL" />.</translation>
@@ -285,6 +288,7 @@
 <translation id="3975724895399328945">ກ່ຽວກັບ Google Chrome ສຳລັບການທົດສອບ</translation>
 <translation id="3997429360543082038">ກ່ຽວກັບ ChromiumOS</translation>
 <translation id="4010059961270896984">ເມື່ອທ່ານເຂົ້າເບິ່ງເວັບໄຊ, Chromium ຈະເອົາສະເພາະບາງສ່ວນຂອງ URL ມາສ້າງຄວາມສັບສົນແລ້ວສົ່ງໄປໃຫ້ <ph name="BEGIN_LINK" />Google Safe Browsing<ph name="END_LINK" /> ຜ່ານເຊີບເວີຄວາມເປັນສ່ວນຕົວທີ່ເຊື່ອງທີ່ຢູ່ IP ຂອງທ່ານ. ຫາກເວັບໄຊເຮັດສິ່ງທີ່ໜ້າສົງໄສ, ລະບົບຈະສົ່ງ URL ແບບເຕັມ ແລະ ເນື້ອຫາຂອງໜ້າເວັບບາງສ່ວນນຳ.</translation>
+<translation id="4016217212818346953">ປອດໄພຢູ່ສະເໝີດ້ວຍຕົວຈັດການລະຫັດຜ່ານ</translation>
 <translation id="4019629340646866719">ChromiumOS ເກີດຂຶ້ນໄດ້ດ້ວຍ <ph name="BEGIN_LINK_CROS_OSS" />ຊອບແວໂອເພນຊອດ<ph name="END_LINK_CROS_OSS" /> ເພີ່ມເຕີມ, ຮວມທັງ <ph name="BEGIN_LINK_LINUX_OSS" />ສະພາບແວດລ້ອມການພັດທະນາ Linux<ph name="END_LINK_LINUX_OSS" />.</translation>
 <translation id="4022972681110646219">ແປໜ້າຈໍ</translation>
 <translation id="4023601594785368013">ພາສາຕົ້ນສະບັບ: <ph name="LANGUAGE" /></translation>
@@ -504,6 +508,7 @@
 <translation id="6400112897226594999">ໂລໂກ້ Chromium ພາຍໃນໜ້າຈໍຄອມພິວເຕີ.</translation>
 <translation id="6403826409255603130">Chromium ແມ່ນບຣາວເຊີເວັບທີ່ແລ່ນໜ້າເວັບ ແລະແອັບພລິເຄຊັນດ້ວຍຄວາມໄວແບບສາຍຟ້າແມັບ. ມັນໄວ, ໝັ້ນຄົງ, ແລະໃຊ້ງ່າຍ. ທ່ອງເວັບໄດ້ປອດໄພກ່ວາດ້ວຍການປົກປ້ອງມາລແວ ແລະພິຊຊິງທີ່ສ້າງຢູ່ໃນຕົວ Chromium.</translation>
 <translation id="6414624068245092115">ເພື່ອກວດສອບໃຫ້ແນ່ໃຈວ່າທ່ານສາມາດໃຊ້ ແລະ ບັນທຶກຂໍ້ມູນ Chromium ໃນບັນຊີ Google ຂອງທ່ານໄດ້ຕະລອດເວລາ, ກະລຸນາຢັ້ງຢືນວ່າແມ່ນທ່ານ</translation>
+<translation id="6417332166651156371">ຮູບພາບແບບຮຽບງ່າຍທີ່ສະແດງຈຸດເຂົ້າເຖິງຕົວຈັດການລະຫັດຜ່ານໃນ Chromium</translation>
 <translation id="642132557830635295">Chromium ເຮັດວຽກໄດ້ໄວຂຶ້ນ ແລະ ຄຸນສົມບັດທີ່ໃຊ້ JavaScript ຄວນເຮັດວຽກຕາມທີ່ອອກແບບໄວ້</translation>
 <translation id="6436260184216827876">ການຊອກຫາຮູບບໍ່ພ້ອມນຳໃຊ້. ກະລຸນາລອງໃໝ່ໃນພາຍຫຼັງ.</translation>
 <translation id="6442900851116057561">ຣີສະຕາດ ChromiumOS</translation>
@@ -595,6 +600,7 @@
 <translation id="7196312274710523067">ບໍ່ສາມາດເປີດໃຊ້ Chromium ໄດ້. ກະລຸນາລອງອີກຄັ້ງ.</translation>
 <translation id="7213008767289637091">ເກັບ Chromium ໃນດັອກຂອງທ່ານເພື່ອໄປໃຊ້ມັນຢ່າງວ່ອງໄວໄດ້ທຸກເວລາ</translation>
 <translation id="7213407614656404070">ໃຊ້ Chromium ຕອນໃດກໍໄດ້ທີ່ທ່ານຄລິກລິ້ງໃນຂໍ້ຄວາມ, ເອກະສານ ແລະ ແອັບອື່ນໆ</translation>
+<translation id="7216228761061470870">ເມື່ອທ່ານໃຊ້ຄຸນສົມບັດຊອກຫາຮູບຢູ່ເດັສທັອບ, ລະບົບຈະສົ່ງຊື່ໜ້າ, URL ແລະ ເນື້ອຫາ, ຮວມທັງ PDF ໄປຫາເຊີບເວີ</translation>
 <translation id="7223968959479464213">ຕົວຈັດການໜ້າວຽກ - Chromium</translation>
 <translation id="7252276985725323153">ເລີ່ມທ່ອງເວັບໄດ້ທັນທີ: ຕອນນີ້ລະບົບສາມາດເປີດໃຊ້ Chromium ເມື່ອ Windows ເລີ່ມເຮັດວຽກໄດ້ແລ້ວ.</translation>
 <translation id="7274695763216404502">ປັກໝຸດແລ້ວ! ໃຊ້ການຊອກຫາຮູບອີກຄັ້ງຈາກແຖບເຄື່ອງມື</translation>

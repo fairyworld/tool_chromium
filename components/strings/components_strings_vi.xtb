@@ -314,6 +314,7 @@ Nếu bạn từ chối, chế độ cài đặt quyền riêng tư của bạn 
 <translation id="1463793142714244641">Quyền sở hữu bất động sản và bất động sản nghỉ dưỡng</translation>
 <translation id="1465457928007067810">Đã lưu IBAN vào Tài khoản Google</translation>
 <translation id="1467432559032391204">Trái</translation>
+<translation id="1471514598850585811">Máy tính xách tay</translation>
 <translation id="1472675084647422956">Hiện thêm</translation>
 <translation id="1473183651233018052">JIS B10</translation>
 <translation id="1473495410389165587">Nhập ít nhất 3 từ để được trợ giúp khi viết</translation>
@@ -1236,6 +1237,7 @@ Nếu bạn từ chối, chế độ cài đặt quyền riêng tư của bạn 
 <translation id="2929525460561903222">{SHIPPING_ADDRESS,plural, =0{<ph name="SHIPPING_ADDRESS_PREVIEW" />}=1{<ph name="SHIPPING_ADDRESS_PREVIEW" /> và <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> địa chỉ giao hàng khác}other{<ph name="SHIPPING_ADDRESS_PREVIEW" /> và <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> địa chỉ giao hàng khác}}</translation>
 <translation id="2930531075747147366">Thẻ được gửi từ thiết bị khác của bạn</translation>
 <translation id="2930577230479659665">Cắt bỏ sau mỗi bản sao chép</translation>
+<translation id="2931453528659195355">Quản lý thông tin mua sắm</translation>
 <translation id="2933624813161016821">Nhũ nổi</translation>
 <translation id="2935726091208500473">chia sẻ các thẻ của bạn</translation>
 <translation id="293796669683825859">Nhận xét</translation>
@@ -1728,6 +1730,7 @@ Nếu bạn từ chối, chế độ cài đặt quyền riêng tư của bạn 
 <translation id="3681841880472207951">Video QuickTime</translation>
 <translation id="3687920599421452763">Xe tải và xe tải nhỏ</translation>
 <translation id="3693327506115126094">Chọn cách xác minh danh tính của bạn</translation>
+<translation id="3693516565203081475">Chọn phương thức thanh toán</translation>
 <translation id="3698353241727597930">Quản trị viên đã định cấu hình để <ph name="FILES" /> được lưu vào bộ nhớ <ph name="CLOUD_STORAGE" /> do doanh nghiệp của bạn quản lý. Các tệp này có thể được theo dõi, kiểm tra và giữ lại khi bạn xoá tệp.</translation>
 <translation id="3698629142018988477">Nút Tạo trang web, hãy nhấn nút này để tạo nhanh một trang mới trong Google Sites</translation>
 <translation id="3700094625653511150">Để ẩn các lựa chọn trả sau, hãy chuyển đến <ph name="IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_FOOTNOTE_HIDE_OPTION_PAYMENT_SETTINGS_LINK_TEXT" /></translation>
@@ -3536,6 +3539,7 @@ Nếu bạn từ chối, chế độ cài đặt quyền riêng tư của bạn 
 <translation id="6494750904506170417">cửa sổ bật lên và chuyển hướng</translation>
 <translation id="6495664197699704593">Mật khẩu này chỉ được lưu trên thiết bị này. Để sử dụng trên các thiết bị khác, <ph name="GOOGLE_PASSWORD_MANAGER" />.</translation>
 <translation id="649611364763911650">Để sử dụng dịch vụ tự động điền khác trong Chrome, hãy chọn nhà cung cấp dịch vụ tự động điền trong phần cài đặt Android</translation>
+<translation id="6496531801333278234">Được tìm thấy nhờ tính năng Trí thông minh cá nhân. Bạn có thể quản lý thông tin của mình trong phần cài đặt.</translation>
 <translation id="6499038740797743453">Đặt lại mật khẩu?</translation>
 <translation id="6502510275417601303">Thông báo về chế độ cài đặt thông tin thanh toán mới đã đóng</translation>
 <translation id="6502991525169604759">Không bao gồm các thay đổi của bạn</translation>
@@ -5152,6 +5156,7 @@ Thông tin chi tiết bổ sung:
 <translation id="9063800855227801443">Không thể chụp nội dung bí mật</translation>
 <translation id="9065203028668620118">Chỉnh sửa</translation>
 <translation id="9065745800631924235">Cụm từ tìm kiếm <ph name="TEXT" /> từ lịch sử</translation>
+<translation id="9066116644715286230">{NUM_TABS,plural, =1{Thông tin chi tiết về việc chia sẻ thẻ. Đang chia sẻ 1 thẻ từ {WEBSITE_LIST_STR}}other{Thông tin chi tiết về việc chia sẻ thẻ. Đang chia sẻ {NUM_TABS} thẻ từ {WEBSITE_LIST_STR}}}</translation>
 <translation id="90695670378604968">Nhựa (Mờ)</translation>
 <translation id="9069693763241529744">Bị một tiện ích chặn</translation>
 <translation id="9073799351042754113">Bạn đã chọn tắt cảnh báo bảo mật đối với trang web này.</translation>

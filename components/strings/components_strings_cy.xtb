@@ -1236,6 +1236,7 @@ Fel arall, bydd eich gosodiadau preifatrwydd yn rhwystro hyn. Bydd hyn yn caniat
 <translation id="2929525460561903222">{SHIPPING_ADDRESS,plural, =0{<ph name="SHIPPING_ADDRESS_PREVIEW" />}=1{<ph name="SHIPPING_ADDRESS_PREVIEW" /> ac <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> arall}two{<ph name="SHIPPING_ADDRESS_PREVIEW" /> a <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> arall}few{<ph name="SHIPPING_ADDRESS_PREVIEW" /> a <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> arall}many{<ph name="SHIPPING_ADDRESS_PREVIEW" /> a <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> arall}other{<ph name="SHIPPING_ADDRESS_PREVIEW" /> a <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> arall}}</translation>
 <translation id="2930531075747147366">Tab o'ch Dyfais Arall</translation>
 <translation id="2930577230479659665">Tocio ar ôl pob copi</translation>
+<translation id="2931453528659195355">Rheoli gwybodaeth siopa</translation>
 <translation id="2933624813161016821">Ffoil Boglynnu</translation>
 <translation id="2935726091208500473">wrthi'n rhannu eich tabiau</translation>
 <translation id="293796669683825859">Sylwadau</translation>
@@ -1728,6 +1729,7 @@ I guddio opsiynau talu'n ddiweddarach, ewch i'r <ph name="BEGIN_LINK" />gosodiad
 <translation id="3681841880472207951">Fideo QuickTime</translation>
 <translation id="3687920599421452763">Faniau a Faniau Bach</translation>
 <translation id="3693327506115126094">Dewiswch sut y byddwch yn cadarnhau mai chi sydd yno</translation>
+<translation id="3693516565203081475">Dewis dull talu</translation>
 <translation id="3698353241727597930">Mae eich gweinyddwr wedi ffurfweddu i gadw <ph name="FILES" /> yn eich storfa <ph name="CLOUD_STORAGE" /> a reolir gan Enterprise. Mae'n bosib y bydd y ffeiliau hyn yn cael eu monitro, eu harchwilio, a'u cadw pan fyddwch yn eu dileu.</translation>
 <translation id="3698629142018988477">Botwm creu gwefan, gweithredwch i greu gwefan newydd yn Google Sites yn gyflym</translation>
 <translation id="3700094625653511150">I guddio opsiynau talu'n ddiweddarach, ewch i <ph name="IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_FOOTNOTE_HIDE_OPTION_PAYMENT_SETTINGS_LINK_TEXT" /></translation>
@@ -5150,6 +5152,7 @@ Manylion ychwanegol:
 <translation id="9063800855227801443">Methu â thynnu sgrinlun o gynnwys cyfrinachol</translation>
 <translation id="9065203028668620118">Golygu</translation>
 <translation id="9065745800631924235">Chwiliad <ph name="TEXT" /> o'r hanes</translation>
+<translation id="9066116644715286230">{NUM_TABS,plural, =1{Manylion rhannu tabiau. Wrthi'n rhannu 1 tab o {WEBSITE_LIST_STR}}zero{Manylion rhannu tabiau. Wrthi'n rhannu {NUM_TABS} tab o {WEBSITE_LIST_STR}}two{Manylion rhannu tabiau. Wrthi'n rhannu {NUM_TABS} dab o {WEBSITE_LIST_STR}}few{Manylion rhannu tabiau. Wrthi'n rhannu {NUM_TABS} tab o {WEBSITE_LIST_STR}}many{Manylion rhannu tabiau. Wrthi'n rhannu {NUM_TABS} tab o {WEBSITE_LIST_STR}}other{Manylion rhannu tabiau. Wrthi'n rhannu {NUM_TABS} tab o {WEBSITE_LIST_STR}}}</translation>
 <translation id="90695670378604968">Plastig (Matte)</translation>
 <translation id="9069693763241529744">Rhwystrwyd gan estyniad</translation>
 <translation id="9073799351042754113">Rydych wedi dewis diffodd rhybuddion diogelwch ar gyfer y wefan hon.</translation>

@@ -30,6 +30,7 @@
 <translation id="126567311906253476">Gmail বা YouTube-এর মতো Google পরিষেবায় <ph name="USER_EMAIL" /> দিয়ে সাইন-ইন করার সময় আপনি একই অ্যাকাউন্ট দিয়ে Chromium-এ অটোমেটিক সাইন-ইন করতে পারবেন</translation>
 <translation id="1287534462498555020">আপনার ফোনে Chromium ডাউনলোড করুন</translation>
 <translation id="1290883685122687410">সেট-আপ সংক্রান্ত সমস্যা: <ph name="METAINSTALLER_EXIT_CODE" />। <ph name="WINDOWS_ERROR" /></translation>
+<translation id="1312200348844120300">এই ইলাস্ট্রেশনে দেখানো হচ্ছে যে কোনও প্রোডাক্ট খুঁজে পেতে আপনি কীভাবে 'ছবি সার্চ করা' ফিচারটি ব্যবহার করতে পারেন</translation>
 <translation id="1315551408014407711">আপনার নতুন Chromium প্রোফাইল সেট আপ করুন</translation>
 <translation id="132092532143527429">Chromium-এ Gemini ব্যবহার করে দেখুন</translation>
 <translation id="1324107359134968521">ব্লুটুথ ডিভাইসগুলি এক্সপ্লোর করতে 
@@ -92,6 +93,7 @@
 <translation id="1951406923938785464">এই ধরনের ফাইল সাধারণত ডাউনলোড করা হয় না এবং এটি বিপজ্জনক হতে পারে, তাই Chromium এই ডাউনলোডটি ব্লক করে দিয়েছে</translation>
 <translation id="1953553007165777902">ডাউনলোড হচ্ছে... <ph name="MINUTE" /> মিনিট বাকি আছে</translation>
 <translation id="1966382378801805537">Chromium ডিফল্ট ব্রাউজার নির্ধারণ বা সেট করতে পারছে না</translation>
+<translation id="197326043290947695">'ছবি সার্চ করা' ফিচার ব্যবহার করে আরও স্মার্ট ব্রাউজিং করুন</translation>
 <translation id="1990262977744080398">Chromium কিছু ফাইল কেন ব্লক করে, নতুন ট্যাবে খোলে সেই সম্পর্কে জানুন</translation>
 <translation id="1999715455684970349">আপনার Chromium সফ্টওয়্যার আপ-টু-ডেট রাখুন। এই পরিষেবা অ্যাক্টিভ না থাকলে বা বন্ধ হয়ে গেলে, Chromium সফ্টওয়্যার আপ-টু-ডেট থাকবে না, তার মানে হল নিরাপত্তা সম্পর্কিত ঝুঁকি থাকতে পারে যা সমাধান করা যাবে না এবং ফিচার কাজ নাও করতে পারে। কোনও Chromium সফ্টওয়্যার এটির ব্যবহার না করলে এই পরিষেবা নিজে থেকে আনইনস্টল হয়।</translation>
 <translation id="2008474315282236005">এটি এই ডিভাইস থেকে ১টি আইটেম মুছে দেবে। আপনার ডেটা পরে পুনরুদ্ধার করার জন্য, Chromium-এ <ph name="USER_EMAIL" /> হিসেবে সাইন-ইন করুন।</translation>
@@ -234,6 +236,7 @@
 <translation id="3387527074123400161">ChromiumOS</translation>
 <translation id="3406848076815591792">বর্তমান Chromium প্রোফাইলে পাল্টাতে চান?</translation>
 <translation id="3412460710772753638">এই ডিভাইসের Password Manager-এ</translation>
+<translation id="3423442168617177595">শক্তিশালী পাসওয়ার্ড তৈরি, সেভ ও অটোফিল করতে সাহায্য করার জন্য এটি Chromium-এ ইন-বিল্ট রয়েছে। সহজে অ্যাক্সেস করার জন্য শর্টকাট যোগ করুন</translation>
 <translation id="3455907671758333080">আপনার ফোনে Chromium-এর সাথে উন্নত Safe Browsing এক্সটেন্ড করুন</translation>
 <translation id="3461644266919055473">আপনার জন্য Chromium সেট-আপ করা হচ্ছে...</translation>
 <translation id="3474745554856756813">এটি এই ডিভাইস থেকে <ph name="ITEMS_COUNT" />টি আইটেম মুছে দেবে। আপনার ডেটা পরে পুনরুদ্ধার করার জন্য, Chromium-এ <ph name="USER_EMAIL" /> হিসেবে সাইন-ইন করুন।</translation>
@@ -283,6 +286,7 @@
 <translation id="3975724895399328945">Google Chrome for Testing সম্পর্কে</translation>
 <translation id="3997429360543082038">ChromiumOS সম্পর্কে</translation>
 <translation id="4010059961270896984">আপনি কোনও সাইট ভিজিট করলে, Chromium সেই সাইটের URL-এর অস্পষ্ট অংশ <ph name="BEGIN_LINK" />Google Safe Browsing<ph name="END_LINK" />-এ পাঠায়। এই কাজটি একটি প্রাইভেসি সার্ভারের মাধ্যমে করা হয়, যা আপনার IP অ্যাড্রেস লুকিয়ে রাখে। সাইটে সন্দেহজনক কিছু পাওয়া গেলে, সম্পূর্ণ URL ও পৃষ্ঠার কন্টেন্টের কিছু অংশও পাঠানো হয়।</translation>
+<translation id="4016217212818346953">Password Manager ব্যবহার করে নিরাপদে থাকুন</translation>
 <translation id="4019629340646866719"><ph name="BEGIN_LINK_LINUX_OSS" />Linux ডেভেলপমেন্ট এনভায়রনমেন্ট<ph name="END_LINK_LINUX_OSS" />-এর ক্ষেত্রে যেমন করা হয়েছে, তেমনভাবে অতিরিক্ত <ph name="BEGIN_LINK_CROS_OSS" />ওপেন সোর্স সফ্টওয়্যার<ph name="END_LINK_CROS_OSS" />-এর মাধ্যমে ChromiumOS তৈরি করা সম্ভব হয়েছে।</translation>
 <translation id="4022972681110646219">স্ক্রিনে থাকা সব কন্টেন্ট অনুবাদ করুন</translation>
 <translation id="4023601594785368013">মূল ভাষা: <ph name="LANGUAGE" /></translation>
@@ -502,6 +506,7 @@
 <translation id="6400112897226594999">কম্পিউটার স্ক্রিনের মধ্যে Chromium লোগো।</translation>
 <translation id="6403826409255603130">Chromium হল একটি ওয়েব ব্রাউজার যা ওয়েব পৃষ্ঠার গতি এবং অ্যাপগুলিকে বিদ্যুৎ গতিতে সঞ্চালিত করে৷ এটা দ্রুত, স্থিতিশীল এবং সহজে ব্যবহারের যোগ্য৷ Chromium নির্মিত ম্যালওয়ার এবং ফিশিং সুরক্ষার সাহায্যে আরও সুরক্ষিত ভাবে ওয়েব ব্রাউজ করুন৷</translation>
 <translation id="6414624068245092115">আপনার Google অ্যাকাউন্টে সবসময় Chromium ডেটা ব্যবহার ও সেভ করতে পারবেন তা নিশ্চিত করার জন্য, নিজের পরিচয় যাচাই করে নিন</translation>
+<translation id="6417332166651156371">Chromium-এ Password Manager-এর এন্ট্রি পয়েন্টটি একটি সহজ ছবির মাধ্যমে এখানে দেখানো হয়েছে</translation>
 <translation id="642132557830635295">Chromium আরও দ্রুত কাজ করে এবং যেসব ফিচার জাভাস্ক্রিপ্ট ব্যবহার করে, সেগুলি ডিজাইন করা অনুযায়ী কাজ করতে হবে</translation>
 <translation id="6436260184216827876">'ছবি সার্চ করা' ফিচার উপলভ্য নেই। পরে আবার চেষ্টা করুন।</translation>
 <translation id="6442900851116057561">ChromiumOS রিস্টার্ট করুন</translation>
@@ -591,6 +596,7 @@
 <translation id="7196312274710523067">Chromium চালু করা যায়নি। আবার চেষ্টা করুন।</translation>
 <translation id="7213008767289637091">যেকোনও সময় দ্রুত অ্যাক্সেসের জন্য নিজের 'ডক'-এ Chromium রাখুন</translation>
 <translation id="7213407614656404070">যেকোনও সময় মেসেজ, ডকুমেন্ট এবং অন্যান্য অ্যাপে থাকা লিঙ্কে ক্লিক করতে Chromium ব্যবহার করুন</translation>
+<translation id="7216228761061470870">ডেস্কটপে 'ছবি সার্চ করা' ফিচার ব্যবহার করার সময়, পৃষ্ঠার টাইটেল, URL এবং PDF সহ কন্টেন্ট সার্ভারে পাঠানো হয়</translation>
 <translation id="7223968959479464213">টাস্ক ম্যানেজার - Chromium</translation>
 <translation id="7252276985725323153">ইনস্ট্যান্ট ব্রাউজ করা শুরু করুন: Windows চালু হলেই এখন Chromium লঞ্চ হতে পারবে।</translation>
 <translation id="7274695763216404502">পিন করা আছে! টুলবার থেকে 'ছবি সার্চ করা' ফিচার আবার ব্যবহার করুন</translation>

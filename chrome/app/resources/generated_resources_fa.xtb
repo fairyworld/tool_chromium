@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{یک گذرواژه به <ph name="BRAND" /> در این دستگاه وارد شد}one{{NUM_PASSWORDS} گذرواژه به <ph name="BRAND" /> در این دستگاه وارد شد}other{{NUM_PASSWORDS} گذرواژه به <ph name="BRAND" /> در این دستگاه وارد شد}}</translation>
 <translation id="1046572983040892965">پنجره به بالا سمت چپ منتقل شد</translation>
 <translation id="1047431265488717055">کپی کردن متن &amp;پیوند</translation>
+<translation id="1048350929895890054">سایت‌هایی که منو شناور در آن‌ها مسدود شده است</translation>
 <translation id="1048986595386481879">اختصاص‌یافته به‌صورت پویا</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{درحال دریافت <ph name="ATTACHMENTS" /> از <ph name="DEVICE_NAME" />}one{درحال دریافت <ph name="ATTACHMENTS" /> از <ph name="DEVICE_NAME" />}other{درحال دریافت <ph name="ATTACHMENTS" /> از <ph name="DEVICE_NAME" />}}</translation>
 <translation id="1049743911850919806">ناشناس</translation>
@@ -519,7 +520,7 @@
 <translation id="1380028686461971526">اتصال خودکار به شبکه</translation>
 <translation id="1381567580865186407">‏گفتار <ph name="LANGUAGE" /> برای پردازش به Google ارسال می‌شود</translation>
 <translation id="1382174183118245544">شماره کارت اعتباری</translation>
-<translation id="1383065744946263511">سنجاق کردن به «نوارابزار»</translation>
+<translation id="1383065744946263511">سنجاق کردن به نوارابزار</translation>
 <translation id="1383381142702995121">مدیریت این افزونه</translation>
 <translation id="1383597849754832576">نمی‌توان فایل‌های گفتاری را بارگیری کرد. بعداً دوباره امتحان کنید.</translation>
 <translation id="1383861834909034572">باز کردن پس از بارگیری</translation>
@@ -937,6 +938,7 @@
 <translation id="1695510246756136088">اتصال به اینترنت ممکن نیست. دوباره امتحان کنید.</translation>
 <translation id="1696555181932908973">می‌توانید روش‌های دیگر را برای ادامه دادن در <ph name="SITE_ETLD_PLUS_ONE" /> امتحان کنید.</translation>
 <translation id="1696685050160038195">برای حفظ ایمنی دستگاهتان، باید فقط نرم‌افزارهای ارائه‌شده توسط منابع و توسعه‌دهندگان قابل‌اعتماد را نصب و اجرا کنید.</translation>
+<translation id="1696832149095851409">منو شناور در نوشتار انتخاب‌شده</translation>
 <translation id="1697122132646041614">«رأی مخالف» فرمی را برای ارسال بازخورد دقیق درباره علت نپسندیدن این نتایج باز می‌کند.</translation>
 <translation id="1697532407822776718">همه چیز مرتب است.</translation>
 <translation id="1698796500103229697">&amp;روش‌های پرداخت</translation>
@@ -2511,6 +2513,7 @@
 <translation id="2845276301195220700">‏کنش‌های بیشتر برای «تقویم Google»</translation>
 <translation id="2845382757467349449">همیشه نشان دادن نوار نشانک‌ها</translation>
 <translation id="284581348330507117">گذرواژه‌های متمایز ایجاد کنید</translation>
+<translation id="2846345106886298325">‏تکلیف انجام شد و نتیجه به Gemini Spark برگردانده شد</translation>
 <translation id="284884486564166077">هر تصویری را با «لنز» جستجو کنید</translation>
 <translation id="2849035674501872372">بالا را نگاه کنید</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3014,6 +3017,7 @@
 <translation id="3223109931751684474">دسترسی به گذرکلیدها در این دستگاه برداشته شود</translation>
 <translation id="3223531857777746191">دکمه بازنشانی</translation>
 <translation id="3225084153129302039">چهرک پیش‌فرض بنفش</translation>
+<translation id="3226249862705569834">حسگرهای درحال استفاده</translation>
 <translation id="3226487301970807183">پنهان/نمایان کردن پانل کناری ترازشده به‌چپ</translation>
 <translation id="322708765617468434">هروقت بخواهید می‌توانید فرد دیگری را بعداز راه‌اندازی به دستگاه اضافه کنید. هر فرد می‌تواند تجربه‌اش را شخصی‌سازی کند و داده‌ها را خصوصی نگه دارد.</translation>
 <translation id="3227137524299004712">میکروفن</translation>
@@ -4237,7 +4241,7 @@
 <translation id="4103644672850109428">صفحه‌خوان، درشت‌نمایی</translation>
 <translation id="4104163789986725820">&amp;صادر کردن...</translation>
 <translation id="4107048419833779140">شناسایی و خارج کردن دستگاه‌های ذخیره‌سازی</translation>
-<translation id="4107207375883769436">سازمان شما ممکن است نیاز داشته باشد تا داده های مروری شما مانند سابقه مرور و گذرواژه‌های شما را در نمایه کاری‌تان ببیند و مدیریت کند.</translation>
+<translation id="4107207375883769436">سازمان شما ممکن است نیاز داشته باشد تا داده‌های مرور شما مانند سابقه مرور و گذرواژه‌های شما را در نمایه کاری‌تان ببیند و مدیریت کند.</translation>
 <translation id="4107522742068568249">رفتن به کنترل ایمنی</translation>
 <translation id="4107793386654579933">انتخاب میان‌بر برای کنش <ph name="ACTION_NAME" /></translation>
 <translation id="4109135793348361820">انتقال پنجره به <ph name="USER_NAME" /> (<ph name="USER_EMAIL" />)</translation>
@@ -5233,7 +5237,6 @@
 <translation id="486505726797718946">حافظه ذخیره شد</translation>
 <translation id="486635084936119914">باز شدن خودکار برخی از انواع فایل بعد از بارگیری</translation>
 <translation id="4867272607148176509">والدین می‌توانند برنامه‌ها را تأیید یا مسدود کنند، محدودیت‌های زمانی تنظیم کنند، و مرور در وب را کنترل کنند. بعداً می‌توان حساب تحصیلی را برای دسترسی به اکثر منابع مدرسه اضافه کرد.</translation>
-<translation id="486796517585164369">· زبانه اخیر</translation>
 <translation id="4868284252360267853">‏درحال‌حاضر، این کادر گفتگو متمرکز نشده است. برای تمرکز کردن روی این کادر گفتگو، کلیدهای Command+Shift+Option A را فشار دهید.</translation>
 <translation id="4869170227080975044">‏خواندن اطلاعات شبکه ChromeOS</translation>
 <translation id="4870724079713069532">می‌توانید فایل‌های پشتیبانی‌شده را با این برنامه ازطریق «کاوشگر فایل» یا برنامه‌های دیگر باز کنید و ویرایش کنید. برای کنترل اینکه کدام فایل‌ها به‌طور پیش‌فرض در این برنامه باز شود، به <ph name="BEGIN_LINK" />تنظیمات پنجره‌ها<ph name="END_LINK" /> بروید.</translation>
@@ -6058,7 +6061,7 @@
 <translation id="5493792505296048976">صفحه روشن است</translation>
 <translation id="5494016731375030300">برگه‌هایی که اخیراً بسته شده‌اند</translation>
 <translation id="5494362494988149300">پس از &amp;تکمیل باز شود</translation>
-<translation id="5494879038325093596">‏هویت خود را درستی‌سنجی کنید تا آن را در تمام دستگاه های متصل به «حساب Google» خود دریافت کنید</translation>
+<translation id="5494879038325093596">‏هویت خود را درستی‌سنجی کنید تا آن را با «حساب Google» خود در تمام دستگاه‌ها دریافت کنید</translation>
 <translation id="5494920125229734069">انتخاب همه</translation>
 <translation id="5495466433285976480">با این کار بعد از راه‌اندازی مجدد، همه داده‌ها، فایل‌ها، کاربران محلی و سایر تنظیمات حذف خواهد شد. همه کاربران باید دوباره وارد سیستم شوند.</translation>
 <translation id="5495597166260341369">روشن ماندن نمایشگر</translation>
@@ -6127,6 +6130,7 @@
 <translation id="5546865291508181392">یافتن</translation>
 <translation id="5547868626772433490">‏پرسیدن از Gemini</translation>
 <translation id="5548075230008247516">انتخاب همه موارد لغو شد، از حالت انتخاب خارج شدید.</translation>
+<translation id="554810465530189549">وقتی نوشتار انتخاب می‌شود، منو شناور نشان داده نشود</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{«<ph name="TAB_TITLE" />»}=1{«<ph name="TAB_TITLE" />» و یک برگه دیگر}one{«<ph name="TAB_TITLE" />» و # برگه دیگر}other{«<ph name="TAB_TITLE" />» و # برگه دیگر}}</translation>
 <translation id="554903022911579950">کربرس</translation>
 <translation id="5549511085333906441">انتخاب تنظیمات</translation>
@@ -6292,6 +6296,7 @@
 <translation id="5678955352098267522">خواندن داده‌های شما در <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">«<ph name="ESIM_PROFILE_NAME" />» حذف شود؟</translation>
 <translation id="5681586175480958839">فایل درحال باز شدن است</translation>
+<translation id="5682950763196110705">نمایش منو شناور هنگام انتخاب نوشتار</translation>
 <translation id="5684110242705861346">افزونه «<ph name="NAME" />» توسط خط‌مشی سازمانتان اضافه شده است و این تنظیم را کنترل می‌کند. <ph name="BEGIN_LINK" />دیدن جزئیات<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">‏جزئیات Wi-Fi</translation>
 <translation id="5684661240348539843">شناسه دارایی</translation>
@@ -10068,6 +10073,7 @@
 <translation id="8505669004895429027">صرفه‌جویی‌های کم</translation>
 <translation id="8507052544157927817">سبک زیرخط</translation>
 <translation id="8507227974644337342">وضوح صفحه</translation>
+<translation id="8507443886219296894">پنهان کردن برای این سایت</translation>
 <translation id="850763987657366362">گواهینامه وارد نشد</translation>
 <translation id="8508532351844333131">‏‫<ph name="WEBSITE_ORIGIN" /> می‌خواهد اطلاعات را در دستگاه Android شما ذخیره کند</translation>
 <translation id="8509177919508253835">بازنشانی کلیدهای امنیتی و ایجاد پین</translation>
@@ -10128,6 +10134,7 @@
 <translation id="8552102814346875916">ذخیره در فهرست «این سایت‌ها همیشه فعال نگه داشته شود»</translation>
 <translation id="8552947739661397736">‏دردست گرفتن تکلیف، Gemini درحال‌حاضر کنترل را دردست دارد.</translation>
 <translation id="8553342806078037065">مدیریت افراد دیگر</translation>
+<translation id="8554642222921881444">منو شناور در نوشتار انتخاب‌شده</translation>
 <translation id="8554899698005018844">زبانی موجود نیست</translation>
 <translation id="8555444629041783356">زمان‌بندی خودکار غروب</translation>
 <translation id="8557022314818157177">کلید امنیتی را تازمانی‌که اثرانگشت ثبت شود، لمس کنید</translation>
@@ -10424,6 +10431,7 @@
 <translation id="8759753423332885148">بیشتر بدانید.</translation>
 <translation id="876161309768861172">به سیستم وارد نشدید، لطفاً دوباره امتحان کنید</translation>
 <translation id="8761945298804995673">این کاربر از قبل وجود دارد</translation>
+<translation id="876287961468788565">‏وقتی نوشتاری را در سایتی انتخاب می‌کنید، Chrome می‌تواند منو شناوری را با کنش‌ها نشان دهد.</translation>
 <translation id="8762886931014513155"><ph name="DEVICE_TYPE" /> شما باید به‌روزرسانی شود</translation>
 <translation id="8763927697961133303">‏دستگاه USB</translation>
 <translation id="8765940060470412555">برداشتن سنجاق حالت خواندن</translation>
@@ -10773,7 +10781,7 @@
 <translation id="9012585441087414258">‏دربرابر سایت‌ها، بارگیری‌ها، و افزونه‌هایی که خطرناک بودنشان مشخص شده است از شما محافظت می‌کند. اگر صفحه‌ای کار مشکوکی انجام دهد، نشانی‌های وب و بیت‌های محتوای صفحه به «مرور ایمن Google» ارسال می‌شود.</translation>
 <translation id="9014206344398081366">‏آموزش گام‌به‌گام ChromeVox</translation>
 <translation id="9014674417732091912">به ردیف <ph name="ROW_NUMBER" /> منتقل شد</translation>
-<translation id="9015111999662965458">برای اطمینان از استفاده ایمن از این دستگاه، سازمان شما ممکن است نیاز داشته باشد اطلاعاتی درباره سیستم‌عامل، مرورگر، تنظیمات و نرم‌افزارهایی که در دستگاه نصب شده است را مشاهده کند.</translation>
+<translation id="9015111999662965458">برای اطمینان از استفاده ایمن از این دستگاه، سازمان شما ممکن است نیاز داشته باشد اطلاعاتی درباره سیستم‌عامل، مرورگر، تنظیمات، و نرم‌افزارهایی را که در دستگاه نصب شده است مشاهده کند.</translation>
 <translation id="9015849286924418538">برای دسترسی داشتن آسان، زبانه‌ها را در گروه‌های برچسب‌گذاری‌شده و کدبندی‌شده با رنگ سازمان‌دهی کنید</translation>
 <translation id="9016827136585652292">پنهان/ نمایان کردن صفحه حریم خصوصی</translation>
 <translation id="90181708067259747">تاریخ انقضا: <ph name="CARD" /></translation>

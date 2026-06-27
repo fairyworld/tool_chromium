@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{මෙම උපාංගය මත <ph name="BRAND" /> වෙත 1 මුරපදයක් ආයාත කරන ලදි}one{මෙම උපාංය මත <ph name="BRAND" /> වෙත මුරපද {NUM_PASSWORDS}ක් ආයාත කරන ලදි}other{මෙම උපාංය මත <ph name="BRAND" /> වෙත මුරපද {NUM_PASSWORDS}ක් ආයාත කරන ලදි}}</translation>
 <translation id="1046572983040892965">කවුළුව ඉහළට සහ වමට ගෙන ගියා</translation>
 <translation id="1047431265488717055">සබැඳි පෙළ පිටපත් කරන්න</translation>
+<translation id="1048350929895890054">පාවෙන මෙනුව අවහිර කර ඇති වෙබ් අඩවි</translation>
 <translation id="1048986595386481879">ගතිකව වෙන් කළා</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{<ph name="DEVICE_NAME" /> වෙතින් <ph name="ATTACHMENTS" /> ලැබෙමින්}one{<ph name="DEVICE_NAME" /> වෙතින් <ph name="ATTACHMENTS" /> ලැබෙමින්}other{<ph name="DEVICE_NAME" /> වෙතින් <ph name="ATTACHMENTS" /> ලැබෙමින්}}</translation>
 <translation id="1049743911850919806">අප්‍රකට</translation>
@@ -936,6 +937,7 @@
 <translation id="1695510246756136088">අන්තර්ජාලය වෙත සම්බන්ධ විය නොහැකිය. නැවත උත්සාහ කරන්න.</translation>
 <translation id="1696555181932908973"><ph name="SITE_ETLD_PLUS_ONE" /> මත ඉදිරියට යාමට ඔබට වෙනත් ක්‍රම උත්සාහ කළ හැක.</translation>
 <translation id="1696685050160038195">ඔබේ උපාංගය සුරක්ෂිතව තබා ගැනීම සඳහා, ඔබ විශ්වාසදායක මූලාශ්‍රවලින් සහ සංවර්ධකයන්ගෙන් පමණක් මෘදුකාංග ධාවනය කර ස්ථාපනය කළ යුතු ය.</translation>
+<translation id="1696832149095851409">තෝරාගත් පෙළ මත පාවෙන මෙනුව</translation>
 <translation id="1697122132646041614">ඔබ මෙම ප්‍රතිඵල වලට අකමැති හේතුව පිළිබඳව සවිස්තරාත්මක ප්‍රතිපෝෂණ ඉදිරිපත් කිරීම සඳහා මාපටැඟිල්ලක් පහළට පෝරමයක් විවෘත කරයි.</translation>
 <translation id="1697532407822776718">ඔබ මුළුමනින් සුදානම්ය!</translation>
 <translation id="1698796500103229697">&amp;ගෙවීමේ ක්‍රම</translation>
@@ -2502,6 +2504,7 @@
 <translation id="2845276301195220700">Google දිනදර්ශනය සඳහා තව ක්‍රියා</translation>
 <translation id="2845382757467349449">හැමවිට පිටුසලකුණු බාර් එක පෙන්වන්න</translation>
 <translation id="284581348330507117">අනන්‍ය මුරපද තනන්න</translation>
+<translation id="2846345106886298325">කාර්යය ඉටු කර Gemini Spark වෙත ආපසු ලබා දෙන ලදි</translation>
 <translation id="284884486564166077">Lens සමග ඕනෑම රූපයක් සොයන්න</translation>
 <translation id="2849035674501872372">සොයන්න</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3003,6 +3006,7 @@
 <translation id="3223109931751684474">මෙම උපාංගය මත ඔබේ මුරයතුරු භාවිත කිරීමේ ප්‍රවේශය ඉවත් කරන්න</translation>
 <translation id="3223531857777746191">යළි සැකසුම් බොත්තම</translation>
 <translation id="3225084153129302039">පෙරනිමි දම් නියුරුව</translation>
+<translation id="3226249862705569834">සංවේදක භාවිතයේ ඇත</translation>
 <translation id="3226487301970807183">වමට පෙළගැස්වූ පැති පැනලය ටොගල කරන්න</translation>
 <translation id="322708765617468434">පිහිටුවීමෙන් පසු ඔබට සැම විට ම වෙනත් පුද්ගලයෙකු උපාංගයට එක් කළ හැක. එක් එක් පුද්ගලයාට තම අත්දැකීම් පෞද්ගලීකරණය කිරීමට සහ දත්ත පෞද්ගලිකව තබා ගැනීමට හැක.</translation>
 <translation id="3227137524299004712">මයික්‍රෆෝනය:</translation>
@@ -5222,7 +5226,6 @@
 <translation id="486505726797718946">මතකය සුරකින ලදි</translation>
 <translation id="486635084936119914">බාගැනීමෙන් පසුව ඇතැම් ගොනු වර්ග ස්වයංක්‍රීයව විවෘත කරන්න</translation>
 <translation id="4867272607148176509">දෙමාපියන්ට යෙදුම් අනුමත කිරීමට හෝ අවහිර කිරීමට, කාල සීමාවන් සැකසීමට සහ වෙබ් බ්‍රවුස් කිරීම පාලනය කිරීමට හැක. බොහෝ පාසල් සම්පත් වෙත ප්‍රවේශ වීමට පාසල් ගිණුමක් පසුව එක් කළ හැක.</translation>
-<translation id="486796517585164369">මෑත පටිත්ත</translation>
 <translation id="4868284252360267853">මෙම සංවාදයට දැනට අවධානය යොමු කර නැත. මෙම සංවාදයට අවධානය යොමු කිරීමට Command-Shift-Option A ඔබන්න.</translation>
 <translation id="4869170227080975044">ChromeOS ජාල තොරතුරු කියවන්න</translation>
 <translation id="4870724079713069532">ඔබට File Explorer හෝ වෙනත් යෙදුම් වෙතින් මෙම යෙදුම සමග සහාය දක්වන ගොනු විවෘත කිරීමට සහ සංස්කරණය කිරීමට හැකිය. පෙරනිමියෙන් මෙම යෙදුම තුළ විවෘත වන ගොනු පාලනය කිරීමට, <ph name="BEGIN_LINK" />Windows සැකසීම්<ph name="END_LINK" /> වෙත යන්න.</translation>
@@ -6115,6 +6118,7 @@
 <translation id="5546865291508181392">Find</translation>
 <translation id="5547868626772433490">Gemini වෙතින් අසන්න</translation>
 <translation id="5548075230008247516">සියලු අයිතම තේරීම ඉවත් කරන ලදි, තේරීම් ප්‍රකාරයෙන් ඉවත් විය.</translation>
+<translation id="554810465530189549">පෙළ තෝරා ගත් විට පාවෙන මෙනුව නොපෙන්වන්න</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{"<ph name="TAB_TITLE" />"}=1{"<ph name="TAB_TITLE" />" සහ වෙන 1 පටිත්තක්}one{"<ph name="TAB_TITLE" />" සහ වෙනත් පටිති # ක්}other{"<ph name="TAB_TITLE" />" සහ වෙනත් පටිති # ක්}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">ඔබේ පිහිටුවීම තෝරා ගන්න</translation>
@@ -6281,6 +6285,7 @@
 <translation id="5678955352098267522"><ph name="WEBSITE_1" /> හි ඔබගේ දත්ත කියවන්න</translation>
 <translation id="5680050361008726776">"<ph name="ESIM_PROFILE_NAME" />" ඉවත් කරන්නද?</translation>
 <translation id="5681586175480958839">ගොනුව දැනටමත් විවෘත වෙමින් පවතී</translation>
+<translation id="5682950763196110705">පෙළ තෝරා ගත් විට පාවෙන මෙනුව පෙන්වන්න</translation>
 <translation id="5684110242705861346">"<ph name="NAME" />" දිගුව ඔබේ සංවිධානයේ ප්‍රතිපත්තිය මගින් එක් කර ඇති අතර මෙම සැකසීම පාලනය කරයි. <ph name="BEGIN_LINK" />විස්තර බලන්න<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Wi-Fi විස්තර</translation>
 <translation id="5684661240348539843">වත්කම් හඳුන්වනය</translation>
@@ -10054,6 +10059,7 @@
 <translation id="8505669004895429027">කුඩා ඉතුරුම්</translation>
 <translation id="8507052544157927817">යටින් ඉරි ඇඳීමේ විලාසය</translation>
 <translation id="8507227974644337342">තිර විභේදනය</translation>
+<translation id="8507443886219296894">මෙම වෙබ් අඩවිය සඳහා සඟවන්න</translation>
 <translation id="850763987657366362">සහතිකය ආයාත කළ නොහැක</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> හට ඔබේ Android උපාංගයෙහි තතු සුරැකීමට අවශ්‍යයි</translation>
 <translation id="8509177919508253835">ආරක්‍ෂක යතුරු යළි සකසා රහස් අංක සාදන්න</translation>
@@ -10114,6 +10120,7 @@
 <translation id="8552102814346875916">"මෙම අඩවි සැම විටම සක්‍රියව තබා ගන්න" ලැයිස්තුවට සුරකින්න</translation>
 <translation id="8552947739661397736">කාර්යය භාර ගන්න, Gemini දැනට පාලනය කර ඇත</translation>
 <translation id="8553342806078037065">අනෙක් පුද්ගලයින් කළමනාකරණය කරන්න</translation>
+<translation id="8554642222921881444">තෝරාගත් පෙළ මත පාවෙන මෙනුව</translation>
 <translation id="8554899698005018844">භාෂාවක් නැත</translation>
 <translation id="8555444629041783356">ස්වයංක්‍රීය හිරු බැස යෑමේ කාලසටහන</translation>
 <translation id="8557022314818157177">ඔබේ ඇඟිලි සලකුණ ග්‍රහණ කරන තෙක් ඔබේ ආරක්‍ෂක යතුර ස්පර්ශ කරමින් සිටින්න</translation>
@@ -10410,6 +10417,7 @@
 <translation id="8759753423332885148">තවත් දැනගන්න.</translation>
 <translation id="876161309768861172">ඔබව පුරනය වීමට නොහැකි විය, නැවත උත්සාහ කරන්න</translation>
 <translation id="8761945298804995673">මෙම පරිශීලකයා දැනටමත් සිටී</translation>
+<translation id="876287961468788565">ඔබ වෙබ් අඩවියක පෙළ තෝරන විට Chrome හට ක්‍රියා සහිත පාවෙන මෙනුවක් පෙන්විය හැක.</translation>
 <translation id="8762886931014513155">ඔබේ <ph name="DEVICE_TYPE" />ට යාවත්කාලීනයක් අවශ්‍යයි</translation>
 <translation id="8763927697961133303">USB උපාංගය</translation>
 <translation id="8765940060470412555">කියවීමේ මාදිලිය ඉවත් කරන්න</translation>

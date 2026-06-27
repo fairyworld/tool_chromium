@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{এই ডিভাইসে ১টি পাসওয়ার্ড <ph name="BRAND" />-এ ইমপোর্ট করা হয়েছে}one{এই ডিভাইসে {NUM_PASSWORDS}টি পাসওয়ার্ড <ph name="BRAND" />-এ ইমপোর্ট করা হয়েছে}other{এই ডিভাইসে {NUM_PASSWORDS}টি পাসওয়ার্ড <ph name="BRAND" />-এ ইমপোর্ট করা হয়েছে}}</translation>
 <translation id="1046572983040892965">উইন্ডো উপরে বাঁদিকে সরানো হয়েছে</translation>
 <translation id="1047431265488717055">লিঙ্ক ও টেক্সট কপি করুন</translation>
+<translation id="1048350929895890054">যেসব সাইটে ফ্লোটিং মেনু ব্লক করা রয়েছে</translation>
 <translation id="1048986595386481879">ডায়নামিকভাবে সাইজ বরাদ্দ করা হয়েছে</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{<ph name="DEVICE_NAME" /> থেকে <ph name="ATTACHMENTS" /> গ্রহণ করা হচ্ছে}one{<ph name="DEVICE_NAME" /> থেকে <ph name="ATTACHMENTS" /> গ্রহণ করা হচ্ছে}other{<ph name="DEVICE_NAME" /> থেকে <ph name="ATTACHMENTS" /> গ্রহণ করা হচ্ছে}}</translation>
 <translation id="1049743911850919806">ছদ্মবেশী</translation>
@@ -937,6 +938,7 @@
 <translation id="1695510246756136088">ইন্টারনেটে কানেক্ট করা যায়নি। আবার চেষ্টা করুন।</translation>
 <translation id="1696555181932908973"><ph name="SITE_ETLD_PLUS_ONE" />-এ চালিয়ে যেতে অন্য উপায় চেষ্টা করে দেখতে পারেন।</translation>
 <translation id="1696685050160038195">আপনার ডিভাইস সুরক্ষিত রাখতে, শুধুমাত্র বিশ্বস্ত সোর্স ও ডেভেলপারদের থেকে পাওয়া সফ্টওয়্যারই রান ও ইনস্টল করা উচিত।</translation>
+<translation id="1696832149095851409">বেছে নেওয়া টেক্সটের ওপর ফ্লোটিং মেনু</translation>
 <translation id="1697122132646041614">'থাম্বস-ডাউন' আইকন এমন একটি ফর্ম খোলে, যেখানে এইসব ফলাফল কেন আপনার পছন্দ হয়নি সেই সম্পর্কিত বিশদ মতামত জমা দেওয়া যায়।</translation>
 <translation id="1697532407822776718">আপনার সমস্ত সেট আছে!</translation>
 <translation id="1698796500103229697">&amp;পেমেন্ট পদ্ধতি</translation>
@@ -2512,6 +2514,7 @@
 <translation id="2845276301195220700">Google Calendar সংক্রান্ত আরও অ্যাকশন</translation>
 <translation id="2845382757467349449">সবসময় বুকমার্কস বার দেখান</translation>
 <translation id="284581348330507117">অনন্য পাসওয়ার্ড তৈরি করুন</translation>
+<translation id="2846345106886298325">টাস্ক সম্পূর্ণ হয়েছে এবং Gemini Spark-এ ফিরে এসেছে</translation>
 <translation id="284884486564166077">Lens ব্যবহার করে যেকোনও ছবি সার্চ করুন</translation>
 <translation id="2849035674501872372">খুঁজে দেখা</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3015,6 +3018,7 @@
 <translation id="3223109931751684474">এই ডিভাইসের জন্য আপনার পাসকী থেকে অ্যক্সেস সরান</translation>
 <translation id="3223531857777746191">রিসেট করার বোতাম</translation>
 <translation id="3225084153129302039">ডিফল্ট রক্তবর্ণ অবতার</translation>
+<translation id="3226249862705569834">যেসব সেন্সর ব্যবহার করা হচ্ছে</translation>
 <translation id="3226487301970807183">বাঁদিক বরাবর অ্যালাইন থাকা সাইড প্যানেল টগল করুন</translation>
 <translation id="322708765617468434">সেট-আপ করার পরে আপনি যেকোনও সময় অন্য ব্যক্তিকে যোগ করতে পারবেন। প্রত্যেক ব্যক্তি নিজের অ্যাকাউন্ট পছন্দমতো সেট-আপ করে ডেটা ব্যক্তিগত রাখতে পারবেন।</translation>
 <translation id="3227137524299004712">মাইক্রোফোন</translation>
@@ -5234,7 +5238,6 @@
 <translation id="486505726797718946">মেমরি সেভ করা হয়েছে</translation>
 <translation id="486635084936119914">নির্দিষ্ট কিছু প্রকারের ফাইল ডাউনলোডের পরে স্বয়ংক্রিয়ভাবে খুলুন</translation>
 <translation id="4867272607148176509">অভিভাবক, অ্যাপ অনুমোদন বা ব্লক করতে, সময়সীমা সেট এবং ওয়েব ব্রাউজিং নিয়ন্ত্রণ করতে পারবেন। স্কুলের বেশিরভাগ রিসোর্স অ্যাক্সেস করার জন্য পরে একটি স্কুল অ্যাকাউন্ট যোগ করা যেতে পারে।</translation>
-<translation id="486796517585164369">· সাম্প্রতিক ট্যাব</translation>
 <translation id="4868284252360267853">এই ডায়ালগ বর্তমানে ফোকাসে নেই। এই ডায়ালগে ফোকাস করার জন্য Command-Shift-Option A প্রেস করুন।</translation>
 <translation id="4869170227080975044">ChromeOS নেটওয়ার্ক সংক্রান্ত তথ্য পড়ুন</translation>
 <translation id="4870724079713069532">File Explorer বা অন্য অ্যাপ থেকে এই অ্যাপে কাজ করে এমন ফাইল খুলতে ও এডিট করতে পারবেন। ডিফল্ট হিসেবে, কোন কোন ফাইল এই অ্যাপে খোলে তা নিয়ন্ত্রণ করতে, <ph name="BEGIN_LINK" />Windows সেটিংসে<ph name="END_LINK" /> যান।</translation>
@@ -6128,6 +6131,7 @@
 <translation id="5546865291508181392">খুঁজুন</translation>
 <translation id="5547868626772433490">Gemini-কে জিজ্ঞাসা করুন</translation>
 <translation id="5548075230008247516">সব আইটেম বাছাই করা থেকে বাদ দেওয়া হয়েছে, 'বাছাই' মোড বন্ধ করা হয়েছে।</translation>
+<translation id="554810465530189549">টেক্সট বেছে নেওয়া হলে আর ফ্লোটিং মেনু দেখবেন না</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{"<ph name="TAB_TITLE" />"}=1{"<ph name="TAB_TITLE" />" এবং অন্য ১টি ট্যাব}one{"<ph name="TAB_TITLE" />" এবং অন্য #টি ট্যাব}other{"<ph name="TAB_TITLE" />" এবং অন্য #টি ট্যাব}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">সেট-আপ বেছে নিন</translation>
@@ -6294,6 +6298,7 @@
 <translation id="5678955352098267522"><ph name="WEBSITE_1" />এ আপনার ডেটা পড়ে</translation>
 <translation id="5680050361008726776">"<ph name="ESIM_PROFILE_NAME" />" সরাবেন?</translation>
 <translation id="5681586175480958839">ফাইল আগে থেকেই খোলা হয়েছে</translation>
+<translation id="5682950763196110705">টেক্সট বেছে নেওয়া হলে ফ্লোটিং মেনু দেখুন</translation>
 <translation id="5684110242705861346">আপনার সংস্থার নীতি অনুযায়ী "<ph name="NAME" />" এক্সটেনশন যোগ করা হয়েছে এবং এটি এই সেটিং নিয়ন্ত্রণ করছে। <ph name="BEGIN_LINK" />বিবরণ দেখুন<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">ওয়াই-ফাইয়ের বিবরণ</translation>
 <translation id="5684661240348539843">সম্পদ শনাক্তকারী</translation>
@@ -10070,6 +10075,7 @@
 <translation id="8505669004895429027">কম পরিমাণে সেভ করা</translation>
 <translation id="8507052544157927817">আন্ডারলাইনের স্টাইল</translation>
 <translation id="8507227974644337342">স্ক্রিনের রেজোলিউশন</translation>
+<translation id="8507443886219296894">এই সাইটের জন্য লুকান</translation>
 <translation id="850763987657366362">সার্টিফিকেট ইমপোর্ট করা যায়নি</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> ওয়েবসাইটটি আপনার Android ডিভাইসে তথ্য সেভ করতে চাইছে</translation>
 <translation id="8509177919508253835">নিরাপত্তা কী ডিভাইস রিসেট করে পিন তৈরি করুন</translation>
@@ -10130,6 +10136,7 @@
 <translation id="8552102814346875916">"সব সময় এইসব সাইট অ্যাক্টিভ রাখুন" তালিকায় সেভ করুন</translation>
 <translation id="8552947739661397736">টাস্কের দায়িত্ব নিয়ে নিন, Gemini বর্তমানে কন্ট্রোল করছে</translation>
 <translation id="8553342806078037065">অন্যান্য ব্যক্তিদের পরিচালনা করুন</translation>
+<translation id="8554642222921881444">বেছে নেওয়া টেক্সটের ওপর ফ্লোটিং মেনু</translation>
 <translation id="8554899698005018844">কোনও ভাষা নেই</translation>
 <translation id="8555444629041783356">অটোমেটিক সানসেট শিডিউল</translation>
 <translation id="8557022314818157177">আপনার আঙ্গুলের ছাপ ক্যাপচার না করা পর্যন্ত 'নিরাপত্তা কী'-তে টাচ করতে থাকুন</translation>
@@ -10426,6 +10433,7 @@
 <translation id="8759753423332885148">আরও জানুন৷</translation>
 <translation id="876161309768861172">সাইন-ইন করানো যায়নি, আবার চেষ্টা করুন</translation>
 <translation id="8761945298804995673">এই ব্যবহারকারী আগে থেকেই আছেন</translation>
+<translation id="876287961468788565">কোনও সাইটে টেক্সট বেছে নিলে, Chrome বিভিন্ন অ্যাকশন সহ একটি ফ্লোটিং মেনু দেখাতে পারে।</translation>
 <translation id="8762886931014513155">আপনার <ph name="DEVICE_TYPE" /> আপডেট করা প্রয়োজন</translation>
 <translation id="8763927697961133303">USB ডিভাইস</translation>
 <translation id="8765940060470412555">রিডিং মোড আনপিন করুন</translation>

@@ -64,13 +64,13 @@
 <translation id="1597911401261118146">Wenn du prüfen möchtest, ob deine Passwörter von Datenpannen und anderen Sicherheitsproblemen betroffen sind, <ph name="BEGIN_LINK" />melde dich in Chrome an<ph name="END_LINK" />.</translation>
 <translation id="1619639070275605589">Durch diese Aktion werden:
           <ph name="LINE_BREAKS" />
-            • Deine „Beim Start“-Seite, die „Neuer Tab“-Seite, die Suchmaschine und angepinnte Tabs zurückgesetzt.
+            • Deine „Beim Start“-Seite, die „Neuer Tab“-Seite, die Suchmaschine und angepinnte Tabs zurückgesetzt
             <ph name="LINE_BREAK" />
-            • Erweiterungen deaktiviert.
+            • Erweiterungen deaktiviert
             <ph name="LINE_BREAK" />
-            • Cookies und andere vorübergehende Websitedaten gelöscht.
+            • Cookies und andere vorübergehende Websitedaten gelösch.
             <ph name="LINE_BREAK" />
-            • Chrome-Verknüpfungen zurückgesetzt.
+            • Chrome-Verknüpfungen zurückgesetzt
             <ph name="LINE_BREAKS" />
             Diese Aktion wirkt sich nicht auf Lesezeichen, den Verlauf und gespeicherte Passwörter aus.</translation>
 <translation id="1619887657840448962">Um Chrome sicherer zu machen, haben wir die folgende Erweiterung deaktiviert. Sie ist nicht im <ph name="IDS_EXTENSION_WEB_STORE_TITLE" /> aufgeführt und wurde möglicherweise ohne dein Wissen hinzugefügt.</translation>

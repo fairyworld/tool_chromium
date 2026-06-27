@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{1 пароль импортирован в <ph name="BRAND" /> этом устройстве.}one{{NUM_PASSWORDS} пароль импортирован в <ph name="BRAND" /> на этом устройстве.}few{{NUM_PASSWORDS} пароля импортировано в <ph name="BRAND" /> на этом устройстве.}many{{NUM_PASSWORDS} паролей импортировано в <ph name="BRAND" /> на этом устройстве.}other{{NUM_PASSWORDS} пароля импортировано в <ph name="BRAND" /> на этом устройстве.}}</translation>
 <translation id="1046572983040892965">Окно перемещено вверх и влево</translation>
 <translation id="1047431265488717055">Скопировать &amp;текст ссылки</translation>
+<translation id="1048350929895890054">Сайты, на которых заблокировано плавающее меню</translation>
 <translation id="1048986595386481879">Динамическое выделение места</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{Выполняется передача данных (<ph name="ATTACHMENTS" />) с устройства "<ph name="DEVICE_NAME" />"…}one{Выполняется передача данных (<ph name="ATTACHMENTS" />) с устройства "<ph name="DEVICE_NAME" />"…}few{Выполняется передача данных (<ph name="ATTACHMENTS" />) с устройства "<ph name="DEVICE_NAME" />"…}many{Выполняется передача данных (<ph name="ATTACHMENTS" />) с устройства "<ph name="DEVICE_NAME" />"…}other{Выполняется передача данных (<ph name="ATTACHMENTS" />) с устройства "<ph name="DEVICE_NAME" />"…}}</translation>
 <translation id="1049743911850919806">Инкогнито</translation>
@@ -936,6 +937,7 @@
 <translation id="1695510246756136088">Не удается подключиться к интернету. Повторите попытку.</translation>
 <translation id="1696555181932908973">Чтобы продолжить использовать сайт <ph name="SITE_ETLD_PLUS_ONE" />, попробуйте другие способы авторизации.</translation>
 <translation id="1696685050160038195">Чтобы устройство было в безопасности, устанавливайте и запускайте только программное обеспечение, предоставленное надежными разработчиками и источниками.</translation>
+<translation id="1696832149095851409">плавающее меню для выделенного текста</translation>
 <translation id="1697122132646041614">Нажать кнопку "Не нравится", чтобы открыть форму для отправки подробного отзыва.</translation>
 <translation id="1697532407822776718">Готово!</translation>
 <translation id="1698796500103229697">Способы оплаты</translation>
@@ -1205,6 +1207,7 @@
 <translation id="1897120393475391208">Использовать надежный пароль</translation>
 <translation id="1897860317037652061">Не удалось выполнить сканирование.</translation>
 <translation id="1898804291554630487">Спросить об этой странице</translation>
+<translation id="1899172684246105747">Вы можете выбрать оформление, тёмную тему и не только.</translation>
 <translation id="1900305421498694955">Приложения из Google Play могут запрашивать разрешение на полный доступ к чтению и записи файлов на внешних запоминающих устройствах. При этом созданные на устройстве файлы и папки будут видны всем пользователям внешнего запоминающего устройства. <ph name="LINK_BEGIN" />Подробнее…<ph name="LINK_END" /></translation>
 <translation id="1901213235765457754">Попросите администратора обновить это приложение</translation>
 <translation id="1901303067676059328">Выделить &amp;все</translation>
@@ -2499,6 +2502,7 @@
 <translation id="2845276301195220700">Другие действия для Google Календаря</translation>
 <translation id="2845382757467349449">Всегда показывать панель закладок</translation>
 <translation id="284581348330507117">Создайте уникальные пароли</translation>
+<translation id="2846345106886298325">Задача выполнена. Вы вернулись в Gemini Spark.</translation>
 <translation id="284884486564166077">Поиск по изображению с помощью Объектива</translation>
 <translation id="2849035674501872372">Найти</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3002,6 +3006,7 @@
 <translation id="3223109931751684474">Запретить использование ключей доступа на этом устройстве</translation>
 <translation id="3223531857777746191">Кнопка сброса</translation>
 <translation id="3225084153129302039">Аватар по умолчанию (фиолетовый)</translation>
+<translation id="3226249862705569834">Используемые датчики</translation>
 <translation id="3226487301970807183">Показать или скрыть боковую панель слева</translation>
 <translation id="322708765617468434">После настройки вы в любое время сможете добавить на устройство другого человека. У каждого пользователя будет возможность персонализировать устройство и обеспечить конфиденциальность своих данных.</translation>
 <translation id="3227137524299004712">Микрофон</translation>
@@ -5220,7 +5225,6 @@
 <translation id="486505726797718946">Освобождены ресурсы памяти</translation>
 <translation id="486635084936119914">Автоматически открывать некоторые типы файлов после скачивания</translation>
 <translation id="4867272607148176509">Родители смогут одобрять или блокировать приложения, ограничивать время использования и контролировать просмотр сайтов. Позже можно добавить учебный аккаунт с доступом к большинству школьных материалов.</translation>
-<translation id="486796517585164369">· Вкладка "Недавние"</translation>
 <translation id="4868284252360267853">Это диалоговое окно находится не в фокусе. Чтобы это исправить, нажмите Command + Shift + Option + A.</translation>
 <translation id="4869170227080975044">Чтение данных сети ChromeOS</translation>
 <translation id="4870724079713069532">Вы можете открывать и редактировать поддерживаемые файлы в этом приложении из Проводника и других приложений. Указать, какие типы файлов по умолчанию будут открываться в этом приложении, можно в <ph name="BEGIN_LINK" />настройках Windows<ph name="END_LINK" />.</translation>
@@ -6114,6 +6118,7 @@
 <translation id="5546865291508181392">Найти</translation>
 <translation id="5547868626772433490">Спросить Gemini</translation>
 <translation id="5548075230008247516">Выбор всех объектов отменен, выполнен выход из режима выбора.</translation>
+<translation id="554810465530189549">Не показывать плавающее меню при выделении текста</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{"<ph name="TAB_TITLE" />"}=1{"<ph name="TAB_TITLE" />" и ещё 1 вкладка}one{"<ph name="TAB_TITLE" />" и ещё # вкладка}few{"<ph name="TAB_TITLE" />" и ещё # вкладки}many{"<ph name="TAB_TITLE" />" и ещё # вкладок}other{"<ph name="TAB_TITLE" />" и ещё # вкладки}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">Выбор конфигурации</translation>
@@ -6279,6 +6284,7 @@
 <translation id="5678955352098267522">Просмотр данных на сайте <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">Удалить профиль "<ph name="ESIM_PROFILE_NAME" />"?</translation>
 <translation id="5681586175480958839">Файл уже открывается</translation>
+<translation id="5682950763196110705">Показывать плавающее меню при выделении текста</translation>
 <translation id="5684110242705861346">Этим параметром управляет расширение "<ph name="NAME" />", добавленное в соответствии с правилами вашей организации. <ph name="BEGIN_LINK" />Подробнее…<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Сведения о сети Wi-Fi</translation>
 <translation id="5684661240348539843">Идентификатор объекта</translation>
@@ -8413,6 +8419,7 @@
 <translation id="7289303553784750393">Если у вас есть подключение к интернету, но проблема не решается, попробуйте другие способы авторизации, чтобы продолжить работу на <ph name="SITE_ETLD_PLUS_ONE" />.</translation>
 <translation id="7289386924227731009"><ph name="WINDOW_TITLE" /> – требуется разрешение. Нажмите F6, чтобы ответить.</translation>
 <translation id="7290005709287747471">Отключить</translation>
+<translation id="7290139233643258082">Применить тему</translation>
 <translation id="7292067737327289208">Этим <ph name="BEGIN_LINK" />браузером управляет<ph name="END_LINK" /> ваша организация, а <ph name="BEGIN_LINK" />профилем<ph name="END_LINK" /> – <ph name="PROFILE_DOMAIN" />.</translation>
 <translation id="7292147651179697920">Попроси родителя разрешить доступ в настройках.</translation>
 <translation id="7292195267473691167"><ph name="LOCALE" /> (<ph name="VARIANT" />)</translation>
@@ -10058,6 +10065,7 @@
 <translation id="8505669004895429027">Небольшая экономия</translation>
 <translation id="8507052544157927817">Подчеркивание</translation>
 <translation id="8507227974644337342">Разрешение экрана</translation>
+<translation id="8507443886219296894">Скрыть на этом сайте</translation>
 <translation id="850763987657366362">Не удалось импортировать сертификат.</translation>
 <translation id="8508532351844333131">После этого сайт <ph name="WEBSITE_ORIGIN" /> сможет сохранить информацию на вашем устройстве Android.</translation>
 <translation id="8509177919508253835">Сбросить настройки электронных ключей и создать PIN-коды</translation>
@@ -10118,6 +10126,7 @@
 <translation id="8552102814346875916">Добавить в список сайтов, которые всегда активны</translation>
 <translation id="8552947739661397736">Выполнить задачу самостоятельно (сейчас ей занимается Gemini)</translation>
 <translation id="8553342806078037065">Другие пользователи</translation>
+<translation id="8554642222921881444">Плавающее меню для выделенного текста</translation>
 <translation id="8554899698005018844">Язык не указан</translation>
 <translation id="8555444629041783356">Автоматическое обновление времени восхода и захода солнца</translation>
 <translation id="8557022314818157177">Продолжайте прикасаться к сканеру отпечатков пальцев на электронном ключе, пока отпечаток не будет сохранен.</translation>
@@ -10414,6 +10423,7 @@
 <translation id="8759753423332885148">Подробнее…</translation>
 <translation id="876161309768861172">Не удалось войти в систему. Повторите попытку.</translation>
 <translation id="8761945298804995673">Такой пользователь уже существует.</translation>
+<translation id="876287961468788565">Chrome может показывать плавающее меню с действиями, когда вы выделяете текст на сайте.</translation>
 <translation id="8762886931014513155">Требуется обновить устройство <ph name="DEVICE_TYPE" /></translation>
 <translation id="8763927697961133303">USB-устройство</translation>
 <translation id="8765940060470412555">Открепить функцию режима чтения</translation>

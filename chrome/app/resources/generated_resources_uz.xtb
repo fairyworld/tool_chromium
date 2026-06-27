@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{Bu qurilmadagi <ph name="BRAND" /> xizmatiga 1 ta parol import qilindi}other{Bu qurilmadagi <ph name="BRAND" /> xizmatiga {NUM_PASSWORDS} ta parol import qilindi}}</translation>
 <translation id="1046572983040892965">Oyna yuqoriga va chapga olindi</translation>
 <translation id="1047431265488717055">Havola matnidan nusxa olish</translation>
+<translation id="1048350929895890054">Bildirgi menyu chiqishi bloklangan saytlar</translation>
 <translation id="1048986595386481879">Dinamik joy ajratish</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{<ph name="DEVICE_NAME" /> qurilmasidan <ph name="ATTACHMENTS" /> qabul qilinmoqda}other{<ph name="DEVICE_NAME" /> qurilmasidan <ph name="ATTACHMENTS" /> qabul qilinmoqda}}</translation>
 <translation id="1049743911850919806">Inkognito</translation>
@@ -937,6 +938,7 @@ Parollarni istalgan vaqtda <ph name="GOOGLE_PASSWORD_MANAGER" /> orqali tekshiri
 <translation id="1695510246756136088">Internetga ulanilmadi. Qayta urining.</translation>
 <translation id="1696555181932908973"><ph name="SITE_ETLD_PLUS_ONE" /> orqali boshqa usulda davom eting.</translation>
 <translation id="1696685050160038195">Qurilmani xavfsiz saqlash uchun faqatgina ishonchli manba yoki ishlab chiquvchi dasturlarini ishga tushirish va oʻrnatish tavsiya etiladi.</translation>
+<translation id="1696832149095851409">matn belgilanganda chiqadigan bildirgi menyu</translation>
 <translation id="1697122132646041614">Salbiy baho bosilsa, bu natijalarning nega yoqmagani haqida batafsil fikr-mulohaza yuborish shakli ochiladi.</translation>
 <translation id="1697532407822776718">Tayyor!</translation>
 <translation id="1698796500103229697">&amp;Toʻlov usullari</translation>
@@ -2504,6 +2506,7 @@ Oʻz qurilmangizda Family Link ilovasini oʻrnatib, bu hisob sozlamalarini boshq
 <translation id="2845276301195220700">Google Taqvim uchun boshqa amallar</translation>
 <translation id="2845382757467349449">Xatcho‘plar panelini har doim ko‘rsatish</translation>
 <translation id="284581348330507117">Unikal parollar yarating</translation>
+<translation id="2846345106886298325">Vazifa bajarildi va Gemini Spark oynasiga qaytdingiz</translation>
 <translation id="284884486564166077">Istalgan rasmni Lens orqali qidiring</translation>
 <translation id="2849035674501872372">Tepaga qarang</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3005,6 +3008,7 @@ Oʻz qurilmangizda Family Link ilovasini oʻrnatib, bu hisob sozlamalarini boshq
 <translation id="3223109931751684474">Bu qurilmaning kirish kalitlariga ruxsatini olib tashlash</translation>
 <translation id="3223531857777746191">Asliga qaytarish tugmasi</translation>
 <translation id="3225084153129302039">Standart siyohrang avatar</translation>
+<translation id="3226249862705569834">Sensorlar faol</translation>
 <translation id="3226487301970807183">Chapga tekislangan yon panelni almashtirish</translation>
 <translation id="322708765617468434">Sozlashdan keyin boshqa odamni qurilmaga qoʻshishingiz mumkin. Har bir odamning tajribasi alohida moslashtiriladi va ularning maʼlumotlari xavfsiz saqlanadi.</translation>
 <translation id="3227137524299004712">Mikrofon</translation>
@@ -5223,7 +5227,6 @@ Kichiklashtirish uchun Ctrl+Alt+Yorqinlikni pasaytirish tugmalarini bosing.</tra
 <translation id="486505726797718946">Xotira saqlandi</translation>
 <translation id="486635084936119914">Ba’zi turdagi fayllar yuklab olinishi bilan avtomatik ochilsin</translation>
 <translation id="4867272607148176509">Ota-onalar ilovalarni tasdiqlashi yoki bloklashi, vaqt chegaralarini belgilashi va brauzerlarni koʻrishni boshqarishi mumkin. Koʻplab maktab resurslariga kirish uchun maktab hisobini keyinroq qoʻshish mumkin.</translation>
-<translation id="486796517585164369">· Oxirgi varaq</translation>
 <translation id="4868284252360267853">Bu suhbat hozir fokuslanmagan. Bu suhbatni fokuslash uchun CMD+Shift+Option tugmalarini bosing.</translation>
 <translation id="4869170227080975044">ChromeOS tarmoq axborotini oʻqish</translation>
 <translation id="4870724079713069532">Mos keladigan fayllarni bu ilova bilan fayl menejeri yoki boshqa ilovalar orqali ochishingiz va tahrirlashingiz mumkin. Bu ilova bilan standart holatda qaysi ilovalar ochilishini boshqarish uchun <ph name="BEGIN_LINK" />Windows sozlamalarini<ph name="END_LINK" /> oching.</translation>
@@ -6117,6 +6120,7 @@ Bu amal uchun bir nechta kalit tugma belgilash mumkin.</translation>
 <translation id="5546865291508181392">Qidirish</translation>
 <translation id="5547868626772433490">Geminidan soʻrash</translation>
 <translation id="5548075230008247516">Barchasi belgilanmagan, tanlash rejimi oʻchiq.</translation>
+<translation id="554810465530189549">Matn belgilanganda bildirgi menyu chiqmasin</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{“<ph name="TAB_TITLE" />”}=1{“<ph name="TAB_TITLE" />” va yana 1 ta varaq}other{“<ph name="TAB_TITLE" />” va yana # ta varaq}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">Sozlamani tanlang</translation>
@@ -6282,6 +6286,7 @@ Bu amal uchun bir nechta kalit tugma belgilash mumkin.</translation>
 <translation id="5678955352098267522">Ma’lumotlarni <ph name="WEBSITE_1" /> saytida ko‘rish</translation>
 <translation id="5680050361008726776"><ph name="ESIM_PROFILE_NAME" /> olib tashlansinmi?</translation>
 <translation id="5681586175480958839">Fayl allaqachon ochilmoqda</translation>
+<translation id="5682950763196110705">Matn belgilanganda bildirgi menyuni chiqarish</translation>
 <translation id="5684110242705861346">“<ph name="NAME" />” kengaytmasi tashkilotingiz siyosati tomonidan qoʻshilgan va bu sozlamani boshqaradi. <ph name="BEGIN_LINK" />Tafsilotlar<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Wi-Fi axboroti</translation>
 <translation id="5684661240348539843">Obyekt identifikatori</translation>
@@ -10055,6 +10060,7 @@ Kalit faylini ishonchli joyda saqlang. U kengaytmaning yangi versiyalarini yarat
 <translation id="8505669004895429027">Kichik tejash</translation>
 <translation id="8507052544157927817">Tagiga chizish uslubi</translation>
 <translation id="8507227974644337342">Ekrandagi tasvir tiniqligi</translation>
+<translation id="8507443886219296894">Bu sayt uchun berkitish</translation>
 <translation id="850763987657366362">Sertifikat import qilinmadi</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> Android qurilmangizga axborot saqlamoqchi</translation>
 <translation id="8509177919508253835">Elektron kalitlarni asliga qaytarish va PIN kodlar yaratish</translation>
@@ -10115,6 +10121,7 @@ Kalit faylini ishonchli joyda saqlang. U kengaytmaning yangi versiyalarini yarat
 <translation id="8552102814346875916">“Quyidagi saytlar doim faol qolsin” roʻyxatiga saqlash</translation>
 <translation id="8552947739661397736">Vazifani mustaqil bajarish (hozir Gemini zimmasida)</translation>
 <translation id="8553342806078037065">Boshqa foydalanuvchilarni boshqarish</translation>
+<translation id="8554642222921881444">Matn belgilanganda chiqadigan bildirgi menyu</translation>
 <translation id="8554899698005018844">Til tanlanmagan</translation>
 <translation id="8555444629041783356">Kun botishi avtomatik jadvali</translation>
 <translation id="8557022314818157177">Barmoq izi yozib olinguncha elektron kalitga teginib turing</translation>
@@ -10411,6 +10418,7 @@ Kalit faylini ishonchli joyda saqlang. U kengaytmaning yangi versiyalarini yarat
 <translation id="8759753423332885148">Batafsil.</translation>
 <translation id="876161309768861172">Profilga kirilmadi, qaytadan urining</translation>
 <translation id="8761945298804995673">Bu foydalanuvchi allaqachon mavjud</translation>
+<translation id="876287961468788565">Chrome saytdagi matnni belgilaganingizda turli amallarni bajarish uchun bildirgi menyuni chiqarishi mumkin.</translation>
 <translation id="8762886931014513155"><ph name="DEVICE_TYPE" /> tizimi yangilanishi lozim</translation>
 <translation id="8763927697961133303">USB qurilma</translation>
 <translation id="8765940060470412555">Oʻqish rejimini yechib olish</translation>

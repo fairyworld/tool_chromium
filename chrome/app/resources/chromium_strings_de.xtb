@@ -566,7 +566,7 @@ Einige Funktionen stehen möglicherweise nicht zur Verfügung. Gib bitte ein and
             <ph name="LINE_BREAK" />
             • Chromium-Verknüpfungen zurückgesetzt
             <ph name="LINE_BREAKS" />
-            Lesezeichen, Verlauf und gespeicherte Passwörter sind davon nicht betroffen.</translation>
+            Diese Aktion wirkt sich nicht auf Lesezeichen, den Verlauf und gespeicherte Passwörter aus.</translation>
 <translation id="6934579572334859869">Bildersuche nach Infos zu diesem Bild fragen</translation>
 <translation id="6948031725951063910">Du hast das Chromium-Limit von <ph name="BOOKMARK_LIMIT" /> Lesezeichen erreicht. Einige deiner Lesezeichen wurden daher noch nicht in deinem Google-Konto gespeichert.
 

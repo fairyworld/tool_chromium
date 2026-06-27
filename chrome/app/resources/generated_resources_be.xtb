@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{У <ph name="BRAND" /> на гэтай прыладзе імпартаваны 1 пароль}one{У <ph name="BRAND" /> на гэтай прыладзе імпартаваны {NUM_PASSWORDS} пароль}few{У <ph name="BRAND" /> на гэтай прыладзе імпартавана {NUM_PASSWORDS} паролі}many{У <ph name="BRAND" /> на гэтай прыладзе імпартавана {NUM_PASSWORDS} пароляў}other{У <ph name="BRAND" /> на гэтай прыладзе імпартавана {NUM_PASSWORDS} пароля}}</translation>
 <translation id="1046572983040892965">Акно перамешчана ўверх і ўлева</translation>
 <translation id="1047431265488717055">Скапіраваць &amp;тэкст спасылкі</translation>
+<translation id="1048350929895890054">Сайты, на якіх плаваючае меню заблакіравана</translation>
 <translation id="1048986595386481879">Дынамічнае размеркаванне</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{Ідзе атрыманне даных (<ph name="ATTACHMENTS" />) з прылады "<ph name="DEVICE_NAME" />"}one{Ідзе атрыманне даных (<ph name="ATTACHMENTS" />) з прылады "<ph name="DEVICE_NAME" />"}few{Ідзе атрыманне даных (<ph name="ATTACHMENTS" />) з прылады "<ph name="DEVICE_NAME" />"}many{Ідзе атрыманне даных (<ph name="ATTACHMENTS" />) з прылады "<ph name="DEVICE_NAME" />"}other{Ідзе атрыманне даных (<ph name="ATTACHMENTS" />) з прылады "<ph name="DEVICE_NAME" />"}}</translation>
 <translation id="1049743911850919806">Інкогніта</translation>
@@ -936,6 +937,7 @@
 <translation id="1695510246756136088">Не ўдалося падключыцца да інтэрнэту. Паўтарыце спробу.</translation>
 <translation id="1696555181932908973">Каб працягнуць работу на сайце <ph name="SITE_ETLD_PLUS_ONE" />, паспрабуйце іншыя спосабы ўваходу.</translation>
 <translation id="1696685050160038195">Каб прылада заставалася абароненай, усталёўвайце і запускайце толькі праграмнае забеспячэнне, атрыманае з надзейных крыніц і ад распрацоўшчыкаў, якім вы давяраеце.</translation>
+<translation id="1696832149095851409">плаваючае меню на выбраным тэксце</translation>
 <translation id="1697122132646041614">Калі націснуць кнопку "Не падабаецца", будзе адкрыта форма для адпраўкі падрабязнага водгуку аб тым, чаму вам не спадабаліся гэтыя вынікі.</translation>
 <translation id="1697532407822776718">Усё гатова!</translation>
 <translation id="1698796500103229697">&amp;Спосабы аплаты</translation>
@@ -1204,6 +1206,7 @@
 <translation id="1897120393475391208">Выкарыстоўвайце надзейны пароль</translation>
 <translation id="1897860317037652061">Не ўдалося выканаць праверку</translation>
 <translation id="1898804291554630487">Задайце пытанне пра гэту старонку</translation>
+<translation id="1899172684246105747">Наладзьце браўзер з дапамогай тэм, цёмнага рэжыму і іншых параметраў.</translation>
 <translation id="1900305421498694955">Праграмы з Google Play могуць патрабаваць поўнага доступу да файлавай сістэмы – каб чытаць і запісваць файлы на знешніх прыладах сховішча. Створаныя на прыладзе файлы і папкі бачныя ўсім, хто выкарыстоўвае знешні дыск. <ph name="LINK_BEGIN" />Даведацца больш<ph name="LINK_END" /></translation>
 <translation id="1901213235765457754">Папрасіце адміністратара абнавіць гэту праграму</translation>
 <translation id="1901303067676059328">Выбраць &amp;усё</translation>
@@ -2496,6 +2499,7 @@
 <translation id="2845276301195220700">Іншыя дзеянні для Google Календара</translation>
 <translation id="2845382757467349449">Заўсёды паказваць панэль закладак</translation>
 <translation id="284581348330507117">Стварыце ўнікальныя паролі</translation>
+<translation id="2846345106886298325">Задача выканана і вы вярнуліся ў Gemini Spark</translation>
 <translation id="284884486564166077">Пошук па відарысе з дапамогай Аб’ектыва</translation>
 <translation id="2849035674501872372">Знайсці</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -2999,6 +3003,7 @@
 <translation id="3223109931751684474">Выдаліць доступ да ключоў доступу на гэтай прыладзе</translation>
 <translation id="3223531857777746191">Кнопка "Скінуць"</translation>
 <translation id="3225084153129302039">Стандартны фіялетавы аватар</translation>
+<translation id="3226249862705569834">Датчыкі, якія выкарыстоўваюцца</translation>
 <translation id="3226487301970807183">Паказаць або схаваць бакавую панэль злева</translation>
 <translation id="322708765617468434">Дадаць яшчэ аднаго карыстальніка на прыладу можна будзе пасля наладжвання. Дададзеныя карыстальнікі могуць персаналізаваць патрэбныя функцыі. Пры гэтым іх даныя застаюцца прыватнымі.</translation>
 <translation id="3227137524299004712">Мікрафон</translation>
@@ -5216,7 +5221,6 @@
 <translation id="486505726797718946">Захавана ў памяці</translation>
 <translation id="486635084936119914">Аўтаматычна адкрываць пэўныя тыпы файлаў пасля спампоўвання</translation>
 <translation id="4867272607148176509">Бацькі могуць ухваляць і блакіраваць праграмы, усталёўваць абмежаванні па часе і кантраляваць прагляд вэб-старонак. Для доступу да большасці навучальных рэсурсаў пазней можна дадаць вучэбны ўліковы запіс.</translation>
-<translation id="486796517585164369">· Нядаўняя ўкладка</translation>
 <translation id="4868284252360267853">Гэта дыялогавае акно не вылучана. Каб вылучыць яго, націсніце Command + Shift + Option + A.</translation>
 <translation id="4869170227080975044">Прагляд звестак пра сетку ChromeOS</translation>
 <translation id="4870724079713069532">З дапамогай гэтай праграмы можна адкрываць і змяняць сумяшчальныя файлы ў Правадніку і іншых праграмах. Каб указаць, якія файлы павінны адкрывацца ў гэтай праграме стандартна, <ph name="BEGIN_LINK" />перайдзіце ў налады Windows<ph name="END_LINK" />.</translation>
@@ -6109,6 +6113,7 @@
 <translation id="5546865291508181392">Шукаць</translation>
 <translation id="5547868626772433490">Задаць пытанне Gemini</translation>
 <translation id="5548075230008247516">Вы скасавалі выбар усіх элементаў і выйшлі з рэжыму выбару.</translation>
+<translation id="554810465530189549">Не паказваць плаваючае меню пры выбары тэксту</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{"<ph name="TAB_TITLE" />"}=1{"<ph name="TAB_TITLE" />" і яшчэ 1 укладка}one{"<ph name="TAB_TITLE" />" і яшчэ # укладка}few{"<ph name="TAB_TITLE" />" і яшчэ # укладкі}many{"<ph name="TAB_TITLE" />" і яшчэ # укладак}other{"<ph name="TAB_TITLE" />" і яшчэ # укладкі}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">Выберыце варыянт наладжвання</translation>
@@ -6274,6 +6279,7 @@
 <translation id="5678955352098267522">Прагляд вашых даных на <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">Выдаліць "<ph name="ESIM_PROFILE_NAME" />"?</translation>
 <translation id="5681586175480958839">Файл ужо адкрываецца</translation>
+<translation id="5682950763196110705">Паказваць усплывальнае меню пры выбары тэксту</translation>
 <translation id="5684110242705861346">Гэта налада кантралюецца пашырэннем "<ph name="NAME" />", якое было дададзена ў адпаведнасці з палітыкай вашай арганізацыі. <ph name="BEGIN_LINK" />Падрабязнасці<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Звесткі пра Wi-Fi</translation>
 <translation id="5684661240348539843">Ідэнтыфікатар аб’екта ўласнасці</translation>
@@ -8407,6 +8413,7 @@
 <translation id="7289303553784750393">Калі ў вас ёсць падключэнне да інтэрнэту, а праблема не знікае, паспрабуйце іншыя спосабы ўваходу, каб працягнуць работу на сайце <ph name="SITE_ETLD_PLUS_ONE" />.</translation>
 <translation id="7289386924227731009"><ph name="WINDOW_TITLE" /> – Запытаны дазвол. Каб адказаць, націсніце F6</translation>
 <translation id="7290005709287747471">Выключыць</translation>
+<translation id="7290139233643258082">Прымяніць тэму</translation>
 <translation id="7292067737327289208">Вашым <ph name="BEGIN_LINK" />браўзерам кіруе<ph name="END_LINK" /> ваша арганізацыя, а <ph name="BEGIN_LINK" />профілем<ph name="END_LINK" /> – <ph name="PROFILE_DOMAIN" /></translation>
 <translation id="7292147651179697920">Папрасі бацькоў адкрыць у Наладах доступ</translation>
 <translation id="7292195267473691167"><ph name="LOCALE" /> (<ph name="VARIANT" />)</translation>
@@ -10053,6 +10060,7 @@
 <translation id="8505669004895429027">Малая эканомія</translation>
 <translation id="8507052544157927817">Стыль "Падкрэсліванне"</translation>
 <translation id="8507227974644337342">Раздзяляльнасць экрана</translation>
+<translation id="8507443886219296894">Схаваць для гэтага сайта</translation>
 <translation id="850763987657366362">Не ўдалося імпартаваць сертыфікат</translation>
 <translation id="8508532351844333131">Сайт "<ph name="WEBSITE_ORIGIN" />" запытвае дазвол на захаванне інфармацыі на вашу прыладу Android</translation>
 <translation id="8509177919508253835">Скід ключоў бяспекі і стварэнне PIN-кодаў</translation>
@@ -10113,6 +10121,7 @@
 <translation id="8552102814346875916">Захаваць у спіс сайтаў, укладкі з якімі заўсёды павінны заставацца актыўнымі</translation>
 <translation id="8552947739661397736">Узяць кіраванне задачай на сябе (зараз ёй кіруе Gemini)</translation>
 <translation id="8553342806078037065">Іншыя карыстальнікі</translation>
+<translation id="8554642222921881444">Плаваючае меню на выбраным тэксце</translation>
 <translation id="8554899698005018844">Мова не выбрана</translation>
 <translation id="8555444629041783356">Аўтаматычнае абнаўленне часу ўзыходу і захаду сонца</translation>
 <translation id="8557022314818157177">Каб дадаць адбітак пальца, націскайце на ключ бяспекі</translation>
@@ -10409,6 +10418,7 @@
 <translation id="8759753423332885148">Даведацца больш.</translation>
 <translation id="876161309768861172">Не ўдалося ўвайсці ў сістэму. Паўтарыце спробу.</translation>
 <translation id="8761945298804995673">Гэты карыстальнік ужо існуе</translation>
+<translation id="876287961468788565">Chrome можа паказваць плаваючае меню з дзеяннямі, калі вы выбіраеце тэкст на сайце.</translation>
 <translation id="8762886931014513155">Неабходна абнавіць <ph name="DEVICE_TYPE" /></translation>
 <translation id="8763927697961133303">Прылада USB</translation>
 <translation id="8765940060470412555">Адмацаваць рэжым чытання</translation>

@@ -327,6 +327,7 @@
 <translation id="2411239243988279592"><ph name="TAB_TITLE" />, ಆಡಿಬಲ್ ಟ್ಯಾಬ್ ಅನ್ನು ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ</translation>
 <translation id="2413014528833954543">ಈ ಸಾಧನದಲ್ಲಿ ಪಾಸ್‌ವರ್ಡ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ</translation>
 <translation id="2414886740292270097">ಗಾಢ</translation>
+<translation id="2415037988255164008">ವಿಂಡೋಗಳನ್ನು ಮರುಸ್ಥಾಪಿಸಬೇಕೆ?</translation>
 <translation id="2421705177906985956">ಪ್ರದರ್ಶಿಸಲು ಪ್ರಸ್ತುತ ಯಾವುದೇ ಸೈಟ್‌ಗಳಿಲ್ಲ</translation>
 <translation id="2426805022920575512">ಇನ್ನೊಂದು ಖಾತೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ</translation>
 <translation id="2427025860753516072">{FILE_COUNT,plural, =1{ವೀಡಿಯೊಗಳು, ಪಟ್ಟಿಯಲ್ಲಿರುವ 1 ವೀಡಿಯೊ}one{ವೀಡಿಯೊಗಳು, ಪಟ್ಟಿಯಲ್ಲಿರುವ # ವೀಡಿಯೊಗಳು}other{ವೀಡಿಯೊಗಳು, ಪಟ್ಟಿಯಲ್ಲಿರುವ # ವೀಡಿಯೊಗಳು}}</translation>
@@ -1337,6 +1338,7 @@
 <translation id="6556501700899673703">Lexend</translation>
 <translation id="6560414384669816528">Sogou ಜೊತೆಗೆ ಹುಡುಕಿ</translation>
 <translation id="656065428026159829">ಇನ್ನಷ್ಟು ನೋಡಿ</translation>
+<translation id="6565781844089373403">ವಿಂಡೋಗಳನ್ನು ಮರುಸ್ಥಾಪಿಸಿ</translation>
 <translation id="6565959834589222080">ಲಭ್ಯವಿರುವಾಗ ವೈ-ಫೈ ಅನ್ನು ಬಳಸಲಾಗುತ್ತದೆ</translation>
 <translation id="657177046675873214">ನಿಮ್ಮ ಎಲ್ಲಾ ಸಾಧನಗಳಲ್ಲಿ ನಿಮ್ಮ ಬುಕ್‌ಮಾರ್ಕ್‌ಗಳನ್ನು ಪಡೆಯಲು, ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ "ಬುಕ್‌ಮಾರ್ಕ್‌ಗಳು" ಎಂಬುದನ್ನು ಆನ್ ಮಾಡಿ</translation>
 <translation id="6573096386450695060">ಯಾವಾಗಲೂ ಅನುಮತಿಸಿ</translation>
@@ -2038,7 +2040,6 @@
 <translation id="939598580284253335">ಪಾಸ್‌ಫ್ರೇಸ್ ಅನ್ನು ನಮೂದಿಸಿ</translation>
 <translation id="94161319503679839"><ph name="TAB_TITLE" />, ಪಿನ್ ಮಾಡಿರುವ ಪಿಕ್ಚರ್-ಇನ್-ಪಿಕ್ಚರ್ ಅಜ್ಞಾತ ಟ್ಯಾಬ್</translation>
 <translation id="945522503751344254">ಪ್ರತಿಕ್ರಿಯೆಯನ್ನು ಕಳುಹಿಸಿ</translation>
-<translation id="949667118776341807">ತಿರುಗಿಸಿ</translation>
 <translation id="95817756606698420">Chrome ಚೀನಾದಲ್ಲಿ ಹುಡುಕಲು <ph name="BEGIN_BOLD" />Sogou<ph name="END_BOLD" /> ಬಳಸಬಹುದು. ನೀವು ಇದನ್ನು <ph name="BEGIN_LINK" />ಸೆಟ್ಟಿಂಗ್‌ಗಳು<ph name="END_LINK" /> ನಲ್ಲಿ ಬದಲಾಯಿಸಬಹುದು.</translation>
 <translation id="961856697154696964">ಬ್ರೌಸಿಂಗ್ ಡೇಟಾವನ್ನು ಅಳಿಸಿ</translation>
 <translation id="963246339335003378">ಟಾಸ್ಕ್‌ ಮ್ಯಾನೇಜರ್‌ ಅನ್ನು ತೆರೆಯಿರಿ</translation>

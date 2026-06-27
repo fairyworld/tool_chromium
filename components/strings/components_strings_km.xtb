@@ -1240,6 +1240,7 @@
 <translation id="2929525460561903222">{SHIPPING_ADDRESS,plural, =0{<ph name="SHIPPING_ADDRESS_PREVIEW" />}=1{<ph name="SHIPPING_ADDRESS_PREVIEW" /> និង <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> ទៀត}other{<ph name="SHIPPING_ADDRESS_PREVIEW" /> និង <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> ទៀត}}</translation>
 <translation id="2930531075747147366">ផ្ទាំង​ពីឧបករណ៍​ផ្សេងទៀត​របស់អ្នក</translation>
 <translation id="2930577230479659665">តម្រឹម​បន្ទាប់ពី​ច្បាប់ចម្លង​នីមួយៗ</translation>
+<translation id="2931453528659195355">គ្រប់គ្រងព័ត៌មានអំពីការទិញទំនិញ</translation>
 <translation id="2933624813161016821">សន្លឹកអាលុយមីញ៉ូមសម្រាប់ការបោះពុម្ពផុស</translation>
 <translation id="2935726091208500473">ការចែករំលែក​ផ្ទាំង​របស់អ្នក</translation>
 <translation id="293796669683825859">មតិ</translation>
@@ -1732,6 +1733,7 @@
 <translation id="3681841880472207951">វីដេអូ QuickTime</translation>
 <translation id="3687920599421452763">ឡាន​ដឹក​ទំនិញ និង​ឡាន​ដឹក​ទំនិញ​តូច</translation>
 <translation id="3693327506115126094">ជ្រើសរើស​របៀប​ដែលអ្នកនឹងផ្ទៀងផ្ទាត់​ថាជាអ្នក</translation>
+<translation id="3693516565203081475">ជ្រើសរើស​វិធី​បង់​ប្រាក់</translation>
 <translation id="3698353241727597930">អ្នកគ្រប់គ្រងរបស់អ្នកបានកំណត់រចនាសម្ព័ន្ធ ដើម្បីរក្សាទុក<ph name="FILES" />នៅក្នុងទំហំ​ផ្ទុក <ph name="CLOUD_STORAGE" /> ដែលគ្រប់គ្រងដោយសហគ្រាសរបស់អ្នក។ ឯកសារទាំងនេះអាចត្រូវបានត្រួតពិនិត្យ ធ្វើសវនកម្ម និងរក្សាទុកនៅពេលអ្នកលុបឯកសារទាំងនោះ។</translation>
 <translation id="3698629142018988477">ប៊ូតុង "បង្កើតគេហទំព័រ", បើកដំណើរការដើម្បីបង្កើត​គេហទំព័រថ្មី​នៅក្នុង Google Sites បានរហ័ស</translation>
 <translation id="3700094625653511150">ដើម្បីលាក់​ជម្រើស​ទូទាត់​ពេលក្រោយ សូម​ចូលទៅកាន់<ph name="IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_FOOTNOTE_HIDE_OPTION_PAYMENT_SETTINGS_LINK_TEXT" /></translation>
@@ -5158,6 +5160,7 @@
 <translation id="9063800855227801443">មិនអាចថតខ្លឹមសារសម្ងាត់បានទេ</translation>
 <translation id="9065203028668620118">កែប្រែ</translation>
 <translation id="9065745800631924235">ការស្វែងរក <ph name="TEXT" /> ពីប្រវត្តិ</translation>
+<translation id="9066116644715286230">{NUM_TABS,plural, =1{ព័ត៌មានលម្អិត​អំពី​ការបង្ហាញ​ផ្ទាំង។ កំពុង​បង្ហាញ 1 ផ្ទាំងពី {WEBSITE_LIST_STR}}other{ព័ត៌មានលម្អិតអំពីការបង្ហាញផ្ទាំង។ កំពុង​បង្ហាញ {NUM_TABS} ផ្ទាំង​ពី {WEBSITE_LIST_STR}}}</translation>
 <translation id="90695670378604968">ប្លាស្ទិក (គ្រើម)</translation>
 <translation id="9069693763241529744">ទប់ស្កាត់ដោយកម្មវិធីបន្ថែម</translation>
 <translation id="9073799351042754113">អ្នកបាន​ជ្រើសរើសបិទ​ការព្រមាន​អំពីសុវត្ថិភាព​សម្រាប់គេហទំព័រនេះ។</translation>

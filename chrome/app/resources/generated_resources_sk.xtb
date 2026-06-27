@@ -612,6 +612,7 @@ Heslá si môžete kedykoľvek skontrolovať v službe <ph name="GOOGLE_PASSWOR
 <translation id="1455119378540982311">Predvolené veľkosti okna</translation>
 <translation id="1456849775870359518">Karty sa znova otvoria</translation>
 <translation id="146000042969587795">Tento rám je zablokovaný, pretože obsahuje nezabezpečený obsah.</translation>
+<translation id="1460573197675781671">Zavrieť ponuku jazykov</translation>
 <translation id="1460751212339734034">Šetrite čas, píšte menej</translation>
 <translation id="1461041542809785877">Výkonnosť</translation>
 <translation id="1461177659295855031">Presunúť do priečinka panela so záložkami</translation>
@@ -2200,6 +2201,7 @@ Ak chcete spravovať nastavenia tohto účtu, nainštalujte si do zariadenia apl
 <translation id="263796568413910992">Zadajte otázku vo vyhľadávači <ph name="SEARCH_ENGINE_NAME" /> alebo napíšte webovú adresu</translation>
 <translation id="2640299212685523844">Použiť GTK</translation>
 <translation id="264083724974021997">Pripojte sa k svojmu telefónu – dialógové okno</translation>
+<translation id="2641174089709899456">Pripomenutie: prehliadanie s umelou inteligenciou vo vrecku</translation>
 <translation id="2642111877055905627">Futbalová lopta</translation>
 <translation id="2642206811783203764">Vždy povoliť na <ph name="SITE_NAME" /></translation>
 <translation id="2643064289437760082">Údaje merania reklám môžete kedykoľvek odstrániť vymazaním dát prehliadania</translation>
@@ -2708,6 +2710,7 @@ Ak chcete spravovať nastavenia tohto účtu, nainštalujte si do zariadenia apl
 <translation id="3000461861112256445">Zvuk mono</translation>
 <translation id="3001144475369593262">Podradené účty</translation>
 <translation id="3001614333383288217">{COUNT,plural, =0{Nie sú prispôsobené žiadne klávesy}=1{1 prispôsobený kláves}few{{COUNT} prispôsobené klávesy}many{{COUNT} customized keys}other{{COUNT} prispôsobených klávesov}}</translation>
+<translation id="3002745665522516995">Vyberte čokoľvek na stránke a vyhľadajte to</translation>
 <translation id="3002864108328203174">Dolný hárok Gemini na polovičnú výšku</translation>
 <translation id="3003144360685731741">Preferované siete</translation>
 <translation id="3003253259757197230">Webové adresy, ktoré navštevujete, sa odosielajú Googlu, aby mohol predpokladať weby, ktoré navštívite ako ďalšie, a zobrazovať vám ďalšie informácie o navštevovanej stránke</translation>
@@ -5221,7 +5224,6 @@ Ak chcete zobrazenie oddialiť, stlačte Ctrl + Alt + zníženie jasu.</translat
 <translation id="486505726797718946">Bola uvoľnená pamäť</translation>
 <translation id="486635084936119914">Automaticky otvoriť určité typy súborov po ich stiahnutí</translation>
 <translation id="4867272607148176509">Rodičia môžu schvaľovať alebo blokovať aplikácie, nastavovať časové limity a ovládať webové prehliadanie. Školský účet na prístup k väčšine školských zdrojov sa dá pridať neskôr.</translation>
-<translation id="486796517585164369">· Karta Nedávne</translation>
 <translation id="4868284252360267853">Toto dialógové okno nie je momentálne označené. Označíte ho stlačením kombinácie klávesov Command-Shift-Option A.</translation>
 <translation id="4869170227080975044">Čítať informácie o sieťach v systéme ChromeOS</translation>
 <translation id="4870724079713069532">Pomocou tejto aplikácie môžete otvárať a upravovať podporované súbory z Prieskumníka súborov alebo iných aplikácií. Ak chcete ovládať, ktoré súbory predvolene otvoria túto aplikáciu, prejdite do <ph name="BEGIN_LINK" />nastavení systému Windows<ph name="END_LINK" />.</translation>
@@ -5629,6 +5631,7 @@ Ak chcete zobrazenie oddialiť, stlačte Ctrl + Alt + zníženie jasu.</translat
 <translation id="5173668317844998239">Pridať a odstrániť odtlačky prstov uložené v bezpečnostnom kľúči</translation>
 <translation id="5174169235862638850">Heslo bolo skopírované do schránky</translation>
 <translation id="517488401359338823">Odomknúť bezpečnostné zariadenie</translation>
+<translation id="5176671554021050278">Pomocou funkcie Google Lens zistite viac o konkrétnych obrázkoch alebo o texte na stránke.</translation>
 <translation id="5177479852722101802">Aj naďalej blokovať prístup ku kamere a mikrofónu</translation>
 <translation id="5178667623289523808">Nájsť predchádzajúce</translation>
 <translation id="5180276433875360121">Zobraziť <ph name="CERT_LIST" /></translation>
@@ -6446,6 +6449,7 @@ Tejto akcii môžete prideliť viacero prepínačov.</translation>
 <translation id="581911254119283028">všetky aplikácie</translation>
 <translation id="5820751560028604030">Miestne sťahovanie bolo zablokované</translation>
 <translation id="5821565227679781414">Vytvoriť odkaz</translation>
+<translation id="5822533500175132614">Pripomenutie: Plynulé prehliadanie vo vrecku</translation>
 <translation id="5824976764713185207">Po načítaní stránku automaticky prečítať</translation>
 <translation id="5826395379250998812">Pripojte zariadenie <ph name="DEVICE_TYPE" /> k svojmu telefónu. <ph name="LINK_BEGIN" />Ďalšie informácie<ph name="LINK_END" /></translation>
 <translation id="5826993284769733527">Polotransparentné</translation>
@@ -9990,6 +9994,7 @@ Súbor kľúča uložte na bezpečné miesto. Budete ho potrebovať na vytvoreni
 <translation id="8458627787104127436">Otvoriť všetky (<ph name="URL_COUNT" />) v novom okne</translation>
 <translation id="8459023460357294721">Otvoriť <ph name="FILE_NAME" /> aj tak</translation>
 <translation id="8459333762072051247">Stav prihlásenia</translation>
+<translation id="8459596896605939741">Pripomenutie: to najlepšie z online nákupov vo vrecku</translation>
 <translation id="8460448946170646641">Skontrolujte hlavné ovládacie prvky ochrany súkromia a zabezpečenia</translation>
 <translation id="8460490661223303637">Chrome odstránil niektorý obsah, aby ste mohli uložiť spomienku</translation>
 <translation id="8460932807646981183">Spravovať vyhľadávače a vyhľadávanie na webe</translation>

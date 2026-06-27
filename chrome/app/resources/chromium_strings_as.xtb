@@ -32,6 +32,7 @@
 <translation id="126567311906253476"><ph name="USER_EMAIL" />ৰ জৰিয়তে Gmail বা Youtubeৰ দৰে Google সেৱাসমূহত ছাইন ইন কৰাৰ সময়ত, আপুনি একেটা একাউণ্ট ব্যৱহাৰ কৰি স্বয়ংক্ৰিয়ভাৱে Chromiumত ছাইন ইন কৰিব পাৰে</translation>
 <translation id="1287534462498555020">আপোনাৰ ফ’নত Chromium ইনষ্টল কৰক</translation>
 <translation id="1290883685122687410">ছেটআপ সম্পৰ্কীয় আসোঁৱাহ: <ph name="METAINSTALLER_EXIT_CODE" />। <ph name="WINDOWS_ERROR" /></translation>
+<translation id="1312200348844120300">আপুনি কোনো প্ৰ’ডাক্ট সন্ধান কৰিবলৈ প্ৰতিচ্ছবি সন্ধান কৰা সুবিধাটো কেনেকৈ ব্যৱহাৰ কৰিব পাৰে সেয়া দেখুওৱা এক চিত্ৰণ</translation>
 <translation id="1315551408014407711">আপোনাৰ নতুন Chromium প্ৰ'ফাইল ছেট আপ কৰক</translation>
 <translation id="132092532143527429">Chromiumত Gemini ব্যৱহাৰ কৰি চাওক</translation>
 <translation id="1324107359134968521">Chromiumক ব্লুটুথ ডিভাইচসমূহ অন্বেষণ কৰিবলৈ 
@@ -94,6 +95,7 @@
 <translation id="1951406923938785464">এই ফাইলৰ প্ৰকাৰটো সাধাৰণতে ডাউনল’ড কৰা নহয় আৰু ই বিপজ্জনক হ’ব পাৰে বাবে Chromiumএ এই ডাউনল’ডটো অৱৰোধ কৰিছে</translation>
 <translation id="1953553007165777902">ডাউনল’ড হৈ আছে... <ph name="MINUTE" /> মিনিট বাকী আছে</translation>
 <translation id="1966382378801805537">Chromiumএ ডিফ’ল্ট ব্ৰাউজাৰ নির্ধাৰণ বা ছেট কৰিব নোৱাৰে</translation>
+<translation id="197326043290947695">প্ৰতিচ্ছবি সন্ধান কৰাৰ জৰিয়তে স্মাৰ্টভাৱে ব্ৰাউজ কৰক</translation>
 <translation id="1990262977744080398">Chromiumএ কিয় কিছুমান ফাইল অৱৰোধ কৰি নতুন টেবত খোলে সেই বিষয়ে জানক</translation>
 <translation id="1999715455684970349">আপোনাৰ Chromium আপ টু ডে’ট কৰি ৰাখক। যদি এই সেৱাটো অক্ষম কৰা বা বন্ধ কৰা হয়, আপোনাৰ Chromium ছফ্টৱেৰ আপ টু ডে’ট কৰি ৰখা নহ’ব, অৰ্থাৎ উদ্ভৱ হ’ব পৰা সুৰক্ষা সম্পৰ্কীয় দুৰ্বলতাসমূহ সমাধান কৰিব নোৱাৰি আৰু সুবিধাসমূহে কাম নকৰিবও পাৰে। কোনো Chromium ছফ্টৱেৰে ব্যৱহাৰ কৰি নাথাকিলে এই সেৱাটোৱে নিজকে আনইনষ্টল কৰে।</translation>
 <translation id="2008474315282236005">এইটোৱে এই ডিভাইচটোৰ পৰা ১টা বস্তু মচিব। আপোনাৰ ডেটা পাছত পুনৰুদ্ধাৰ কৰিবলৈ Chromiumত <ph name="USER_EMAIL" /> হিচাপে ছাইন ইন কৰক।</translation>
@@ -236,6 +238,7 @@
 <translation id="3387527074123400161">ChromiumOS</translation>
 <translation id="3406848076815591792">পূৰ্বে থকা Chromium প্ৰ'ফাইলটোলৈ যাব নেকি?</translation>
 <translation id="3412460710772753638">এই ডিভাইচটোত Password Managerত</translation>
+<translation id="3423442168617177595">আপোনাক শক্তিশালী পাছৱৰ্ড সৃষ্টি, ছেভ আৰু স্বয়ংক্ৰিয়ভাৱে পূৰ কৰাত সহায় কৰিবলৈ Chromiumত অন্তৰ্ভুক্ত কৰা হৈছে। সহজে এক্সেছ কৰিবলৈ শ্বৰ্টকাটটো যোগ দিয়ক</translation>
 <translation id="3455907671758333080">আপোনাৰ ফ’নত Chromiumৰ জৰিয়তে বৰ্ধিত সুৰক্ষিত ব্ৰাউজিঙৰ সুবিধাটো সম্প্ৰসাৰিত কৰক</translation>
 <translation id="3461644266919055473">Chromium আপোনাৰ নিজৰ কৰি তোলা হৈছে...</translation>
 <translation id="3474745554856756813">ইয়ে এই ডিভাইচটোৰ পৰা <ph name="ITEMS_COUNT" />টা বস্তু মচিব। আপোনাৰ ডেটা পাছত পুনৰুদ্ধাৰ কৰিবলৈ Chromiumত <ph name="USER_EMAIL" /> হিচাপে ছাইন ইন কৰক।</translation>
@@ -285,6 +288,7 @@
 <translation id="3975724895399328945">&amp;Google Chrome for Testingৰ বিষয়ে</translation>
 <translation id="3997429360543082038">ChromiumOSৰ বিষয়ে</translation>
 <translation id="4010059961270896984">আপুনি কোনো ছাইটলৈ গ’লে, Chromiumএ আপোনাৰ IP ঠিকনা লুকুৱাই ৰখা এটা গোপনীয়তা সম্পৰ্কীয় ছাৰ্ভাৰৰ জৰিয়তে <ph name="BEGIN_LINK" />Googleৰ সুৰক্ষিত ব্ৰাউজিঙ<ph name="END_LINK" />লৈ URLটোৰ এটা অস্পষ্ট অংশ পঠিয়ায়। যদি কোনো ছাইটে কোনো সন্দেহজনক কাৰ্য কৰে, তেন্তে সম্পূৰ্ণ URL আৰু পৃষ্ঠাৰ কিছুমান সমলো পঠিওৱা হয়।</translation>
+<translation id="4016217212818346953">Password Managerৰ সহায়ত সুৰক্ষিত হৈ থাকক</translation>
 <translation id="4019629340646866719"><ph name="BEGIN_LINK_LINUX_OSS" />Linux বিকাশৰ পৰিৱেশ<ph name="END_LINK_LINUX_OSS" />ৰ দৰে অতিৰিক্ত <ph name="BEGIN_LINK_CROS_OSS" />মুক্ত উৎসৰ ছফ্টৱেৰ<ph name="END_LINK_CROS_OSS" />ৰ জৰিয়তে ChromiumOSক ব্যৱহাৰযোগ্য কৰা হৈছে।</translation>
 <translation id="4022972681110646219">স্ক্ৰীনৰ সমল অনুবাদ কৰক</translation>
 <translation id="4023601594785368013">মূল ভাষা: <ph name="LANGUAGE" /></translation>
@@ -504,6 +508,7 @@
 <translation id="6400112897226594999">কম্পিউটাৰৰ স্ক্ৰীনত Chromium লগ'।</translation>
 <translation id="6403826409255603130">Chromium হৈছে ৱেবপৃষ্ঠা আৰু এপ্লিকেশ্বনসমূহক বিজুলী বেগেৰে চলোৱা এক ৱেব ব্ৰাউজাৰ। এইটো ক্ষিপ্ৰ, স্থিৰ আৰু ব্যৱহাৰৰ বাবে সুবিধাজনক। মালৱেৰ আৰু ফিশ্বিঙৰ পৰা বিশেষভাৱে সুৰক্ষা পোৱা সুবিধাৰে নির্মিত Chromium ৰ জৰিয়তে অতি সুৰক্ষিতভাৱে ৱেব ব্ৰাউজিং কৰক।</translation>
 <translation id="6414624068245092115">আপোনাৰ Google একাউণ্টত আপুনি সদায়েই Chromiumৰ ডেটা ব্যৱহাৰ আৰু ছেভ কৰিব পৰাটো নিশ্চিত কৰিবলৈ, এয়া আপুনিয়েই বুলি সত্যাপন কৰক</translation>
+<translation id="6417332166651156371">Chromiumত Password Managerৰ প্ৰৱেশ বিন্দু দেখুওৱা এখন সৰলীকৃত প্ৰতিচ্ছবি</translation>
 <translation id="642132557830635295">Chromium অধিক দ্ৰুততাৰে চলে আৰু JavaScript ব্যৱহাৰ কৰা সুবিধাসমূহে ডিজাইন কৰা অনুসৰি কাম কৰিব লাগে</translation>
 <translation id="6436260184216827876">প্ৰতিচ্ছবিৰ সন্ধান সুবিধাটো উপলব্ধ নহয়। পাছত পুনৰ চেষ্টা কৰক।</translation>
 <translation id="6442900851116057561">ChromiumOS ৰিষ্টাৰ্ট কৰক</translation>
@@ -595,6 +600,7 @@
 <translation id="7196312274710523067">Chromium লন্স কৰিব পৰা নগ’ল। পুনৰ চেষ্টা কৰক।</translation>
 <translation id="7213008767289637091">যিকোনো সময়তে ক্ষিপ্ৰতাৰে ইয়ালৈ যাবলৈ Chromiumক আপোনাৰ ড’কত ৰাখক</translation>
 <translation id="7213407614656404070">আপুনি বাৰ্তা, নথি আৰু অন্য এপ্‌সমূহত যেতিয়াই লিংকত ক্লিক কৰে Chromium ব্যৱহাৰ কৰক</translation>
+<translation id="7216228761061470870">আপুনি প্ৰতিচ্ছবি সন্ধান কৰা সুবিধাটো ব্যৱহাৰ কৰিলে, PDFসমূহকে ধৰি পৃষ্ঠাখনৰ শিৰোনাম, URL আৰু সমল ছাৰ্ভাৰলৈ পঠিওৱা হয়।</translation>
 <translation id="7223968959479464213">কাৰ্য পৰিচালক - Chromium</translation>
 <translation id="7252276985725323153">তাৎক্ষণিকভাৱে ব্ৰাউজ কৰা আৰম্ভ কৰক: Windows ষ্টাৰ্ট হোৱাৰ লগে লগে এতিয়া Chromium লঞ্চ কৰিব পাৰি।</translation>
 <translation id="7274695763216404502">পিন কৰা হৈছে! টুলবাৰৰ পৰা প্ৰতিচ্ছবিৰ সন্ধান সুবিধাটো পুনৰ ব্যৱহাৰ কৰক</translation>
