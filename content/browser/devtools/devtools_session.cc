@@ -287,12 +287,12 @@ void DevToolsSession::MojoConnectionDestroyed() {
 void DevToolsSession::DispatchProtocolMessage(
     base::span<const uint8_t> message) {
   if (client_->UsesBinaryProtocol()) {
-    crdtp::Status status =
+    crdtp::StatusOr<size_t> status =
         crdtp::cbor::CheckCBORMessage(crdtp::SpanFrom(message));
     if (!status.ok()) {
       DispatchProtocolMessageToClient(
-          crdtp::CreateErrorNotification(
-              crdtp::DispatchResponse::ParseError(status.ToASCIIString()))
+          crdtp::CreateErrorNotification(crdtp::DispatchResponse::ParseError(
+                                             status.status().ToASCIIString()))
               ->Serialize());
       return;
     }
