@@ -15,6 +15,7 @@
 #import "base/test/scoped_feature_list.h"
 #import "components/policy/core/common/policy_pref_names.h"
 #import "components/prefs/testing_pref_service.h"
+#import "components/sync/test/test_sync_service.h"
 #import "download_manager_tab_helper.h"
 #import "ios/chrome/browser/download/model/download_directory_util.h"
 #import "ios/chrome/browser/drive/model/drive_policy.h"
@@ -34,6 +35,8 @@
 #import "ios/chrome/browser/signin/model/fake_authentication_service_delegate.h"
 #import "ios/chrome/browser/signin/model/fake_system_identity.h"
 #import "ios/chrome/browser/signin/model/fake_system_identity_manager.h"
+#import "ios/chrome/browser/sync/model/sync_service_factory.h"
+#import "ios/chrome/browser/sync/model/test_sync_service_utils.h"
 #import "ios/chrome/test/fakes/fake_download_manager_tab_helper_delegate.h"
 #import "ios/chrome/test/fakes/fake_enterprise_commands_handler.h"
 #import "ios/chrome/test/ios_chrome_scoped_testing_local_state.h"
@@ -88,6 +91,8 @@ class DownloadManagerTabHelperTest : public PlatformTest {
         AuthenticationServiceFactory::GetInstance(),
         AuthenticationServiceFactory::GetFactoryWithDelegate(
             std::make_unique<FakeAuthenticationServiceDelegate>()));
+    builder.AddTestingFactory(SyncServiceFactory::GetInstance(),
+                              base::BindRepeating(&CreateTestSyncService));
     profile_ = std::move(builder).Build();
 
     browser_ = std::make_unique<TestBrowser>(profile_.get());
