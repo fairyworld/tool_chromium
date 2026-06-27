@@ -25,6 +25,7 @@
 #import "components/signin/public/base/consent_level.h"
 #import "components/signin/public/identity_manager/account_capabilities_test_mutator.h"
 #import "components/signin/public/identity_manager/identity_test_utils.h"
+#import "components/sync/test/test_sync_service.h"
 #import "components/unified_consent/pref_names.h"
 #import "ios/chrome/browser/feature_engagement/model/tracker_factory.h"
 #import "ios/chrome/browser/intelligence/bwg/metrics/gemini_metrics.h"
@@ -49,6 +50,8 @@
 #import "ios/chrome/browser/signin/model/fake_authentication_service_delegate.h"
 #import "ios/chrome/browser/signin/model/identity_manager_factory.h"
 #import "ios/chrome/browser/signin/model/identity_test_environment_browser_state_adaptor.h"
+#import "ios/chrome/browser/sync/model/sync_service_factory.h"
+#import "ios/chrome/browser/sync/model/test_sync_service_utils.h"
 #import "ios/chrome/test/ios_chrome_scoped_testing_local_state.h"
 #import "ios/public/provider/chrome/browser/bwg/gemini_api.h"
 #import "ios/web/public/test/fakes/fake_navigation_context.h"
@@ -83,6 +86,8 @@ class GeminiTabHelperTest : public PlatformTest {
         AuthenticationServiceFactory::GetInstance(),
         AuthenticationServiceFactory::GetFactoryWithDelegate(
             std::make_unique<FakeAuthenticationServiceDelegate>()));
+    builder.AddTestingFactory(SyncServiceFactory::GetInstance(),
+                              base::BindRepeating(&CreateTestSyncService));
     builder.AddTestingFactory(
         IdentityManagerFactory::GetInstance(),
         base::BindRepeating(IdentityTestEnvironmentBrowserStateAdaptor::
@@ -326,8 +331,6 @@ TEST_F(GeminiTabHelperTest, TestShouldShowSuggestionChips) {
   web_state_->SetCurrentURL(GURL("https://www.not-google.com"));
   ASSERT_TRUE(tab_helper_->ShouldShowSuggestionChips());
 }
-
-
 
 TEST_F(GeminiTabHelperTest, TestDidStartNavigation_ShowsImageRemixTooltip) {
   feature_engagement::test::ScopedIphFeatureList iph_feature_list;
