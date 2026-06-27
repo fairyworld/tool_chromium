@@ -1677,9 +1677,10 @@ Unknown properties are collapsed to zero. -->
   <int value="1" label="Through a message"/>
   <int value="2" label="Through the app menu item"/>
   <int value="3" label="Through the toolbar button"/>
+  <int value="4" label="Through the context menu"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/android/java/src/org/chromium/chrome/browser/dom_distiller/ReaderModeManager.java:EntryPoint) -->
+<!-- LINT.ThenChange(//chrome/android/java/src/org/chromium/chrome/browser/dom_distiller/ReaderModeManager.java:DomDistillerEntryPoint) -->
 
 <!-- LINT.IfChange(JAWSMajorVersion)-->
 

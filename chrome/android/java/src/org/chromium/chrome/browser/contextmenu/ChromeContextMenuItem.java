@@ -83,7 +83,8 @@ class ChromeContextMenuItem {
         Item.INSPECT_ELEMENT,
         Item.COPY_VIDEO_FRAME,
         Item.DOWNLOAD_VIDEO_FRAME,
-        Item.LENS_OVERLAY
+        Item.LENS_OVERLAY,
+        Item.READING_MODE
     })
     @Retention(RetentionPolicy.SOURCE)
     public @interface Item {
@@ -147,8 +148,9 @@ class ChromeContextMenuItem {
         int COPY_VIDEO_FRAME = 46;
         int DOWNLOAD_VIDEO_FRAME = 47;
         int LENS_OVERLAY = 48;
+        int READING_MODE = 49;
         // ALWAYS UPDATE!
-        int NUM_ENTRIES = 49;
+        int NUM_ENTRIES = 50;
     }
 
     /** Mapping from {@link Item} to the ID found in the ids.xml. */
@@ -202,6 +204,7 @@ class ChromeContextMenuItem {
         R.id.contextmenu_copy_video_frame, // Item.COPY_VIDEO_FRAME
         R.id.contextmenu_download_video_frame, // Item.DOWNLOAD_VIDEO_FRAME
         R.id.contextmenu_lens_overlay, // Item.LENS_OVERLAY
+        R.id.contextmenu_open_in_reading_mode, // Item.READING_MODE
     };
 
     /** Mapping from {@link Item} to the ID of the string that describes the action of the item. */
@@ -255,6 +258,7 @@ class ChromeContextMenuItem {
         R.string.contextmenu_copy_video_frame, // Item.COPY_VIDEO_FRAME
         R.string.contextmenu_download_video_frame, // Item.DOWNLOAD_VIDEO_FRAME
         R.string.contextmenu_search_tab_with_google_lens, // Item.LENS_OVERLAY
+        R.string.contextmenu_open_in_reading_mode, // Item.READING_MODE
     };
 
     /**

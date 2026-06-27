@@ -80,6 +80,7 @@ import org.chromium.chrome.browser.ui.lens.LensOverlayTabHelper;
 import org.chromium.chrome.browser.ui.signin.ForcedSigninStatusProvider;
 import org.chromium.components.browser_ui.share.ShareParams;
 import org.chromium.components.browser_ui.widget.BrowserUiListMenuUtils;
+import org.chromium.components.dom_distiller.core.DomDistillerUrlUtils;
 import org.chromium.components.embedder_support.contextmenu.ChipDelegate;
 import org.chromium.components.embedder_support.contextmenu.ContextMenuImageFormat;
 import org.chromium.components.embedder_support.contextmenu.ContextMenuItemDelegate;
@@ -252,6 +253,7 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
             Action.VIEW_PAGE_SOURCE,
             Action.COPY_VIDEO_FRAME,
             Action.DOWNLOAD_VIDEO_FRAME,
+            Action.READING_MODE,
         })
         @Retention(RetentionPolicy.SOURCE)
         public @interface Action {
@@ -310,7 +312,8 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
             int VIEW_PAGE_SOURCE = 52;
             int COPY_VIDEO_FRAME = 53;
             int DOWNLOAD_VIDEO_FRAME = 54;
-            int NUM_ENTRIES = 55;
+            int READING_MODE = 55;
+            int NUM_ENTRIES = 56;
         }
 
         // LINT.ThenChange(/tools/metrics/histograms/enums.xml:ContextMenuOptionAndroid)
@@ -518,6 +521,16 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                     boolean isEnabled = !LensOverlayTabHelper.isOverlayShowing(tab);
                     pageGroup.add(createListItem(Item.LENS_OVERLAY, false, isEnabled));
                     maybeRecordUkmLensShown();
+                }
+                boolean isChromeOrNativePage =
+                        mParams.getPageUrl().getScheme().equals(UrlConstants.CHROME_SCHEME)
+                                || mParams.getPageUrl()
+                                        .getScheme()
+                                        .equals(UrlConstants.CHROME_NATIVE_SCHEME)
+                                || (getTab() != null && getTab().isNativePage());
+                if (!isChromeOrNativePage
+                        && !DomDistillerUrlUtils.isDistilledPage(mParams.getPageUrl())) {
+                    pageGroup.add(createListItem(Item.READING_MODE));
                 }
             }
             groupedItems.add(pageGroup);
@@ -1299,6 +1312,11 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                     mParams.getReferrer(),
                     /* navigateToTab= */ true,
                     /* additionalNavigationParams= */ null);
+        } else if (itemId == R.id.contextmenu_open_in_reading_mode) {
+            recordContextMenuSelection(ContextMenuUma.Action.READING_MODE);
+            if (mItemDelegate instanceof TabContextMenuItemDelegate tabDelegate) {
+                tabDelegate.onOpenInReadingMode();
+            }
         } else {
             onTabBackedItemSelected(itemId);
         }
