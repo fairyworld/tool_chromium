@@ -21,10 +21,13 @@
 #import "components/metrics/unsent_log_store.h"
 #import "components/prefs/testing_pref_service.h"
 #import "components/regional_capabilities/regional_capabilities_switches.h"
+#import "components/sync/test/test_sync_service.h"
 #import "components/ukm/ukm_service.h"
 #import "components/variations/synthetic_trial_registry.h"
 #import "ios/chrome/browser/shared/model/profile/test/test_profile_ios.h"
 #import "ios/chrome/browser/shared/model/profile/test/test_profile_manager_ios.h"
+#import "ios/chrome/browser/sync/model/sync_service_factory.h"
+#import "ios/chrome/browser/sync/model/test_sync_service_utils.h"
 #import "ios/chrome/test/ios_chrome_scoped_testing_local_state.h"
 #import "ios/web/public/test/web_task_environment.h"
 #import "testing/platform_test.h"
@@ -37,7 +40,10 @@ class IOSChromeMetricsServiceClientTest : public PlatformTest {
  public:
   IOSChromeMetricsServiceClientTest()
       : enabled_state_provider_(/*consent=*/false, /*enabled=*/false) {
-    profile_manager_.AddProfileWithBuilder(TestProfileIOS::Builder());
+    TestProfileIOS::Builder builder;
+    builder.AddTestingFactory(SyncServiceFactory::GetInstance(),
+                              base::BindRepeating(&CreateTestSyncService));
+    profile_manager_.AddProfileWithBuilder(std::move(builder));
   }
 
   IOSChromeMetricsServiceClientTest(const IOSChromeMetricsServiceClientTest&) =
