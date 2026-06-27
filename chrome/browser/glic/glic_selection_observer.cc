@@ -14,6 +14,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/task/single_thread_task_runner.h"
+#include "base/task/thread_pool.h"
 #include "build/build_config.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_clipboard_utils.h"
@@ -31,6 +32,7 @@
 #include "chrome/browser/glic/public/service/glic_instance_coordinator.h"
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/chrome_pages.h"
@@ -42,9 +44,14 @@
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings_pattern.h"
 #include "components/feature_engagement/public/tracker.h"
+#include "components/optimization_guide/content/browser/page_context_eligibility_observer.h"
+#include "components/optimization_guide/content/browser/page_context_eligibility.h"
+#include "components/prefs/pref_service.h"
 #include "components/shared_highlighting/core/common/disabled_sites.h"
 #include "components/shared_highlighting/core/common/fragment_directives_utils.h"
 #include "components/shared_highlighting/core/common/shared_highlighting_features.h"
+#include "components/signin/public/identity_manager/account_info.h"
+#include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/clipboard_types.h"
 #include "content/public/browser/render_frame_host.h"
@@ -221,6 +228,18 @@ GlicSelectionObserver::GlicSelectionObserver(content::WebContents* web_contents)
             base::BindRepeating(&GlicSelectionObserver::OnGlobalPanelShowHide,
                                 weak_ptr_factory_.GetWeakPtr()));
   }
+
+  std::string account;
+  if (profile) {
+    auto* identity_manager = IdentityManagerFactory::GetForProfile(profile);
+    if (identity_manager) {
+      account =
+          identity_manager->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin)
+              .email;
+    }
+  }
+
+  CreatePageContextEligibilityAPI(std::move(account));
 
   web_contents->ForEachRenderFrameHost(
       [this](content::RenderFrameHost* render_frame_host) {
@@ -889,11 +908,54 @@ void GlicSelectionObserver::SendAdditionalContextToPanel(
   if (!glic_keyed_service_) {
     return;
   }
+
+  // If the page is not eligible, do not send the additional context.
+  if (page_context_tracker_ && !selected_text.empty() &&
+      !page_context_tracker_->IsPageContextEligible()) {
+    return;
+  }
+
   if (auto* instance = glic_keyed_service_->GetInstanceForTab(tab_interface)) {
     // TODO(b/508916357): Use the invoke API.
     instance->SendAdditionalContext(
         CreateAdditionalContext(web_contents(), selected_text));
   }
+}
+
+void GlicSelectionObserver::OnPageContextEligibilityChanged(bool is_eligible) {
+  // If the page becomes ineligible and we've already sent selection context,
+  // we should clear it.
+  if (!is_eligible && has_sent_selection_context_) {
+    auto* tab_interface =
+        tabs::TabInterface::MaybeGetFromContents(web_contents());
+    if (tab_interface) {
+      SendAdditionalContextToPanel(tab_interface, std::u16string());
+      has_sent_selection_context_ = false;
+    }
+  }
+}
+
+void GlicSelectionObserver::CreatePageContextEligibilityAPI(std::string account) {
+  base::ThreadPool::PostTaskAndReplyWithResult(
+      FROM_HERE, {base::TaskPriority::BEST_EFFORT, base::MayBlock()},
+      base::BindOnce(&optimization_guide::PageContextEligibility::Get),
+      base::BindOnce(
+          &GlicSelectionObserver::OnPageContextEligibilityAPILoaded,
+          weak_ptr_factory_.GetWeakPtr(), std::move(account)));
+}
+
+void GlicSelectionObserver::OnPageContextEligibilityAPILoaded(
+    std::string account,
+    optimization_guide::PageContextEligibility* page_context_eligibility) {
+  if (!page_context_eligibility) {
+    return;
+  }
+  page_context_tracker_ =
+      optimization_guide::PageContextEligibilityObserver::Create(
+          web_contents(), std::move(account),
+          base::BindRepeating(
+              &GlicSelectionObserver::OnPageContextEligibilityChanged,
+              weak_ptr_factory_.GetWeakPtr()));
 }
 
 void GlicSelectionObserver::CopyLinkToHighlight(

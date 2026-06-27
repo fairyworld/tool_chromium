@@ -18,6 +18,7 @@
 #include "base/time/time.h"
 #include "base/timer/timer.h"
 #include "chrome/browser/glic/host/host.h"
+#include "components/optimization_guide/content/browser/page_context_eligibility_observer.h"
 #include "components/shared_highlighting/core/common/shared_highlighting_metrics.h"
 #include "content/public/browser/render_widget_host.h"
 #include "content/public/browser/weak_document_ptr.h"
@@ -31,6 +32,11 @@ class RenderFrameHost;
 }  // namespace content
 
 class BrowserWindowInterface;
+
+namespace optimization_guide {
+class PageContextEligibilityObserver;
+class PageContextEligibility;
+}  // namespace optimization_guide
 
 namespace glic {
 
@@ -128,6 +134,12 @@ class GlicSelectionObserver
 
   void RequestLinkGeneration(content::RenderFrameHost* rfh);
 
+  void OnPageContextEligibilityChanged(bool is_eligible);
+  void CreatePageContextEligibilityAPI(std::string account);
+  void OnPageContextEligibilityAPILoaded(
+      std::string account,
+      optimization_guide::PageContextEligibility* page_context_eligibility);
+
   raw_ptr<GlicKeyedService> glic_keyed_service_;
   base::CallbackListSubscription panel_state_subscription_;
   std::u16string last_selected_text_;
@@ -173,9 +185,17 @@ class GlicSelectionObserver
   mojo::Remote<blink::mojom::TextFragmentReceiver> text_fragment_remote_;
   std::optional<GURL> generated_link_;
 
-  base::WeakPtrFactory<GlicSelectionObserver> weak_ptr_factory_{this};
-
   friend class GlicSelectionObserverTest;
+
+ protected:
+  ::optimization_guide::PageContextEligibilityObserver* page_context_tracker() {
+    return page_context_tracker_.get();
+  }
+
+ private:
+  std::unique_ptr<::optimization_guide::PageContextEligibilityObserver>
+      page_context_tracker_;
+  base::WeakPtrFactory<GlicSelectionObserver> weak_ptr_factory_{this};
 };
 
 }  // namespace glic

@@ -90,6 +90,7 @@ source_set("glic") {
     "//components/feature_engagement/public",
     "//components/metrics",
     "//components/optimization_guide/content/browser",
+    "//components/optimization_guide/content/browser:page_context_eligibility",
     "//components/policy/core/browser",
     "//components/prefs",
     "//components/signin/public/identity_manager",
