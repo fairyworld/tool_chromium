@@ -6,6 +6,7 @@ import("//build/buildflag_header.gni")
 import("//build/config/chrome_build.gni")
 import("//build/util/process_version.gni")
 import("//chrome/common/request_header_integrity/buildflags.gni")
+import("//mojo/public/tools/bindings/mojom.gni")
 
 config("header_name_defines") {
   defines = []
@@ -30,11 +31,18 @@ config("header_name_defines") {
 
 source_set("request_header_integrity") {
   sources = [
+    "chrome_companero_loader.cc",
+    "chrome_companero_loader.h",
     "request_header_integrity_url_loader_throttle.cc",
     "request_header_integrity_url_loader_throttle.h",
   ]
 
   configs += [ ":header_name_defines" ]
+
+  public_deps = [
+    ":buildflags",
+    ":mojom",
+  ]
 
   deps = [
     "//base",
@@ -61,7 +69,10 @@ source_set("request_header_integrity") {
 source_set("unit_tests") {
   testonly = true
 
-  sources = [ "request_header_integrity_url_loader_throttle_unittest.cc" ]
+  sources = [
+    "chrome_companero_loader_unittest.cc",
+    "request_header_integrity_url_loader_throttle_unittest.cc",
+  ]
 
   deps = [
     ":request_header_integrity",
@@ -108,4 +119,8 @@ if (!is_android) {
 buildflag_header("buildflags") {
   header = "buildflags.h"
   flags = [ "ENABLE_REQUEST_HEADER_INTEGRITY=$enable_request_header_integrity" ]
+}
+
+mojom("mojom") {
+  sources = [ "chrome_companero.mojom" ]
 }
