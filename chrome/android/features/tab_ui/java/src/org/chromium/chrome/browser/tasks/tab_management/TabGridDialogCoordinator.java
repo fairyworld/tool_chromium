@@ -57,6 +57,7 @@ import org.chromium.chrome.browser.tasks.tab_management.TabListMediator.TabListI
 import org.chromium.chrome.browser.tasks.tab_management.TabProperties.UiType;
 import org.chromium.chrome.browser.tasks.tab_management.TabSwitcherMessageManager.MessageType;
 import org.chromium.chrome.browser.tasks.tab_management.TabUiMetricsHelper.TabGroupColorChangeActionType;
+import org.chromium.chrome.browser.tasks.tab_management.color_picker.ColorPickerContainer;
 import org.chromium.chrome.browser.tasks.tab_management.color_picker.ColorPickerCoordinator;
 import org.chromium.chrome.browser.tasks.tab_management.color_picker.ColorPickerCoordinator.ColorPickerLayoutType;
 import org.chromium.chrome.browser.tasks.tab_management.color_picker.ColorPickerType;
@@ -418,12 +419,15 @@ public class TabGridDialogCoordinator implements TabGridDialogMediator.DialogCon
                 };
 
         List<Integer> colors = TabGroupColorPickerUtils.getTabGroupColorIdList();
+        View root =
+                LayoutInflater.from(mActivity)
+                        .inflate(R.layout.tab_group_color_picker_container, null);
+        ColorPickerContainer container = root.findViewById(R.id.color_picker_container);
         mColorPickerCoordinator =
                 new ColorPickerCoordinator(
                         mActivity,
                         colors,
-                        LayoutInflater.from(mActivity)
-                                .inflate(R.layout.tab_group_color_picker_container, null),
+                        container,
                         ColorPickerType.TAB_GROUP,
                         mModel.get(TabGridDialogProperties.IS_INCOGNITO),
                         ColorPickerLayoutType.DOUBLE_ROW,
@@ -458,7 +462,7 @@ public class TabGridDialogCoordinator implements TabGridDialogMediator.DialogCon
                         mActivity,
                         decorView,
                         AppCompatResources.getDrawable(mActivity, bgDrawableId),
-                        contentView,
+                        root,
                         new ViewRectProvider(anchorView));
         mColorIconPopupWindow.addOnDismissListener(onDismissListener);
         mColorIconPopupWindow.setFocusable(true);

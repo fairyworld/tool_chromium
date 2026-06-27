@@ -750,11 +750,13 @@ public class TabGroupContextMenuCoordinator extends TabStripReorderingHelper<Tok
 
         // TODO(crbug.com/357104424): Consider create ColorPickerCoordinator once during the first
         // call, and reuse it for subsequent calls.
+        View inflatedRoot = ((ViewStub) contentView.findViewById(R.id.color_picker_stub)).inflate();
+        ColorPickerContainer container = inflatedRoot.findViewById(R.id.color_picker_container);
         mColorPickerCoordinator =
                 new ColorPickerCoordinator(
                         context,
                         TabGroupColorPickerUtils.getTabGroupColorIdList(),
-                        ((ViewStub) contentView.findViewById(R.id.color_picker_stub)).inflate(),
+                        container,
                         ColorPickerType.TAB_GROUP,
                         isIncognito,
                         ColorPickerLayoutType.DYNAMIC,

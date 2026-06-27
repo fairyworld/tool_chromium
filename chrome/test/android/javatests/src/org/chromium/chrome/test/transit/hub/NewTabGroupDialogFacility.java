@@ -60,6 +60,7 @@ public class NewTabGroupDialogFacility<
     private final SoftKeyboardFacility mSoftKeyboard;
     public ViewElement<View> dialogElement;
     public ViewElement<View> titleInputElement;
+    public ViewElement<View> colorPickerElement;
     public ViewElement<View>[] colorElements;
     public ViewElement<View> doneButtonElement;
     private @Nullable String mTitle;
@@ -113,7 +114,7 @@ public class NewTabGroupDialogFacility<
                 inDialogOption());
 
         // TODO(crbug.com/346377124): Partially cut off in android_30_google_apis_x86.textpb
-        declareView(withId(R.id.color_picker_container));
+        colorPickerElement = declareView(withId(R.id.color_picker_container));
         @TabGroupColorId List<Integer> colors = TabGroupColorPickerUtils.getTabGroupColorIdList();
         // Only the first 5 colors are displayed reliably when the soft keyboard opens.
         colorElements = new ViewElement[5];
@@ -161,12 +162,11 @@ public class NewTabGroupDialogFacility<
                 context.getString(
                         TabGroupColorPickerUtils.getTabGroupColorPickerItemColorAccessibilityString(
                                 color));
-        Matcher<View> contentDescriptionMatcher = withContentDescription(colorName);
+        Matcher<View> matcher = withContentDescription(colorName);
         if (selected != null) {
-            contentDescriptionMatcher =
-                    allOf(contentDescriptionMatcher, selected ? isChecked() : not(isChecked()));
+            matcher = allOf(matcher, selected ? isChecked() : not(isChecked()));
         }
-        return viewSpec(withId(R.id.color_picker_icon), contentDescriptionMatcher);
+        return colorPickerElement.descendant(matcher);
     }
 
     /** Input a new tab group name. */
