@@ -15,6 +15,7 @@ import type {AppElement, CustomizeButtonsElement, NtpSearchboxElement, PageRemot
 import {NtpBackgroundImageSource, PageCallbackRouter, PageHandlerRemote} from 'chrome://new-tab-page/new_tab_page.js';
 import {PageCallbackRouter as ComposeboxPageCallbackRouter, PageHandlerRemote as ComposeboxPageHandlerRemote} from 'chrome://resources/cr_components/composebox/composebox.mojom-webui.js';
 import {ToolMode} from 'chrome://resources/cr_components/composebox/composebox_query.mojom-webui.js';
+import type {ComposeboxVoiceSearchElement} from 'chrome://resources/cr_components/composebox/composebox_voice_search.js';
 import type {CrButtonElement} from 'chrome://resources/cr_elements/cr_button/cr_button.js';
 import type {CrToastElement} from 'chrome://resources/cr_elements/cr_toast/cr_toast.js';
 import {Command, CommandHandlerRemote} from 'chrome://resources/js/browser_command.mojom-webui.js';
@@ -2631,6 +2632,21 @@ suite('NewTabPageAppTest', () => {
   });
 
   suite('VoiceSearchCoherence', () => {
+    class MockSpeechRecognition {
+      onend: (() => void)|null = null;
+      start() {}
+      stop() {}
+      abort() {
+        if (this.onend) {
+          this.onend();
+        }
+      }
+    }
+
+    suiteSetup(() => {
+      Object.assign(window, {webkitSpeechRecognition: MockSpeechRecognition});
+    });
+
     async function recreateApp() {
       document.body.innerHTML = window.trustedTypes!.emptyHTML;
       app = document.createElement('ntp-app');
@@ -3221,6 +3237,211 @@ suite('NewTabPageAppTest', () => {
             assertFalse(
                 has8000Timeout,
                 'Should not start idle timer when dynamicTimeout is enabled');
+          });
+
+      test('Activation via mic click with experiment enabled', async () => {
+        loadTimeData.overrideValues({
+          voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+        });
+        await recreateApp();
+
+        metrics = fakeMetricsPrivate();
+
+        // Act: Open voice search dialog.
+        $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
+        await app.updateComplete;
+
+        const voiceSearch =
+            app.shadowRoot.querySelector<ComposeboxVoiceSearchElement>(
+                'cr-composebox-voice-search');
+        assertTrue(!!voiceSearch);
+        await voiceSearch.updateComplete;
+        assertEquals('NTP_REALBOX', voiceSearch.metricSource);
+
+        // Assert dual-logging (both new unified metrics and legacy NTP
+        // metrics).
+        assertEquals(1, metrics.count('VoiceSearch.Action'));
+        assertEquals(
+            1, metrics.count('VoiceSearch.Action', 0 /* ACTIVATED_BY_ICON */));
+        assertEquals(1, metrics.count('VoiceSearch.Action.NTP_REALBOX'));
+        assertEquals(
+            1,
+            metrics.count(
+                'VoiceSearch.Action.NTP_REALBOX', 0 /* ACTIVATED_BY_ICON */));
+        assertEquals(1, metrics.count(VOICE_ACTIONS_METRIC));
+        assertEquals(
+            1, metrics.count(VOICE_ACTIONS_METRIC, VoiceAction.ACTIVATE));
+      });
+
+      test(
+          'Activation via keyboard shortcut with experiment enabled',
+          async () => {
+            loadTimeData.overrideValues({
+              voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+            });
+            await recreateApp();
+
+            metrics = fakeMetricsPrivate();
+
+            // Act: Press shortcut keys.
+            window.dispatchEvent(new KeyboardEvent('keydown', {
+              ctrlKey: true,
+              shiftKey: true,
+              code: 'Period',
+            }));
+            await app.updateComplete;
+
+            const voiceSearch =
+                app.shadowRoot.querySelector<ComposeboxVoiceSearchElement>(
+                    'cr-composebox-voice-search');
+            assertTrue(!!voiceSearch);
+            await voiceSearch.updateComplete;
+            assertEquals('NTP_REALBOX', voiceSearch.metricSource);
+
+            // Assert dual-logging (both new unified metrics and legacy NTP
+            // metrics).
+            assertEquals(1, metrics.count('VoiceSearch.Action'));
+            assertEquals(
+                1,
+                metrics.count(
+                    'VoiceSearch.Action', 1 /* ACTIVATED_BY_KEYBOARD */));
+            assertEquals(1, metrics.count('VoiceSearch.Action.NTP_REALBOX'));
+            assertEquals(
+                1,
+                metrics.count(
+                    'VoiceSearch.Action.NTP_REALBOX',
+                    1 /* ACTIVATED_BY_KEYBOARD */));
+            assertEquals(1, metrics.count(VOICE_ACTIONS_METRIC));
+            assertEquals(
+                1,
+                metrics.count(
+                    VOICE_ACTIONS_METRIC, VoiceAction.ACTIVATE_KEYBOARD));
+          });
+
+      // TODO(crbug.com/527969922): Re-enable this test
+      test.skip('Activation via mic click with experiment disabled', async () => {
+        loadTimeData.overrideValues({
+          voiceSearchCoherenceAnySearchboxExperimentEnabled: false,
+          voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: false,
+        });
+        await recreateApp();
+
+        metrics = fakeMetricsPrivate();
+
+        // Act: Open voice search dialog.
+        $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
+        await microtasksFinished();
+
+        // Assert: Logs original legacy metrics, does NOT log new metrics.
+        assertEquals(1, metrics.count(VOICE_ACTIONS_METRIC));
+        assertEquals(
+            1, metrics.count(VOICE_ACTIONS_METRIC, VoiceAction.ACTIVATE));
+        assertEquals(0, metrics.count('VoiceSearch.Action'));
+        assertEquals(0, metrics.count('VoiceSearch.Action.NTP_REALBOX'));
+      });
+
+      // TODO(crbug.com/527969922): Re-enable this test
+      test.skip(
+          'Activation via keyboard shortcut with experiment disabled',
+          async () => {
+            loadTimeData.overrideValues({
+              voiceSearchCoherenceAnySearchboxExperimentEnabled: false,
+              voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: false,
+            });
+            await recreateApp();
+
+            metrics = fakeMetricsPrivate();
+
+            // Act: Press shortcut keys.
+            window.dispatchEvent(new KeyboardEvent('keydown', {
+              ctrlKey: true,
+              shiftKey: true,
+              code: 'Period',
+            }));
+            await microtasksFinished();
+
+            // Assert: Logs original legacy metrics, does NOT log new metrics.
+            assertEquals(1, metrics.count(VOICE_ACTIONS_METRIC));
+            assertEquals(
+                1,
+                metrics.count(
+                    VOICE_ACTIONS_METRIC, VoiceAction.ACTIVATE_KEYBOARD));
+            assertEquals(0, metrics.count('VoiceSearch.Action'));
+            assertEquals(0, metrics.count('VoiceSearch.Action.NTP_REALBOX'));
+          });
+
+      test(
+          'QUERY_SUBMITTED does not log legacy NewTabPage.VoiceActions when experiment enabled',
+          async () => {
+            loadTimeData.overrideValues({
+              voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+            });
+            await recreateApp();
+
+            metrics = fakeMetricsPrivate();
+
+            $$(app, '#searchbox')!.dispatchEvent(
+                new CustomEvent('open-composebox', {
+                  detail: {text: '', files: []},
+                }));
+            await microtasksFinished();
+
+            const composebox =
+                app.shadowRoot.querySelector('ntp-composebox, cr-composebox');
+            assertTrue(!!composebox);
+            composebox.dispatchEvent(new CustomEvent(
+                'voice-search-action',
+                {detail: {value: VoiceSearchAction.QUERY_SUBMITTED}}));
+            await microtasksFinished();
+
+            // Assert: Legacy classic histogram NewTabPage.VoiceActions does NOT
+            // log QUERY_SUBMITTED (enum value 1) due to early return.
+            assertEquals(
+                0,
+                metrics.count(
+                    VOICE_ACTIONS_METRIC, VoiceAction.QUERY_SUBMITTED));
+          });
+
+      // TODO(crbug.com/527969922): Re-enable this test
+      test.skip(
+          'QUERY_SUBMITTED logs legacy NewTabPage.VoiceActions when experiment disabled',
+          async () => {
+            loadTimeData.overrideValues({
+              composeboxSource: 'NTP_REALBOX',
+              voiceSearchCoherenceAnySearchboxExperimentEnabled: false,
+              voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: false,
+              voiceSearchCoherenceComposeboxesEnabled: false,
+            });
+            await recreateApp();
+
+            metrics = fakeMetricsPrivate();
+
+            $$(app, '#searchbox')!.dispatchEvent(
+                new CustomEvent('open-composebox', {
+                  detail: {text: '', files: []},
+                }));
+            await microtasksFinished();
+
+            const composebox =
+                app.shadowRoot.querySelector('ntp-composebox, cr-composebox');
+            assertTrue(!!composebox);
+            composebox.dispatchEvent(new CustomEvent(
+                'voice-search-action',
+                {detail: {value: VoiceSearchAction.QUERY_SUBMITTED}}));
+            await microtasksFinished();
+
+            // Assert: Legacy classic histogram NewTabPage.VoiceActions logs
+            // QUERY_SUBMITTED (enum value 1).
+            assertEquals(1, metrics.count(VOICE_ACTIONS_METRIC));
+            assertEquals(
+                1,
+                metrics.count(
+                    VOICE_ACTIONS_METRIC, VoiceAction.QUERY_SUBMITTED));
+
+            // Assert: New unified histograms are NOT logged when experiment is
+            // disabled.
+            assertEquals(0, metrics.count('VoiceSearch.Action'));
+            assertEquals(0, metrics.count('VoiceSearch.Action.NTP_REALBOX'));
           });
     });
   });
