@@ -266,7 +266,9 @@ class KeyboardAccessoryViewBinder {
                         });
             }
 
-            final boolean isLoading = item.getViewState() == ActionBarItem.ViewState.LOADING;
+            final boolean isLoading =
+                    item.getViewState() == ActionBarItem.ViewState.LOADING
+                            || item.getSuggestion().isLoading();
             final boolean isVisuallyDeactivated =
                     item.getViewState() == ActionBarItem.ViewState.DEACTIVATED
                             || item.getSuggestion().applyDeactivatedStyle();
