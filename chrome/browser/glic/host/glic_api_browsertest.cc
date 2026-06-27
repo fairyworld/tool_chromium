@@ -113,6 +113,7 @@
 #include "components/skills/features.h"
 #include "components/skills/public/skill.h"
 #include "components/skills/public/skills_service.h"
+#include "components/subscription_eligibility/subscription_eligibility_prefs.h"
 #include "components/tabs/public/tab_interface.h"
 #include "components/variations/synthetic_trial_registry.h"
 #include "content/public/browser/render_frame_host.h"
@@ -548,6 +549,9 @@ class GlicApiTestWithGeminiActOnWebPolicy : public GlicApiTestWithOneTab {
     identity_test_env_->SetTestURLLoaderFactory(&test_url_loader_factory_);
     identity_manager_ = IdentityManagerFactory::GetForProfile(GetProfile());
     SimulatePrimaryAccountChangedSignIn("foo@bar.com", "");
+
+    GetProfile()->GetPrefs()->SetInteger(
+        subscription_eligibility::prefs::kAiSubscriptionTier, 1);
 
     policy_provider_.SetupPolicyServiceForPolicyUpdates(
         browser()->profile()->GetProfilePolicyConnector()->policy_service());

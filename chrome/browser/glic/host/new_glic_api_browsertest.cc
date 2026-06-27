@@ -69,6 +69,7 @@
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/skills/features.h"
 #include "components/skills/public/skills_service.h"
+#include "components/subscription_eligibility/subscription_eligibility_prefs.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
@@ -2159,6 +2160,9 @@ class NewGlicApiTestWithGeminiActOnWebPolicy : public NewGlicApiTest {
     identity_test_env_->SimulateSuccessfulFetchOfAccountInfo(
         account_info.account_id, account_info.email, account_info.gaia,
         "bar.com", "Full Name", "Given Name", "Locale", "Picture URL");
+
+    GetProfile()->GetPrefs()->SetInteger(
+        subscription_eligibility::prefs::kAiSubscriptionTier, 1);
 
     policy_provider_.SetupPolicyServiceForPolicyUpdates(
         GetProfile()->GetProfilePolicyConnector()->policy_service());

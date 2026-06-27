@@ -48,6 +48,7 @@
 #include "components/signin/public/identity_manager/account_capabilities_test_mutator.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
+#include "components/subscription_eligibility/subscription_eligibility_prefs.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/variations/service/test_variations_service.h"
 #include "components/variations/service/variations_service.h"
@@ -1760,6 +1761,8 @@ TEST_F(GlicEnablingWebActuationToggleTest, ManagedProfile_CannotActOnWeb) {
   profile()->GetPrefs()->SetInteger(
       glic::prefs::kGlicActuationOnWeb,
       static_cast<int>(glic::prefs::GlicActuationOnWebPolicyState::kDisabled));
+  profile()->GetPrefs()->SetInteger(
+      subscription_eligibility::prefs::kAiSubscriptionTier, 1);
 
   auto* glic_service = GlicKeyedService::Get(profile());
   EXPECT_FALSE(glic_service->enabling().ShouldShowWebActuationToggle());
@@ -1781,6 +1784,8 @@ TEST_F(GlicEnablingWebActuationToggleTest, ManagedProfile_CanActOnWeb) {
   profile()->GetPrefs()->SetInteger(
       glic::prefs::kGlicActuationOnWeb,
       static_cast<int>(glic::prefs::GlicActuationOnWebPolicyState::kEnabled));
+  profile()->GetPrefs()->SetInteger(
+      subscription_eligibility::prefs::kAiSubscriptionTier, 1);
 
   auto* glic_service = GlicKeyedService::Get(profile());
   EXPECT_TRUE(glic_service->enabling().ShouldShowWebActuationToggle());

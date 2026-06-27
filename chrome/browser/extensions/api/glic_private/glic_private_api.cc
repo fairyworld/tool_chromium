@@ -184,7 +184,7 @@ api::glic_private::ProfileState CreateProfileState(
 
   state.actuation_allowed =
       base::FeatureList::IsEnabled(features::kGlicActor) && glic_service &&
-      glic_service->actor_policy_checker().CanActOnWeb();
+      glic_service->actor_policy_checker().GlicApiCanActOnWeb();
 
   state.user_enable_actuation_on_web =
       glic_service && glic_service->enabling().GetUserEnabledActuationOnWeb();

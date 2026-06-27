@@ -79,6 +79,13 @@ export function getHtml(this: GlicInternalsAppElement) {
                 this.data_.enablement.actuationEligibility)}
           </td>
         </tr>
+        <tr>
+          <td>Glic Api actuation eligibility</td>
+          <td>
+            ${this.getActuationEligibilityString_(
+                this.data_.enablement.glicApiActuationEligibility)}
+          </td>
+        </tr>
       </table>` :
       html`<h3 id="loadingMsg">Loading...</h3>`}
     <h2>Configuration</h2>

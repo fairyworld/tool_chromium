@@ -86,6 +86,9 @@ struct ProfileEnablement {
 
   // Summary of whether actuation is enabled, and if not, why not.
   ActuationEligibility actuation_eligibility;
+
+  // Summary of whether Glic API actuation is enabled, and if not, why not.
+  ActuationEligibility glic_api_actuation_eligibility;
 };
 
 // Basic configuration information about Glic.
