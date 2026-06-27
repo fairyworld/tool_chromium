@@ -545,6 +545,8 @@
   _fakeboxTapped = NO;
   if (!IsNTPRedesignEnabled()) {
     [self.NTPViewController focusOmnibox];
+  } else if (self.NTPRedesignViewController) {
+    [self.NTPRedesignViewController focusOmnibox];
   }
 }
 
@@ -791,8 +793,14 @@
       [self.toolbarDelegate fakeboxScribbleForwardingTarget];
   headerView.mutator = self.NTPMediator;
   [headerView setupSubviews];
-  headerView.searchEngineLogoView = _searchEngineLogoMediator.view;
-  _searchEngineLogoMediator.consumer = headerView;
+  if (IsNTPRedesignEnabled()) {
+    self.NTPRedesignViewController.searchEngineLogoView =
+        _searchEngineLogoMediator.view;
+    _searchEngineLogoMediator.consumer = self.NTPRedesignViewController;
+  } else {
+    headerView.searchEngineLogoView = _searchEngineLogoMediator.view;
+    _searchEngineLogoMediator.consumer = headerView;
+  }
 }
 
 // Configures `self.contentSuggestionsCoordinator`.
@@ -857,6 +865,7 @@
 // managed by this Coordinator.
 - (void)configureNTPViewController {
   if (IsNTPRedesignEnabled()) {
+    self.NTPRedesignViewController.NTPContentDelegate = self;
     [self configureMainViewControllerUsing:self.NTPRedesignViewController];
     return;
   }
