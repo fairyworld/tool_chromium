@@ -11,6 +11,7 @@
 #include <string>
 
 #include "base/functional/callback.h"
+#include "base/memory/raw_ptr.h"
 #include "base/observer_list_types.h"
 #include "components/contextual_search/contextual_search_types.h"
 #include "components/lens/lens_bitmap_processing.h"
@@ -238,7 +239,7 @@ class ContextualSearchContextController {
       const base::UnguessableToken& file_token) = 0;
 
   // Return the file infos for all files in the request.
-  virtual std::vector<const FileInfo*> GetFileInfoList() = 0;
+  virtual std::vector<raw_ptr<const FileInfo>> GetFileInfoList() = 0;
 
   // Returns a weak pointer to the context controller.
   virtual base::WeakPtr<ContextualSearchContextController> AsWeakPtr() = 0;

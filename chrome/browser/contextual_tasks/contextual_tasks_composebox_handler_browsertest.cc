@@ -733,7 +733,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksComposeboxHandlerTest,
                   callback) { std::move(callback).Run(std::move(context)); });
 
   // Setup FileInfo with expired status.
-  std::vector<const contextual_search::FileInfo*> file_info_list;
+  std::vector<raw_ptr<const contextual_search::FileInfo>> file_info_list;
   contextual_search::FileInfo file_info;
   file_info.tab_session_id = session_id;
   file_info.upload_status =
@@ -827,7 +827,7 @@ IN_PROC_BROWSER_TEST_F(
                   callback) { std::move(callback).Run(std::move(context)); });
 
   // Setup context with uploaded status and some previous content.
-  std::vector<const contextual_search::FileInfo*> file_info_list;
+  std::vector<raw_ptr<const contextual_search::FileInfo>> file_info_list;
   contextual_search::FileInfo file_info;
   file_info.tab_session_id = session_id;
   file_info.upload_status =
@@ -925,7 +925,7 @@ IN_PROC_BROWSER_TEST_F(
                   callback) { std::move(callback).Run(std::move(context)); });
 
   // Setup FileInfo with uploaded status and SAME content.
-  std::vector<const contextual_search::FileInfo*> file_info_list;
+  std::vector<raw_ptr<const contextual_search::FileInfo>> file_info_list;
   contextual_search::FileInfo file_info;
   file_info.tab_session_id = session_id;
   file_info.upload_status =
@@ -1183,7 +1183,7 @@ IN_PROC_BROWSER_TEST_F(
                   callback) { std::move(callback).Run(std::move(context)); });
 
   // Setup FileInfo with uploaded status and OLD bitmap.
-  std::vector<const contextual_search::FileInfo*> file_info_list;
+  std::vector<raw_ptr<const contextual_search::FileInfo>> file_info_list;
   contextual_search::FileInfo file_info;
   file_info.tab_session_id = session_id;
   file_info.upload_status =
@@ -1286,7 +1286,7 @@ IN_PROC_BROWSER_TEST_F(
                   callback) { std::move(callback).Run(std::move(context)); });
 
   // Setup FileInfo with uploaded status and SAME bitmap.
-  std::vector<const contextual_search::FileInfo*> file_info_list;
+  std::vector<raw_ptr<const contextual_search::FileInfo>> file_info_list;
   contextual_search::FileInfo file_info;
   file_info.tab_session_id = session_id;
   file_info.upload_status =
@@ -3401,7 +3401,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksComposeboxHandlerTest,
                   callback) { std::move(callback).Run(std::move(context)); });
 
   // Setup FileInfo with expired status.
-  std::vector<const contextual_search::FileInfo*> file_info_list;
+  std::vector<raw_ptr<const contextual_search::FileInfo>> file_info_list;
   contextual_search::FileInfo file_info;
   file_info.tab_session_id = session_id;
   file_info.upload_status =
@@ -3512,7 +3512,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksComposeboxHandlerTest,
                   callback) { std::move(callback).Run(std::move(context)); });
 
   // Setup FileInfo with expired status.
-  std::vector<const contextual_search::FileInfo*> file_info_list;
+  std::vector<raw_ptr<const contextual_search::FileInfo>> file_info_list;
   contextual_search::FileInfo file_info;
   file_info.tab_session_id = session_id;
   file_info.upload_status =
