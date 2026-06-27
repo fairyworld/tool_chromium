@@ -2768,8 +2768,7 @@ suite('NewTabPageAppTest', () => {
         });
 
     test(
-        'dialog handles recording stopped event when NTP searchbox (realbox) ' +
-            'voice search coherence with live transcription is enabled',
+        'dialog handles recording stopped event by setting searchbox text',
         async () => {
           loadTimeData.overrideValues({
             googleBaseUrl: 'https://www.google.com/',
@@ -2809,6 +2808,15 @@ suite('NewTabPageAppTest', () => {
           assertTrue(!!dialog);
           assertTrue(dialog.open);
 
+          // Override setInputText to verify it is called.
+          const searchboxEl = $$(app, '#searchbox') as NtpSearchboxElement;
+          let setInputTextCalledWith = '';
+          const originalSetInputText = searchboxEl.setInputText;
+          searchboxEl.setInputText = (text: string) => {
+            setInputTextCalledWith = text;
+            originalSetInputText.call(searchboxEl, text);
+          };
+
           // Simulate recording stopped event with valid query.
           voiceSearch.dispatchEvent(new CustomEvent('recording-stopped', {
             detail: 'hello world',
@@ -2818,12 +2826,11 @@ suite('NewTabPageAppTest', () => {
           // Assert dialog is closed (removed from DOM).
           assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
 
-          // Assert windowProxy.navigate was called with correct URL.
-          assertEquals(1, windowProxy.getCallCount('navigate'));
-          const navigatedUrl = windowProxy.getArgs('navigate')[0];
-          assertEquals(
-              'https://www.google.com/search?q=hello+world&gs_ivs=1&sourceid=chrome',
-              navigatedUrl);
+          // Assert windowProxy.navigate was NOT called.
+          assertEquals(0, windowProxy.getCallCount('navigate'));
+
+          // Assert setInputText was called with correct query.
+          assertEquals('hello world', setInputTextCalledWith);
         });
 
     test(
@@ -3110,16 +3117,25 @@ suite('NewTabPageAppTest', () => {
             mockSpeechRecognition.onresult!(results);
             await microtasksFinished();
 
+            // Override setInputText to verify it is called.
+            const searchboxEl = searchbox as NtpSearchboxElement;
+            let setInputTextCalledWith = '';
+            const originalSetInputText = searchboxEl.setInputText;
+            searchboxEl.setInputText = (text: string) => {
+              setInputTextCalledWith = text;
+              originalSetInputText.call(searchboxEl, text);
+            };
+
             // Simulate speech recognition natural finish.
             mockSpeechRecognition.onend!();
             await microtasksFinished();
 
-            // Verify that the query is submitted via navigation.
-            assertEquals(1, windowProxy.getCallCount('navigate'));
-            const navigatedUrl = windowProxy.getArgs('navigate')[0];
-            assertEquals(
-                'https://www.google.com/search?q=test+query&gs_ivs=1&sourceid=chrome',
-                navigatedUrl);
+            // Verify that the query is NOT submitted or navigated.
+            assertEquals(0, searchboxHandler.getCallCount('submitQuery'));
+            assertEquals(0, windowProxy.getCallCount('navigate'));
+
+            // Verify setInputText was called with correct query.
+            assertEquals('test query', setInputTextCalledWith);
           });
 
       test(
@@ -3150,7 +3166,17 @@ suite('NewTabPageAppTest', () => {
             mockSpeechRecognition.onresult!
                 (createResults(exactLimitTranscript, /*isFinal=*/ false));
             await microtasksFinished();
+
             assertEquals(0, windowProxy.getCallCount('navigate'));
+
+            // Override setInputText to verify it is called.
+            const searchboxEl = searchbox as NtpSearchboxElement;
+            let setInputTextCalledWith = '';
+            const originalSetInputText = searchboxEl.setInputText;
+            searchboxEl.setInputText = (text: string) => {
+              setInputTextCalledWith = text;
+              originalSetInputText.call(searchboxEl, text);
+            };
 
             // Construct a long transcript exceeding the limit (121 chars).
             const longTranscript = 'a'.repeat(121);
@@ -3158,13 +3184,12 @@ suite('NewTabPageAppTest', () => {
                 (createResults(longTranscript, /*isFinal=*/ false));
             await microtasksFinished();
 
-            // Verify that the query is force-submitted via navigation.
-            assertEquals(1, windowProxy.getCallCount('navigate'));
-            const navigatedUrl = windowProxy.getArgs('navigate')[0];
-            assertEquals(
-                `https://www.google.com/search?q=${
-                    longTranscript}&gs_ivs=1&sourceid=chrome`,
-                navigatedUrl);
+            // Verify that the query is NOT submitted or navigated.
+            assertEquals(0, searchboxHandler.getCallCount('submitQuery'));
+            assertEquals(0, windowProxy.getCallCount('navigate'));
+
+            // Verify setInputText was called with correct query.
+            assertEquals(longTranscript, setInputTextCalledWith);
           });
 
       test(

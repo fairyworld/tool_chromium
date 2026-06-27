@@ -1148,15 +1148,15 @@ export class AppElement extends AppElementBase {
 
   protected onVoiceSearchRecordingStopped_(e: CustomEvent<string>) {
     const query = e.detail;
+    const dialog = this.shadowRoot.querySelector<HTMLDialogElement>(
+        '#voiceSearchDialog');
+    if (dialog) {
+      dialog.close();
+    }
+    this.onVoiceSearchOverlayClose();
+
     if (query && query.trim().length > 0) {
-      this.onVoiceSearchFinalResult_(e);
-    } else {
-      const dialog = this.shadowRoot.querySelector<HTMLDialogElement>(
-          '#voiceSearchDialog');
-      if (dialog) {
-        dialog.close();
-      }
-      this.onVoiceSearchOverlayClose();
+      this.$.searchbox.setInputText(query);
     }
   }
   /**
