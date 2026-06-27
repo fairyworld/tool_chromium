@@ -414,12 +414,12 @@ public class BottomBarMediator
                                 () ->
                                         BottomBarMetrics.recordIphEvent(
                                                 BottomBarMetrics.IphEvent.SHOWN,
-                                                /* isNewTabIph= */ false))
+                                                BottomBarMetrics.IphFeature.GLIC))
                         .setOnDismissCallback(
                                 () -> {
                                     BottomBarMetrics.recordIphEvent(
                                             BottomBarMetrics.IphEvent.DISMISSED,
-                                            /* isNewTabIph= */ false);
+                                            BottomBarMetrics.IphFeature.GLIC);
                                     triggerNewTabIph();
                                 })
                         .build();
@@ -458,12 +458,12 @@ public class BottomBarMediator
                                 () ->
                                         BottomBarMetrics.recordIphEvent(
                                                 BottomBarMetrics.IphEvent.SHOWN,
-                                                /* isNewTabIph= */ true))
+                                                BottomBarMetrics.IphFeature.NEW_TAB))
                         .setOnDismissCallback(
                                 () ->
                                         BottomBarMetrics.recordIphEvent(
                                                 BottomBarMetrics.IphEvent.DISMISSED,
-                                                /* isNewTabIph= */ true))
+                                                BottomBarMetrics.IphFeature.NEW_TAB))
                         .build();
         newTabModel.set(ActionProperties.IPH_INTENT, newTabIph);
         mNewTabIphIntent = newTabIph;

@@ -1283,10 +1283,15 @@ chromium-metrics-reviews@google.com.
     Recorded when the {IPHType} In-Product Help (IPH) in the Android Bottom Bar
     triggers (is shown or dismissed).
   </summary>
+<!-- LINT.IfChange(AndroidBottomBarIphFeature) -->
+
   <token key="IPHType">
+    <variant name="Aim" summary="AI Mode button"/>
     <variant name="Glic" summary="Gemini button"/>
     <variant name="NewTab" summary="New Tab button"/>
   </token>
+<!-- LINT.ThenChange(//chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMetrics.java:AndroidBottomBarIphFeature) -->
+
 </histogram>
 
 <histogram name="Android.BottomBar.Promo.Event"
