@@ -60,8 +60,8 @@ public class ImmersiveVideoFormatRadioGroup extends RadioGroup {
                 ImmersiveStereoMode.SIDE_BY_SIDE,
                 ImmersiveProjectionType.QUAD),
         new FormatOption(
-                R.string.immersive_playback_confirmation_option_vr180,
-                ImmersiveStereoMode.MONO,
+                R.string.immersive_playback_confirmation_option_vr180_3d,
+                ImmersiveStereoMode.SIDE_BY_SIDE,
                 ImmersiveProjectionType.HEMISPHERE),
         new FormatOption(
                 R.string.immersive_playback_confirmation_option_vr360,
