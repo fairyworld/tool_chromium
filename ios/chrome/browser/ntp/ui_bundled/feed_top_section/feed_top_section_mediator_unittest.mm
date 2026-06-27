@@ -73,11 +73,10 @@ class FeedTopSectionMediatorTest : public PlatformTest {
 
  protected:
   IOSChromeScopedTestingLocalState scoped_testing_local_state_;
-  raw_ptr<AuthenticationService, DanglingUntriaged>
-      fake_authentication_service_;
-  raw_ptr<PrefService, DanglingUntriaged> fake_pref_service_;
   web::WebTaskEnvironment task_environment_;
   std::unique_ptr<TestProfileIOS> fake_profile_;
+  raw_ptr<AuthenticationService> fake_authentication_service_;
+  raw_ptr<PrefService> fake_pref_service_;
   FeedTopSectionMediator* feed_top_section_mediator_;
   FeedTopSectionViewController* feed_top_section_view_controller_;
   base::test::ScopedFeatureList feature_list_;
