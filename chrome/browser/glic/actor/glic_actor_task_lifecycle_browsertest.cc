@@ -584,8 +584,14 @@ bool IsProtectRecentlyVisibleTabEnabled() {
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
+// TODO(crbug.com/528462037): Flaky on Android.
+#if BUILDFLAG(IS_ANDROID)
+#define MAYBE_testActuatingPriorityChange DISABLED_testActuatingPriorityChange
+#else
+#define MAYBE_testActuatingPriorityChange testActuatingPriorityChange
+#endif
 IN_PROC_BROWSER_TEST_F(GlicActorTaskLifecycleFunctionalBrowserTest,
-                       testActuatingPriorityChange) {
+                       MAYBE_testActuatingPriorityChange) {
   GlicInstanceImpl* instance = GetInstanceImpl();
   ASSERT_TRUE(instance);
   ASSERT_OK(WaitForGlicClient(instance));
