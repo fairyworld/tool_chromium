@@ -12,14 +12,13 @@ _jni_sources = [
 
 android_library("java") {
   srcjar_deps = [ ":jni_headers" ]
-  sources = _jni_sources + [ "android/java/src/org/chromium/chrome/browser/enterprise/util/EnterpriseInfo.java" ]
+  sources = _jni_sources
 
   deps = [
     "//base:base_java",
     "//build/android:build_java",
     "//chrome/browser/flags:java",
     "//chrome/browser/profiles/android:java",
-    "//components/policy/android:policy_java",
     "//content/public/android:content_java",
     "//third_party/androidx:androidx_annotation_annotation_java",
     "//third_party/jni_zero:jni_zero_java",
