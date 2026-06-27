@@ -2,25 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_THEMES_CROSS_DEVICE_CROSS_DEVICE_THEME_TRACKER_DESKTOP_H_
-#define CHROME_BROWSER_THEMES_CROSS_DEVICE_CROSS_DEVICE_THEME_TRACKER_DESKTOP_H_
+#ifndef COMPONENTS_THEMES_CROSS_DEVICE_THEME_COMPARER_H_
+#define COMPONENTS_THEMES_CROSS_DEVICE_THEME_COMPARER_H_
 
-#include <memory>
-
-#include "base/functional/callback.h"
-#include "base/memory/weak_ptr.h"
-#include "components/sync/protocol/theme_android_specifics.pb.h"
-#include "components/sync/protocol/theme_ios_specifics.pb.h"
 #include "components/sync/protocol/theme_specifics.pb.h"
-#include "components/themes/cross_device/cross_device_theme_sync_bridge.h"
-#include "components/themes/cross_device/cross_device_theme_tracker.h"
-#include "components/version_info/channel.h"
-
-namespace syncer {
-class DataTypeControllerDelegate;
-}  // namespace syncer
 
 namespace themes {
+
+// Helper to compare theme specifics.
+// Each platform must specialize this for its own specifics type to avoid
+// using SerializeAsString() which is unstable.
+template <typename T>
+struct ThemeComparer;
 
 template <>
 struct ThemeComparer<sync_pb::ThemeSpecifics> {
@@ -188,53 +181,6 @@ struct ThemeComparer<sync_pb::ThemeSpecifics> {
   }
 };
 
-DeviceThemeInfo<sync_pb::ThemeSpecifics> TranslateAndroid(
-    const sync_pb::ThemeAndroidSpecifics& android_specifics);
-
-DeviceThemeInfo<sync_pb::ThemeSpecifics> TranslateIos(
-    const sync_pb::ThemeIosSpecifics& ios_specifics);
-
-class CrossDeviceThemeTrackerDesktop
-    : public CrossDeviceThemeTracker<sync_pb::ThemeSpecifics> {
- public:
-  using AndroidBridge =
-      CrossDeviceThemeSyncBridge<sync_pb::ThemeAndroidSpecifics,
-                                 sync_pb::ThemeSpecifics>;
-  using IosBridge = CrossDeviceThemeSyncBridge<sync_pb::ThemeIosSpecifics,
-                                               sync_pb::ThemeSpecifics>;
-
-  using AndroidBridgeFactory =
-      base::OnceCallback<std::unique_ptr<AndroidBridge>(
-          CrossDeviceThemeTrackerDesktop*)>;
-  using IosBridgeFactory = base::OnceCallback<std::unique_ptr<IosBridge>(
-      CrossDeviceThemeTrackerDesktop*)>;
-
-  using CrossDeviceThemeTracker<sync_pb::ThemeSpecifics>::UpdateThemeInfo;
-  using CrossDeviceThemeTracker<sync_pb::ThemeSpecifics>::RemoveThemeInfo;
-
-  CrossDeviceThemeTrackerDesktop(syncer::DeviceInfoTracker* device_info_tracker,
-                                 AndroidBridgeFactory android_bridge_factory,
-                                 IosBridgeFactory ios_bridge_factory);
-
-  CrossDeviceThemeTrackerDesktop(const CrossDeviceThemeTrackerDesktop&) =
-      delete;
-  CrossDeviceThemeTrackerDesktop& operator=(
-      const CrossDeviceThemeTrackerDesktop&) = delete;
-
-  ~CrossDeviceThemeTrackerDesktop() override;
-
-  base::WeakPtr<syncer::DataTypeControllerDelegate> GetAndroidSyncDelegate();
-  base::WeakPtr<syncer::DataTypeControllerDelegate> GetIosSyncDelegate();
-
- private:
-  std::unique_ptr<CrossDeviceThemeSyncBridge<sync_pb::ThemeAndroidSpecifics,
-                                             sync_pb::ThemeSpecifics>>
-      android_bridge_;
-  std::unique_ptr<CrossDeviceThemeSyncBridge<sync_pb::ThemeIosSpecifics,
-                                             sync_pb::ThemeSpecifics>>
-      ios_bridge_;
-};
-
 }  // namespace themes
 
-#endif  // CHROME_BROWSER_THEMES_CROSS_DEVICE_CROSS_DEVICE_THEME_TRACKER_DESKTOP_H_
+#endif  // COMPONENTS_THEMES_CROSS_DEVICE_THEME_COMPARER_H_
