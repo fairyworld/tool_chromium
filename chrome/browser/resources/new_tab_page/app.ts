@@ -1135,15 +1135,15 @@ export class AppElement extends AppElementBase {
       dialog.close();
     }
     this.onVoiceSearchOverlayClose();
-    this.$.searchbox.pageHandler().submitQuery(
-        e.detail,
-        /* button= */ 0,
-        /* altKey= */ false,
-        /* ctrlKey= */ false,
-        /* metaKey= */ false,
-        /* shiftKey= */ false,
-        /* isVoiceSearch= */ true,
-    );
+
+    const searchParams = new URLSearchParams();
+    searchParams.append('q', e.detail);
+    searchParams.append('gs_ivs', '1');
+    searchParams.append('sourceid', 'chrome');
+    const queryUrl =
+        new URL('/search', loadTimeData.getString('googleBaseUrl'));
+    queryUrl.search = searchParams.toString();
+    WindowProxy.getInstance().navigate(queryUrl.href);
   }
 
   protected onVoiceSearchRecordingStopped_(e: CustomEvent<string>) {

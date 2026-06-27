@@ -2662,6 +2662,7 @@ suite('NewTabPageAppTest', () => {
             '(realbox) voice search coherence with live transcription is enabled',
         async () => {
           loadTimeData.overrideValues({
+            googleBaseUrl: 'chrome://new-tab-page/',
             voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
             voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: true,
           });
@@ -2726,81 +2727,104 @@ suite('NewTabPageAppTest', () => {
           // Assert dialog is closed (removed from DOM).
           assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
 
-          // Assert submitQuery was called on the searchbox page handler with
-          // correct arguments.
-          assertEquals(1, searchboxHandler.getCallCount('submitQuery'));
-          const args = searchboxHandler.getArgs('submitQuery')[0];
-          assertEquals('hello world', args[0]);  // queryText
-          assertEquals(0, args[1]);              // button
-          assertEquals(false, args[2]);          // altKey
-          assertEquals(false, args[3]);          // ctrlKey
-          assertEquals(false, args[4]);          // metaKey
-          assertEquals(false, args[5]);          // shiftKey
-          assertEquals(true, args[6]);           // isVoiceSearch
+          // Assert windowProxy.navigate was called with correct URL.
+          assertEquals(1, windowProxy.getCallCount('navigate'));
+          const navigatedUrl = windowProxy.getArgs('navigate')[0];
+          assertEquals(
+              'chrome://new-tab-page/search?q=hello+world&gs_ivs=1&sourceid=chrome',
+              navigatedUrl);
+        });
+
+    test(
+        'navigates directly to regular search when voiceSearchCoherenceAnySearchboxExperimentEnabled is true',
+        async () => {
+          loadTimeData.overrideValues({
+            googleBaseUrl: 'https://www.google.com/',
+            voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+          });
+          await recreateApp();
+
+          // Open voice search dialog.
+          $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
+          await microtasksFinished();
+
+          const voiceSearch =
+              app.shadowRoot.querySelector('cr-composebox-voice-search');
+          assertTrue(!!voiceSearch);
+
+          // Simulate final result event.
+          voiceSearch.dispatchEvent(
+              new CustomEvent('voice-search-final-result', {
+                detail: 'hello world',
+              }));
+          await microtasksFinished();
+
+          // Assert windowProxy.navigate was called with correct URL.
+          assertEquals(1, windowProxy.getCallCount('navigate'));
+          const navigatedUrl = windowProxy.getArgs('navigate')[0];
+          assertEquals(
+              'https://www.google.com/search?q=hello+world&gs_ivs=1&sourceid=chrome',
+              navigatedUrl);
         });
 
     test(
         'dialog handles recording stopped event when NTP searchbox (realbox) ' +
             'voice search coherence with live transcription is enabled',
         async () => {
-      loadTimeData.overrideValues({
-        voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
-        voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: true,
-      });
-      await recreateApp();
+          loadTimeData.overrideValues({
+            googleBaseUrl: 'https://www.google.com/',
+            voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+            voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: true,
+          });
+          await recreateApp();
 
-      // Open voice search dialog.
-      $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
-      await microtasksFinished();
+          // Open voice search dialog.
+          $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
+          await microtasksFinished();
 
-      let dialog =
-          app.shadowRoot.querySelector<HTMLDialogElement>('#voiceSearchDialog');
-      assertTrue(!!dialog);
-      assertTrue(dialog.open);
+          let dialog = app.shadowRoot.querySelector<HTMLDialogElement>(
+              '#voiceSearchDialog');
+          assertTrue(!!dialog);
+          assertTrue(dialog.open);
 
-      const voiceSearch =
-          app.shadowRoot.querySelector('cr-composebox-voice-search');
-      assertTrue(!!voiceSearch);
+          const voiceSearch =
+              app.shadowRoot.querySelector('cr-composebox-voice-search');
+          assertTrue(!!voiceSearch);
 
-      // Simulate recording stopped event with empty query.
-      voiceSearch.dispatchEvent(new CustomEvent('recording-stopped', {
-        detail: '   ',
-      }));
-      await microtasksFinished();
+          // Simulate recording stopped event with empty query.
+          voiceSearch.dispatchEvent(new CustomEvent('recording-stopped', {
+            detail: '   ',
+          }));
+          await microtasksFinished();
 
-      // Assert dialog is closed (removed from DOM) and query not submitted.
-      assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
-      assertEquals(0, searchboxHandler.getCallCount('submitQuery'));
+          // Assert dialog is closed (removed from DOM) and query not submitted.
+          assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
+          assertEquals(0, windowProxy.getCallCount('navigate'));
 
-      // Re-open dialog for recording stopped with valid query testing.
-      $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
-      await microtasksFinished();
-      dialog =
-          app.shadowRoot.querySelector<HTMLDialogElement>('#voiceSearchDialog');
-      assertTrue(!!dialog);
-      assertTrue(dialog.open);
+          // Re-open dialog for recording stopped with actual words spoken.
+          $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
+          await microtasksFinished();
+          dialog = app.shadowRoot.querySelector<HTMLDialogElement>(
+              '#voiceSearchDialog');
+          assertTrue(!!dialog);
+          assertTrue(dialog.open);
 
-      // Simulate recording stopped event with valid query.
-      voiceSearch.dispatchEvent(new CustomEvent('recording-stopped', {
-        detail: 'hello world',
-      }));
-      await microtasksFinished();
+          // Simulate recording stopped event with valid query.
+          voiceSearch.dispatchEvent(new CustomEvent('recording-stopped', {
+            detail: 'hello world',
+          }));
+          await microtasksFinished();
 
-      // Assert dialog is closed (removed from DOM).
-      assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
+          // Assert dialog is closed (removed from DOM).
+          assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
 
-      // Assert submitQuery was called on the searchbox page handler with
-      // correct arguments.
-      assertEquals(1, searchboxHandler.getCallCount('submitQuery'));
-      const args = searchboxHandler.getArgs('submitQuery')[0];
-      assertEquals('hello world', args[0]);  // queryText
-      assertEquals(0, args[1]);              // button
-      assertEquals(false, args[2]);          // altKey
-      assertEquals(false, args[3]);          // ctrlKey
-      assertEquals(false, args[4]);          // metaKey
-      assertEquals(false, args[5]);          // shiftKey
-      assertEquals(true, args[6]);           // isVoiceSearch
-    });
+          // Assert windowProxy.navigate was called with correct URL.
+          assertEquals(1, windowProxy.getCallCount('navigate'));
+          const navigatedUrl = windowProxy.getArgs('navigate')[0];
+          assertEquals(
+              'https://www.google.com/search?q=hello+world&gs_ivs=1&sourceid=chrome',
+              navigatedUrl);
+        });
 
     test(
         'renders TicTac animation and stop/submit buttons when NTP searchbox ' +
@@ -3063,6 +3087,7 @@ suite('NewTabPageAppTest', () => {
               'relies on recording-stopped',
           async () => {
             loadTimeData.overrideValues({
+              googleBaseUrl: 'https://www.google.com/',
               voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
             });
             await recreateApp();
@@ -3089,10 +3114,12 @@ suite('NewTabPageAppTest', () => {
             mockSpeechRecognition.onend!();
             await microtasksFinished();
 
-            // Verify that the query is submitted to searchbox handler.
-            assertEquals(1, searchboxHandler.getCallCount('submitQuery'));
-            const submitArgs = searchboxHandler.getArgs('submitQuery')[0];
-            assertEquals('test query', submitArgs[0]);
+            // Verify that the query is submitted via navigation.
+            assertEquals(1, windowProxy.getCallCount('navigate'));
+            const navigatedUrl = windowProxy.getArgs('navigate')[0];
+            assertEquals(
+                'https://www.google.com/search?q=test+query&gs_ivs=1&sourceid=chrome',
+                navigatedUrl);
           });
 
       test(
@@ -3101,6 +3128,7 @@ suite('NewTabPageAppTest', () => {
               'coherence experiment is enabled',
           async () => {
             loadTimeData.overrideValues({
+              googleBaseUrl: 'https://www.google.com/',
               voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
             });
             await recreateApp();
@@ -3122,7 +3150,7 @@ suite('NewTabPageAppTest', () => {
             mockSpeechRecognition.onresult!
                 (createResults(exactLimitTranscript, /*isFinal=*/ false));
             await microtasksFinished();
-            assertEquals(0, searchboxHandler.getCallCount('submitQuery'));
+            assertEquals(0, windowProxy.getCallCount('navigate'));
 
             // Construct a long transcript exceeding the limit (121 chars).
             const longTranscript = 'a'.repeat(121);
@@ -3130,10 +3158,13 @@ suite('NewTabPageAppTest', () => {
                 (createResults(longTranscript, /*isFinal=*/ false));
             await microtasksFinished();
 
-            // Verify that the query is force-submitted.
-            assertEquals(1, searchboxHandler.getCallCount('submitQuery'));
-            const submitArgs = searchboxHandler.getArgs('submitQuery')[0];
-            assertEquals(longTranscript, submitArgs[0]);
+            // Verify that the query is force-submitted via navigation.
+            assertEquals(1, windowProxy.getCallCount('navigate'));
+            const navigatedUrl = windowProxy.getArgs('navigate')[0];
+            assertEquals(
+                `https://www.google.com/search?q=${
+                    longTranscript}&gs_ivs=1&sourceid=chrome`,
+                navigatedUrl);
           });
 
       test(
