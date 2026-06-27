@@ -1281,6 +1281,10 @@ void ContextualTasksUI::AddInitialTaskStateToDataSource(
                      ui_service_ && task_creation_url &&
                          IsZeroState(task_creation_url.value(), ui_service_));
   source->AddBoolean("isShownInTab", IsShownInTab());
+  bool is_signed_in = ui_service_ &&
+                      ui_service_->IsSignedInToBrowserWithValidCredentials() &&
+                      ui_service_->CookieJarContainsPrimaryAccount();
+  source->AddBoolean("isSignedIn", is_signed_in);
 }
 
 void ContextualTasksUI::OnSidePanelStateChanged() {

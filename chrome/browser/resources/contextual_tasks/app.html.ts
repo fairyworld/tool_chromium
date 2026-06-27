@@ -18,6 +18,7 @@ export function getHtml(this: ContextualTasksAppElement) {
           .darkMode="${this.darkMode_}"
           .isAiPage="${this.isAiPage_}"
           .isAimEligible="${this.isAimEligible_}"
+          .isUserSignedIn="${this.isUserSignedIn_}"
           .enableOpenInNewTabButton="${this.isAiPage_ && !this.isErrorPageVisible_}"
           .onboardingTooltipShowing="${this.onboardingTooltipShowing_}"
           @new-thread-click="${this.onNewThreadClick_}">

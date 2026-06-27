@@ -222,6 +222,7 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
         reflect: true,
       },
       isAiPage_: {type: Boolean, reflect: true},
+      isUserSignedIn_: {type: Boolean},
       isLensOverlayShowing_: {type: Boolean},
       isOverlayOpenForAimVisualSearch_: {type: Boolean},
       isGhostLoaderVisible_: {type: Boolean, reflect: true},
@@ -313,6 +314,8 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
   // though top-level navigation could fail for numerous reasons.
   protected accessor isLoadError_: boolean = !window.navigator.onLine;
   protected accessor isAiPage_: boolean = loadTimeData.getBoolean('isAiPage');
+  protected accessor isUserSignedIn_: boolean =
+      loadTimeData.getBoolean('isSignedIn');
   protected accessor isAimEligible_: boolean =
       loadTimeData.getBoolean('isAimEligible');
   protected accessor isLensOverlayShowing_: boolean = false;
