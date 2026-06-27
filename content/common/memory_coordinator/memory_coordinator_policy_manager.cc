@@ -19,11 +19,8 @@ namespace content {
 
 MemoryCoordinatorPolicyManager::GroupState::GroupState(
     std::string_view consumer_name,
-    std::optional<base::MemoryConsumerTraits> traits,
-    ProcessType process_type)
-    : consumer_name_(consumer_name),
-      traits_(traits),
-      process_type_(process_type) {}
+    std::optional<base::MemoryConsumerTraits> traits)
+    : consumer_name_(consumer_name), traits_(traits) {}
 
 MemoryCoordinatorPolicyManager::GroupState::~GroupState() = default;
 
@@ -95,8 +92,9 @@ int MemoryCoordinatorPolicyManager::GroupState::RecomputeMemoryLimit() const {
 // MemoryCoordinatorPolicyManager::HostState -----------------------------------
 
 MemoryCoordinatorPolicyManager::HostState::HostState(
-    MemoryConsumerGroupHost* host)
-    : host(host) {}
+    MemoryConsumerGroupHost* host,
+    ProcessType process_type)
+    : host(host), process_type(process_type) {}
 
 MemoryCoordinatorPolicyManager::HostState::~HostState() {
   CHECK(groups.empty());
@@ -140,7 +138,7 @@ void MemoryCoordinatorPolicyManager::AddPolicy(
     for (auto const& [consumer_id, group_state] : host_state->groups) {
       policy->OnConsumerGroupAdded(consumer_id, group_state->consumer_name(),
                                    group_state->traits(),
-                                   group_state->process_type(), child_id);
+                                   host_state->process_type, child_id);
     }
   }
 }
@@ -185,10 +183,11 @@ MemoryCoordinatorPolicyManager::GetGroupState(HostState& host_state,
 }
 
 void MemoryCoordinatorPolicyManager::AddMemoryConsumerGroupHost(
+    ProcessType process_type,
     ChildProcessId child_process_id,
     MemoryConsumerGroupHost* host) {
-  auto [_, inserted] =
-      hosts_.try_emplace(child_process_id, std::make_unique<HostState>(host));
+  auto [_, inserted] = hosts_.try_emplace(
+      child_process_id, std::make_unique<HostState>(host, process_type));
   CHECK(inserted);
 }
 
@@ -202,13 +201,11 @@ void MemoryCoordinatorPolicyManager::OnConsumerGroupAdded(
     uint32_t consumer_id,
     std::string_view consumer_name,
     std::optional<base::MemoryConsumerTraits> traits,
-    ProcessType process_type,
     ChildProcessId child_process_id) {
   HostState& host_state = GetHostState(child_process_id);
 
   auto [_, inserted] = host_state.groups.try_emplace(
-      consumer_id,
-      std::make_unique<GroupState>(consumer_name, traits, process_type));
+      consumer_id, std::make_unique<GroupState>(consumer_name, traits));
   CHECK(inserted);
 
   // Apply any pending override for this consumer that was set before
@@ -225,7 +222,7 @@ void MemoryCoordinatorPolicyManager::OnConsumerGroupAdded(
   base::AutoReset<bool> reset(&is_notifying_, true);
   for (MemoryCoordinatorPolicy* policy : policies_) {
     policy->OnConsumerGroupAdded(consumer_id, consumer_name, traits,
-                                 process_type, child_process_id);
+                                 host_state.process_type, child_process_id);
   }
 }
 
@@ -288,8 +285,8 @@ void MemoryCoordinatorPolicyManager::UpdateConsumers(
   for (auto const& [child_id, host_state] : hosts_) {
     std::vector<MemoryConsumerUpdate> updates;
     for (auto const& [consumer_id, group_state] : host_state->groups) {
-      if (filter(consumer_id, group_state->traits(),
-                 group_state->process_type(), child_id)) {
+      if (filter(consumer_id, group_state->traits(), host_state->process_type,
+                 child_id)) {
         updates.push_back({consumer_id, percentage, release_memory});
       }
     }

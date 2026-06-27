@@ -79,7 +79,8 @@ ChildMemoryConsumerRegistryHost::ChildMemoryConsumerRegistryHost(
       disconnect_handler_(std::move(disconnect_handler)) {
   CHECK(disconnect_handler_);
 
-  controller_->AddMemoryConsumerGroupHost(child_process_id_, this);
+  controller_->AddMemoryConsumerGroupHost(process_type_, child_process_id_,
+                                          this);
 
   // The use of Unretained is safe here because `this` owns the receiver and
   // will always outlive it.
@@ -132,7 +133,7 @@ void ChildMemoryConsumerRegistryHost::Register(
     std::vector<mojom::MemoryConsumerRegistrationPtr> registrations) {
   for (auto& registration : registrations) {
     if (!RegisterImpl(registration->consumer_id, registration->consumer_name,
-                      std::move(registration->traits))) {
+                      registration->traits)) {
       // RegisterImpl() reported a bad message; stop processing the rest of the
       // (now-rejected) batch. We don't need to unregister any that succeeded
       // prior to the one that failed since that will happen automatically when
@@ -178,8 +179,7 @@ bool ChildMemoryConsumerRegistryHost::RegisterImpl(
     return false;
   }
 
-  controller_->OnConsumerGroupAdded(consumer_id, consumer_name,
-                                    std::move(traits), process_type_,
+  controller_->OnConsumerGroupAdded(consumer_id, consumer_name, traits,
                                     child_process_id_);
   return true;
 }

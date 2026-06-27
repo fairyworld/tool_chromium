@@ -49,8 +49,10 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, Persistence) {
   const ChildProcessId kChildId;
   const ChildProcessId kOtherChildId(1);
 
-  policy_manager().AddMemoryConsumerGroupHost(kChildId, &host);
-  policy_manager().AddMemoryConsumerGroupHost(kOtherChildId, &host);
+  policy_manager().AddMemoryConsumerGroupHost(PROCESS_TYPE_BROWSER, kChildId,
+                                              &host);
+  policy_manager().AddMemoryConsumerGroupHost(PROCESS_TYPE_BROWSER,
+                                              kOtherChildId, &host);
 
   PredicateMemoryCoordinatorPolicy policy(
       policy_manager(),
@@ -73,7 +75,7 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, Persistence) {
   EXPECT_CALL(host, UpdateConsumers(UnorderedElementsAre(
                         MemoryConsumerUpdate{kConsumerId1, 50, true})));
   policy_manager().OnConsumerGroupAdded(kConsumerId1, kConsumerName1, {},
-                                        PROCESS_TYPE_BROWSER, kChildId);
+                                        kChildId);
   Mock::VerifyAndClearExpectations(&host);
 
   // A consumer added AFTER the limit was set should NOT receive it if it
@@ -83,7 +85,7 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, Persistence) {
 
   EXPECT_CALL(host, UpdateConsumers(_)).Times(0);
   policy_manager().OnConsumerGroupAdded(kConsumerId2, kConsumerName2, {},
-                                        PROCESS_TYPE_BROWSER, kOtherChildId);
+                                        kOtherChildId);
   Mock::VerifyAndClearExpectations(&host);
 
   policy_manager().OnConsumerGroupRemoved(kConsumerId1, kChildId);
@@ -96,7 +98,8 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, SetLimit) {
   MockMemoryConsumerGroupHost host;
   const ChildProcessId kChildId;
 
-  policy_manager().AddMemoryConsumerGroupHost(kChildId, &host);
+  policy_manager().AddMemoryConsumerGroupHost(PROCESS_TYPE_BROWSER, kChildId,
+                                              &host);
 
   const std::string kConsumerName1 = "consumer1";
   const uint32_t kConsumerId1 = base::PersistentHash(kConsumerName1);
@@ -104,9 +107,9 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, SetLimit) {
   const uint32_t kConsumerId2 = base::PersistentHash(kConsumerName2);
 
   policy_manager().OnConsumerGroupAdded(kConsumerId1, kConsumerName1, {},
-                                        PROCESS_TYPE_BROWSER, kChildId);
+                                        kChildId);
   policy_manager().OnConsumerGroupAdded(kConsumerId2, kConsumerName2, {},
-                                        PROCESS_TYPE_BROWSER, kChildId);
+                                        kChildId);
 
   PredicateMemoryCoordinatorPolicy policy(
       policy_manager(),
@@ -141,13 +144,14 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, ChangeReleaseMemory) {
   MockMemoryConsumerGroupHost host;
   const ChildProcessId kChildId;
 
-  policy_manager().AddMemoryConsumerGroupHost(kChildId, &host);
+  policy_manager().AddMemoryConsumerGroupHost(PROCESS_TYPE_BROWSER, kChildId,
+                                              &host);
 
   const std::string kConsumerName = "consumer1";
   const uint32_t kConsumerId = base::PersistentHash(kConsumerName);
 
   policy_manager().OnConsumerGroupAdded(kConsumerId, kConsumerName, {},
-                                        PROCESS_TYPE_BROWSER, kChildId);
+                                        kChildId);
 
   PredicateMemoryCoordinatorPolicy policy(
       policy_manager(),
@@ -180,7 +184,8 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, DefaultStatePersistence) {
   MockMemoryConsumerGroupHost host;
   const ChildProcessId kChildId;
 
-  policy_manager().AddMemoryConsumerGroupHost(kChildId, &host);
+  policy_manager().AddMemoryConsumerGroupHost(PROCESS_TYPE_BROWSER, kChildId,
+                                              &host);
 
   PredicateMemoryCoordinatorPolicy policy(
       policy_manager(),
@@ -199,7 +204,7 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, DefaultStatePersistence) {
 
   EXPECT_CALL(host, UpdateConsumers(_)).Times(0);
   policy_manager().OnConsumerGroupAdded(kConsumerId, kConsumerName, {},
-                                        PROCESS_TYPE_BROWSER, kChildId);
+                                        kChildId);
   Mock::VerifyAndClearExpectations(&host);
 
   policy_manager().OnConsumerGroupRemoved(kConsumerId, kChildId);
@@ -217,7 +222,8 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, ObserverLifecycle) {
   // hasn't been destroyed.
   MockMemoryConsumerGroupHost host;
   const ChildProcessId kChildId;
-  policy_manager().AddMemoryConsumerGroupHost(kChildId, &host);
+  policy_manager().AddMemoryConsumerGroupHost(PROCESS_TYPE_BROWSER, kChildId,
+                                              &host);
 
   const std::string kConsumerName = "consumer1";
   const uint32_t kConsumerId = base::PersistentHash(kConsumerName);
@@ -229,7 +235,7 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, ObserverLifecycle) {
 
     EXPECT_CALL(host, UpdateConsumers(_)).Times(1);
     policy_manager().OnConsumerGroupAdded(kConsumerId, kConsumerName, {},
-                                          PROCESS_TYPE_BROWSER, kChildId);
+                                          kChildId);
     Mock::VerifyAndClearExpectations(&host);
     policy_manager().OnConsumerGroupRemoved(kConsumerId, kChildId);
   }
@@ -237,7 +243,7 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, ObserverLifecycle) {
   // After destruction, it should no longer be an observer.
   EXPECT_CALL(host, UpdateConsumers(_)).Times(0);
   policy_manager().OnConsumerGroupAdded(kConsumerId, kConsumerName, {},
-                                        PROCESS_TYPE_BROWSER, kChildId);
+                                        kChildId);
   Mock::VerifyAndClearExpectations(&host);
 
   policy_manager().OnConsumerGroupRemoved(kConsumerId, kChildId);
@@ -249,7 +255,8 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest,
   MockMemoryConsumerGroupHost host;
   const ChildProcessId kChildId;
 
-  policy_manager().AddMemoryConsumerGroupHost(kChildId, &host);
+  policy_manager().AddMemoryConsumerGroupHost(PROCESS_TYPE_BROWSER, kChildId,
+                                              &host);
 
   // Define traits for stateful and stateless consumers.
   constexpr base::MemoryConsumerTraits kStatefulTraits(
@@ -274,13 +281,11 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest,
   const uint32_t kNoTraitsId = base::PersistentHash(kNoTraitsName);
 
   policy_manager().OnConsumerGroupAdded(kStatefulId, kStatefulName,
-                                        kStatefulTraits, PROCESS_TYPE_BROWSER,
-                                        kChildId);
+                                        kStatefulTraits, kChildId);
   policy_manager().OnConsumerGroupAdded(kStatelessId, kStatelessName,
-                                        kStatelessTraits, PROCESS_TYPE_BROWSER,
-                                        kChildId);
-  policy_manager().OnConsumerGroupAdded(
-      kNoTraitsId, kNoTraitsName, std::nullopt, PROCESS_TYPE_BROWSER, kChildId);
+                                        kStatelessTraits, kChildId);
+  policy_manager().OnConsumerGroupAdded(kNoTraitsId, kNoTraitsName,
+                                        std::nullopt, kChildId);
 
   PredicateMemoryCoordinatorPolicy policy(
       policy_manager(),

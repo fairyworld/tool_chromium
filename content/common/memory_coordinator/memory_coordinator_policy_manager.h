@@ -80,13 +80,13 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyManager
   void RemovePolicy(MemoryCoordinatorPolicy* policy);
 
   // MemoryConsumerGroupController:
-  void AddMemoryConsumerGroupHost(ChildProcessId child_process_id,
+  void AddMemoryConsumerGroupHost(ProcessType process_type,
+                                  ChildProcessId child_process_id,
                                   MemoryConsumerGroupHost* host) override;
   void RemoveMemoryConsumerGroupHost(ChildProcessId child_process_id) override;
   void OnConsumerGroupAdded(uint32_t consumer_id,
                             std::string_view consumer_name,
                             std::optional<base::MemoryConsumerTraits> traits,
-                            ProcessType process_type,
                             ChildProcessId child_process_id) override;
   void OnConsumerGroupRemoved(uint32_t consumer_id,
                               ChildProcessId child_process_id) override;
@@ -141,8 +141,7 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyManager
   class GroupState {
    public:
     GroupState(std::string_view consumer_name,
-               std::optional<base::MemoryConsumerTraits> traits,
-               ProcessType process_type);
+               std::optional<base::MemoryConsumerTraits> traits);
     ~GroupState();
 
     // Updates the limit requested by `policy`. If `percentage` is 100, the
@@ -153,7 +152,6 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyManager
 
     const std::string& consumer_name() const { return consumer_name_; }
     std::optional<base::MemoryConsumerTraits> traits() const { return traits_; }
-    ProcessType process_type() const { return process_type_; }
     int current_limit() const { return current_limit_; }
 
     // Sets a memory limit override for testing. Returns the new effective
@@ -166,7 +164,6 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyManager
 
     const std::string consumer_name_;
     const std::optional<base::MemoryConsumerTraits> traits_;
-    const ProcessType process_type_;
 
     // The limit requested by each policy.
     base::flat_map<MemoryCoordinatorPolicy*, int> requested_limits_;
@@ -179,10 +176,11 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyManager
   };
 
   struct HostState {
-    explicit HostState(MemoryConsumerGroupHost* host);
+    HostState(MemoryConsumerGroupHost* host, ProcessType process_type);
     ~HostState();
 
     raw_ptr<MemoryConsumerGroupHost> host;
+    const ProcessType process_type;
     absl::flat_hash_map<uint32_t, std::unique_ptr<GroupState>> groups;
   };
 
