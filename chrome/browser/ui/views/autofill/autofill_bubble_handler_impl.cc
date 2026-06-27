@@ -351,6 +351,13 @@ AutofillBubbleBase* AutofillBubbleHandlerImpl::ShowOmniboxAutofillBubble(
       controller);
 }
 
+AutofillBubbleBase* AutofillBubbleHandlerImpl::ShowPaymentsChurnedUsersBubble(
+    content::WebContents* web_contents,
+    PaymentsChurnedUsersBubbleController* controller,
+    bool is_user_gesture) {
+  return nullptr;
+}
+
 AutofillBubbleBase*
 AutofillBubbleHandlerImpl::ShowSaveCardAndVirtualCardEnrollConfirmationBubble(
     views::BubbleAnchor anchor,

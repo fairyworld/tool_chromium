@@ -630,6 +630,7 @@ Called by update_autofill_enums.py.-->
   <int value="9" label="WalletablePassConsent"/>
   <int value="10" label="WalletablePassSave"/>
   <int value="11" label="OmniboxAutofill"/>
+  <int value="12" label="PaymentsChurnedUsers"/>
 </enum>
 
 <!-- LINT.ThenChange(//chrome/browser/ui/autofill/bubble_controller_base.h:BubbleType) -->

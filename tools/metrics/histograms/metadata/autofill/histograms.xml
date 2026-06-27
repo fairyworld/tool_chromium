@@ -2941,6 +2941,8 @@ Called by update_autofill_enums.py. This is a manual comment.-->
     <variant name="OfferNotification" summary="Offer notification bubble."/>
     <variant name="OmniboxAutofill" summary="Omnibox Autofill bubble."/>
     <variant name="Password" summary="Password bubble."/>
+    <variant name="PaymentsChurnedUsers"
+        summary="Payments churned users bubble."/>
     <variant name="SaveIban" summary="Save IBAN bubble."/>
     <variant name="SaveUpdateAddress" summary="Save/update address bubble."/>
     <variant name="SaveUpdateAutofillAi"

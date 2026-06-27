@@ -111,6 +111,7 @@
 #include "chrome/browser/ui/autofill/payments/filled_card_information_bubble_controller_impl.h"
 #include "chrome/browser/ui/autofill/payments/offer_notification_bubble_controller_impl.h"
 #include "chrome/browser/ui/autofill/payments/omnibox_autofill_page_action_controller.h"
+#include "chrome/browser/ui/autofill/payments/payments_churned_users_bubble_controller.h"
 #include "chrome/browser/ui/autofill/payments/save_card_bubble_controller_impl.h"
 #include "chrome/browser/ui/autofill/payments/webauthn_dialog_controller_impl.h"
 #include "chrome/browser/ui/autofill/payments/webauthn_dialog_state.h"
@@ -1297,6 +1298,20 @@ void ChromePaymentsAutofillClient::HideOmniboxAutofillChip() {
 }
 
 #endif
+
+void ChromePaymentsAutofillClient::ShowPaymentsChurnedUsersUI() {
+#if !BUILDFLAG(IS_ANDROID)
+  tabs::TabInterface* tab_interface =
+      tabs::TabInterface::MaybeGetFromContents(web_contents());
+  if (!tab_interface) {
+    return;
+  }
+  if (PaymentsChurnedUsersBubbleController* controller =
+          PaymentsChurnedUsersBubbleController::From(*tab_interface)) {
+    controller->Show();
+  }
+#endif
+}
 
 #if BUILDFLAG(IS_ANDROID)
 AutofillMessageController&
