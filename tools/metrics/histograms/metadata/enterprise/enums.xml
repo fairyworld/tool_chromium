@@ -2624,6 +2624,12 @@ chromium-metrics-reviews@google.com.
   <int value="14" label="Browser launch event"/>
 </enum>
 
+<enum name="EnterpriseReportingUploadResult">
+  <int value="0" label="Success"/>
+  <int value="1" label="Failed (Retry Limit Reached)"/>
+  <int value="2" label="Failed (Permanent Error)"/>
+</enum>
+
 <!-- LINT.IfChange(EnterpriseSkyVaultMigrationDialogAction) -->
 
 <enum name="EnterpriseSkyVaultMigrationDialogAction">

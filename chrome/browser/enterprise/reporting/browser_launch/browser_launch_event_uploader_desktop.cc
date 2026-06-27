@@ -24,12 +24,19 @@ BrowserLaunchEventUploaderDesktop::BrowserLaunchEventUploaderDesktop(
 
 BrowserLaunchEventUploaderDesktop::~BrowserLaunchEventUploaderDesktop() = default;
 
+std::string_view BrowserLaunchEventUploaderDesktop::GetMetricSuffix() const {
+  return IsProfileReporting() ? "Profile" : "Browser";
+}
+
 void BrowserLaunchEventUploaderDesktop::UploadEvent(
     const ::chrome::cros::reporting::proto::BrowserLaunchEvent& event,
     base::OnceCallback<void(policy::CloudPolicyClient::Result)>
         upload_callback) {
   auto context = helper_.PrepareUpload(IsProfileReporting());
   if (!context) {
+    std::move(upload_callback)
+        .Run(policy::CloudPolicyClient::Result(
+            policy::CloudPolicyClient::NotRegistered()));
     return;
   }
 

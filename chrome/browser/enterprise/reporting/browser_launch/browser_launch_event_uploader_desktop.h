@@ -30,6 +30,7 @@ class BrowserLaunchEventUploaderDesktop final : public BrowserLaunchEventUploade
   ~BrowserLaunchEventUploaderDesktop() override;
 
   // BrowserLaunchEventUploader:
+  std::string_view GetMetricSuffix() const override;
   void UploadEvent(
       const ::chrome::cros::reporting::proto::BrowserLaunchEvent& event,
       base::OnceCallback<void(policy::CloudPolicyClient::Result)>
