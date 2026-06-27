@@ -11,6 +11,10 @@ class PrefService;
 
 namespace glic {
 
+// Values for the "glic.onboarding_status" pref.
+// These values are persisted to logs. Entries should not be renumbered and
+// numeric values should never be reused.
+// LINT.IfChange(OnboardingStatus)
 enum class OnboardingStatus : int {
   kNoInteraction = 0,
   kOptedInButNotInvoked = 1,
@@ -20,6 +24,7 @@ enum class OnboardingStatus : int {
   kPromptAndOptIn = 5,
   kMaxValue = kPromptAndOptIn,
 };
+// LINT.ThenChange(//tools/metrics/histograms/metadata/glic/enums.xml:GlicOnboardingStatus)
 
 // Encapsulates reading and mutating the Glic onboarding interaction status
 // stored in profile preferences.
