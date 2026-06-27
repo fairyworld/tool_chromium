@@ -1265,11 +1265,15 @@ class LocationBarMediator
                         mScrimHandler.setVisibility(
                                 mCurrentInput.getAutocompleteState() == AutocompleteState.ENABLED);
                     }
+                    // This logic is fragile, the UrlBar must be told before Autocomplete. The later
+                    // will synchronously notify that there are suggestions if they're cached, while
+                    // the former asserts that it should always be in a session when suggestions
+                    // arrive.
+                    mUrlCoordinator.beginInput(mCurrentInput);
                     mAutocompleteCoordinator.beginInput(session);
                     mFuseboxCoordinator.beginInput(session);
                     mStatusCoordinator.beginInput(session);
                     mHintTextUpdater.beginInput(mCurrentInput);
-                    mUrlCoordinator.beginInput(mCurrentInput);
                     // Trigger animation now that we have an up-to-date value for the fusebox state.
                     setupSuggestionsListShowAnimation();
                     setAttachmentModelList(session.getFuseboxAttachmentModelList());

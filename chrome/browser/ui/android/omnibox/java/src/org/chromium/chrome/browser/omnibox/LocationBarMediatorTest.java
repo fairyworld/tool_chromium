@@ -1552,6 +1552,19 @@ public class LocationBarMediatorTest {
     }
 
     @Test
+    public void testBeginInput_initializationOrder() {
+        mMediator.onFinishNativeInitialization();
+        mProfileSupplier.set(mProfile);
+
+        mMediator.beginInput(new AutocompleteInput());
+        ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
+
+        InOrder inOrder = inOrder(mUrlCoordinator, mAutocompleteCoordinator);
+        inOrder.verify(mUrlCoordinator).beginInput(any());
+        inOrder.verify(mAutocompleteCoordinator).beginInput(any());
+    }
+
+    @Test
     public void testOnUrlFocusChange() {
         testOnUrlFocusChange(/* expectDesktopMode= */ false);
     }
