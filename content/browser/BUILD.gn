@@ -1582,6 +1582,8 @@ source_set("browser") {
     "notifications/platform_notification_service_proxy.h",
     "origin_agent_cluster_isolation_state.cc",
     "origin_agent_cluster_isolation_state.h",
+    "origin_agent_cluster_isolation_state_bridge.cc",
+    "origin_agent_cluster_isolation_state_bridge.h",
     "origin_trials/critical_origin_trials_throttle.cc",
     "origin_trials/critical_origin_trials_throttle.h",
     "origin_trials/origin_trials_utils.cc",
