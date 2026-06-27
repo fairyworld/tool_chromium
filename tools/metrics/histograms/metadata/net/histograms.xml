@@ -308,6 +308,7 @@ chromium-metrics-reviews@google.com.
 <!-- LINT.IfChange(UnexportableKeysSpareKeyPoolType) -->
 
 <variants name="UnexportableKeysSpareKeyPoolType">
+  <variant name="Attestation" summary="attestation"/>
   <variant name="Signing" summary="signing"/>
 </variants>
 

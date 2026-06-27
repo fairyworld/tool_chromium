@@ -157,6 +157,8 @@ class COMPONENT_EXPORT(UNEXPORTABLE_KEYS) UnexportableKeyServiceImpl
   class SpareKeyPool;
 
   using SpareSigningKeyPool = SpareKeyPool<RefCountedUnexportableSigningKey>;
+  using SpareAttestationKeyPool =
+      SpareKeyPool<RefCountedUnexportableAttestationKey>;
 
   // Returns a pointer to the unexportable key with the given ID, or an error
   // if it is not found. The returned pointer is guaranteed to be non-null on
@@ -217,11 +219,11 @@ class COMPONENT_EXPORT(UNEXPORTABLE_KEYS) UnexportableKeyServiceImpl
   // be overwritten on each call to `GetAllKeysForGarbageCollection`.
   AllKeysForGarbageCollectionMap all_gc_keys_by_key_id_;
 
-  // Owns the spare signing key pool. This pool preemptively
-  // generates and caches hardware-backed signing keys in the background to
-  // mitigate the significant latency (~1s) of on-demand Windows TPM key
-  // generation.
+  // Spare key pools for preemptively generating and caching
+  // hardware-backed keys in the background to mitigate the significant
+  // latency (~1s) of on-demand Windows TPM key generation.
   std::unique_ptr<SpareSigningKeyPool> spare_signing_key_pool_;
+  std::unique_ptr<SpareAttestationKeyPool> spare_attestation_key_pool_;
 
   base::WeakPtrFactory<UnexportableKeyServiceImpl> weak_ptr_factory_{this};
 };

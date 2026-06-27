@@ -8,6 +8,7 @@
 #include <array>
 #include <concepts>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <variant>
 
@@ -66,7 +67,8 @@ base::RepeatingCallback<
          base::OnceCallback<void(ServiceErrorOr<scoped_refptr<KeyType>>)>)>
 CreateGenerateKeyCallbackForSparePool(UnexportableKeyTaskManager* task_manager,
                                       BackgroundTaskOrigin origin) {
-  static_assert(std::same_as<KeyType, RefCountedUnexportableSigningKey>,
+  static_assert(std::same_as<KeyType, RefCountedUnexportableSigningKey> ||
+                    std::same_as<KeyType, RefCountedUnexportableAttestationKey>,
                 "Unsupported KeyType");
 
   return base::BindRepeating(
@@ -76,9 +78,17 @@ CreateGenerateKeyCallbackForSparePool(UnexportableKeyTaskManager* task_manager,
              algorithms,
          base::OnceCallback<void(ServiceErrorOr<scoped_refptr<KeyType>>)>
              callback) {
-        task_manager->GenerateSigningKeySlowlyAsync(
-            origin, std::move(config), algorithms,
-            BackgroundTaskPriority::kBestEffort, std::move(callback));
+        if constexpr (std::same_as<KeyType, RefCountedUnexportableSigningKey>) {
+          task_manager->GenerateSigningKeySlowlyAsync(
+              origin, std::move(config), algorithms,
+              BackgroundTaskPriority::kBestEffort, std::move(callback));
+        } else if constexpr (std::same_as<
+                                 KeyType,
+                                 RefCountedUnexportableAttestationKey>) {
+          task_manager->GenerateAttestationKeySlowlyAsync(
+              origin, std::move(config), algorithms,
+              BackgroundTaskPriority::kBestEffort, std::move(callback));
+        }
       },
       base::Unretained(task_manager), origin);
 }
@@ -126,30 +136,44 @@ std::pair<std::vector<uint8_t>, std::string> GetWrappedKeyAndTag(
 // LINT.IfChange(GetSpareKeyPoolHistogramName)
 template <typename KeyType>
 std::string GetSpareKeyPoolHistogramName(std::string_view suffix) {
-  static_assert(std::same_as<KeyType, RefCountedUnexportableSigningKey>,
+  static_assert(std::same_as<KeyType, RefCountedUnexportableSigningKey> ||
+                    std::same_as<KeyType, RefCountedUnexportableAttestationKey>,
                 "Unsupported KeyType for spare key pool metrics");
 
   static constexpr std::string_view kSpareKeyPoolHistogramPrefix =
       "Crypto.UnexportableKeys.SparePool";
-  return base::JoinString({kSpareKeyPoolHistogramPrefix, "Signing", suffix},
-                          ".");
+  return base::JoinString(
+      {kSpareKeyPoolHistogramPrefix,
+       std::same_as<KeyType, RefCountedUnexportableSigningKey> ? "Signing"
+                                                               : "Attestation",
+       suffix},
+      ".");
 }
 // LINT.ThenChange(//tools/metrics/histograms/metadata/net/histograms.xml:UnexportableKeysSpareKeyPoolType)
 
 // Wraps the original key generation callback with latency metrics tracking.
 // This records the duration from when the request was initiated until it is
 // fulfilled (either from the spare pool or via hardware generation).
-base::OnceCallback<void(ServiceErrorOr<UnexportableSigningKeyId>)>
-WrapCallbackWithSpareSigningKeyLatencyHistogram(
-    base::OnceCallback<void(ServiceErrorOr<UnexportableSigningKeyId>)>
-        callback) {
+template <typename KeyIdType>
+base::OnceCallback<void(ServiceErrorOr<KeyIdType>)>
+WrapCallbackWithSpareKeyLatencyHistogram(
+    base::OnceCallback<void(ServiceErrorOr<KeyIdType>)> callback) {
+  // Only `UnexportableSigningKeyId` and `UnexportableAttestationKeyId` are
+  // supported by the spare key pool.
+  static_assert(std::same_as<KeyIdType, UnexportableSigningKeyId> ||
+                std::same_as<KeyIdType, UnexportableAttestationKeyId>);
+
+  using KeyType =
+      std::conditional_t<std::same_as<KeyIdType, UnexportableSigningKeyId>,
+                         RefCountedUnexportableSigningKey,
+                         RefCountedUnexportableAttestationKey>;
+
   return base::BindOnce(
       [](base::TimeTicks start,
-         base::OnceCallback<void(ServiceErrorOr<UnexportableSigningKeyId>)> cb,
-         ServiceErrorOr<UnexportableSigningKeyId> result) {
+         base::OnceCallback<void(ServiceErrorOr<KeyIdType>)> cb,
+         ServiceErrorOr<KeyIdType> result) {
         base::UmaHistogramMediumTimes(
-            GetSpareKeyPoolHistogramName<RefCountedUnexportableSigningKey>(
-                "RequestLatency"),
+            GetSpareKeyPoolHistogramName<KeyType>("RequestLatency"),
             base::TimeTicks::Now() - start);
         std::move(cb).Run(std::move(result));
       },
@@ -623,6 +647,11 @@ UnexportableKeyServiceImpl::UnexportableKeyServiceImpl(
         config_,
         CreateGenerateKeyCallbackForSparePool<RefCountedUnexportableSigningKey>(
             &task_manager, task_origin));
+
+    spare_attestation_key_pool_ = std::make_unique<SpareAttestationKeyPool>(
+        config_,
+        CreateGenerateKeyCallbackForSparePool<
+            RefCountedUnexportableAttestationKey>(&task_manager, task_origin));
   }
 }
 
@@ -651,7 +680,7 @@ void UnexportableKeyServiceImpl::GenerateSigningKeySlowlyAsync(
     base::OnceCallback<void(ServiceErrorOr<UnexportableSigningKeyId>)>
         callback) {
   auto wrapped_callback =
-      WrapCallbackWithSpareSigningKeyLatencyHistogram(std::move(callback));
+      WrapCallbackWithSpareKeyLatencyHistogram(std::move(callback));
 
   if (base::FeatureList::IsEnabled(kEnableUnexportableKeysSpareKeyPool)) {
     scoped_refptr<RefCountedUnexportableSigningKey> spare_key =
@@ -699,10 +728,25 @@ void UnexportableKeyServiceImpl::GenerateAttestationKeySlowlyAsync(
     BackgroundTaskPriority priority,
     base::OnceCallback<void(ServiceErrorOr<UnexportableAttestationKeyId>)>
         callback) {
+  auto wrapped_callback =
+      WrapCallbackWithSpareKeyLatencyHistogram(std::move(callback));
+
+  if (base::FeatureList::IsEnabled(kEnableUnexportableKeysSpareKeyPool)) {
+    scoped_refptr<RefCountedUnexportableAttestationKey> spare_key =
+        spare_attestation_key_pool_->PopSpareKey(acceptable_algorithms);
+    spare_attestation_key_pool_->ReplenishSpareKeyPoolAsync(
+        acceptable_algorithms);
+    if (spare_key) {
+      std::move(wrapped_callback)
+          .Run(attestation_keys_->OnKeyGenerated(std::move(spare_key)));
+      return;
+    }
+  }
+
   task_manager_->GenerateAttestationKeySlowlyAsync(
       task_origin_, config_, acceptable_algorithms, priority,
       WrapCallbackWithErrorIfCancelled(
-          std::move(callback),
+          std::move(wrapped_callback),
           // SAFETY: `attestation_keys_` is owned by `this` and is guaranteed to
           // be alive if the projection callback is invoked (which only happens
           // if the service is still alive).
