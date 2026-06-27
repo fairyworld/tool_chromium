@@ -399,38 +399,7 @@ ReadAnythingUntrustedPageHandler::ReadAnythingUntrustedPageHandler(
       base::BindRepeating(&ReadAnythingUntrustedPageHandler::OnTabWillDetach,
                           weak_factory_.GetWeakPtr()));
 
-  PrefService* prefs = profile_->GetPrefs();
-  base::DictValue voices = base::DictValue();
-  voices = prefs->GetDict(prefs::kAccessibilityReadAnythingVoiceName).Clone();
-  read_anything::mojom::LineFocus line_focus =
-      features::IsReadAnythingLineFocusEnabled()
-          ? static_cast<read_anything::mojom::LineFocus>(
-                prefs->GetInteger(prefs::kAccessibilityReadAnythingLineFocus))
-          : read_anything::mojom::LineFocus::kDefaultValue;
-  bool line_focus_enabled = line_focus != read_anything::mojom::LineFocus::kOff;
-  read_anything::mojom::LineFocus last_non_disabled_line_focus =
-      features::IsReadAnythingLineFocusEnabled()
-          ? static_cast<read_anything::mojom::LineFocus>(prefs->GetInteger(
-                prefs::kAccessibilityReadAnythingLastNonDisabledLineFocus))
-          : read_anything::mojom::LineFocus::kDefaultValue;
-
-  page_->OnSettingsRestoredFromPrefs(
-      static_cast<read_anything::mojom::LineSpacing>(
-          prefs->GetInteger(prefs::kAccessibilityReadAnythingLineSpacing)),
-      static_cast<read_anything::mojom::LetterSpacing>(
-          prefs->GetInteger(prefs::kAccessibilityReadAnythingLetterSpacing)),
-      prefs->GetString(prefs::kAccessibilityReadAnythingFontName),
-      prefs->GetDouble(prefs::kAccessibilityReadAnythingFontScale),
-      prefs->GetBoolean(prefs::kAccessibilityReadAnythingLinksEnabled),
-      prefs->GetBoolean(prefs::kAccessibilityReadAnythingImagesEnabled),
-      static_cast<read_anything::mojom::Colors>(
-          prefs->GetInteger(prefs::kAccessibilityReadAnythingColorInfo)),
-      prefs->GetDouble(prefs::kAccessibilityReadAnythingSpeechRate),
-      std::move(voices),
-      prefs->GetList(prefs::kAccessibilityReadAnythingLanguagesEnabled).Clone(),
-      static_cast<read_anything::mojom::HighlightGranularity>(prefs->GetDouble(
-          prefs::kAccessibilityReadAnythingHighlightGranularity)),
-      last_non_disabled_line_focus, line_focus_enabled);
+  RestoreSettingsFromPrefs();
 
   // Get user's default language to check for compatible fonts.
   language::LanguageModel* language_model =
@@ -1228,6 +1197,7 @@ void ReadAnythingUntrustedPageHandler::Activate(
       // it was previously marked as hidden.
       OnGetPresentationState();
     }
+    RestoreSettingsFromPrefs();
   }
   if (!active && !tab_will_detach_) {
     page_->OnReadingModeHidden(tab_->IsActivated());
@@ -1775,6 +1745,41 @@ void ReadAnythingUntrustedPageHandler::LogTextStyle() {
     base::UmaHistogramEnumeration("Accessibility.ReadAnything.LineFocus",
                                   line_focus);
   }
+}
+
+void ReadAnythingUntrustedPageHandler::RestoreSettingsFromPrefs() {
+  PrefService* prefs = profile_->GetPrefs();
+  base::DictValue voices = base::DictValue();
+  voices = prefs->GetDict(prefs::kAccessibilityReadAnythingVoiceName).Clone();
+  read_anything::mojom::LineFocus line_focus =
+      features::IsReadAnythingLineFocusEnabled()
+          ? static_cast<read_anything::mojom::LineFocus>(
+                prefs->GetInteger(prefs::kAccessibilityReadAnythingLineFocus))
+          : read_anything::mojom::LineFocus::kDefaultValue;
+  bool line_focus_enabled = line_focus != read_anything::mojom::LineFocus::kOff;
+  read_anything::mojom::LineFocus last_non_disabled_line_focus =
+      features::IsReadAnythingLineFocusEnabled()
+          ? static_cast<read_anything::mojom::LineFocus>(prefs->GetInteger(
+                prefs::kAccessibilityReadAnythingLastNonDisabledLineFocus))
+          : read_anything::mojom::LineFocus::kDefaultValue;
+
+  page_->OnSettingsRestoredFromPrefs(
+      static_cast<read_anything::mojom::LineSpacing>(
+          prefs->GetInteger(prefs::kAccessibilityReadAnythingLineSpacing)),
+      static_cast<read_anything::mojom::LetterSpacing>(
+          prefs->GetInteger(prefs::kAccessibilityReadAnythingLetterSpacing)),
+      prefs->GetString(prefs::kAccessibilityReadAnythingFontName),
+      prefs->GetDouble(prefs::kAccessibilityReadAnythingFontScale),
+      prefs->GetBoolean(prefs::kAccessibilityReadAnythingLinksEnabled),
+      prefs->GetBoolean(prefs::kAccessibilityReadAnythingImagesEnabled),
+      static_cast<read_anything::mojom::Colors>(
+          prefs->GetInteger(prefs::kAccessibilityReadAnythingColorInfo)),
+      prefs->GetDouble(prefs::kAccessibilityReadAnythingSpeechRate),
+      std::move(voices),
+      prefs->GetList(prefs::kAccessibilityReadAnythingLanguagesEnabled).Clone(),
+      static_cast<read_anything::mojom::HighlightGranularity>(prefs->GetDouble(
+          prefs::kAccessibilityReadAnythingHighlightGranularity)),
+      last_non_disabled_line_focus, line_focus_enabled);
 }
 
 void ReadAnythingUntrustedPageHandler::

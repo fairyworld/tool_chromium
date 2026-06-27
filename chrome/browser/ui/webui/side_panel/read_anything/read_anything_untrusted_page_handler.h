@@ -352,6 +352,9 @@ class ReadAnythingUntrustedPageHandler :
   // Logs the current visual settings values.
   void LogTextStyle();
 
+  // Restores settings from preferences.
+  void RestoreSettingsFromPrefs();
+
   void PerformActionInTargetTree(const ui::AXActionData& data);
 
   bool AreInnerContentsPdfContent(
