@@ -20,6 +20,7 @@
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
 #include "url/gurl.h"
+#include "url/url_constants.h"
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/browser/extension_registry.h"
@@ -104,6 +105,10 @@ bool IsInspectionAllowed(Profile* profile, content::WebContents* web_contents) {
   if (checker) {
     bool is_blocked = false;
     web_contents->ForEachRenderFrameHost([&](content::RenderFrameHost* frame) {
+      if (frame->GetLastCommittedURL().is_empty() ||
+          frame->GetLastCommittedURL().SchemeIs(url::kAboutScheme)) {
+        return;
+      }
       auto frame_availability =
           checker->GetDevToolsAvailabilityForUrl(frame->GetLastCommittedURL());
       if (frame_availability == policy::DeveloperToolsPolicyChecker::
@@ -160,6 +165,10 @@ bool IsInspectionAllowed(Profile* profile, content::WebContents* web_contents) {
   bool is_blocked = false;
   web_contents->ForEachRenderFrameHostWithAction(
       [&](content::RenderFrameHost* frame) {
+        if (frame->GetLastCommittedURL().is_empty() ||
+            frame->GetLastCommittedURL().SchemeIs(url::kAboutScheme)) {
+          return content::RenderFrameHost::FrameIterationAction::kContinue;
+        }
         if (!IsInspectionAllowed(profile, frame->GetLastCommittedURL())) {
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
           // If the disallowed URL is the PDF viewer, and it's not the primary
@@ -318,6 +327,9 @@ bool IsInspectionAllowed(Profile* profile, const web_app::WebApp* web_app) {
 #endif
 
 bool IsInspectionAllowed(Profile* profile, const GURL& url) {
+  if (url.is_empty() || url.SchemeIs(url::kAboutScheme)) {
+    return true;
+  }
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (url.SchemeIs(extensions::kExtensionScheme)) {
     if (const extensions::Extension* extension =
