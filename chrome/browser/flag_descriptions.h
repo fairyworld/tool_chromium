@@ -7932,16 +7932,6 @@ inline constexpr char kWakeOnWifiAllowedName[] =
 inline constexpr char kWakeOnWifiAllowedDescription[] =
     "Allows wake on WiFi features in shill to be enabled.";
 
-inline constexpr char kWelcomeExperienceTestUnsupportedDevicesName[] =
-    "Welcome Experience test unsupported devices";
-inline constexpr char kWelcomeExperienceTestUnsupportedDevicesDescription[] =
-    "kWelcomeExperienceTestUnsupportedDevices enables the new device Welcome "
-    "Experience to be tested on external devices that are not officially "
-    "supported. When enabled, users will be able to initiate and complete "
-    "the enhanced Welcome Experience flow using these unsupported external "
-    "devices. This flag is intended for testing purposes and should be "
-    "disabled in production environments.";
-
 inline constexpr char kWelcomeTourName[] = "Welcome Tour";
 inline constexpr char kWelcomeTourDescription[] =
     "Enables the Welcome Tour that walks new users through ChromeOS System UI.";
