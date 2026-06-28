@@ -6,10 +6,58 @@
 
 #include "base/functional/bind.h"
 #include "base/task/sequenced_task_runner.h"
+#include "net/traffic_annotation/network_traffic_annotation.h"
 
 namespace private_insights {
 
 namespace {
+
+[[maybe_unused]] constexpr net::NetworkTrafficAnnotationTag kTrafficAnnotation =
+    net::DefineNetworkTrafficAnnotation("private_insights_fcp_http", R"(
+      semantics {
+        sender: "Private Insights Service"
+        description:
+          "Uploads encrypted metrics to a confidential compute service to be "
+          "processed by a TEE-hosted workloads pipeline, which uses "
+          "differential privacy to ensure that only anonymized, aggregate "
+          "results are released."
+        trigger:
+          "Reports are automatically generated at intervals while Chrome is "
+          "running."
+        data:
+          "Encrypted metrics about the usage of the contextual cueing feature, "
+          "including the information about the user context, and the cue "
+          "suggestion. The encryption is bound to the TEE-hosted binary which "
+          "applies differential privacy, ensuring that Google has access to "
+          "anonymized aggregates only."
+        destination: GOOGLE_OWNED_SERVICE
+        internal {
+          contacts {
+            owners: "//components/metrics/private_metrics/OWNERS"
+          }
+        }
+        user_data {
+          type: WEB_CONTENT
+          type: USER_CONTENT
+          type: SENSITIVE_URL
+          type: USAGE_AND_PERFORMANCE_METRICS
+        }
+        last_reviewed: "2026-06-26"
+      }
+      policy {
+        cookies_allowed: NO
+        setting:
+          "Users can enable or disable this feature via "
+          "\"Help improve Chrome's features and performance\" in Chrome "
+          "settings under Sync and Google services > Other Google services. "
+          "The feature is enabled by default."
+        chrome_policy {
+          MetricsReportingEnabled {
+            policy_options { mode: MANDATORY }
+            MetricsReportingEnabled: false
+          }
+        }
+      })");
 
 class FcpHttpRequestHandle : public fcp::client::http::HttpRequestHandle {
  public:
