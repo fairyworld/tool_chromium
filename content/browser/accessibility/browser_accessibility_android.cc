@@ -511,12 +511,8 @@ bool BrowserAccessibilityAndroid::IsTableHeader() const {
 }
 
 bool BrowserAccessibilityAndroid::IsTextSelectable() const {
-  // This property tells Android if the node has selectable text, and is used as
-  // a heuristic to decide if extended selection should be communicated by text
-  // offset or child offset.
+  // This property tells Android if the node has selectable text, see:
   // https://developer.android.com/reference/android/view/accessibility/AccessibilityNodeInfo#isTextSelectable%28%29
-  // TODO(crbug.com/498376490): Update the above comment after Selection API
-  // with offset type is released.
   if (IsText() || IsAndroidTextView() || IsTextField()) {
     return true;
   }

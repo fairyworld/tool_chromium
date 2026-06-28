@@ -2105,15 +2105,14 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
             return;
         }
 
-        final int focusNodeId = selection[2];
-        final int focusOffset = selection[3];
+        final int focusNodeId = selection[EXT_SEL_END_NODE];
+        final int focusOffset = selection[EXT_SEL_END_OFFSET];
+        final int focusOffsetType = selection[EXT_SEL_END_OFFSET_TYPE];
         // If the selection end is not text-selectable, `mMovementAtGranularityIndex` remains
         // `UNDEFINED_SELECTION_INDEX`. This allows `initializeGranularityAndSelection` to set it
         // to the beginning or end of the node based on movement direction.
-        // TODO(crbug.com/498376490): Use offset type when selection API supports it.
         if (mAccessibilityFocusId == focusNodeId
-                && WebContentsAccessibilityImplJni.get()
-                        .isTextSelectable(mNativeObj, focusNodeId)) {
+                && focusOffsetType == AccessibilityNodeInfoBuilder.OFFSET_TYPE_TEXT) {
             mMovementAtGranularityIndex = focusOffset;
         }
     }

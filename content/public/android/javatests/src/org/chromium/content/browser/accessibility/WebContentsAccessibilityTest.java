@@ -2075,6 +2075,62 @@ public class WebContentsAccessibilityTest {
         Assert.assertTrue(lastParagraphNodeInfo.isAccessibilityFocused());
     }
 
+    /** Tests initializeMovementAtGranularityOnSetAccessibilityFocus with selection offset types. */
+    @Test
+    @SmallTest
+    public void testEvent_initializeMovementAtGranularity_withExtendedSelectionOffsetTypes()
+            throws Throwable {
+        // Build a simple web page with a focused container node containing children.
+        setupTestWithHTML(
+                """
+                <p id="text">Some text</p>
+                <img id="image" src="pipe.jpg" alt="pipe" />
+                """);
+
+        int rootVvid = waitForNodeMatching(sClassNameMatcher, "android.webkit.WebView");
+        int textVvId = waitForNodeMatching(sViewIdResourceNameMatcher, "text");
+        int imageVvid = waitForNodeMatching(sViewIdResourceNameMatcher, "image");
+
+        // 1. Set extended selection on the text node.
+        setAndAssertExtendedSelection(
+                rootVvid, textVvId, 1, OFFSET_TYPE_TEXT, textVvId, 3, OFFSET_TYPE_TEXT);
+
+        // Perform focus action to trigger initializeMovementAtGranularityOnSetAccessibilityFocus.
+        performActionOnUiThread(textVvId, ACTION_ACCESSIBILITY_FOCUS, null);
+
+        // Setup GRANULARITY args.
+        Bundle args = new Bundle();
+        args.putInt(ACTION_ARGUMENT_MOVEMENT_GRANULARITY_INT, MOVEMENT_GRANULARITY_CHARACTER);
+        args.putBoolean(ACTION_ARGUMENT_EXTEND_SELECTION_BOOLEAN, false);
+
+        // Swipe forward. Since selection was on the text node, start index should be initialized to
+        // 3.
+        performTextActionOnUiThreadAndWaitForTraversalEvent(
+                textVvId, ACTION_NEXT_AT_MOVEMENT_GRANULARITY, args);
+        Assert.assertEquals(3, mTestData.getTraverseFromIndex());
+        Assert.assertEquals(4, mTestData.getTraverseToIndex());
+
+        // Focus away to clean up.
+        performActionOnUiThread(rootVvid, ACTION_ACCESSIBILITY_FOCUS, null);
+
+        // 2. Set selection on the image node with child offset types.
+        setAndAssertExtendedSelection(
+                rootVvid, rootVvid, 1, OFFSET_TYPE_CHILD, rootVvid, 2, OFFSET_TYPE_CHILD);
+
+        // Focus on the text node.
+        performActionOnUiThread(textVvId, ACTION_ACCESSIBILITY_FOCUS, null);
+
+        // Clear previous event stats.
+        mTestData.setReceivedTraversalEvent(false);
+
+        // Swipe forward on the text node. Since the selection focus node was the image node,
+        // it shouldn't initialize the granularity index (which remains -1).
+        performTextActionOnUiThreadAndWaitForTraversalEvent(
+                textVvId, ACTION_NEXT_AT_MOVEMENT_GRANULARITY, args);
+        Assert.assertEquals(0, mTestData.getTraverseFromIndex());
+        Assert.assertEquals(1, mTestData.getTraverseToIndex());
+    }
+
     // ------------------ Tests of AccessibilityNodeInfo objects ------------------ //
     // These tests are included here rather than in WebContentsAccessibilityTreeTest because
     // they test the AccessibilityNodeInfo over a series of actions/events, rather than statically.
