@@ -1143,6 +1143,7 @@
 <translation id="1843048149176045210">複製下載連結</translation>
 <translation id="1845060436536902492">ChromeOS Flex 的螢幕閱讀器 ChromeVox 主要供失明和低視力人士使用，可協助他們透過語音合成器或點字顯示器閱讀螢幕上顯示的文字。按一下空白鍵即可啟用 ChromeVox。ChromeVox 啟動後，系統會提供快速導覽。</translation>
 <translation id="1845727111305721124">已允許播放音效</translation>
+<translation id="1846100293138248204">儲存至「記憶」</translation>
 <translation id="1846308012215045257">按住 Ctrl 鍵並按一下即可執行 <ph name="PLUGIN_NAME" /></translation>
 <translation id="1848219224579402567">蓋上螢幕時登出帳戶</translation>
 <translation id="184862733444771842">功能要求</translation>
@@ -6148,6 +6149,7 @@
 <translation id="5562588178647493983">請聯絡管理員查詢詳情</translation>
 <translation id="556321030400250233">本機或共用檔案</translation>
 <translation id="5563234215388768762">搜尋 Google 或輸入網址</translation>
+<translation id="5563460629751333413">無法連接伺服器，請稍後再試。</translation>
 <translation id="5563698194918415761">更新被網絡政策或 Proxy 伺服器封鎖。</translation>
 <translation id="5563824734298958390">要離開分頁群組嗎？</translation>
 <translation id="5565735124758917034">啟用</translation>
@@ -8184,6 +8186,7 @@
 <translation id="7109543803214225826">已移除捷徑</translation>
 <translation id="7110644433780444336">{NUM_TABS,plural, =1{在群組中加入分頁}other{在群組中加入分頁}}</translation>
 <translation id="7111822978084196600">命名此視窗</translation>
+<translation id="7113314569799918830">Chrome 版 Gemini 正擴展至不同地區，但並非所有地區皆可使用</translation>
 <translation id="7113502843173351041">存取您的電郵地址</translation>
 <translation id="7115361495406486998">沒有可用的聯絡人</translation>
 <translation id="7117228822971127758">請稍後再試</translation>

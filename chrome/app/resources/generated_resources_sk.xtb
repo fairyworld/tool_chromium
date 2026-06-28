@@ -1207,6 +1207,7 @@ Heslá si môžete kedykoľvek skontrolovať v službe <ph name="GOOGLE_PASSWOR
 <translation id="1897120393475391208">Použiť silné heslo</translation>
 <translation id="1897860317037652061">Nepodarilo sa skontrolovať</translation>
 <translation id="1898804291554630487">Spýtajte sa na túto stránku</translation>
+<translation id="1899172684246105747">Prispôsobte si prehliadač pomocou motívov či tmavého režimu.</translation>
 <translation id="1900305421498694955">Aplikácie na Google Play môžu vyžadovať úplný prístup k systému súborov a povolenie zapisovať súbory v externých úložiskách. Súbory a priečinky vytvorené v zariadení sú viditeľné pre všetkých používateľov príslušného externého disku. <ph name="LINK_BEGIN" />Ďalšie informácie<ph name="LINK_END" /></translation>
 <translation id="1901213235765457754">Požiadajte správcu o aktualizáciu tejto aplikácie</translation>
 <translation id="1901303067676059328">Vybrať &amp;všetko</translation>
@@ -8415,6 +8416,7 @@ Máte ešte # ďalších. Správca hesiel Google odporúča okamžite dané hes
 <translation id="7289303553784750393">Ak ste online, ale tento problém sa opakuje, môžete skúsiť ďalšie spôsoby, ako pokračovať na webe <ph name="SITE_ETLD_PLUS_ONE" />.</translation>
 <translation id="7289386924227731009"><ph name="WINDOW_TITLE" /> – Vyžaduje sa povolenie, reagujte stlačením klávesa F6</translation>
 <translation id="7290005709287747471">Deaktivovať</translation>
+<translation id="7290139233643258082">Použiť motív</translation>
 <translation id="7292067737327289208"><ph name="BEGIN_LINK" />Prehliadač je spravovaný<ph name="END_LINK" /> vašou organizáciou a váš <ph name="BEGIN_LINK" />profil<ph name="END_LINK" /> doménou <ph name="PROFILE_DOMAIN" /></translation>
 <translation id="7292147651179697920">Požiadaj rodiča, aby povolil prístup v Nastaveniach</translation>
 <translation id="7292195267473691167"><ph name="LOCALE" /> (<ph name="VARIANT" />)</translation>

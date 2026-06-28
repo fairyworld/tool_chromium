@@ -32,6 +32,7 @@ Neke funkcije su možda nedostupne i promene podešavanja neće biti sačuvane.
 <translation id="126567311906253476">Kada se prijavljujete u Google usluge kao što su Gmail ili YouTube pomoću naloga <ph name="USER_EMAIL" />, možete automatski da se prijavite u Chromium pomoću istog naloga</translation>
 <translation id="1287534462498555020">Preuzmite Chromium na telefon</translation>
 <translation id="1290883685122687410">Greška pri podešavanju: <ph name="METAINSTALLER_EXIT_CODE" />. <ph name="WINDOWS_ERROR" /></translation>
+<translation id="1312200348844120300">Ilustracija koja prikazuje kako možete da koristite pretragu slika da biste potražili proizvod</translation>
 <translation id="1315551408014407711">Podesite nov Chromium profil</translation>
 <translation id="132092532143527429">Isprobajte sa Gemini-jem u Chromium-u</translation>
 <translation id="1324107359134968521">Chromium zahteva pristup Bluetooth-u da bi istraživao 
@@ -94,6 +95,7 @@ Neke funkcije su možda nedostupne i promene podešavanja neće biti sačuvane.
 <translation id="1951406923938785464">Chromium je blokirao ovo preuzimanje jer se ovaj tip fajl ne preuzima često i može da bude opasan</translation>
 <translation id="1953553007165777902">Preuzima se... Još <ph name="MINUTE" /> min</translation>
 <translation id="1966382378801805537">Chromium ne može da odredi ni da podesi podrazumevani pregledač</translation>
+<translation id="197326043290947695">Pregledajte pametnije uz pretragu slika</translation>
 <translation id="1990262977744080398">Saznajte zašto Chromium blokira neke fajlove, otvara se na novoj kartici</translation>
 <translation id="1999715455684970349">Ažurira Chromium softver. Ako je ova usluga onemogućena ili zaustavljena, Chromium softver neće biti ažuriran, što znači da neće biti moguće otkloniti bezbednosne propuste koji mogu da nastanu i da funkcije možda neće raditi. Ova usluga se deinstalira kada je ne koristi nijedan Chromium softver.</translation>
 <translation id="2008474315282236005">Ovim ćete izbrisati 1 stavku sa ovog uređaja. Da biste kasnije vratili podatke, prijavite se u Chromium kao <ph name="USER_EMAIL" />.</translation>
@@ -236,6 +238,7 @@ Neke funkcije su možda nedostupne i promene podešavanja neće biti sačuvane.
 <translation id="3387527074123400161">Chromium OS</translation>
 <translation id="3406848076815591792">Želite da pređete na postojeći Chromium profil?</translation>
 <translation id="3412460710772753638">U Menadžeru lozinki na ovom uređaju</translation>
+<translation id="3423442168617177595">Ugrađen je u Chromium da bi vam pomogao da pravite, čuvate i automatski popunjavate jake lozinke. Dodajte prečicu radi lakšeg pristupa</translation>
 <translation id="3455907671758333080">Produžite poboljšano bezbedno pregledanje uz Chromium na telefonu</translation>
 <translation id="3461644266919055473">Prilagođavamo Chromium…</translation>
 <translation id="3474745554856756813">Ovim ćete izbrisati <ph name="ITEMS_COUNT" /> stavke(i) sa ovog uređaja. Da biste kasnije vratili podatke, prijavite se u Chromium kao <ph name="USER_EMAIL" />.</translation>
@@ -285,6 +288,7 @@ Neke funkcije su možda nedostupne i promene podešavanja neće biti sačuvane.
 <translation id="3975724895399328945">O verziji Google Chrome for Testing</translation>
 <translation id="3997429360543082038">O Chromium OS-u</translation>
 <translation id="4010059961270896984">Kada odete na sajt, Chromium šalje maskirani deo URL-a <ph name="BEGIN_LINK" />Google bezbednom pregledanju<ph name="END_LINK" /> preko servera za privatnost koji krije IP adresu. Ako sajt radi nešto sumnjivo, šalju se i kompletni URL-ovi i delovi sadržaja stranice.</translation>
+<translation id="4016217212818346953">Ostanite bezbedni uz Menadžer lozinki</translation>
 <translation id="4019629340646866719">Chromium OS je omogućen zahvaljujući dodatnom <ph name="BEGIN_LINK_CROS_OSS" />softveru sa otvorenim kodom<ph name="END_LINK_CROS_OSS" />, kao što je <ph name="BEGIN_LINK_LINUX_OSS" />Linux okruženje za programiranje<ph name="END_LINK_LINUX_OSS" />.</translation>
 <translation id="4022972681110646219">Prevedi ekran</translation>
 <translation id="4023601594785368013">Izvorni jezik: <ph name="LANGUAGE" /></translation>
@@ -504,6 +508,7 @@ Ako ova stranica ne radi na očekivani način, dozvolite optimizaciju.</translat
 <translation id="6400112897226594999">Chromium logotip na ekranu računara.</translation>
 <translation id="6403826409255603130">Chromium je veb pregledač koji pokreće veb-stranice i aplikacije munjevitom brzinom. Brz je, stabilan i jednostavan za korišćenje. Pregledajte Veb bezbednije sa zaštitom od malvera i „pecanja“ koja je ugrađena u Chromium.</translation>
 <translation id="6414624068245092115">Da biste bili sigurni da uvek možete da koristite i čuvate Chromium podatke na Google nalogu, potvrdite svoj identitet</translation>
+<translation id="6417332166651156371">Pojednostavljena slika koja prikazuje ulaznu tačku Menadžera lozinki u Chromium-u</translation>
 <translation id="642132557830635295">Chromium radi brže i funkcije koje koriste JavaScript bi trebalo da rade kako je predviđeno</translation>
 <translation id="6436260184216827876">Pretraga slika nije dostupna. Probajte ponovo kasnije.</translation>
 <translation id="6442900851116057561">Restartujte Chromium OS</translation>
@@ -595,6 +600,7 @@ Ne možete da sačuvate nove obeleživače na nalogu dok ne izbrišete neke. Ako
 <translation id="7196312274710523067">Nije moguće pokrenuti Chromium. Pokušajte ponovo.</translation>
 <translation id="7213008767289637091">Zadržite Chromium na traci da biste mu brzo pristupali u svakom trenutku</translation>
 <translation id="7213407614656404070">Koristite Chromium svaki put kada kliknete na linkove u porukama, dokumentima i drugim aplikacijama</translation>
+<translation id="7216228761061470870">Kada koristite pretragu slika na računaru, naslov, URL i sadržaj stranice, uključujući PDF-ove, šalju se na server</translation>
 <translation id="7223968959479464213">Menadžer zadataka – Chromium</translation>
 <translation id="7252276985725323153">Odmah počnite da pregledate: Chromium sada može da se pokrene kada se pokrene Windows.</translation>
 <translation id="7274695763216404502">Zakačeno je. Ponovo koristite pretragu slika sa trake s alatkama</translation>

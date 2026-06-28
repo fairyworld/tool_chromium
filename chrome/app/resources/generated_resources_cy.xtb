@@ -1216,6 +1216,7 @@ Gwiriwch eich cyfrineiriau unrhyw bryd yn y <ph name="GOOGLE_PASSWORD_MANAGER" /
 <translation id="1897120393475391208">Defnyddiwch gyfrinair cryf</translation>
 <translation id="1897860317037652061">Methodd y sgan</translation>
 <translation id="1898804291554630487">Gofyn am y dudalen hon</translation>
+<translation id="1899172684246105747">Addaswch eich porwr gydag opsiynau megis themâu a modd tywyll.</translation>
 <translation id="1900305421498694955">Mae'n bosib y bydd apiau o Google Play yn gofyn am fynediad system ffeiliau llawn i ddarllen ac ysgrifennu ffeiliau ar ddyfeisiau storfa allanol. Mae ffeiliau a ffolderi a grëir ar y ddyfais yn weladwy i unrhyw un sy'n defnyddio'r gyriant allanol. <ph name="LINK_BEGIN" />Dysgu rhagor<ph name="LINK_END" /></translation>
 <translation id="1901213235765457754">Gofynnwch i'ch gweinyddwr ddiweddaru'r ap hwn</translation>
 <translation id="1901303067676059328">Dewis &amp;popeth</translation>
@@ -8430,6 +8431,7 @@ Mae gennych # cyfrinair arall sydd wedi'u darganfod. Mae Rheolwr Cyfrineiriau Go
 <translation id="7289303553784750393">Os ydych chi ar-lein ond bod y mater hwn yn dal i ddigwydd, gallwch roi cynnig ar ffyrdd eraill o barhau ar <ph name="SITE_ETLD_PLUS_ONE" />.</translation>
 <translation id="7289386924227731009"><ph name="WINDOW_TITLE" /> - Gofynnwyd am ganiatâd, pwyswch F6 i ymateb</translation>
 <translation id="7290005709287747471">Dadweithredu</translation>
+<translation id="7290139233643258082">Cymhwyso thema</translation>
 <translation id="7292067737327289208"><ph name="BEGIN_LINK" />Rheolir eich porwr<ph name="END_LINK" /> gan eich sefydliad a <ph name="BEGIN_LINK" />rheolir eich proffil<ph name="END_LINK" /> gan <ph name="PROFILE_DOMAIN" /></translation>
 <translation id="7292147651179697920">Gofynnwch i'ch rhiant ganiatáu mynediad yn y Gosodiadau</translation>
 <translation id="7292195267473691167"><ph name="LOCALE" /> (<ph name="VARIANT" />)</translation>

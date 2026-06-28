@@ -327,6 +327,7 @@ Samo neko ko ima pristupnu frazu može da čita šifrovane podatke. Pristupna fr
 <translation id="2411239243988279592"><ph name="TAB_TITLE" />, izabrana kartica sa zvukom</translation>
 <translation id="2413014528833954543">Provera lozinki na ovom uređaju nije uspela</translation>
 <translation id="2414886740292270097">Tamna</translation>
+<translation id="2415037988255164008">Želite da vratite prozore?</translation>
 <translation id="2421705177906985956">Trenutno nema sajtova za prikaz</translation>
 <translation id="2426805022920575512">Izaberite drugi nalog</translation>
 <translation id="2427025860753516072">{FILE_COUNT,plural, =1{Videi, 1 video na listi}one{Videi, # video na listi}few{Videi, # videa na listi}other{Videi, # videa na listi}}</translation>
@@ -1338,6 +1339,7 @@ Na primer, neki veb-sajtovi mogu da odgovore na ovaj zahtev prikazivanjem oglasa
 <translation id="6556501700899673703">Lexend</translation>
 <translation id="6560414384669816528">Pretraga pomoću Sogou-a</translation>
 <translation id="656065428026159829">Prikaži još</translation>
+<translation id="6565781844089373403">Vrati prozore</translation>
 <translation id="6565959834589222080">WiFi se koristi kada je dostupan</translation>
 <translation id="657177046675873214">Da bi vam obeleživači bili dostupni na svim uređajima, uključite Obeleživače u podešavanjima</translation>
 <translation id="6573096386450695060">Uvek dozvoli</translation>

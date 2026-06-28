@@ -1236,6 +1236,7 @@
 <translation id="2929525460561903222">{SHIPPING_ADDRESS,plural, =0{<ph name="SHIPPING_ADDRESS_PREVIEW" />}=1{「<ph name="SHIPPING_ADDRESS_PREVIEW" />」和另外 <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> 個地址}other{「<ph name="SHIPPING_ADDRESS_PREVIEW" />」和另外 <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> 個地址}}</translation>
 <translation id="2930531075747147366">你的另一部裝置傳來分頁</translation>
 <translation id="2930577230479659665">完成每次複印後修剪</translation>
+<translation id="2931453528659195355">管理購物資料</translation>
 <translation id="2933624813161016821">燙金浮雕壓印</translation>
 <translation id="2935726091208500473">分享分頁</translation>
 <translation id="293796669683825859">留言</translation>
@@ -1727,6 +1728,7 @@
 <translation id="3681841880472207951">QuickTime 影片</translation>
 <translation id="3687920599421452763">客貨車和小型客貨車</translation>
 <translation id="3693327506115126094">選擇身分驗證方式</translation>
+<translation id="3693516565203081475">選擇付款方法</translation>
 <translation id="3698353241727597930">管理員已將<ph name="FILES" />的儲存位置設定為由公司管理的 <ph name="CLOUD_STORAGE" />。即使你刪除這些檔案，公司仍可能會監控、審核及保留這些檔案。</translation>
 <translation id="3698629142018988477">建立網站按鈕，啟動之後就可以喺「Google 協作平台」度快速建立新網站</translation>
 <translation id="3700094625653511150">如要隱藏「稍後付款」選項，請前往<ph name="IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_FOOTNOTE_HIDE_OPTION_PAYMENT_SETTINGS_LINK_TEXT" /></translation>
@@ -5151,6 +5153,7 @@
 <translation id="9063800855227801443">無法擷取機密內容</translation>
 <translation id="9065203028668620118">編輯</translation>
 <translation id="9065745800631924235">「<ph name="TEXT" />」嘅搜尋記錄</translation>
+<translation id="9066116644715286230">{NUM_TABS,plural, =1{分頁分享詳情。分享緊 {WEBSITE_LIST_STR} 嘅 1 個分頁}other{分頁分享詳情。分享緊 {WEBSITE_LIST_STR} 嘅 {NUM_TABS} 個分頁}}</translation>
 <translation id="90695670378604968">塑膠 (啞面)</translation>
 <translation id="9069693763241529744">根據擴充程式設定封鎖</translation>
 <translation id="9073799351042754113">您已選擇關閉此網站的安全性警告。</translation>

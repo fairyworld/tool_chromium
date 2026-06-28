@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{Увезена је 1 лозинка у <ph name="BRAND" /> на овом уређају}one{Увезена је {NUM_PASSWORDS} лозинка у <ph name="BRAND" /> на овом уређају}few{Увезене су {NUM_PASSWORDS} лозинке у <ph name="BRAND" /> на овом уређају}other{Увезено је {NUM_PASSWORDS} лозинки у <ph name="BRAND" /> на овом уређају}}</translation>
 <translation id="1046572983040892965">Прозор је померен нагоре и улево</translation>
 <translation id="1047431265488717055">Копирај тек&amp;ст линка</translation>
+<translation id="1048350929895890054">Сајтови на којима је плутајући мени блокиран</translation>
 <translation id="1048986595386481879">Динамички додељен</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{Прима се <ph name="ATTACHMENTS" /> са уређаја <ph name="DEVICE_NAME" />}one{Прима се <ph name="ATTACHMENTS" /> са уређаја <ph name="DEVICE_NAME" />}few{Примају се <ph name="ATTACHMENTS" /> са уређаја <ph name="DEVICE_NAME" />}other{Прима се <ph name="ATTACHMENTS" /> са уређаја <ph name="DEVICE_NAME" />}}</translation>
 <translation id="1049743911850919806">Без архивирања</translation>
@@ -936,6 +937,7 @@
 <translation id="1695510246756136088">Не можете да се повежете на интернет. Пробајте поново.</translation>
 <translation id="1696555181932908973">Можете да пробате друге начине да бисте наставили на <ph name="SITE_ETLD_PLUS_ONE" />.</translation>
 <translation id="1696685050160038195">Да бисте заштитили уређај, треба да покрећете и инсталирате софтвер само из поузданих извора и од поузданих програмера.</translation>
+<translation id="1696832149095851409">плутајући мени на изабраном тексту</translation>
 <translation id="1697122132646041614">Опција Не свиђа ми се отвара образац за слање детаљних повратних информација о томе зашто вам се не свиђају ови резултати.</translation>
 <translation id="1697532407822776718">Спремни сте!</translation>
 <translation id="1698796500103229697">Начини плаћања</translation>
@@ -2498,6 +2500,7 @@
 <translation id="2845276301195220700">Још радњи за Google календар</translation>
 <translation id="2845382757467349449">Увек приказуј траку са обележивачима</translation>
 <translation id="284581348330507117">Направите јединствене лозинке</translation>
+<translation id="2846345106886298325">Задатак је обављен и враћен у Gemini Spark</translation>
 <translation id="284884486564166077">Претражите било коју слику помоћу Објектива</translation>
 <translation id="2849035674501872372">Потражите</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3001,6 +3004,7 @@
 <translation id="3223109931751684474">Уклоните приступ приступним кључевима на овом уређају</translation>
 <translation id="3223531857777746191">Дугме Ресетуј</translation>
 <translation id="3225084153129302039">Подразумевани љубичасти аватар</translation>
+<translation id="3226249862705569834">Сензори се користе</translation>
 <translation id="3226487301970807183">Укључите/искључите бочну таблу са леве стране</translation>
 <translation id="322708765617468434">Увек можете да додате другу особу на уређај после подешавања. Свака особа може да персонализује доживљај и чува приватност података.</translation>
 <translation id="3227137524299004712">Микрофон</translation>
@@ -6111,6 +6115,7 @@
 <translation id="5546865291508181392">Пронађи</translation>
 <translation id="5547868626772433490">Упитајте Gemini</translation>
 <translation id="5548075230008247516">Поништен је избор свих ставки. Напустили се режим избора.</translation>
+<translation id="554810465530189549">Не приказуј плутајући мени када је текст изабран</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{„<ph name="TAB_TITLE" />“}=1{„<ph name="TAB_TITLE" />“ и још 1 картица}one{„<ph name="TAB_TITLE" />“ и још # картица}few{„<ph name="TAB_TITLE" />“ и још # картице}other{„<ph name="TAB_TITLE" />“ и још # картица}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">Одаберите подешавање</translation>
@@ -6277,6 +6282,7 @@
 <translation id="5678955352098267522">Читање ваших података на <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">Желите да уклоните „<ph name="ESIM_PROFILE_NAME" />“?</translation>
 <translation id="5681586175480958839">Фајл се већ отвара</translation>
+<translation id="5682950763196110705">Прикажи плутајући мени када је текст изабран</translation>
 <translation id="5684110242705861346">Додатак <ph name="NAME" /> је додат према смерницама ваше организације и управља овим подешавањем. <ph name="BEGIN_LINK" />Прикажи детаље<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">Детаљи о WiFi мрежи</translation>
 <translation id="5684661240348539843">Идентификатор елемента</translation>
@@ -10055,6 +10061,7 @@
 <translation id="8505669004895429027">Мале уштеде</translation>
 <translation id="8507052544157927817">Стил подвлачења</translation>
 <translation id="8507227974644337342">Резолуција екрана</translation>
+<translation id="8507443886219296894">Сакриј за овај сајт</translation>
 <translation id="850763987657366362">Увоз сертификата није успео</translation>
 <translation id="8508532351844333131"><ph name="WEBSITE_ORIGIN" /> жели да сачува информације на Android уређају</translation>
 <translation id="8509177919508253835">Ресетујте безбедносне кључеве и направите PIN-ове</translation>
@@ -10115,6 +10122,7 @@
 <translation id="8552102814346875916">Сачувајте на листи Увек задржи ове сајтове активним</translation>
 <translation id="8552947739661397736">Преузми задатак, Gemini тренутно има контролу</translation>
 <translation id="8553342806078037065">Управљање другим људима</translation>
+<translation id="8554642222921881444">Плутајући мени на изабраном тексту</translation>
 <translation id="8554899698005018844">Без језика</translation>
 <translation id="8555444629041783356">Аутоматски распоред заласка сунца</translation>
 <translation id="8557022314818157177">Наставите да додирујете безбедносни кључ док не снимимо отисак прста</translation>
@@ -10411,6 +10419,7 @@
 <translation id="8759753423332885148">Сазнајте више.</translation>
 <translation id="876161309768861172">Пријава није успела, пробајте поново</translation>
 <translation id="8761945298804995673">Овај корисник већ постоји</translation>
+<translation id="876287961468788565">Chrome може да прикаже плутајући мени са радњама када изаберете текст на сајту.</translation>
 <translation id="8762886931014513155">Треба да ажурирате <ph name="DEVICE_TYPE" /></translation>
 <translation id="8763927697961133303">USB уређај</translation>
 <translation id="8765940060470412555">Откачи режим за читање</translation>
