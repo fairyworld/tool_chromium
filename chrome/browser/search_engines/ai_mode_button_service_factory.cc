@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/ui/omnibox/ai_mode_button_service_factory.h"
+#include "chrome/browser/search_engines/ai_mode_button_service_factory.h"
 
 #include <memory>
 #include <utility>
@@ -12,7 +12,7 @@
 #include "chrome/browser/profiles/profile_selections.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/grit/branded_strings.h"
-#include "components/omnibox/browser/ai_mode_button_service.h"
+#include "components/search_engines/ai_mode_button_service.h"
 #include "ui/base/l10n/l10n_util.h"
 
 // static

@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_OMNIBOX_BROWSER_TEST_AI_MODE_BUTTON_SERVICE_H_
-#define COMPONENTS_OMNIBOX_BROWSER_TEST_AI_MODE_BUTTON_SERVICE_H_
+#ifndef COMPONENTS_SEARCH_ENGINES_TEST_AI_MODE_BUTTON_SERVICE_H_
+#define COMPONENTS_SEARCH_ENGINES_TEST_AI_MODE_BUTTON_SERVICE_H_
 
-#include "components/omnibox/browser/ai_mode_button_service.h"
+#include "components/search_engines/ai_mode_button_service.h"
 
 class TestAiModeButtonService : public AiModeButtonService {
  public:
@@ -17,4 +17,4 @@ class TestAiModeButtonService : public AiModeButtonService {
   using AiModeButtonService::current_config_;
 };
 
-#endif  // COMPONENTS_OMNIBOX_BROWSER_TEST_AI_MODE_BUTTON_SERVICE_H_
+#endif  // COMPONENTS_SEARCH_ENGINES_TEST_AI_MODE_BUTTON_SERVICE_H_

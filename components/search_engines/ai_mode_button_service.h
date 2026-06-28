@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_OMNIBOX_BROWSER_AI_MODE_BUTTON_SERVICE_H_
-#define COMPONENTS_OMNIBOX_BROWSER_AI_MODE_BUTTON_SERVICE_H_
+#ifndef COMPONENTS_SEARCH_ENGINES_AI_MODE_BUTTON_SERVICE_H_
+#define COMPONENTS_SEARCH_ENGINES_AI_MODE_BUTTON_SERVICE_H_
 
 #include <optional>
 #include <string>
@@ -13,7 +13,7 @@
 #include "base/memory/raw_ptr.h"
 #include "base/scoped_observation.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/omnibox/browser/ai_mode_button_config.h"
+#include "components/search_engines/ai_mode_button_config.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/search_engines/template_url_service_observer.h"
 
@@ -89,4 +89,4 @@ class AiModeButtonService : public KeyedService,
       callbacks_;
 };
 
-#endif  // COMPONENTS_OMNIBOX_BROWSER_AI_MODE_BUTTON_SERVICE_H_
+#endif  // COMPONENTS_SEARCH_ENGINES_AI_MODE_BUTTON_SERVICE_H_

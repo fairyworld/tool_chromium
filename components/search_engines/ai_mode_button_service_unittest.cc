@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/omnibox/browser/ai_mode_button_service.h"
+#include "components/search_engines/ai_mode_button_service.h"
 
 #include <memory>
 #include <string>
@@ -14,12 +14,12 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/mock_callback.h"
 #include "base/test/task_environment.h"
-#include "components/omnibox/browser/ai_mode_button_config.h"
-#include "components/omnibox/browser/test_ai_mode_button_service.h"
+#include "components/search_engines/ai_mode_button_config.h"
 #include "components/search_engines/search_engine_type.h"
 #include "components/search_engines/search_engines_test_environment.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_service.h"
+#include "components/search_engines/test_ai_mode_button_service.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
