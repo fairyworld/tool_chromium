@@ -88,6 +88,7 @@
 #include "components/google/core/common/google_util.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/lens/lens_features.h"
+#include "components/live_caption/caption_util.h"
 #include "components/password_manager/core/browser/features/password_features.h"
 #include "components/password_manager/core/browser/leak_detection_dialog_utils.h"
 #include "components/password_manager/core/browser/manage_passwords_referrer.h"
@@ -959,6 +960,9 @@ void AddGlicStrings(content::WebUIDataSource* html_source, Profile* profile) {
        IDS_SETTINGS_GLIC_EXPERIMENTAL_TRIGGERING_CONSIDER_1},
       {"glicExperimentalTriggeringConsider2",
        IDS_SETTINGS_GLIC_EXPERIMENTAL_TRIGGERING_CONSIDER_2},
+      {"glicMediaUnderstandingToggle", IDS_SETTINGS_GLIC_MEDIA_UNDERSTANDING},
+      {"glicMediaUnderstandingToggleSublabel",
+       IDS_SETTINGS_GLIC_MEDIA_UNDERSTANDING_SUBLABEL},
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
@@ -1057,6 +1061,8 @@ void AddGlicStrings(content::WebUIDataSource* html_source, Profile* profile) {
   html_source->AddBoolean(
       "glicCanUseLive",
       glic::GlicEnabling::EnablementForProfile(profile).EligibleForLive());
+  html_source->AddBoolean("headlessCaptionsEnabled",
+                          captions::IsHeadlessCaptionFeatureSupported());
   html_source->AddBoolean(
       "actorLoginFederatedLoginSupportEnabled",
       base::FeatureList::IsEnabled(features::kFedCmEmbedderInitiatedLogin));

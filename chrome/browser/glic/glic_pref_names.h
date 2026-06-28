@@ -145,6 +145,10 @@ inline constexpr char kGlicPreviousPositionY[] = "glic.previous_bounds.y";
 inline constexpr char kGlicClosedCaptioningEnabled[] =
     "glic.closed_captioning_enabled";
 
+// Bool pref for the media understanding setting.
+inline constexpr char kGlicMediaUnderstandingEnabled[] =
+    "glic.media_understanding_enabled";
+
 // Bool pref that determines if errors are allowed to be shown.
 inline constexpr char kGlicShowErrorAllowed[] = "glic.show_error_allowed";
 

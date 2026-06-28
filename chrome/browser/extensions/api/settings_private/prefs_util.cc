@@ -1362,6 +1362,8 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[glic::prefs::kGlicClosedCaptioningEnabled] =
       settings_api::PrefType::kBoolean;
+  (*s_allowlist)[glic::prefs::kGlicMediaUnderstandingEnabled] =
+      settings_api::PrefType::kBoolean;
   (*s_allowlist)[glic::prefs::kGlicGeolocationEnabled] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[glic::prefs::kGlicMicrophoneEnabled] =
