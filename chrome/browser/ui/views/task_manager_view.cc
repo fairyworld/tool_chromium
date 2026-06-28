@@ -115,7 +115,7 @@ base::span<const TaskManagerView::FilterTab> GetTabDefinitions() {
 
 TaskManagerView::~TaskManagerView() {
   // Delete child views now, while our table model still exists.
-  tabs_ = nullptr;  // Destroyed by `container` below.
+  tabs_ = nullptr;
   tab_table_ = nullptr;
   RemoveAllChildViews();
 
@@ -257,7 +257,7 @@ bool TaskManagerView::AcceleratorPressed(const ui::Accelerator& accelerator) {
 }
 
 views::View* TaskManagerView::GetInitiallyFocusedView() {
-  // Set initial focus to |table_view_| so that screen readers can navigate the
+  // Set initial focus to |tab_table_| so that screen readers can navigate the
   // UI when the dialog is opened without having to manually assign focus first.
   return tab_table_;
 }
