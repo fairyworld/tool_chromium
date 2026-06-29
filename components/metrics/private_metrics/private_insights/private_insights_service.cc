@@ -29,10 +29,31 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "third_party/abseil-cpp/absl/status/statusor.h"
 #include "third_party/federated_compute/src/fcp/client/fl_runner.h"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wextra-semi"
+#include "third_party/federated_compute/src/fcp/client/tensorflow/tensorflow_runner_factory.h"
+#pragma clang diagnostic pop
 
 namespace private_insights {
 
 namespace {
+
+void EnsureTensorflowRunnerRegistered() {
+  // This is a workaround for FCP crashing when doing eligibility check without
+  // TensorFlow.
+  // TODO(b/528431754): Remove this when fixed in FCP.
+  static const bool registered = []() {
+    fcp::client::GetGlobalTensorflowRunnerFactoryRegistry().Register(
+        fcp::client::TensorflowRunnerImplementation::kTensorflowRunnerImpl,
+        []() -> std::unique_ptr<fcp::client::TensorflowRunner> {
+          // Returning a null is fine here, as we're not using TF. We just want
+          // to have a factory that doesn't crash when called.
+          return nullptr;
+        });
+    return true;
+  }();
+  (void)registered;
+}
 
 PrivateInsightsService::FederatedComputationResult
 ParseFederatedComputationResult(
@@ -240,6 +261,7 @@ PrivateInsightsService::UploadBlocking(
 PrivateInsightsService::FederatedComputationResult
 PrivateInsightsService::RunFederatedComputation(
     const FederatedComputationParams& params) {
+  EnsureTensorflowRunnerRegistered();
   const std::string client_version =
       base::StrCat({"chrome_v", version_info::GetMajorVersionNumber()});
   absl::StatusOr<fcp::client::FLRunnerResult> statusor =  // nocheck

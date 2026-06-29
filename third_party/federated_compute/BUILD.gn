@@ -196,6 +196,8 @@ source_set("fl_runner") {
     "src/fcp/client/secagg_event_publisher.h",
     "src/fcp/client/simple_task_environment.h",
     "src/fcp/client/stats.h",
+    "src/fcp/client/tensorflow/tensorflow_runner.h",
+    "src/fcp/client/tensorflow/tensorflow_runner_factory.h",
   ]
 
   sources = [
@@ -251,9 +253,7 @@ source_set("fl_runner") {
     "src/fcp/client/runner_common.h",
     "src/fcp/client/secagg_runner.h",
     "src/fcp/client/simple_task_environment.cc",
-    "src/fcp/client/tensorflow/tensorflow_runner.h",
     "src/fcp/client/tensorflow/tensorflow_runner_factory.cc",
-    "src/fcp/client/tensorflow/tensorflow_runner_factory.h",
     "src/fcp/client/willow/willow_payload_encryptor.h",
     "src/fcp/confidentialcompute/time_window_utilities.cc",
     "src/fcp/confidentialcompute/time_window_utilities.h",
