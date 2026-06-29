@@ -64,10 +64,15 @@ rust_static_library("child_process_security_policy_impl") {
   visibility = [ ":browser" ]
   configs += [ "//content:content_implementation" ]
   deps = [
+    "//base:feature",
     "//storage/common:storage_common_rust",
+    "//third_party/blink/public/common",
     "//third_party/rust/cxx/v1:lib",
     "//url:url_rust",
   ]
+  if (is_component_build) {
+    rustflags = [ "--cfg=component_build" ]
+  }
 }
 
 if (is_ios) {

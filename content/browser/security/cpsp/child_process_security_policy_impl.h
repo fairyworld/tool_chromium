@@ -232,7 +232,9 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
                                const std::string& filesystem_id) override;
   bool HasWebUIBindings(int child_id) override;
   void GrantSendMidiMessage(int child_id) override;
+  void GrantSendMidiMessage_Cpp(int child_id);
   void GrantSendMidiSysExMessage(int child_id) override;
+  void GrantSendMidiSysExMessage_Cpp(int child_id);
   bool CanAccessDataForOrigin(int child_id, const url::Origin& origin) override;
   bool HostsOrigin(int child_id, const url::Origin& origin) override;
   void AddFutureIsolatedOrigins(
@@ -592,9 +594,11 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
 
   // Returns true if sending MIDI messages is allowed.
   bool CanSendMidiMessage(ChildProcessId child_id);
+  bool CanSendMidiMessage_Cpp(ChildProcessId child_id);
 
   // Returns true if sending system exclusive (SysEx) MIDI messages is allowed.
   bool CanSendMidiSysExMessage(ChildProcessId child_id);
+  bool CanSendMidiSysExMessage_Cpp(ChildProcessId child_id);
 
   // Remove all isolated origins associated with |browser_context| and clear any
   // pointers that may reference |browser_context|.  This is

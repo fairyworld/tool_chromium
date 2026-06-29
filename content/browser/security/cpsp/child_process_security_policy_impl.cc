@@ -1207,6 +1207,22 @@ ChildProcessSecurityPolicyImpl* ChildProcessSecurityPolicyImpl::GetInstance() {
 
 void ChildProcessSecurityPolicyImpl::Add(ChildProcessId child_id,
                                          BrowserContext* browser_context) {
+  if (IsRustEnabled(GetRustPolicy(CpspRustFeature::kProcessState))) {
+    // TODO(crbug.com/522844976): Pass ChildProcessId directly to Rust.
+    rust::child_process_security_policy::add_process(child_id.GetUnsafeValue());
+  }
+  // Note: We explicitly continue to create process_state_ even when in
+  // Rust-only mode, since the values tracked by ProcessState have only
+  // partially been implemented by the Rust version so far. Once ProcessState
+  // is fully supported in Rust, we can early-return here when `GetRustPolicy()
+  // == RustPolicy::kRustOnly`.
+  //
+  // TODO(crbug.com/522872468): Currently, the Rust implementation also depends
+  // on the reference counting done below in AddProcessReference() to manage its
+  // ProcessState lifetime. So even when ProcessState is fully implemented in
+  // Rust, this would only be able to early-return here if/when the
+  // ProcessState lifetime management is moved over to Rust.
+
   DCHECK(browser_context);
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   DCHECK(child_id);
@@ -1555,6 +1571,12 @@ void ChildProcessSecurityPolicyImpl::GrantDeleteFromFileSystem(
 }
 
 void ChildProcessSecurityPolicyImpl::GrantSendMidiMessage(int child_id) {
+  RUST_CPP_PROCESS_STATE_VOID_FUNCTION(
+      rust::child_process_security_policy::grant_send_midi_message(child_id),
+      GrantSendMidiMessage_Cpp(child_id));
+}
+
+void ChildProcessSecurityPolicyImpl::GrantSendMidiMessage_Cpp(int child_id) {
   if (base::FeatureList::IsEnabled(blink::features::kBlockMidiByDefault)) {
     base::AutoLock lock(lock_);
 
@@ -1567,6 +1589,14 @@ void ChildProcessSecurityPolicyImpl::GrantSendMidiMessage(int child_id) {
 }
 
 void ChildProcessSecurityPolicyImpl::GrantSendMidiSysExMessage(int child_id) {
+  RUST_CPP_PROCESS_STATE_VOID_FUNCTION(
+      rust::child_process_security_policy::grant_send_midi_sysex_message(
+          child_id),
+      GrantSendMidiSysExMessage_Cpp(child_id));
+}
+
+void ChildProcessSecurityPolicyImpl::GrantSendMidiSysExMessage_Cpp(
+    int child_id) {
   base::AutoLock lock(lock_);
 
   // TODO(crbug.com/379869738) Remove FromUnsafeValue.
@@ -2852,6 +2882,15 @@ void ChildProcessSecurityPolicyImpl::RegisterFileSystemPermissionPolicy_Cpp(
 
 bool ChildProcessSecurityPolicyImpl::CanSendMidiMessage(
     ChildProcessId child_id) {
+  RUST_CPP_PROCESS_STATE_RETURN_FUNCTION(
+      // TODO(crbug.com/522844976): Pass ChildProcessId directly to Rust.
+      rust::child_process_security_policy::can_send_midi_message(
+          child_id.GetUnsafeValue()),
+      CanSendMidiMessage_Cpp(child_id));
+}
+
+bool ChildProcessSecurityPolicyImpl::CanSendMidiMessage_Cpp(
+    ChildProcessId child_id) {
   base::AutoLock lock(lock_);
 
   if (auto* state = process_states_.GetProcessStateForQuery(child_id)) {
@@ -2861,6 +2900,15 @@ bool ChildProcessSecurityPolicyImpl::CanSendMidiMessage(
 }
 
 bool ChildProcessSecurityPolicyImpl::CanSendMidiSysExMessage(
+    ChildProcessId child_id) {
+  RUST_CPP_PROCESS_STATE_RETURN_FUNCTION(
+      // TODO(crbug.com/522844976): Pass ChildProcessId directly to Rust.
+      rust::child_process_security_policy::can_send_midi_sysex_message(
+          child_id.GetUnsafeValue()),
+      CanSendMidiSysExMessage_Cpp(child_id));
+}
+
+bool ChildProcessSecurityPolicyImpl::CanSendMidiSysExMessage_Cpp(
     ChildProcessId child_id) {
   base::AutoLock lock(lock_);
 
@@ -3981,13 +4029,35 @@ void ChildProcessSecurityPolicyImpl::ProcessStateMaps::RemoveProcessReference(
   DCHECK_EQ(itr->second, 1);
   process_reference_counts_.erase(itr);
 
+  // TODO(crbug.com/522872468): Figure out ProcessState lifetime management in
+  // Rust. For now, rely on C++ to do the reference counting for ProcessState
+  // and CPSP Handles to know when it's safe to remove the ProcessState on the
+  // Rust side, which is here. Note that for now, this will keep Rust's
+  // ProcessState available to be read or modified without distinguishing
+  // whether it's in pending removal state or not. Eventually, this call should
+  // be moved to `Remove()`, and at that time the Rust side should create a
+  // pending remove data structure to ensure that the ProcessState can be
+  // queried but not modified in the time window between CPSP::Remove() and
+  // here.
+  //
+  // Similarly to Add(), we avoid an early return here in Rust-only mode and
+  // allow the C++ cleanup code to complete, since Rust doesn't yet support
+  // everything in ProcessState.
+  if (IsRustEnabled(GetRustPolicy(CpspRustFeature::kProcessState))) {
+    // TODO(crbug.com/522844976): Pass ChildProcessId directly to Rust.
+    rust::child_process_security_policy::remove_process(
+        child_id.GetUnsafeValue());
+  }
+
   // |child_id| could be inside tasks that are on the IO thread task queues. We
   // need to keep the |pending_remove_state_| entry around until we have
   // successfully executed a task on the IO thread. This should ensure that any
   // pending tasks on the IO thread will have completed before we remove the
   // entry.
-  // TODO(acolwell): Remove this call once all objects on the IO thread have
-  // been converted to use Handles.
+  //
+  // TODO(crbug.com/461372139): Remove this PostTask. It should no longer be
+  // needed now that all objects on the IO thread have been converted to use
+  // Handles.
   GetIOThreadTaskRunner({})->PostTask(
       FROM_HERE,
       base::BindOnce(
