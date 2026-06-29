@@ -2429,6 +2429,11 @@
     "expiry_milestone": 140
   },
   {
+    "name": "device-signals-backfill-disclaimer",
+    "owners": [ "ssolarewicz@google.com", "cec-growth@google.com" ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "devtools-enable-durable-messages",
     "owners": [ "alexnj@chromium.org" ],
     "expiry_milestone": 160

@@ -6346,6 +6346,13 @@ inline constexpr char kCreateNewTabGroupAppMenuTopLevelName[] =
 inline constexpr char kCreateNewTabGroupAppMenuTopLevelDescription[] =
     "In the app menu, add an option to create a new tab group at the top level";
 
+inline constexpr char kDeviceSignalsBackfillDisclaimerName[] =
+    "Startup Enterprise Signals Disclaimer";
+inline constexpr char kDeviceSignalsBackfillDisclaimerDescription[] =
+    "Enables the Startup Enterprise Signals Disclaimer. The disclaimer will be "
+    "shown to managed users missing the device signals permission on chrome "
+    "startup.";
+
 inline constexpr char kDialMediaRouteProviderName[] =
     "Allow cast device discovery with DIAL protocol";
 inline constexpr char kDialMediaRouteProviderDescription[] =
