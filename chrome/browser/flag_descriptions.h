@@ -6430,16 +6430,6 @@ inline constexpr char kMemoryPurgeOnFreezeLimitDescription[] =
     "backgrounded interval, to minimize overhead when pages are periodically "
     "unfrozen. To be enabled with memory-purge-on-freeze-limit.";
 
-inline constexpr char kReadAnythingImagesViaAlgorithmName[] =
-    "Reading Mode with images added via algorithm";
-inline constexpr char kReadAnythingImagesViaAlgorithmDescription[] =
-    "Have Reading Mode use a local rules based algorithm to include images "
-    "from webpages.";
-
-inline constexpr char kReadAnythingImmersiveReadingModeName[] =
-    "Reading Mode Experimental Immersive Mode";
-inline constexpr char kReadAnythingImmersiveReadingModeDescription[] =
-    "Enables the infrastructure for Immersive Reading Mode.";
 
 inline constexpr char kReadAnythingOmniboxChipName[] =
     "Reading Mode Omnibox Chip";

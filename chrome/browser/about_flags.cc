@@ -7613,10 +7613,6 @@ const FeatureEntry kFeatureEntries[] = {
      kOsDesktop,
      FEATURE_VALUE_TYPE(features::kReadAnythingReadAloudPhraseHighlighting)},
 
-    {"read-anything-images-via-algorithm",
-     flag_descriptions::kReadAnythingImagesViaAlgorithmName,
-     flag_descriptions::kReadAnythingImagesViaAlgorithmDescription, kOsDesktop,
-     FEATURE_VALUE_TYPE(features::kReadAnythingImagesViaAlgorithm)},
 
     {"read-anything-docs-integration",
      flag_descriptions::kReadAnythingDocsIntegrationName,
@@ -12189,13 +12185,7 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(
          autofill::features::kAutofillDisableBnplCountryCheckForTesting)},
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
-    {"read-anything-immersive-reading-mode",
-     flag_descriptions::kReadAnythingImmersiveReadingModeName,
-     flag_descriptions::kReadAnythingImmersiveReadingModeDescription,
-     kOsDesktop, FEATURE_VALUE_TYPE(features::kImmersiveReadAnything)},
-#endif
+
 #if BUILDFLAG(IS_ANDROID)
     {"xplat-synced-setup", flag_descriptions::kXplatSyncedSetupName,
      flag_descriptions::kXplatSyncedSetupDescription, kOsAndroid,
