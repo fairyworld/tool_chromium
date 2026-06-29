@@ -9187,6 +9187,8 @@ Called by update_use_counter_feature_enum.py.-->
   <int value="440" label="TextModules"/>
   <int value="441" label="DRAFT_TemplateFor"/>
   <int value="442" label="DRAFT_HTMLProcessingInstructions"/>
+  <int value="443" label="DRAFT_HTMLSetterMethods"/>
+  <int value="444" label="DRAFT_HTMLStreamMethods"/>
 </enum>
 
 <!-- LINT.ThenChange(//third_party/blink/public/mojom/use_counter/metrics/webdx_feature.mojom:WebDXFeature) -->
