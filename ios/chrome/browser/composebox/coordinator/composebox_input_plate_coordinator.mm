@@ -365,6 +365,12 @@ contextual_search::ContextualSearchSource ContextualSearchSourceFromEntrypoint(
   [_omniboxCoordinator focusOmnibox];
 }
 
+- (void)processContextLibraryWebpageSignalWithURL:(const GURL&)url
+                                            title:(NSString*)title {
+  CHECK(_entrypoint == ComposeboxEntrypoint::kCobrowse);
+  [_mediator processContextLibraryWebpageSignalWithURL:url title:title];
+}
+
 #pragma mark - ComposeboxInputPlateViewControllerDelegate
 
 - (void)composeboxViewController:
