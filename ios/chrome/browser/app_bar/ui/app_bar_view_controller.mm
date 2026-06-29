@@ -798,6 +798,7 @@ UIColor* AssistantHighlightBackgroundColor() {
 
   _assistantButton.enabled =
       _buttonsEnabled && _assistantButtonEnabled && !_incognito;
+  [self updateAssistantButtonAccessibilityLabel];
   // Force a configuration update to refresh accessibility traits.
   [_assistantButton setNeedsUpdateConfiguration];
   [_assistantButton layoutIfNeeded];
@@ -1145,6 +1146,31 @@ UIColor* AssistantHighlightBackgroundColor() {
   // the tab groups page is not visible.
   _openNewTabButton.menu = nil;
   _openNewTabButton.showsMenuAsPrimaryAction = NO;
+}
+
+// Updates the accessibility label for the assistant button based on the current
+// state.
+- (void)updateAssistantButtonAccessibilityLabel {
+  if (!_assistantButton) {
+    return;
+  }
+  NSString* label;
+  switch (_assistantButtonState) {
+    case AppBarAssistantButtonState::kAsk:
+      label = l10n_util::GetNSString(IDS_IOS_APP_BAR_ASK_GEMINI);
+      break;
+    case AppBarAssistantButtonState::kAIM:
+      label = l10n_util::GetNSString(IDS_OMNIBOX_AI_MODE_SCOPE_PLACEHOLDER_TEXT);
+      break;
+    case AppBarAssistantButtonState::kLens:
+      label = l10n_util::GetNSString(IDS_IOS_LENS_PRODUCT_NAME);
+      break;
+    case AppBarAssistantButtonState::kAccount:
+      label = _signedIn ? l10n_util::GetNSString(IDS_IOS_APP_BAR_ACCOUNT)
+                        : l10n_util::GetNSString(IDS_IOS_APP_BAR_SIGN_IN);
+      break;
+  }
+  _assistantButton.accessibilityLabel = label;
 }
 
 // Updates the accessibility label for the new tab button based on the current
