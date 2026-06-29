@@ -2396,6 +2396,7 @@ void BuildAndCompute(
   if (!create_graph_result.has_value()) {
     return;
   }
+  graph_builder_remote.reset();
 
   mojo::Remote<mojom::WebNNGraph> graph_remote;
   graph_remote.Bind(std::move(create_graph_result.value()->graph_remote));
@@ -2429,8 +2430,8 @@ void BuildAndCompute(
     EXPECT_TRUE(read_tensor_future.Wait());
   }
 
+  context_remote->DestroyGraph(graph_token);
   graph_remote.reset();
-  graph_builder_remote.reset();
 }
 
 }  // namespace
