@@ -676,7 +676,7 @@ export class ContextualActionMenuElement extends
     const isRestored =
         (this.aimThreadRestoredTabs)
             .some(restoredTab => restoredTab.tabId === tab.tabId);
-    if (isRestored || this.isInputTypeDisabled_(InputType.kBrowserTab)) {
+    if (isRestored) {
       return true;
     }
 
@@ -684,6 +684,10 @@ export class ContextualActionMenuElement extends
     const isCurrentlySelected = this.disabledTabIds.has(tab.tabId);
     if (isCurrentlySelected) {
       return false;
+    }
+
+    if (this.isInputTypeDisabled_(InputType.kBrowserTab)) {
+      return true;
     }
 
     if (this.enableMultiTabSelection_) {
