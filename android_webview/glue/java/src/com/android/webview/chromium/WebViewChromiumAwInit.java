@@ -71,6 +71,8 @@ import java.util.ArrayDeque;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -208,7 +210,7 @@ public class WebViewChromiumAwInit {
     // This is only accessed during WebViewChromiumFactoryProvider.initialize() which is guarded by
     // the WebViewFactory lock in the framework, and on the UI thread during startChromium
     // which cannot be called before initialize() has completed.
-    private Thread mSetUpResourcesThread;
+    private FutureTask<Void> mSetUpResourcesTask;
 
     // Guards access to fields that are initialized on first use rather than by startChromium.
     // This lock is used across WebViewChromium startup classes ie WebViewChromiumAwInit,
@@ -986,7 +988,7 @@ public class WebViewChromiumAwInit {
     void setUpResourcesOnBackgroundThread(int packageId, Context context) {
         try (DualTraceEvent e =
                 DualTraceEvent.scoped("WebViewChromiumAwInit.setUpResourcesOnBackgroundThread")) {
-            assert mSetUpResourcesThread == null : "This method shouldn't be called twice.";
+            assert mSetUpResourcesTask == null : "This method shouldn't be called twice.";
 
             Runnable setUpResourcesRunnable =
                     new Runnable() {
@@ -1004,16 +1006,16 @@ public class WebViewChromiumAwInit {
                     };
 
             // Make sure that ResourceProvider is initialized before starting the browser process.
-            mSetUpResourcesThread = new Thread(setUpResourcesRunnable);
-            mSetUpResourcesThread.start();
+            mSetUpResourcesTask = new FutureTask<>(setUpResourcesRunnable, null);
+            PostTask.postTask(TaskTraits.USER_VISIBLE, mSetUpResourcesTask);
         }
     }
 
     private void waitUntilSetUpResources() {
         try (DualTraceEvent e =
                 DualTraceEvent.scoped("WebViewChromiumAwInit.waitUntilSetUpResources")) {
-            mSetUpResourcesThread.join();
-        } catch (InterruptedException e) {
+            mSetUpResourcesTask.get();
+        } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
