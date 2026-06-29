@@ -7,10 +7,42 @@
 
 #include <atomic>
 #include <cstddef>
+#include <string>
+#include <string_view>
 
 #include "base/synchronization/waitable_event.h"
+#include "net/http/http_request_headers.h"
+#include "third_party/abseil-cpp/absl/status/status.h"
+#include "third_party/federated_compute/src/fcp/client/http/http_client.h"
+
+namespace net {
+class HttpResponseHeaders;
+}  // namespace net
 
 namespace private_insights {
+
+struct ProcessedRequestHeaders {
+  net::HttpRequestHeaders headers;
+  bool has_explicit_accept_encoding = false;
+  std::string upload_content_type = "application/octet-stream";
+};
+
+// Converts an FCP HTTP request method enum to the standard HTTP method string.
+std::string_view GetMethodString(fcp::client::http::HttpRequest::Method method);
+
+// Converts a Chromium net error code to an Abseil status as expected by FCP.
+absl::Status ConvertNetErrorToFcpStatus(int net_error);
+
+// Processes FCP request extra headers by filtering out unsafe headers and
+// extracting metadata such as explicit Accept-Encoding and Content-Type.
+ProcessedRequestHeaders ProcessFcpRequestHeaders(
+    const fcp::client::http::HeaderList& headers);
+
+// Converts Chromium response headers to FCP header list, applying FCP-specific
+// header stripping rules.
+fcp::client::http::HeaderList ConvertResponseHeadersToFcp(
+    const net::HttpResponseHeaders* headers,
+    bool request_had_explicit_accept_encoding);
 
 // Thread-safe synchronization primitive that allows threads to wait until a
 // set of operations decrement the counter to zero.

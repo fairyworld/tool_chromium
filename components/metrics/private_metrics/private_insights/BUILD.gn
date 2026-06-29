@@ -37,7 +37,11 @@ source_set("fcp_utils") {
   visibility = [ ":*" ]
   public = [ "fcp_utils.h" ]
   sources = [ "fcp_utils.cc" ]
-  public_deps = [ "//base" ]
+  public_deps = [
+    "//base",
+    "//third_party/federated_compute:fl_runner",
+  ]
+  deps = [ "//net" ]
 }
 
 source_set("fcp_event_publisher") {
