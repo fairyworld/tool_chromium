@@ -13728,6 +13728,21 @@
             ]
         }
     ],
+    "IOSComposeboxPhysicalKeyboardReturnKeys": [
+        {
+            "platforms": [
+                "ios"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "ComposeboxPhysicalKeyboardReturnKeys"
+                    ]
+                }
+            ]
+        }
+    ],
     "IOSConfirmationButtonSwapOrder": [
         {
             "platforms": [
