@@ -956,11 +956,17 @@ UIWindow* WindowWithAccessibilityIdentifier(NSString* accessibility_id) {
 }
 
 + (id<GREYMatcher>)addressesAndMoreButton {
+  if (IsYourSavedInfoSettingsPageIosEnabled()) {
+    return grey_accessibilityID(kSettingsAddressesAndMoreCellId);
+  }
   return [ChromeMatchersAppInterface
       buttonWithAccessibilityLabelID:(IDS_AUTOFILL_ADDRESSES_SETTINGS_TITLE)];
 }
 
 + (id<GREYMatcher>)paymentMethodsButton {
+  if (IsYourSavedInfoSettingsPageIosEnabled()) {
+    return grey_accessibilityID(kSettingsPaymentMethodsCellId);
+  }
   return [ChromeMatchersAppInterface
       buttonWithAccessibilityLabelID:(IDS_AUTOFILL_PAYMENT_METHODS)];
 }
