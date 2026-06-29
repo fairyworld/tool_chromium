@@ -33,7 +33,6 @@
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/optimization_guide/core/model_execution/model_execution_prefs.h"
-#include "components/personal_context/core/personal_context_prefs.h"
 #include "components/personal_context/core/personal_context_types.h"
 #include "components/prefs/pref_service.h"
 #include "components/signin/public/base/consent_level.h"
@@ -357,8 +356,6 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
 
   const bool policy_pref_enabled =
       !IsAutofillAiDisabledByEnterprisePolicy(prefs);
-  const bool personal_context_pref_enabled = prefs->GetBoolean(
-      personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus);
   const bool autofill_ai_available =
       GetAutofillAiOptInStatus(prefs, identity_manager) ||
       base::FeatureList::IsEnabled(features::kAutofillAiAvailableByDefault);
@@ -403,9 +400,6 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
                     kAutofillAmbientAutofillSkipEligibilityChecks)) {
           return true;
         }
-        if (!personal_context_pref_enabled) {
-          return false;
-        }
       }
 
       if (!EntityTypeIsEnabledInSettings(*prefs, *entity_type)) {
@@ -420,9 +414,6 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
       if (base::FeatureList::IsEnabled(
               features::debug::kAutofillAmbientAutofillSkipEligibilityChecks)) {
         return true;
-      }
-      if (!personal_context_pref_enabled) {
-        return false;
       }
       // TODO(crbug.com/523168644): Check `kGeminiSettings` pref enablement.
       if (base::FeatureList::IsEnabled(
