@@ -692,14 +692,9 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
 
   personal_context::PersonalContextEnablementService* enablement_service =
       PersonalContextEnablementServiceFactory::GetForProfile(profile);
-  html_source->AddBoolean(
-      "showSuggestionsFromGeminiSettings",
-      autofill::ShouldShowPersonalContextAutofillSetting(
-          enablement_service,
-          subscription_eligibility::SubscriptionEligibilityServiceFactory::
-              GetForProfile(profile),
-          profile->GetPrefs(),
-          GoogleGroupsManagerFactory::GetForBrowserContext(profile)));
+  html_source->AddBoolean("showSuggestionsFromGeminiSettings",
+                          autofill::ShouldShowPersonalContextAutofillSetting(
+                              autofill_client, enablement_service));
   html_source->AddBoolean(
       "isAtMemoryEnabled",
       autofill::MayPerformAtMemoryAction(

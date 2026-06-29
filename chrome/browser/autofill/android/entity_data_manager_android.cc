@@ -92,8 +92,13 @@ EntityDataManagerAndroid::~EntityDataManagerAndroid() = default;
 
 bool EntityDataManagerAndroid::IsPersonalContextPreferenceVisible(JNIEnv* env) {
   return autofill::ShouldShowPersonalContextAutofillSetting(
-      personal_context_enablement_service_, subscription_eligibility_service_,
-      prefs_, google_groups_manager_);
+#if !BUILDFLAG(IS_FUCHSIA)
+      google_groups_manager_,
+#endif
+      prefs_, &entity_data_manager(), identity_manager_, sync_service_,
+      IsWalletPublicPassStorageEnabledHelper(), is_off_the_record_,
+      entity_data_manager_->GetVariationCountryCode(),
+      personal_context_enablement_service_, subscription_eligibility_service_);
 }
 
 bool EntityDataManagerAndroid::IsPersonalContextEnabled(JNIEnv* env) {
