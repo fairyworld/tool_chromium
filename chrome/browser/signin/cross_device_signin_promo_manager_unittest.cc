@@ -58,6 +58,10 @@ class CrossDeviceSigninPromoManagerTest : public testing::Test {
  protected:
   TestingProfile* profile() { return profile_.get(); }
 
+  void FastForwardBy(base::TimeDelta delta) {
+    task_environment_.FastForwardBy(delta);
+  }
+
   signin::IdentityTestEnvironment* identity_test_env() {
     return identity_test_env_adaptor_->identity_test_env();
   }
@@ -95,7 +99,8 @@ class CrossDeviceSigninPromoManagerTest : public testing::Test {
   }
 
  private:
-  content::BrowserTaskEnvironment task_environment_;
+  content::BrowserTaskEnvironment task_environment_{
+      base::test::TaskEnvironment::TimeSource::MOCK_TIME};
   std::unique_ptr<TestingProfile> profile_;
   std::unique_ptr<IdentityTestEnvironmentProfileAdaptor>
       identity_test_env_adaptor_;
@@ -185,4 +190,110 @@ TEST_F(CrossDeviceSigninPromoManagerTest,
   // disabled.
   EXPECT_TRUE(ShouldShowCrossDeviceSigninPromo(
       CrossDeviceSigninPromoEntryPoint::kProfileMenu, profile()));
+}
+
+TEST_F(CrossDeviceSigninPromoManagerTest, ShouldShowPromo_ShownLimitReached) {
+  // Setup: Signed in, local device, history sync enabled.
+  identity_test_env()->MakePrimaryAccountAvailable(
+      "user@gmail.com", signin::ConsentLevel::kSignin);
+  AddDevice("local_device_guid", /*is_local=*/true);
+  SetHistoryAndTabsSyncingPreference(true);
+
+  // Show the promo 4 times.
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_TRUE(ShouldShowCrossDeviceSigninPromo(
+        CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile()));
+    OnCrossDeviceSigninPromoShown(
+        CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile());
+  }
+
+  // 5th time: still allowed.
+  EXPECT_TRUE(ShouldShowCrossDeviceSigninPromo(
+      CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile()));
+  OnCrossDeviceSigninPromoShown(CrossDeviceSigninPromoEntryPoint::kHistoryPage,
+                                profile());
+
+  // 6th time: limit reached.
+  EXPECT_FALSE(ShouldShowCrossDeviceSigninPromo(
+      CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile()));
+}
+
+TEST_F(CrossDeviceSigninPromoManagerTest, ShouldShowPromo_DismissedCooldown) {
+  // Setup: Signed in, local device, history sync enabled.
+  identity_test_env()->MakePrimaryAccountAvailable(
+      "user@gmail.com", signin::ConsentLevel::kSignin);
+  AddDevice("local_device_guid", /*is_local=*/true);
+  SetHistoryAndTabsSyncingPreference(true);
+
+  // Show once.
+  EXPECT_TRUE(ShouldShowCrossDeviceSigninPromo(
+      CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile()));
+  OnCrossDeviceSigninPromoShown(CrossDeviceSigninPromoEntryPoint::kHistoryPage,
+                                profile());
+
+  // Dismiss it.
+  OnCrossDeviceSigninPromoDismissed(
+      CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile());
+
+  // Cooldown active: should not show.
+  EXPECT_FALSE(ShouldShowCrossDeviceSigninPromo(
+      CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile()));
+
+  // Fast forward by 6 days: still active.
+  FastForwardBy(base::Days(6));
+  EXPECT_FALSE(ShouldShowCrossDeviceSigninPromo(
+      CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile()));
+
+  // Fast forward to 7 days: cooldown expired, allowed to show.
+  FastForwardBy(base::Days(1));
+  EXPECT_TRUE(ShouldShowCrossDeviceSigninPromo(
+      CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile()));
+}
+
+TEST_F(CrossDeviceSigninPromoManagerTest,
+       ShouldShowPromo_ShownAfterDismissalLimit) {
+  // Setup: Signed in, local device, history sync enabled.
+  identity_test_env()->MakePrimaryAccountAvailable(
+      "user@gmail.com", signin::ConsentLevel::kSignin);
+  AddDevice("local_device_guid", /*is_local=*/true);
+  SetHistoryAndTabsSyncingPreference(true);
+
+  // Show and dismiss.
+  OnCrossDeviceSigninPromoShown(CrossDeviceSigninPromoEntryPoint::kHistoryPage,
+                                profile());
+  OnCrossDeviceSigninPromoDismissed(
+      CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile());
+
+  // Wait 7 days.
+  FastForwardBy(base::Days(7));
+  EXPECT_TRUE(ShouldShowCrossDeviceSigninPromo(
+      CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile()));
+
+  // Show it again after dismissal.
+  OnCrossDeviceSigninPromoShown(CrossDeviceSigninPromoEntryPoint::kHistoryPage,
+                                profile());
+
+  // Now it was shown once after dismissal, so it should be blocked permanently.
+  EXPECT_FALSE(ShouldShowCrossDeviceSigninPromo(
+      CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile()));
+
+  // Even after another 7 days.
+  FastForwardBy(base::Days(7));
+  EXPECT_FALSE(ShouldShowCrossDeviceSigninPromo(
+      CrossDeviceSigninPromoEntryPoint::kHistoryPage, profile()));
+}
+
+TEST_F(CrossDeviceSigninPromoManagerTest,
+       ProfileMenuPromoIgnoresDismissalLimits) {
+  // Setup: Signed in, local device, history sync enabled.
+  identity_test_env()->MakePrimaryAccountAvailable(
+      "user@gmail.com", signin::ConsentLevel::kSignin);
+  AddDevice("local_device_guid", /*is_local=*/true);
+  SetHistoryAndTabsSyncingPreference(true);
+
+  // Show 10 times.
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_TRUE(ShouldShowCrossDeviceSigninPromo(
+        CrossDeviceSigninPromoEntryPoint::kProfileMenu, profile()));
+  }
 }
