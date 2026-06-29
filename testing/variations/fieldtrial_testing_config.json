@@ -7104,6 +7104,25 @@
             ]
         }
     ],
+    "ContextHubExplorations": [
+        {
+            "platforms": [
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "ContextHubFeaturesEnabled",
+                    "enable_features": [
+                        "AutoTodos",
+                        "ContextHub"
+                    ]
+                }
+            ]
+        }
+    ],
     "ContextManagementInComposebox": [
         {
             "platforms": [
