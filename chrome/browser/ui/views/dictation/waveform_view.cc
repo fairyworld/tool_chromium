@@ -12,6 +12,7 @@
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
 #include "ui/color/color_provider.h"
+#include "ui/gfx/animation/infinite_animation.h"
 #include "ui/gfx/canvas.h"
 #include "ui/gfx/geometry/rect_f.h"
 namespace dictation {
@@ -40,6 +41,7 @@ constexpr float kDampingCoefficient = 35.0f;
 WaveformView::WaveformView() {
   bars_.resize(kBarCount);
   audio_history_.resize(kAudioHistorySize, 0.0f);
+  animation_ = std::make_unique<gfx::InfiniteAnimation>(this);
 }
 
 WaveformView::~WaveformView() = default;
@@ -82,16 +84,14 @@ void WaveformView::OnPaint(gfx::Canvas* canvas) {
 
 void WaveformView::AddedToWidget() {
   last_update_time_ = base::TimeTicks::Now();
-  timer_.Start(FROM_HERE, base::Milliseconds(16),
-               base::BindRepeating(&WaveformView::UpdateAnimation,
-                                   base::Unretained(this)));
+  animation_->Start();
 }
 
 void WaveformView::RemovedFromWidget() {
-  timer_.Stop();
+  animation_->Stop();
 }
 
-void WaveformView::UpdateAnimation() {
+void WaveformView::AnimationProgressed(const gfx::Animation* animation) {
   const base::TimeTicks now = base::TimeTicks::Now();
   base::TimeDelta delta = now - last_update_time_;
   last_update_time_ = now;

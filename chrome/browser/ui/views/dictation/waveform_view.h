@@ -11,7 +11,12 @@
 #include "base/timer/timer.h"
 #include "chrome/browser/ui/views/dictation/dictation_bubble_ui.h"
 #include "ui/base/metadata/metadata_header_macros.h"
+#include "ui/gfx/animation/animation_delegate.h"
 #include "ui/views/view.h"
+
+namespace gfx {
+class InfiniteAnimation;
+}
 
 namespace dictation {
 
@@ -19,7 +24,7 @@ namespace dictation {
 // rounded bars. The animation only plays during transcribing, using a
 // spring-damper physics simulation driven by the audio level (simulated by
 // default, but can be overridden by calling SetAudioLevel).
-class WaveformView : public views::View {
+class WaveformView : public views::View, public gfx::AnimationDelegate {
   METADATA_HEADER(WaveformView, views::View)
 
  public:
@@ -43,9 +48,11 @@ class WaveformView : public views::View {
   void AddedToWidget() override;
   void RemovedFromWidget() override;
 
+  // gfx::AnimationDelegate:
+  void AnimationProgressed(const gfx::Animation* animation) override;
+
  private:
   // Animation update ticks (running at 60 FPS).
-  void UpdateAnimation();
   void UpdateSimulatedAudio(base::TimeDelta delta);
   void UpdatePhysics(base::TimeDelta delta);
   float GetTargetHeightForBar(size_t index,
@@ -56,7 +63,7 @@ class WaveformView : public views::View {
   DictationBubbleUi::State state_ = DictationBubbleUi::State::kInactive;
 
   // Animation timer and tracking.
-  base::RepeatingTimer timer_;
+  std::unique_ptr<gfx::InfiniteAnimation> animation_;
   base::TimeTicks last_update_time_;
 
   // Audio level and ripple history.

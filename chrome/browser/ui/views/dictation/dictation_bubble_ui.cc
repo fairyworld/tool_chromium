@@ -4,7 +4,6 @@
 
 #include "chrome/browser/ui/views/dictation/dictation_bubble_ui.h"
 
-#include "base/logging.h"
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
 #include "chrome/browser/ui/views/chrome_typography.h"
