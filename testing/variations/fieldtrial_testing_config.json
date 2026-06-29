@@ -16684,6 +16684,11 @@
                     "enable_features": [
                         "DrainSpdySessionSynchronouslyOnRemoteEndpointDisconnect",
                         "NetTaskScheduler"
+                    ],
+                    "disable_features": [
+                        "NetTaskScheduler2",
+                        "NetTaskSchedulerHostResolver",
+                        "NetworkServicePerPriorityTaskQueues"
                     ]
                 },
                 {
