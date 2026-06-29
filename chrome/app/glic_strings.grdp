@@ -470,19 +470,16 @@
   <if expr="use_titlecase">
     <message name="IDS_CONTENT_CONTEXT_GLICSHAREIMAGE" desc="Share image with Gemini and recreate based on user-selected prompt">Create Image with Gemini</message>
     <message name="IDS_GLIC_CONTEXT_MENU_SUMMARIZE_PAGE_WITH_GEMINI" desc="Text for the 'Summarize this page' context menu item.">Summarize this page with Gemini</message>
-    <message name="IDS_GLIC_CONTEXT_MENU_ASK_GEMINI_ABOUT" desc="Text for context menu item to ask Gemini about the selected text.">
-      Ask Gemini About “<ph name="SELECTION">$1<ex>selected text</ex></ph>”
-    </message>
   </if>
   <if expr="not use_titlecase">
     <message name="IDS_CONTENT_CONTEXT_GLICSHAREIMAGE" desc="Share image with Gemini and recreate based on user-selected prompt">Create image with Gemini</message>
     <message name="IDS_GLIC_CONTEXT_MENU_SUMMARIZE_PAGE_WITH_GEMINI" desc="Text for the 'Summarize this page' context menu item.">Summarize this page with Gemini</message>
-    <message name="IDS_GLIC_CONTEXT_MENU_ASK_GEMINI_ABOUT" desc="Text for context menu item to ask Gemini about the selected text.">
-      Ask Gemini about “<ph name="SELECTION">$1<ex>selected text</ex></ph>”
-    </message>
   </if>
 
   <message name="IDS_GLIC_SUMMARIZE_PAGE_PROMPT" desc="Prompt sent to request page summarization via context menu.">Summarize this page</message>
+  <message name="IDS_GLIC_CONTEXT_MENU_ASK_GEMINI_ABOUT" desc="Text for context menu item to ask Gemini about the selected text.">
+      Ask Gemini about “<ph name="SELECTION">$1<ex>selected text</ex></ph>”
+    </message>
 
   <!-- IPH -->
   <if expr="use_titlecase">
