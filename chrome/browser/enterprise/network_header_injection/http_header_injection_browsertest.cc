@@ -14,6 +14,8 @@
 #include "components/policy/core/common/policy_map.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
+#include "extensions/browser/api/declarative_net_request/rules_monitor_service.h"
+#include "extensions/browser/api/declarative_net_request/test_utils.h"
 #include "extensions/test/test_extension_dir.h"
 #include "net/dns/mock_host_resolver.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
@@ -41,7 +43,7 @@ class HttpHeaderInjectionBrowserTest : public policy::PolicyTest {
 
     embedded_test_server()->RegisterRequestHandler(
         base::BindRepeating(&HttpHeaderInjectionBrowserTest::HandleRequest,
-                            base::Unretained(this)));
+                            base::Unretained(this), "/match"));
 
     net::test_server::InstallDefaultWebSocketHandlers(embedded_test_server());
 
@@ -49,7 +51,12 @@ class HttpHeaderInjectionBrowserTest : public policy::PolicyTest {
   }
 
   std::unique_ptr<net::test_server::HttpResponse> HandleRequest(
+      std::string_view handle_path,
       const net::test_server::HttpRequest& request) {
+    if (request.relative_url != handle_path) {
+      return nullptr;
+    }
+
     last_request_headers_ = request.headers;
 
     auto response = std::make_unique<net::test_server::BasicHttpResponse>();
@@ -149,7 +156,19 @@ class HttpHeaderInjectionBrowserTest : public policy::PolicyTest {
                                         {resource_type}, nullptr));
 
     extensions::ChromeTestExtensionLoader loader(browser()->profile());
-    return loader.LoadExtension(test_dir.UnpackedPath());
+
+    auto* rules_monitor_service =
+        extensions::declarative_net_request::RulesMonitorService::Get(
+            browser()->profile());
+    extensions::declarative_net_request::RulesetManagerObserver ruleset_waiter(
+        rules_monitor_service->ruleset_manager());
+
+    scoped_refptr<const extensions::Extension> extension =
+        loader.LoadExtension(test_dir.UnpackedPath());
+
+    ruleset_waiter.WaitForExtensionsWithRulesetsCount(1);
+
+    return extension;
   }
 
   base::test::ScopedFeatureList feature_list_;
