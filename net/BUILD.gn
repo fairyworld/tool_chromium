@@ -3263,6 +3263,7 @@ target(_test_target_type, "net_unittests") {
     "HpackHeaderTableFuzzTest.CanCallMethodSequence",
     "HttpAuthHandlerDigestTest.DigestAuthDoesNotCrash",
     "HttpNoVarySearchTest.AreEquivalentImplementationsMatch",
+    "HttpUtilTest.ParseFetchSingleRangeNeverCrashes",
     "PickleTest.FuzzRoundTrip",
     "ParseProxyListFuzzer.TestOneInput",
     "QuicheHostnameUtilsFuzzTest.FuzzPropertyNormalizationIsIdempotentForValidSni",
