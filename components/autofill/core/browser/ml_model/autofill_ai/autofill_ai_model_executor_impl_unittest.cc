@@ -47,9 +47,25 @@ using optimization_guide::proto::AutofillAiTypeResponse;
 using ::testing::_;
 using ::testing::An;
 using ::testing::ElementsAre;
+using ::testing::Field;
 using ::testing::IsEmpty;
 using MockOnModelExecutedCallback =
     base::MockCallback<base::OnceCallback<void(const FormGlobalId&)>>;
+
+// Creates a response populated with FieldTypeResponses described by the
+// provided pairs of (field_index, FieldType).
+AutofillAiTypeResponse CreateResponse(
+    std::vector<std::pair<int, FieldType>> response_descriptions) {
+  AutofillAiTypeResponse response;
+  for (auto [field_index, type] : response_descriptions) {
+    optimization_guide::proto::FieldTypeResponse* field_response =
+        response.add_field_responses();
+    field_response->set_field_index(field_index);
+    field_response->set_field_type(type);
+    field_response->add_all_field_types(type);
+  }
+  return response;
+}
 
 class AutofillAiModelExecutorImplTest : public testing::Test {
  public:
@@ -89,12 +105,7 @@ TEST_F(AutofillAiModelExecutorImplTest, ValidResponse) {
   base::HistogramTester histogram_tester;
   const FormData form =
       test::GetFormData({.fields = {{.name = u"Passport number"}}});
-  AutofillAiTypeResponse response;
-  {
-    auto* field_response = response.add_field_responses();
-    field_response->set_field_type(PASSPORT_NUMBER);
-    field_response->set_field_index(0);
-  }
+  AutofillAiTypeResponse response = CreateResponse({{0, PASSPORT_NUMBER}});
 
   MockOnModelExecutedCallback on_model_executed;
   EXPECT_CALL(
@@ -132,16 +143,12 @@ TEST_F(AutofillAiModelExecutorImplTest, PrivateAiServiceType) {
       *model_executor(),
       ExecuteModel(
           optimization_guide::ModelBasedCapabilityKey::kFormsClassifications, _,
-          _, An<OptimizationGuideModelExecutionResultCallback>()))
-      .WillOnce([](optimization_guide::ModelBasedCapabilityKey feature,
-                   const google::protobuf::MessageLite& request_metadata,
-                   const optimization_guide::ModelExecutionOptions& options,
-                   OptimizationGuideModelExecutionResultCallback callback) {
-        EXPECT_EQ(options.service_type,
-                  optimization_guide::ModelExecutionServiceType::kPrivateAi);
-        std::move(callback).Run(OptimizationGuideModelExecutionResult(),
-                                /*log_entry=*/nullptr);
-      });
+          Field(&optimization_guide::ModelExecutionOptions::service_type,
+                optimization_guide::ModelExecutionServiceType::kPrivateAi),
+          An<OptimizationGuideModelExecutionResultCallback>()))
+      .WillOnce(base::test::RunOnceCallback<3>(
+          OptimizationGuideModelExecutionResult(),
+          /*log_entry=*/nullptr));
 
   MockOnModelExecutedCallback on_model_executed;
   EXPECT_CALL(on_model_executed, Run(form.global_id()));
@@ -155,12 +162,7 @@ TEST_F(AutofillAiModelExecutorImplTest, FieldIndexOutOfBounds) {
   base::HistogramTester histogram_tester;
   const FormData form =
       test::GetFormData({.fields = {{.name = u"Passport number"}}});
-  AutofillAiTypeResponse response;
-  {
-    auto* field_response = response.add_field_responses();
-    field_response->set_field_type(PASSPORT_NUMBER);
-    field_response->set_field_index(1);
-  }
+  AutofillAiTypeResponse response = CreateResponse({{1, PASSPORT_NUMBER}});
 
   MockOnModelExecutedCallback on_model_executed;
   EXPECT_CALL(
@@ -190,12 +192,7 @@ TEST_F(AutofillAiModelExecutorImplTest, FieldIndexNegative) {
   base::HistogramTester histogram_tester;
   const FormData form =
       test::GetFormData({.fields = {{.name = u"Passport number"}}});
-  AutofillAiTypeResponse response;
-  {
-    auto* field_response = response.add_field_responses();
-    field_response->set_field_type(PASSPORT_NUMBER);
-    field_response->set_field_index(-1);
-  }
+  AutofillAiTypeResponse response = CreateResponse({{-1, PASSPORT_NUMBER}});
 
   MockOnModelExecutedCallback on_model_executed;
   EXPECT_CALL(
@@ -226,17 +223,8 @@ TEST_F(AutofillAiModelExecutorImplTest, DuplicateFieldIndices) {
   const FormData form =
       test::GetFormData({.fields = {{.name = u"Passport number"},
                                     {.name = u"Passport issuing country"}}});
-  AutofillAiTypeResponse response;
-  {
-    auto* field_response = response.add_field_responses();
-    field_response->set_field_type(PASSPORT_NUMBER);
-    field_response->set_field_index(0);
-  }
-  {
-    auto* field_response = response.add_field_responses();
-    field_response->set_field_type(PASSPORT_ISSUING_COUNTRY);
-    field_response->set_field_index(0);
-  }
+  AutofillAiTypeResponse response =
+      CreateResponse({{0, PASSPORT_NUMBER}, {0, PASSPORT_ISSUING_COUNTRY}});
 
   MockOnModelExecutedCallback on_model_executed;
   EXPECT_CALL(
@@ -267,13 +255,11 @@ TEST_F(AutofillAiModelExecutorImplTest, OngoingRequestWithSameSignature) {
   // Two forms with different signatures and two different responses.
   const FormData form1 =
       test::GetFormData({.fields = {{.name = u"Passport number"}}});
-  AutofillAiTypeResponse response1;
-  response1.add_field_responses()->set_field_type(PASSPORT_NUMBER);
+  AutofillAiTypeResponse response1 = CreateResponse({{0, PASSPORT_NUMBER}});
 
   const FormData form2 =
       test::GetFormData({.fields = {{.name = u"First name"}}});
-  AutofillAiTypeResponse response2;
-  response2.add_field_responses()->set_field_type(NAME_FIRST);
+  AutofillAiTypeResponse response2 = CreateResponse({{0, NAME_FIRST}});
 
   ASSERT_NE(CalculateFormSignature(form1), CalculateFormSignature(form2));
 
@@ -394,11 +380,7 @@ TEST_F(AutofillAiModelExecutorImplTest, MqlsUpload) {
   stripped_form->set_form_signature(*CalculateFormSignature(form));
   stripped_form->add_fields()->set_field_signature(
       *CalculateFieldSignatureForField(form.fields()[0]));
-  AutofillAiTypeResponse response;
-  optimization_guide::proto::FieldTypeResponse* field_response =
-      response.add_field_responses();
-  field_response->set_field_type(PASSPORT_NUMBER);
-  field_response->set_field_index(0);
+  AutofillAiTypeResponse response = CreateResponse({{0, PASSPORT_NUMBER}});
 
   MockOnModelExecutedCallback on_model_executed;
   EXPECT_CALL(*model_executor(), ExecuteModel)
