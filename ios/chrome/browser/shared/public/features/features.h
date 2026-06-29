@@ -756,13 +756,6 @@ bool IsComposeboxIOSEnabled();
 // memory. When disabled, images are decoded at full resolution.
 BASE_DECLARE_FEATURE(kContextMenuPreviewDownsampleImage);
 
-// The feature to enable or disable the group color on the tab group and tab
-// grid surfaces.
-BASE_DECLARE_FEATURE(kTabGroupColorOnSurface);
-
-// Returns true if the TabGroupColorOnSurface feature is enabled.
-bool IsTabGroupColorOnSurfaceEnabled();
-
 // Enables the OmniboxCrashFixKillSwitch feature.
 BASE_DECLARE_FEATURE(kOmniboxCrashFixKillSwitch);
 

@@ -903,15 +903,6 @@ bool IsComposeboxIOSEnabled() {
 BASE_FEATURE(kContextMenuPreviewDownsampleImage,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-BASE_FEATURE(kTabGroupColorOnSurface, base::FEATURE_ENABLED_BY_DEFAULT);
-
-bool IsTabGroupColorOnSurfaceEnabled() {
-  if (IsUpdateTabGroupColorsEnabled()) {
-    return true;
-  }
-  return base::FeatureList::IsEnabled(kTabGroupColorOnSurface);
-}
-
 BASE_FEATURE(kOmniboxCrashFixKillSwitch, base::FEATURE_DISABLED_BY_DEFAULT);
 
 bool IsOmniboxCrashFixKillSwitchEnabled() {

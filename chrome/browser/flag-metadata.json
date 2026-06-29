@@ -9074,11 +9074,6 @@
     "expiry_milestone": 160
   },
   {
-    "name": "tab-group-color-on-surface",
-    "owners": [ "bling-meridian@google.com", "bling-flags@google.com" ],
-    "expiry_milestone": 155
-  },
-  {
     "name": "tab-group-color-refresh",
     "owners": [ "dominicaustria@google.com", "top-chrome-desktop-ui@google.com" ],
     "expiry_milestone": 160

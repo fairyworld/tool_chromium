@@ -10,7 +10,6 @@
 #import "base/strings/sys_string_conversions.h"
 #import "ios/chrome/browser/menu/ui_bundled/menu_action_type.h"
 #import "ios/chrome/browser/net/model/crurl.h"
-#import "ios/chrome/browser/saved_tab_groups/ui/tab_group_utils.h"
 #import "ios/chrome/browser/shared/model/web_state_list/tab_group.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/scene_commands.h"
@@ -721,12 +720,7 @@ constexpr CGFloat kEmojiCanvasPaddingRatio = 1.3;
       }
     };
 
-    UIColor* imageColor;
-    if (IsTabGroupColorOnSurfaceEnabled()) {
-      imageColor = [TabGroupColorPalette commonColor:group->GetColor()];
-    } else {
-      imageColor = tab_groups::ColorForTabGroupColorId(group->GetColor());
-    }
+    UIColor* imageColor = [TabGroupColorPalette commonColor:group->GetColor()];
 
     UIAction* groupAction =
         [self actionWithTitle:title

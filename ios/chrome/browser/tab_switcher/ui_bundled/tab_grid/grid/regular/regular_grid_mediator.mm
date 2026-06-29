@@ -613,12 +613,7 @@ using ScopedTabGroupSyncObservation =
     return nil;
   }
 
-  UIColor* groupColor;
-  if (IsTabGroupColorOnSurfaceEnabled()) {
-    groupColor = [TabGroupColorPalette commonColor:tabGroup->GetColor()];
-  } else {
-    groupColor = tab_groups::ColorForTabGroupColorId(tabGroup->GetColor());
-  }
+  UIColor* groupColor = [TabGroupColorPalette commonColor:tabGroup->GetColor()];
   return
       [self.regularDelegate facePileProviderForGroupID:collaborationID.value()
                                             groupColor:groupColor];

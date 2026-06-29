@@ -1918,11 +1918,6 @@ inline constexpr char kSyncWalletVehicleRegistrationsName[] =
 inline constexpr char kSyncWalletVehicleRegistrationsDescription[] =
     "Enables syncing vehicle registrations in the wallet to the server.";
 
-inline constexpr char kTabGroupColorOnSurfaceName[] =
-    "Tab group color on surfaces";
-inline constexpr char kTabGroupColorOnSurfaceDescription[] =
-    "Adds the tab group color to the tab group and tab grid surfaces.";
-
 inline constexpr char kTabGroupInOverflowMenuName[] =
     "Enable the Tab Group button in the overflow menu";
 inline constexpr char kTabGroupInOverflowMenuDescription[] =
