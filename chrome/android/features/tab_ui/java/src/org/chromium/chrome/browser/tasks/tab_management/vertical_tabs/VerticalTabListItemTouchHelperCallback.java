@@ -352,7 +352,9 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
     public void onSelectedChanged(RecyclerView.@Nullable ViewHolder viewHolder, int actionState) {
         super.onSelectedChanged(viewHolder, actionState);
 
-        if (mTabGridItemLongPressOrchestrator != null && viewHolder != null) {
+        if (mTabGridItemLongPressOrchestrator != null
+                && viewHolder != null
+                && !mIsMouseInputSource) {
             int position = viewHolder.getBindingAdapterPosition();
             mTabGridItemLongPressOrchestrator.onSelectedChanged(position, actionState);
         }
@@ -444,7 +446,7 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
             int actionState,
             boolean isCurrentlyActive) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-        if (mTabGridItemLongPressOrchestrator != null) {
+        if (mTabGridItemLongPressOrchestrator != null && !mIsMouseInputSource) {
             float displacementSquared = calcMagnitudeSquared(dX, dY);
             mTabGridItemLongPressOrchestrator.processChildDisplacement(displacementSquared);
         }
