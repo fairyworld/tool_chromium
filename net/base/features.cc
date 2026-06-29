@@ -907,4 +907,11 @@ BASE_FEATURE_ENUM_PARAM(base::TaskPriority,
 
 BASE_FEATURE(kTestRootStore, base::FEATURE_DISABLED_BY_DEFAULT);
 
+BASE_FEATURE(kCacheCertVerification, base::FEATURE_ENABLED_BY_DEFAULT);
+
+BASE_FEATURE_PARAM(int,
+                   kCacheCertVerificationTtlSecs,
+                   &kCacheCertVerification,
+                   1800);
+
 }  // namespace net::features

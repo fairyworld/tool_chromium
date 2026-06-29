@@ -930,6 +930,16 @@ NET_EXPORT BASE_DECLARE_FEATURE_PARAM(base::TaskPriority,
 // developer use only in isolated testing environments.
 NET_EXPORT BASE_DECLARE_FEATURE(kTestRootStore);
 
+// If enabled, cache certificate verification results will be put into the
+// certificate verification cache. All other cache interactions (creation,
+// clear, get) are performed regardless of this feature.
+NET_EXPORT BASE_DECLARE_FEATURE(kCacheCertVerification);
+
+// The TTL in seconds for entries put into the certificate verification cache.
+// If set to 0, entries will still technically be put into the cache, but will
+// already be expired.
+NET_EXPORT BASE_DECLARE_FEATURE_PARAM(int, kCacheCertVerificationTtlSecs);
+
 }  // namespace net::features
 
 #endif  // NET_BASE_FEATURES_H_
