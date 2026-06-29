@@ -108,6 +108,7 @@ void EmailVerifierDelegate::Verify(
     NotifyFlowCompleted(EvpAutofillFlowResult::kVerifierUnavailable);
     return;
   }
+  in_flight_verify_count_++;
   verifier->Verify(
       result, nonce,
       base::BindOnce(&EmailVerifierDelegate::OnVerificationResponseReceived,
@@ -122,6 +123,12 @@ void EmailVerifierDelegate::OnVerificationResponseReceived(
     FieldGlobalId token_field_id,
     net::SchemefulSite issuer_site,
     std::optional<std::string> token) {
+  if (in_flight_verify_count_ == 0) {
+    // Navigation already completed this flow and recorded
+    // kPageNavigatedDuringVerification.
+    return;
+  }
+  in_flight_verify_count_--;
   if (!manager) {
     NotifyFlowCompleted(EvpAutofillFlowResult::kManagerDestroyed);
     return;
@@ -282,6 +289,13 @@ void EmailVerifierDelegate::DidFinishNavigation(
     content::NavigationHandle* navigation_handle) {
   if (navigation_handle->IsInPrimaryMainFrame() &&
       navigation_handle->HasCommitted()) {
+    if (!navigation_handle->IsSameDocument() && in_flight_verify_count_ > 0) {
+      for (size_t i = 0; i < in_flight_verify_count_; ++i) {
+        NotifyFlowCompleted(
+            EvpAutofillFlowResult::kPageNavigatedDuringVerification);
+      }
+      in_flight_verify_count_ = 0;
+    }
     // `HasCommitted` returns true even for same document commits, e.g.
     // if the state is cleared on pushState() or #anchor navigations.
     // We clear the issuers_ map on these navigations too.

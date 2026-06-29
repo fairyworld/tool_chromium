@@ -33,6 +33,7 @@
 #include "content/public/browser/runtime_feature_state/runtime_feature_state_document_data.h"
 #include "content/public/browser/webid/email_verifier.h"
 #include "content/public/common/content_features.h"
+#include "content/public/test/navigation_simulator.h"
 #include "content/public/test/test_renderer_host.h"
 #include "net/base/schemeful_site.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -925,6 +926,49 @@ TEST_F(EmailVerifierDelegateTest, DriverInactiveBeforeResponse) {
   histogram_tester.ExpectUniqueSample("Blink.Evp.Autofill.FlowResult",
                                       EvpAutofillFlowResult::kDriverInactive,
                                       1);
+}
+
+// Verifies that if a page navigation completes while a verification request is
+// in-flight, kPageNavigatedDuringVerification is recorded.
+TEST_F(EmailVerifierDelegateTest, PageNavigatedDuringVerification) {
+  base::HistogramTester histogram_tester;
+  FormStructure* form = SetUpValidForm();
+
+  EXPECT_CALL(email_verifier(), CheckIfVerifiable("johndoe@hades.com", _))
+      .WillOnce(RunOnceCallback<1>(CreateVerifiableResult()));
+
+  EXPECT_CALL(client(), ShowEmailVerificationPopup)
+      .WillOnce(RunOnceCallback<3>(
+          AutofillClient::EmailVerificationPermissionUiResult::kAccepted));
+
+  // Capture the verification response callback and keep it in-flight.
+  EmailVerifier::OnEmailVerifiedCallback saved_response_callback;
+  EXPECT_CALL(email_verifier(), Verify(_, "test_nonce", _))
+      .WillOnce([&](const EmailVerifier::Result&, const std::string&,
+                    EmailVerifier::OnEmailVerifiedCallback callback) {
+        saved_response_callback = std::move(callback);
+      });
+
+  TriggerDefaultFormFill(*form);
+
+  ASSERT_TRUE(saved_response_callback);
+
+  // Simulate primary main frame navigation committing while verification is
+  // in-flight.
+  content::NavigationSimulator::NavigateAndCommitFromBrowser(
+      web_contents(), GURL("https://other-example.com"));
+
+  histogram_tester.ExpectUniqueSample(
+      "Blink.Evp.Autofill.FlowResult",
+      EvpAutofillFlowResult::kPageNavigatedDuringVerification, 1);
+
+  // If the network response returns after navigation, running the callback
+  // should be a no-op because in_flight_verify_count_ was reset.
+  std::move(saved_response_callback)
+      .Run(std::optional<std::string>("test_token"));
+
+  // Verify no additional metric was logged.
+  histogram_tester.ExpectTotalCount("Blink.Evp.Autofill.FlowResult", 1);
 }
 
 // Verifies that focus loss on an email field only triggers verification if the

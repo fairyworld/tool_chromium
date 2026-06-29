@@ -42,7 +42,8 @@ enum class EvpAutofillFlowResult {
   kManagerDestroyed = 9,
   kTokenSentToRenderer = 10,
   kDriverInactive = 11,
-  kMaxValue = kDriverInactive,
+  kPageNavigatedDuringVerification = 12,
+  kMaxValue = kPageNavigatedDuringVerification,
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/blink/enums.xml:EvpAutofillFlowResult)
 
@@ -157,6 +158,7 @@ class EmailVerifierDelegate : public AutofillManager::Observer,
 
   ScopedAutofillManagersObservation observation_{this};
   std::map<FieldGlobalId, GURL> issuers_;
+  size_t in_flight_verify_count_ = 0;
   std::optional<FieldGlobalId> last_focused_field_;
   // A tab-scoped cache of recently verified email values (mapped by field ID)
   // used to deduplicate verification prompts when the user alternates focus.

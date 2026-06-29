@@ -272,6 +272,7 @@ Called by update_document_policy_enum.py.-->
   <int value="9" label="ManagerDestroyed"/>
   <int value="10" label="TokenSentToRenderer"/>
   <int value="11" label="DriverInactive"/>
+  <int value="12" label="PageNavigatedDuringVerification"/>
 </enum>
 
 <!-- LINT.ThenChange(//components/autofill/content/browser/integrators/email_verifier/email_verifier_delegate.h:EvpAutofillFlowResult) -->
