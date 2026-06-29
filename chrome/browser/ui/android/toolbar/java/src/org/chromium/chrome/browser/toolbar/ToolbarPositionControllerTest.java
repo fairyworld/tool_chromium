@@ -111,8 +111,6 @@ public class ToolbarPositionControllerTest {
 
     private BrowserControlsStateProvider.Observer mBrowserControlsObserver;
 
-    private float mBrowserControlHiddenRatio;
-
     private final BrowserControlsSizer mBrowserControlsSizer =
             new BrowserControlsSizer() {
                 @ControlsPosition private int mControlsPosition = ControlsPosition.TOP;
@@ -257,7 +255,7 @@ public class ToolbarPositionControllerTest {
 
                 @Override
                 public float getBrowserControlHiddenRatio() {
-                    return mBrowserControlHiddenRatio;
+                    return 0;
                 }
 
                 @Override
@@ -582,92 +580,6 @@ public class ToolbarPositionControllerTest {
 
     @Test
     @Config(qualifiers = "sw400dp")
-    public void testUpdatePositionSnapsWhenScrolledOff() {
-        setUserToolbarAnchorPreference(/* showToolbarOnTop= */ false);
-        assertControlsAtBottom();
-
-        // Simulate controls being scrolled offscreen.
-        mBrowserControlHiddenRatio = 1.0f;
-        mBrowserControlsSizer.setControlsPosition(
-                ControlsPosition.BOTTOM, 0, 0, 0, TOOLBAR_HEIGHT, 0, TOOLBAR_HEIGHT);
-
-        // Change position preference to TOP.
-        setUserToolbarAnchorPreference(/* showToolbarOnTop= */ true);
-
-        // When scrolled off, the position change should be a SNAP (no animation).
-        assertEquals(ControlsPosition.TOP, mBrowserControlsSizer.getControlsPosition());
-
-        // We verify that the newly placed top controls are forced to be offscreen
-        // (offset = -height) and the old bottom controls are left offscreen
-        // (offset = height, preserved).
-        assertEquals(-TOOLBAR_HEIGHT, mBrowserControlsSizer.getTopControlOffset());
-        assertEquals(TOOLBAR_HEIGHT, mBrowserControlsSizer.getBottomControlOffset());
-
-        // Verify immediate view translations to prevent 1-frame flicker.
-        verify(mControlContainerView).setTranslationY(-TOOLBAR_HEIGHT);
-        verify(mProgressBarContainer).setTranslationY(-TOOLBAR_HEIGHT);
-    }
-
-    @Test
-    @Config(qualifiers = "sw400dp")
-    public void testUpdatePositionSnapsWhenPartiallyScrolled_BottomToTop() {
-        setUserToolbarAnchorPreference(/* showToolbarOnTop= */ false);
-        assertControlsAtBottom();
-
-        // Simulate controls being 50% scrolled off.
-        mBrowserControlHiddenRatio = 0.5f;
-        mBrowserControlsSizer.setControlsPosition(
-                ControlsPosition.BOTTOM, 0, 0, 0, TOOLBAR_HEIGHT, 0, TOOLBAR_HEIGHT / 2);
-
-        // Change position preference to TOP.
-        setUserToolbarAnchorPreference(/* showToolbarOnTop= */ true);
-
-        // Position should change to TOP.
-        assertEquals(ControlsPosition.TOP, mBrowserControlsSizer.getControlsPosition());
-
-        // Verify that the initial top offset is scaled by the hidden ratio (50% of top height).
-        // Since newTopHeight = TOOLBAR_HEIGHT, initialTopOffset should be -TOOLBAR_HEIGHT / 2.
-        assertEquals(-TOOLBAR_HEIGHT / 2, mBrowserControlsSizer.getTopControlOffset());
-        // Verify that the initial bottom offset is preserved from the old bottom offset (50% of
-        // height).
-        assertEquals(TOOLBAR_HEIGHT / 2, mBrowserControlsSizer.getBottomControlOffset());
-
-        // Verify immediate view translations to prevent 1-frame flicker.
-        verify(mControlContainerView).setTranslationY(-TOOLBAR_HEIGHT / 2);
-        verify(mProgressBarContainer).setTranslationY(-TOOLBAR_HEIGHT / 2);
-    }
-
-    @Test
-    @Config(qualifiers = "sw400dp")
-    public void testUpdatePositionSnapsWhenPartiallyScrolled_TopToBottom() {
-        setUserToolbarAnchorPreference(/* showToolbarOnTop= */ true);
-        assertControlsAtTop();
-
-        // Simulate controls being 50% scrolled off.
-        mBrowserControlHiddenRatio = 0.5f;
-        mBrowserControlsSizer.setControlsPosition(
-                ControlsPosition.TOP, TOOLBAR_HEIGHT, 0, -TOOLBAR_HEIGHT / 2, 0, 0, 0);
-
-        // Change position preference to BOTTOM.
-        setUserToolbarAnchorPreference(/* showToolbarOnTop= */ false);
-
-        // Position should change to BOTTOM.
-        assertEquals(ControlsPosition.BOTTOM, mBrowserControlsSizer.getControlsPosition());
-
-        // Verify that the initial top offset is preserved from the old top offset (-50% of height).
-        assertEquals(-TOOLBAR_HEIGHT / 2, mBrowserControlsSizer.getTopControlOffset());
-        // Verify that the initial bottom offset is scaled by the hidden ratio (50% of new bottom
-        // height).
-        // Since newBottomHeight = TOOLBAR_HEIGHT, initialBottomOffset should be TOOLBAR_HEIGHT / 2.
-        assertEquals(TOOLBAR_HEIGHT / 2, mBrowserControlsSizer.getBottomControlOffset());
-
-        // Verify immediate view translations to prevent 1-frame flicker.
-        verify(mControlContainerView).setTranslationY(TOOLBAR_HEIGHT / 2);
-        verify(mProgressBarContainer).setTranslationY(TOOLBAR_HEIGHT / 2);
-    }
-
-    @Test
-    @Config(qualifiers = "sw400dp")
     public void testBottomControlsStacker() {
         setUserToolbarAnchorPreference(/* showToolbarOnTop= */ false);
         assertControlsAtBottom();
@@ -751,8 +663,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         doesUserPreferTopToolbar,
-                        ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.BOTTOM));
 
         assertEquals(
                 StateTransition.SNAP_TO_TOP,
@@ -764,8 +675,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         doesUserPreferTopToolbar,
-                        ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.BOTTOM));
 
         assertEquals(
                 StateTransition.SNAP_TO_TOP,
@@ -777,8 +687,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         doesUserPreferTopToolbar,
-                        ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.BOTTOM));
 
         assertEquals(
                 StateTransition.SNAP_TO_TOP,
@@ -790,8 +699,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         doesUserPreferTopToolbar,
-                        ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.BOTTOM));
 
         assertEquals(
                 StateTransition.SNAP_TO_TOP,
@@ -803,8 +711,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         doesUserPreferTopToolbar,
-                        ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.BOTTOM));
 
         assertEquals(
                 StateTransition.SNAP_TO_TOP,
@@ -816,8 +723,7 @@ public class ToolbarPositionControllerTest {
                         true,
                         isFormFieldFocusedWithKeyboardVisible,
                         doesUserPreferTopToolbar,
-                        ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.BOTTOM));
 
         assertEquals(
                 StateTransition.NONE,
@@ -829,8 +735,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         true,
                         doesUserPreferTopToolbar,
-                        ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.BOTTOM));
 
         assertEquals(
                 StateTransition.SNAP_TO_BOTTOM,
@@ -842,8 +747,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         doesUserPreferTopToolbar,
-                        ControlsPosition.TOP,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.TOP));
 
         assertEquals(
                 StateTransition.SNAP_TO_BOTTOM,
@@ -855,8 +759,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         doesUserPreferTopToolbar,
-                        ControlsPosition.TOP,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.TOP));
 
         AddressBarPreference.setToolbarPositionAndSource(
                 ToolbarPositionAndSource.BOTTOM_LONG_PRESS);
@@ -870,8 +773,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         doesUserPreferTopToolbar,
-                        ControlsPosition.TOP,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.TOP));
 
         AddressBarPreference.setToolbarPositionAndSource(ToolbarPositionAndSource.BOTTOM_SETTINGS);
         assertEquals(
@@ -884,8 +786,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         doesUserPreferTopToolbar,
-                        ControlsPosition.TOP,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.TOP));
 
         AddressBarPreference.setToolbarPositionAndSource(ToolbarPositionAndSource.TOP_LONG_PRESS);
         assertEquals(
@@ -898,8 +799,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         true,
-                        ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ false));
+                        ControlsPosition.BOTTOM));
 
         AddressBarPreference.setToolbarPositionAndSource(ToolbarPositionAndSource.TOP_SETTINGS);
         assertEquals(
@@ -912,83 +812,7 @@ public class ToolbarPositionControllerTest {
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         true,
-                        ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ false));
-    }
-
-    @Test
-    public void testCalculateStateTransition_ScrolledOff_AnimateToSnap() {
-        boolean prefStateChanged = true;
-        boolean ntpShowing = false;
-        boolean tabSwitcherShowing = false;
-        boolean isOmniboxFocused = false;
-        boolean isFindInPageShowing = false;
-        boolean isFormFieldFocusedWithKeyboardVisible = false;
-        boolean doesUserPreferTopToolbar = false;
-
-        // With prefStateChanged = true, doesUserPreferTopToolbar = false, and current = TOP,
-        // it should normally ANIMATE_TO_BOTTOM.
-        AddressBarPreference.setToolbarPositionAndSource(
-                ToolbarPositionAndSource.BOTTOM_LONG_PRESS);
-
-        // 1. Verify normal animation when NOT scrolled off.
-        assertEquals(
-                StateTransition.ANIMATE_TO_BOTTOM,
-                ToolbarPositionController.calculateStateTransition(
-                        prefStateChanged,
-                        ntpShowing,
-                        tabSwitcherShowing,
-                        isOmniboxFocused,
-                        isFindInPageShowing,
-                        isFormFieldFocusedWithKeyboardVisible,
-                        doesUserPreferTopToolbar,
-                        ControlsPosition.TOP,
-                        /* isScrolledOff= */ false));
-
-        // 2. Verify it overrides to SNAP_TO_BOTTOM when scrolled off.
-        assertEquals(
-                StateTransition.SNAP_TO_BOTTOM,
-                ToolbarPositionController.calculateStateTransition(
-                        prefStateChanged,
-                        ntpShowing,
-                        tabSwitcherShowing,
-                        isOmniboxFocused,
-                        isFindInPageShowing,
-                        isFormFieldFocusedWithKeyboardVisible,
-                        doesUserPreferTopToolbar,
-                        ControlsPosition.TOP,
-                        /* isScrolledOff= */ true));
-
-        // 3. Same for animating to TOP.
-        AddressBarPreference.setToolbarPositionAndSource(ToolbarPositionAndSource.TOP_LONG_PRESS);
-
-        // Verify normal animation when NOT scrolled off.
-        assertEquals(
-                StateTransition.ANIMATE_TO_TOP,
-                ToolbarPositionController.calculateStateTransition(
-                        prefStateChanged,
-                        ntpShowing,
-                        tabSwitcherShowing,
-                        isOmniboxFocused,
-                        isFindInPageShowing,
-                        isFormFieldFocusedWithKeyboardVisible,
-                        true, // User prefers top
-                        ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ false));
-
-        // Verify it overrides to SNAP_TO_TOP when scrolled off.
-        assertEquals(
-                StateTransition.SNAP_TO_TOP,
-                ToolbarPositionController.calculateStateTransition(
-                        prefStateChanged,
-                        ntpShowing,
-                        tabSwitcherShowing,
-                        isOmniboxFocused,
-                        isFindInPageShowing,
-                        isFormFieldFocusedWithKeyboardVisible,
-                        true, // User prefers top
-                        ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ true));
+                        ControlsPosition.BOTTOM));
     }
 
     @Test

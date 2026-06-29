@@ -171,7 +171,6 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
     private final TopInsetProvider.Observer mTopInsetProviderObserver;
     private int mTopInset;
     private boolean mIsFirstPositionChange;
-    private boolean mPositionTransitionInProgress;
 
     private final SettableNonNullObservableSupplier<Integer> mCurrentPosition;
     private final NonNullObservableSupplier<Integer> mKeyboardHeightSupplier;
@@ -544,7 +543,6 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
                 mIsFormFieldFocusedSupplier.get()
                         && mKeyboardVisibilityDelegate.isKeyboardShowing(
                                 mControlContainer.getView());
-        boolean isScrolledOff = mBrowserControlsSizer.getBrowserControlHiddenRatio() == 1.0f;
         @StateTransition
         int stateTransition =
                 calculateStateTransition(
@@ -555,9 +553,7 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
                         isFindInPageShowing,
                         isFormFieldFocusedWithKeyboardVisible,
                         isToolbarConfiguredToShowOnTop(),
-                        mCurrentPosition.get(),
-                        isScrolledOff);
-
+                        mCurrentPosition.get());
         @ControlsPosition
         int newControlsPosition =
                 switch (stateTransition) {
@@ -573,7 +569,6 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
 
         if (newControlsPosition == mCurrentPosition.get()) return;
 
-        mPositionTransitionInProgress = true;
         int newTopHeight;
         int controlContainerHeight = mControlContainer.getToolbarHeight();
         mCurrentPosition.set(newControlsPosition);
@@ -582,61 +577,26 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
             Log.i(TAG, "Set a new control position: %d.", newControlsPosition);
         }
 
-        // 1. Calculate the new top height and update layer visibilities.
         if (newControlsPosition == ControlsPosition.TOP) {
             newTopHeight = mBrowserControlsSizer.getTopControlsHeight() + controlContainerHeight;
             updateLayerVisibility(animatingToTop);
+            mControlContainer.getView().setTranslationY(0);
+            mToolbarProgressBarContainer.setTranslationY(0);
+            updateProgressBarAnchor();
         } else {
             maybeForceBottomToolbarLayoutUpdateAndCapture(ntpShowing);
+
             newTopHeight = mBrowserControlsSizer.getTopControlsHeight() - controlContainerHeight;
             updateLayerVisibility(animatingToBottom);
+            CoordinatorLayout.LayoutParams progressBarLayoutParams =
+                    (LayoutParams) mToolbarProgressBarContainer.getLayoutParams();
+            progressBarLayoutParams.setAnchorId(View.NO_ID);
+            progressBarLayoutParams.anchorGravity = Gravity.NO_GRAVITY;
+            progressBarLayoutParams.gravity = Gravity.BOTTOM;
+            mToolbarProgressBarContainer.setLayoutParams(progressBarLayoutParams);
         }
 
-        // 2. Update bottom stacker layers to get the correct new bottom height.
         mBottomControlsStacker.updateLayerVisibilitiesAndSizes();
-        int newBottomHeight = mBottomControlsStacker.getTotalHeight();
-
-        // 3. Calculate initial offsets. When animating we can use the controlContainerHeight;
-        // however, for snap animation we need to calculate this based on the current hidden ratio
-        // to preserve the height and prevent 1-frame flickers during the snap.
-        // We only apply the hidden ratio case to the incoming controls as during snap or animated
-        // transitions, the outgoing controls will remain at the current position for that 1-frame
-        // regardless.
-        float hiddenRatio = mBrowserControlsSizer.getBrowserControlHiddenRatio();
-        int initialTopOffset;
-        int initialBottomOffset;
-        if (newControlsPosition == ControlsPosition.TOP) {
-            initialTopOffset =
-                    animatingToTop ? -controlContainerHeight : (int) (-newTopHeight * hiddenRatio);
-            // Bottom controls are outgoing (moving to TOP). We must preserve their current
-            // offset during this transition frame. If we reset it to 0 or another value,
-            // the outgoing controls would visually jump or flicker for a single frame before
-            // they are fully removed/hidden by the layout engine.
-            initialBottomOffset = mBrowserControlsSizer.getBottomControlOffset();
-        } else {
-            // Top controls are outgoing (moving to BOTTOM). We must preserve their current
-            // offset during this transition frame for the same reason as above.
-            initialTopOffset = mBrowserControlsSizer.getTopControlOffset();
-            initialBottomOffset =
-                    animatingToBottom
-                            ? controlContainerHeight
-                            : (int) (newBottomHeight * hiddenRatio);
-        }
-
-        // 4. Apply translations and layout parameters immediately to prevent a 1-frame flicker.
-        // Setting the controls position triggers an asynchronous round-trip to the C++
-        // compositor to update the offset tags. During the frame(s) before the compositor
-        // responds, the Java views would render at their default (resting) positions,
-        // causing a noticeable 1-frame flash of the toolbar at the wrong side of the screen.
-        // Manually translating the views to their initial transition offsets here forces
-        // them to render offscreen (or at their correct intermediate positions) immediately.
-        // This temporary translation is overwritten with the true compositor-driven offset
-        // in updateViewOffset() on the next frame, once the mPositionTransitionInProgress gating
-        // flag is reset below.
-        translateViewsForTransition(initialTopOffset, initialBottomOffset, newControlsPosition);
-        updateProgressBarLayout(newControlsPosition);
-        updateLayoutParametersForPosition(newControlsPosition);
-
         if (animatingToTop || animatingToBottom) {
             mBrowserControlsSizer.setAnimateBrowserControlsHeightChanges(true);
             // Prevent a visual glitch when animating the control container into a new location by
@@ -649,14 +609,45 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
                 newControlsPosition,
                 newTopHeight,
                 mBrowserControlsSizer.getTopControlsMinHeight(),
-                initialTopOffset,
+                // If animating to top, set the initial offset of the animation to fully hide the
+                // toolbar. This is negative since it's relative to the top of the content.
+                animatingToTop
+                        ? -controlContainerHeight
+                        : mBrowserControlsSizer.getTopControlOffset(),
                 mBottomControlsStacker.getTotalHeight(),
                 mBottomControlsStacker.getTotalMinHeight(),
-                initialBottomOffset);
+                // If animating to bottom, set the initial offset of the animation to fully hide the
+                // toolbar. This is positive since it's relative to the bottom of the content.
+                animatingToBottom
+                        ? controlContainerHeight
+                        : mBrowserControlsSizer.getBottomControlOffset());
         mBrowserControlsSizer.setAnimateBrowserControlsHeightChanges(false);
 
         // Commit the new layer sizes and visibilities we calculated above to avoid inconsistency.
         mBottomControlsStacker.requestLayerUpdate(false);
+        CoordinatorLayout.LayoutParams hairlineLayoutParams =
+                mControlContainer.mutateHairlineLayoutParams();
+        hairlineLayoutParams.anchorGravity =
+                newControlsPosition == ControlsPosition.TOP ? Gravity.BOTTOM : Gravity.TOP;
+        if (ChromeFeatureList.sAndroidApb144Patch3.isEnabled()) {
+            hairlineLayoutParams.gravity = hairlineLayoutParams.anchorGravity;
+        } else {
+            hairlineLayoutParams.gravity = Gravity.TOP;
+        }
+        LayoutParams layoutParams = mControlContainer.mutateLayoutParams();
+        int verticalGravity =
+                newControlsPosition == ControlsPosition.TOP ? Gravity.TOP : Gravity.BOTTOM;
+        layoutParams.gravity = Gravity.START | verticalGravity;
+        int heightAboveToolbar =
+                mTopControlsStacker.getHeightFromLayerToTop(TopControlType.TOOLBAR);
+        layoutParams.topMargin =
+                newControlsPosition == ControlsPosition.TOP ? heightAboveToolbar : 0;
+        CoordinatorLayout.LayoutParams toolbarLayoutParams =
+                mControlContainer.mutateToolbarLayoutParams();
+        toolbarLayoutParams.topMargin =
+                newControlsPosition == ControlsPosition.BOTTOM ? mHairlineHeight : 0;
+        toolbarLayoutParams.bottomMargin =
+                newControlsPosition == ControlsPosition.BOTTOM ? 0 : mHairlineHeight;
 
         // Set that the bottom omnibox has been used at least once now.
         if (newControlsPosition == ControlsPosition.BOTTOM && mProfileSupplier.get() != null) {
@@ -664,7 +655,6 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
         }
 
         mIsFirstPositionChange = false;
-        mPositionTransitionInProgress = false;
     }
 
     @VisibleForTesting
@@ -676,8 +666,7 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
             boolean isFindInPageShowing,
             boolean isFormFieldFocusedWithKeyboardVisible,
             boolean doesUserPreferTopToolbar,
-            @ControlsPosition int currentPosition,
-            boolean isScrolledOff) {
+            @ControlsPosition int currentPosition) {
         @ControlsPosition int newControlsPosition;
         if (ntpShowing
                 || tabSwitcherShowing
@@ -703,10 +692,7 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
                             && (positionAndSource == ToolbarPositionAndSource.TOP_LONG_PRESS
                                     || positionAndSource
                                             == ToolbarPositionAndSource.BOTTOM_LONG_PRESS);
-            // Don't animate when controls are scrolled off. If the controls are not on the screen
-            // the composited aspect of the animation will stall resulting in the compositor
-            // becoming stuck in a state where the composited layers are permanently visible.
-            if (animate && !isScrolledOff) {
+            if (animate) {
                 return switchingToBottom
                         ? StateTransition.ANIMATE_TO_BOTTOM
                         : StateTransition.ANIMATE_TO_TOP;
@@ -722,7 +708,6 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
     }
 
     private void updateViewOffset(BottomControlsLayerWithOffset layer, View viewForLayer) {
-        if (mPositionTransitionInProgress) return;
         if (mLayerVisibility == LayerVisibility.HIDDEN) return;
 
         int layerYOffset = layer.getLayerOffsetPx() + mControlContainerTranslationSupplier.get();
@@ -816,8 +801,7 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
                         /* isFindInPageShowing= */ false,
                         /* isFormFieldFocusedWithKeyboardVisible= */ false,
                         isToolbarConfiguredToShowOnTop(),
-                        /* currentPosition= */ ControlsPosition.BOTTOM,
-                        /* isScrolledOff= */ false)
+                        /* currentPosition= */ ControlsPosition.BOTTOM)
                 == StateTransition.SNAP_TO_TOP;
     }
 
@@ -1006,43 +990,28 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
         return mIsFirstPositionChange;
     }
 
-    private void translateViewsForTransition(
-            int topOffset, int bottomOffset, @ControlsPosition int newPosition) {
-        if (newPosition == ControlsPosition.TOP) {
-            mControlContainer.getView().setTranslationY(topOffset);
-            mToolbarProgressBarContainer.setTranslationY(topOffset);
-        } else {
-            mControlContainer.getView().setTranslationY(bottomOffset);
-            mToolbarProgressBarContainer.setTranslationY(bottomOffset);
-        }
-    }
-
-    private void updateProgressBarLayout(@ControlsPosition int position) {
+    private void updateProgressBarAnchor() {
         Runnable progressBarChangeRunnable =
                 () -> {
                     // Bail out if there was a state change while we waited for the runnable to
                     // execute.
-                    if (mCurrentPosition.get() != position) return;
+                    if (mCurrentPosition.get() != ControlsPosition.TOP) return;
                     LayoutParams progressBarLayoutParams =
                             (LayoutParams) mToolbarProgressBarContainer.getLayoutParams();
-                    if (position == ControlsPosition.TOP) {
-                        int targetAnchorId = mControlContainer.getView().getId();
-                        if (mTopControlsStacker.isLayerAtBottom(TopControlType.BOOKMARK_BAR)
-                                && mBookmarkBarIdSupplier.get() != 0) {
-                            targetAnchorId = mBookmarkBarIdSupplier.get();
-                        }
-                        progressBarLayoutParams.setAnchorId(targetAnchorId);
-                        progressBarLayoutParams.anchorGravity = Gravity.BOTTOM;
-                        if (ChromeFeatureList.sAndroidAnimatedProgressBarInBrowser.isEnabled()
-                                && ChromeFeatureList.sAndroidApb144Patch4.isEnabled()) {
-                            progressBarLayoutParams.gravity = Gravity.BOTTOM;
-                        } else {
-                            progressBarLayoutParams.gravity = Gravity.CENTER;
-                        }
-                    } else {
-                        progressBarLayoutParams.setAnchorId(View.NO_ID);
-                        progressBarLayoutParams.anchorGravity = Gravity.NO_GRAVITY;
+
+                    int targetAnchorId = mControlContainer.getView().getId();
+                    if (mTopControlsStacker.isLayerAtBottom(TopControlType.BOOKMARK_BAR)
+                            && mBookmarkBarIdSupplier.get() != 0) {
+                        targetAnchorId = mBookmarkBarIdSupplier.get();
+                    }
+                    progressBarLayoutParams.setAnchorId(targetAnchorId);
+
+                    progressBarLayoutParams.anchorGravity = Gravity.BOTTOM;
+                    if (ChromeFeatureList.sAndroidAnimatedProgressBarInBrowser.isEnabled()
+                            && ChromeFeatureList.sAndroidApb144Patch4.isEnabled()) {
                         progressBarLayoutParams.gravity = Gravity.BOTTOM;
+                    } else {
+                        progressBarLayoutParams.gravity = Gravity.CENTER;
                     }
                     mToolbarProgressBarContainer.setLayoutParams(progressBarLayoutParams);
                 };
@@ -1052,31 +1021,5 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
         } else {
             progressBarChangeRunnable.run();
         }
-    }
-
-    private void updateLayoutParametersForPosition(@ControlsPosition int newPosition) {
-        CoordinatorLayout.LayoutParams hairlineLayoutParams =
-                mControlContainer.mutateHairlineLayoutParams();
-        hairlineLayoutParams.anchorGravity =
-                newPosition == ControlsPosition.TOP ? Gravity.BOTTOM : Gravity.TOP;
-        if (ChromeFeatureList.sAndroidApb144Patch3.isEnabled()) {
-            hairlineLayoutParams.gravity = hairlineLayoutParams.anchorGravity;
-        } else {
-            hairlineLayoutParams.gravity = Gravity.TOP;
-        }
-
-        LayoutParams layoutParams = mControlContainer.mutateLayoutParams();
-        int verticalGravity = newPosition == ControlsPosition.TOP ? Gravity.TOP : Gravity.BOTTOM;
-        layoutParams.gravity = Gravity.START | verticalGravity;
-        int heightAboveToolbar =
-                mTopControlsStacker.getHeightFromLayerToTop(TopControlType.TOOLBAR);
-        layoutParams.topMargin = newPosition == ControlsPosition.TOP ? heightAboveToolbar : 0;
-
-        CoordinatorLayout.LayoutParams toolbarLayoutParams =
-                mControlContainer.mutateToolbarLayoutParams();
-        toolbarLayoutParams.topMargin =
-                newPosition == ControlsPosition.BOTTOM ? mHairlineHeight : 0;
-        toolbarLayoutParams.bottomMargin =
-                newPosition == ControlsPosition.BOTTOM ? 0 : mHairlineHeight;
     }
 }
