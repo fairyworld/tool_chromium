@@ -7736,14 +7736,12 @@ test("unit_tests") {
       "//chrome/browser/new_tab_page:unit_tests",
       "//chrome/browser/ui/omnibox",
       "//chrome/browser/ui/webui/cr_components/most_visited:unit_tests",
+      "//chrome/browser/ui/webui/new_tab_page:unit_tests",
       "//chrome/browser/ui/webui/searchbox:searchbox_test_utils",
       "//components/contextual_search:test_support",
     ]
     if (!is_android) {
-      deps += [
-        "//chrome/browser/ui/webui/new_tab_page:unit_tests",
-        "//chrome/browser/ui/webui/ntp_microsoft_auth:unit_tests",
-      ]
+      deps += [ "//chrome/browser/ui/webui/ntp_microsoft_auth:unit_tests" ]
     }
   }
 
