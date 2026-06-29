@@ -26,6 +26,10 @@
 
 class PrefService;
 
+namespace fcp::client {
+class ExampleQueryResult;
+}
+
 namespace network {
 class SharedURLLoaderFactory;
 }
@@ -154,7 +158,15 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
 
   static RunFederatedComputationFunc run_federated_computation_func;
 
-  void OnUploadComplete(FederatedComputationResult result);
+  void OnUploadComplete(
+      base::circular_deque<ContextualCueEventEntry> pending_events,
+      FederatedComputationResult result);
+
+  void RequeueEvents(base::circular_deque<ContextualCueEventEntry> events);
+
+  static void SerializeEventsToQueryResult(
+      const base::circular_deque<ContextualCueEventEntry>& events,
+      fcp::client::ExampleQueryResult* query_result);
 
   raw_ptr<PrefService> local_state_ = nullptr;
   base::FilePath profile_dir_;
@@ -181,6 +193,13 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
                            PopulationNameFinchParam);
   FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest, LogContextualCueEvent);
+  FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
+                           SerializeEventsToQueryResult);
+  FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest, RequeueEventsEmpty);
+  FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
+                           RequeueEventsPrependsRequeuedEvents);
+  FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
+                           RequeueEventsExceedsMaxEvents);
 };
 
 }  // namespace private_insights

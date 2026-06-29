@@ -20,6 +20,7 @@
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/federated_compute/src/fcp/client/example_query_result.pb.h"
 
 namespace private_insights {
 
@@ -287,6 +288,141 @@ TEST_F(PrivateInsightsServiceTest, LogContextualCueEvent) {
       kContextualCueEventsLoggingQueuedCountHistogram, 2, 2);
   histogram_tester.ExpectUniqueSample(
       kContextualCueEventsLoggingRemovedCountHistogram, 1, 1);
+}
+
+TEST_F(PrivateInsightsServiceTest, SerializeEventsToQueryResult) {
+  base::circular_deque<PrivateInsightsService::ContextualCueEventEntry> events;
+
+  base::Time time1;
+  ASSERT_TRUE(base::Time::FromUTCExploded({.year = 2026,
+                                           .month = 6,
+                                           .day_of_week = 0,
+                                           .day_of_month = 28,
+                                           .hour = 12,
+                                           .minute = 0,
+                                           .second = 0,
+                                           .millisecond = 0},
+                                          &time1));
+  events::ContextualCueLogEvent event1;
+  event1.set_cue_id("cue_1");
+  events.push_back({time1, event1});
+
+  base::Time time2;
+  ASSERT_TRUE(base::Time::FromUTCExploded({.year = 2026,
+                                           .month = 6,
+                                           .day_of_week = 0,
+                                           .day_of_month = 28,
+                                           .hour = 12,
+                                           .minute = 5,
+                                           .second = 30,
+                                           .millisecond = 500},
+                                          &time2));
+  events::ContextualCueLogEvent event2;
+  event2.set_cue_id("cue_2");
+  events.push_back({time2, event2});
+
+  fcp::client::ExampleQueryResult query_result;
+  PrivateInsightsService::SerializeEventsToQueryResult(events, &query_result);
+
+  EXPECT_EQ(query_result.result_source(),
+            fcp::client::ExampleQueryResult::PRIVATE_LOGGER);
+  EXPECT_EQ(query_result.stats().output_rows_count(), 2);
+
+  const auto& vectors = query_result.vector_data().vectors();
+  ASSERT_EQ(vectors.count("entry"), 1u);
+  ASSERT_EQ(vectors.count("confidential_compute_event_time"), 1u);
+
+  const auto& entry_bytes = vectors.at("entry").bytes_values();
+  ASSERT_EQ(entry_bytes.value_size(), 2);
+  EXPECT_EQ(entry_bytes.value(0), event1.SerializeAsString());
+  EXPECT_EQ(entry_bytes.value(1), event2.SerializeAsString());
+
+  const auto& time_strings =
+      vectors.at("confidential_compute_event_time").string_values();
+  ASSERT_EQ(time_strings.value_size(), 2);
+  EXPECT_EQ(time_strings.value(0), "2026-06-28T12:00:00.000Z");
+  EXPECT_EQ(time_strings.value(1), "2026-06-28T12:05:30.500Z");
+}
+
+TEST_F(PrivateInsightsServiceTest, RequeueEventsEmpty) {
+  TestingPrefServiceSimple local_state;
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
+                                 test_shared_url_loader_factory_);
+  DCHECK_CALLED_ON_VALID_SEQUENCE(service.sequence_checker_);
+
+  events::ContextualCueLogEvent event1;
+  event1.set_cue_id("cue_1");
+  service.LogContextualCueEvent(event1);
+  EXPECT_EQ(service.contextual_cue_events_.size(), 1u);
+
+  service.RequeueEvents({});
+  EXPECT_EQ(service.contextual_cue_events_.size(), 1u);
+  EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_1");
+}
+
+TEST_F(PrivateInsightsServiceTest, RequeueEventsPrependsRequeuedEvents) {
+  TestingPrefServiceSimple local_state;
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
+                                 test_shared_url_loader_factory_);
+  DCHECK_CALLED_ON_VALID_SEQUENCE(service.sequence_checker_);
+
+  // Prepare pending events cue_1 and cue_2.
+  base::circular_deque<PrivateInsightsService::ContextualCueEventEntry>
+      pending_events;
+  events::ContextualCueLogEvent event1;
+  event1.set_cue_id("cue_1");
+  events::ContextualCueLogEvent event2;
+  event2.set_cue_id("cue_2");
+  pending_events.emplace_back(base::Time::Now(), event1);
+  pending_events.emplace_back(base::Time::Now(), event2);
+
+  // Log cue_3 and cue_4.
+  events::ContextualCueLogEvent event3;
+  event3.set_cue_id("cue_3");
+  events::ContextualCueLogEvent event4;
+  event4.set_cue_id("cue_4");
+  service.LogContextualCueEvent(event3);
+  service.LogContextualCueEvent(event4);
+
+  // Requeuing prepends pending events before existing events.
+  service.RequeueEvents(std::move(pending_events));
+  EXPECT_EQ(service.contextual_cue_events_.size(), 4u);
+  EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_1");
+  EXPECT_EQ(service.contextual_cue_events_[1].event.cue_id(), "cue_2");
+  EXPECT_EQ(service.contextual_cue_events_[2].event.cue_id(), "cue_3");
+  EXPECT_EQ(service.contextual_cue_events_[3].event.cue_id(), "cue_4");
+}
+
+TEST_F(PrivateInsightsServiceTest, RequeueEventsExceedsMaxEvents) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeatureWithParameters(
+      kPrivateInsightsFeature, {{"max_contextual_cue_events", "2"}});
+
+  TestingPrefServiceSimple local_state;
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
+                                 test_shared_url_loader_factory_);
+  DCHECK_CALLED_ON_VALID_SEQUENCE(service.sequence_checker_);
+
+  // Prepare pending events cue_1 and cue_2.
+  base::circular_deque<PrivateInsightsService::ContextualCueEventEntry>
+      requeue_list;
+  events::ContextualCueLogEvent event1;
+  event1.set_cue_id("cue_1");
+  events::ContextualCueLogEvent event2;
+  event2.set_cue_id("cue_2");
+  requeue_list.emplace_back(base::Time::Now(), event1);
+  requeue_list.emplace_back(base::Time::Now(), event2);
+
+  // Log cue_3.
+  events::ContextualCueLogEvent event3;
+  event3.set_cue_id("cue_3");
+  service.LogContextualCueEvent(event3);
+
+  // Oldest events should be dropped.
+  service.RequeueEvents(std::move(requeue_list));
+  EXPECT_EQ(service.contextual_cue_events_.size(), 2u);
+  EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_2");
+  EXPECT_EQ(service.contextual_cue_events_[1].event.cue_id(), "cue_3");
 }
 
 }  // namespace private_insights

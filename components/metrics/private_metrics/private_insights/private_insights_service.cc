@@ -9,6 +9,7 @@
 #include "base/check.h"
 #include "base/files/file_path.h"
 #include "base/functional/bind.h"
+#include "base/i18n/time_formatting.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/sequence_checker.h"
 #include "base/strings/strcat.h"
@@ -28,6 +29,7 @@
 #include "google_apis/google_api_keys.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "third_party/abseil-cpp/absl/status/statusor.h"
+#include "third_party/federated_compute/src/fcp/client/example_query_result.pb.h"
 #include "third_party/federated_compute/src/fcp/client/fl_runner.h"
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wextra-semi"
@@ -220,6 +222,9 @@ void PrivateInsightsService::TriggerUpload() {
   }
   is_upload_running_ = true;
 
+  base::circular_deque<ContextualCueEventEntry> pending_events =
+      std::move(contextual_cue_events_);
+
   // TODO(b/527985497): Prepare the real result here.
   fcp_task_env_->result() = fcp::client::ExampleQueryResult();
 
@@ -230,7 +235,8 @@ void PrivateInsightsService::TriggerUpload() {
       base::BindOnce(&PrivateInsightsService::UploadBlocking, fcp_task_env_,
                      base::TimeTicks::Now()),
       base::BindOnce(&PrivateInsightsService::OnUploadComplete,
-                     weak_ptr_factory_.GetWeakPtr()));
+                     weak_ptr_factory_.GetWeakPtr(),
+                     std::move(pending_events)));
 
   base::UmaHistogramEnumeration(kTriggerUploadOutcomeHistogram,
                                 TriggerUploadOutcome::kTaskPosted);
@@ -308,6 +314,7 @@ PrivateInsightsService::RunFederatedComputationFunc
         &PrivateInsightsService::RunFederatedComputation;
 
 void PrivateInsightsService::OnUploadComplete(
+    base::circular_deque<ContextualCueEventEntry> pending_events,
     FederatedComputationResult result) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   is_upload_running_ = false;
@@ -317,6 +324,53 @@ void PrivateInsightsService::OnUploadComplete(
     base::UmaHistogramCounts100(
         kContributedTaskCountHistogram,
         static_cast<int>(*result.contributed_task_count));
+  }
+
+  if (result.outcome == FederatedComputationOutcome::kFailed) {
+    // Requeue only when we're sure the contribution failed. If it partially
+    // succeeded or we're unsure, we have to drop the data to avoid accidentally
+    // contributing the dame data twice, as it would undermine privacy
+    // guarantees of FCP.
+    RequeueEvents(std::move(pending_events));
+  }
+}
+
+void PrivateInsightsService::RequeueEvents(
+    base::circular_deque<ContextualCueEventEntry> events) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+  if (events.empty()) {
+    return;
+  }
+
+  int max_events = kMaxContextualCueEvents.Get();
+  while (!events.empty() &&
+         static_cast<int>(contextual_cue_events_.size()) < max_events) {
+    contextual_cue_events_.push_front(std::move(events.back()));
+    events.pop_back();
+  }
+}
+
+// static
+void PrivateInsightsService::SerializeEventsToQueryResult(
+    const base::circular_deque<ContextualCueEventEntry>& events,
+    fcp::client::ExampleQueryResult* query_result) {
+  CHECK(query_result);
+
+  query_result->set_result_source(
+      fcp::client::ExampleQueryResult::PRIVATE_LOGGER);
+  query_result->mutable_stats()->set_output_rows_count(
+      static_cast<int32_t>(events.size()));
+
+  auto* proto_values =
+      (*query_result->mutable_vector_data()->mutable_vectors())["entry"]
+          .mutable_bytes_values();
+  auto* time_values =
+      (*query_result->mutable_vector_data()
+            ->mutable_vectors())["confidential_compute_event_time"]
+          .mutable_string_values();
+  for (const auto& entry : events) {
+    proto_values->add_value(entry.event.SerializeAsString());
+    time_values->add_value(base::TimeFormatAsIso8601(entry.timestamp));
   }
 }
 
