@@ -8,8 +8,11 @@
 #import "base/memory/raw_ptr.h"
 #import "base/metrics/histogram_functions.h"
 #import "base/sequence_checker.h"
+#import "base/task/sequenced_task_runner.h"
 #import "base/time/time.h"
 #import "components/prefs/pref_service.h"
+#import "ios/chrome/app/background_refresh/background_refresh_metrics.h"
+#import "ios/chrome/app/background_refresh/discover_feed_task.h"
 #import "ios/chrome/browser/discover_feed/model/discover_feed_service.h"
 #import "ios/chrome/browser/discover_feed/model/discover_feed_service_factory.h"
 #import "ios/chrome/browser/shared/model/application_context/application_context.h"
@@ -17,6 +20,7 @@
 #import "ios/chrome/browser/shared/model/profile/profile_ios.h"
 #import "ios/chrome/browser/shared/model/profile/profile_manager_ios.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
+#import "ios/web/public/thread/web_task_traits.h"
 #import "ios/web/public/thread/web_thread.h"
 
 namespace {
@@ -31,7 +35,10 @@ enum class DiscoverFeedServiceAvailability {
 
 @implementation DiscoverFeedProvider {
   raw_ptr<DiscoverFeedService> _service;
+  __weak DiscoverFeedTask* _runningTask;
   SEQUENCE_CHECKER(_sequenceChecker);
+  base::Time _startTime;
+  BOOL _isCancelled;
 }
 
 - (instancetype)init {
@@ -84,8 +91,9 @@ enum class DiscoverFeedServiceAvailability {
 
 - (void)handleRefreshWithCompletion:(ProceduralBlock)completion {
   DCHECK_CALLED_ON_VALID_SEQUENCE(_sequenceChecker);
+  _startTime = base::Time::Now();
+  _isCancelled = NO;
 
-  // Trigger caching of the service.
   DiscoverFeedService* service = [self discoverFeedService];
 
   // Log service availability.
@@ -95,33 +103,70 @@ enum class DiscoverFeedServiceAvailability {
   base::UmaHistogramEnumeration(
       "IOS.Discover.BackgroundRefresh.ServiceAvailability", availability);
 
-  __weak __typeof(self) weakSelf = self;
-  [super handleRefreshWithCompletion:^{
-    [weakSelf refreshCompleted];
+  DiscoverFeedTask* discoverTask = [self discoverFeedTask];
+  if (!discoverTask) {
     if (completion) {
       completion();
     }
-  }];
+    return;
+  }
+
+  __weak __typeof(self) weakSelf = self;
+  base::OnceClosure completionClosure = base::BindOnce(^{
+    web::GetUIThreadTaskRunner({})->PostTask(
+        FROM_HERE, base::BindOnce(^{
+          [weakSelf refreshFinishedWithCompletion:completion];
+        }));
+  });
+
+  self.taskRunner->PostTask(
+      FROM_HERE, base::BindOnce(
+                     [](DiscoverFeedTask* task, base::OnceClosure cb) {
+                       [task executeWithCompletion:std::move(cb)];
+                     },
+                     discoverTask, std::move(completionClosure)));
 }
 
 - (id<AppRefreshProviderTask>)task {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(_sequenceChecker);
-  // TODO(crbug.com/528112746): Implement AppRefreshProviderTask for discover
-  // feed.
-  return nil;
+  return [self discoverFeedTask];
 }
 
 - (void)cancelRefresh {
   DCHECK_CALLED_ON_VALID_SEQUENCE(_sequenceChecker);
+  _isCancelled = YES;
   [super cancelRefresh];
-  _service = nullptr;
+  [_runningTask cancel];
 }
 
 #pragma mark - Private
 
-- (void)refreshCompleted {
+- (DiscoverFeedTask*)discoverFeedTask {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(_sequenceChecker);
+  CHECK(!_isCancelled);
+  DiscoverFeedService* service = [self discoverFeedService];
+  if (!service) {
+    return nil;
+  }
+  DiscoverFeedTask* task = [[DiscoverFeedTask alloc] initWithService:service];
+  _runningTask = task;
+  return task;
+}
+
+- (void)refreshFinishedWithCompletion:(ProceduralBlock)completion {
   DCHECK_CALLED_ON_VALID_SEQUENCE(_sequenceChecker);
   _service = nullptr;
+
+  if (_isCancelled) {
+    return;
+  }
+
+  RecordProviderExecutionDuration(self.identifier,
+                                  base::Time::Now() - _startTime);
+  self.lastRun = base::Time::Now();
+
+  if (completion) {
+    completion();
+  }
 }
 
 - (DiscoverFeedService*)discoverFeedService {
