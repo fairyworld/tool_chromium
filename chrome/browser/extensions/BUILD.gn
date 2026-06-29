@@ -2182,6 +2182,9 @@ source_set("unit_tests") {
     if (is_chromeos) {
       sources += [
         "api/braille_display_private/braille_display_private_api_unittest.cc",
+        "api/document_scan/document_scan_api_handler_unittest.cc",
+        "api/document_scan/document_scan_api_unittest.cc",
+        "api/document_scan/document_scan_type_converters_unittest.cc",
         "api/enterprise_device_attributes/enterprise_device_attributes_api_ash_unittest.cc",
         "api/enterprise_kiosk_input/enterprise_kiosk_input_unittest.cc",
         "api/enterprise_login/enterprise_login_api_unittest.cc",
@@ -2189,6 +2192,7 @@ source_set("unit_tests") {
         "api/image_writer_private/image_writer_private_api_chromeos_unittest.cc",
         "api/image_writer_private/removable_storage_provider_chromeos_unittest.cc",
         "api/quick_unlock_private/quick_unlock_private_api_unittest.cc",
+        "api/terminal/startup_status_unittest.cc",
         "extension_garbage_collector_chromeos_unittest.cc",
         "external_pref_loader_unittest.cc",
         "external_provider_impl_chromeos_unittest.cc",
@@ -2202,7 +2206,10 @@ source_set("unit_tests") {
         "//chrome/browser/ash/login/smart_lock",
         "//chrome/browser/ash/login/users",
         "//chrome/browser/ash/printing",
+        "//chrome/browser/ash/scanning",
+        "//chrome/browser/ash/scanning:test_support",
         "//chrome/browser/extensions/api/braille_display_private",
+        "//chrome/browser/extensions/api/terminal:startup_status",
         "//chrome/browser/prefs:util",
         "//chrome/browser/printing",
         "//chrome/test:test_support_unit",
@@ -2537,6 +2544,23 @@ source_set("browser_tests") {
     deps += [ "//components/safe_browsing/content/common:file_type_policies_test_support" ]
   }
 
+  if (is_win || is_mac) {
+    sources += [
+      "api/networking_private/networking_private_apitest.cc",
+      "api/networking_private/networking_private_service_client_apitest.cc",
+    ]
+    deps += [
+      "//components/onc",
+      "//components/wifi:test_support",
+    ]
+  }
+
+  if (is_win || is_mac || is_linux) {
+    sources += [
+      "api/image_writer_private/image_writer_utility_client_browsertest.cc",
+    ]
+  }
+
   if (is_android) {
     sources += [ "//chrome/browser/extensions/extension_keybinding_apitest.cc" ]
     deps += [
@@ -2588,6 +2612,11 @@ source_set("browser_tests") {
     deps += [ "//chrome/browser/media/router:test_support" ]
   }
 
+  if (use_aura) {
+    sources += [ "extension_install_prompt_show_params_browsertest.cc" ]
+    deps += [ "//ui/aura:test_support" ]
+  }
+
   # These tests don't run on desktop Android.
   if (enable_extensions) {
     sources += [
@@ -2616,6 +2645,7 @@ source_set("browser_tests") {
       "api/autofill_private/autofill_private_apitest.cc",
       "api/autofill_private/autofill_util_browsertest.cc",
       "api/automation/automation_apitest.cc",
+      "api/bookmark_manager_private/bookmark_manager_private_api_browsertest.cc",
       "api/braille_display_private/braille_display_private_apitest.cc",
       "api/command_line_private/command_line_private_apitest.cc",
       "api/declarative/declarative_apitest.cc",
@@ -2636,6 +2666,7 @@ source_set("browser_tests") {
       "api/image_writer_private/test_utils.h",
       "api/passwords_private/passwords_private_apitest.cc",
       "api/passwords_private/passwords_private_delegate_impl_browsertest.cc",
+      "api/permissions/permissions_api_browsertest.cc",
       "api/printer_provider/printer_provider_apitest.cc",
       "api/protocol_handlers/protocol_handlers_manager_browsertest.cc",
       "api/resources_private/resources_private_apitest.cc",
@@ -2823,6 +2854,7 @@ source_set("browser_tests") {
         "api/audio/audio_apitest_chromeos.cc",
         "api/bluetooth/bluetooth_apitest.cc",
         "api/bluetooth/bluetooth_private_apitest.cc",
+        "api/bluetooth_low_energy/bluetooth_low_energy_apitest.cc",
         "api/bluetooth_low_energy/bluetooth_low_energy_apitest_chromeos.cc",
         "api/bluetooth_socket/bluetooth_socket_apitest.cc",
         "api/cec_private/cec_private_ash_apitest.cc",
