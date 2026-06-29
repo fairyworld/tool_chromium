@@ -270,9 +270,6 @@ public final class ProductionSupportedFlagList {
                 "When enabled, improves heuristic regexes for state classification to avoid"
                         + " misclassification as civil state."),
         Flag.baseFeature(
-                AutofillFeatures.AUTOFILL_FIX_FORM_TRACKING,
-                "Improves form submission tracking and duplicate submission handling"),
-        Flag.baseFeature(
                 AutofillFeatures.AUTOFILL_FIX_STATE_COUNTRY_MISCLASSIFICATION,
                 "When enabled, the rationalization engine will fix misclassifications where"
                         + " a field is detected as a COUNTRY when it should be a STATE or vice"
@@ -307,10 +304,6 @@ public final class ProductionSupportedFlagList {
         Flag.baseFeature(
                 AutofillFeatures.AUTOFILL_PREFER_PHONE_COUNTRY_CODE_TYPE_OVER_COUNTRY_HTML_TYPE,
                 "Prioritizes PHONE_HOME_COUNTRY_CODE heuristic type over kCountryName html type"),
-        Flag.baseFeature(
-                AutofillFeatures.AUTOFILL_REPLACE_CACHED_WEB_ELEMENTS_BY_RENDERER_IDS,
-                "When enabled, AutofillAgent will store its cached form and fields as renderer ids "
-                        + "instead of holding strong references to blink::WebElement objects."),
         Flag.baseFeature(
                 AutofillFeatures.AUTOFILL_USE_IN_ADDRESS_MODEL,
                 "When enabled, Autofill uses a custom address model for India."),

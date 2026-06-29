@@ -667,12 +667,6 @@ BASE_FEATURE(kAutofillFixCivilStateMisclassificationForESPT,
 // weeks on canary.
 BASE_FEATURE(kAutofillFixFormEquality, base::FEATURE_ENABLED_BY_DEFAULT);
 
-// Removes logic that resets form submission tracking data upon receiving a
-// FORM_SUBMISSION or PROBABLE_FORM_SUBMISSION signal. Also, fixes submission
-// deduplication so that it ignores submissions that PWM doesn't act upon.
-// TODO(crbug.com/40281981): Remove when launched.
-BASE_FEATURE(kAutofillFixFormTracking, base::FEATURE_ENABLED_BY_DEFAULT);
-
 // When enabled, the rewriter uses updated rewrite rules.
 // TODO(crbug.com/445863287): Cleanup when launched.
 BASE_FEATURE(kAutofillFixRewriterRules, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -867,12 +861,6 @@ BASE_FEATURE(kAutofillPopupZOrderSecuritySurface,
 // When enabled, we prefer a `PHONE_HOME_COUNTRY_CODE` heuristic type over a
 // `HtmlFieldType::kCountryCode`.
 BASE_FEATURE(kAutofillPreferPhoneCountryCodeTypeOverCountryHtmlType,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Replaces cached web elements in AutofillAgent and FormTracker by their
-// renderer ids.
-// TODO(crbug.com/40281981): Remove when launched.
-BASE_FEATURE(kAutofillReplaceCachedWebElementsByRendererIds,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Replaces blink::WebFormElementObserver usage in FormTracker by updated logic
