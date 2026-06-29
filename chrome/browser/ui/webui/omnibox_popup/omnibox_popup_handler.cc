@@ -4,6 +4,8 @@
 
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_handler.h"
 
+#include "base/metrics/histogram_functions.h"
+#include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/ui/omnibox/omnibox_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_edit_model.h"
 #include "chrome/browser/ui/omnibox/omnibox_popup_view.h"
@@ -76,11 +78,13 @@ void OmniboxPopupHandler::OnContextMenuClosed() {
   page_->OnContextMenuClosed();
 }
 
-void OmniboxPopupHandler::SetInputState(const std::string& text,
-                                        const gfx::Range& selection,
-                                        bool user_input_in_progress,
-                                        const std::string& full_url,
-                                        bool is_focused) {
+void OmniboxPopupHandler::SetInputState(
+    const std::string& text,
+    const gfx::Range& selection,
+    bool user_input_in_progress,
+    const std::string& full_url,
+    bool is_focused,
+    const std::string& permanent_display_text) {
   latest_selection_ = selection;
   current_sequence_number_++;
   auto state = omnibox_popup::mojom::OmniboxInputState::New();
@@ -90,5 +94,12 @@ void OmniboxPopupHandler::SetInputState(const std::string& text,
   state->user_input_in_progress = user_input_in_progress;
   state->full_url = full_url;
   state->is_focused = is_focused;
+  state->permanent_display_text = permanent_display_text;
+
   page_->SetInputState(std::move(state));
+}
+
+void OmniboxPopupHandler::LogEscapeAction(
+    omnibox_popup::mojom::OmniboxEscapeAction action) {
+  base::UmaHistogramEnumeration("Omnibox.Escape", action);
 }

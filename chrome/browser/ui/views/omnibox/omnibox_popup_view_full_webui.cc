@@ -4,6 +4,8 @@
 
 #include "chrome/browser/ui/views/omnibox/omnibox_popup_view_full_webui.h"
 
+#include <string>
+
 #include "base/metrics/histogram_functions.h"
 #include "base/time/time.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -59,10 +61,11 @@ void OmniboxPopupViewFullWebUI::SyncNativeStateToWebUI() {
 
   bool user_input_in_progress =
       controller()->edit_model()->user_input_in_progress();
-  std::u16string text =
-      user_input_in_progress
-          ? controller()->edit_model()->user_text()
-          : controller()->edit_model()->GetPermanentDisplayText();
+  std::u16string permanent_display_text =
+      controller()->edit_model()->GetPermanentDisplayText();
+  std::u16string text = user_input_in_progress
+                            ? controller()->edit_model()->user_text()
+                            : permanent_display_text;
   gfx::Range selection = gfx::Range(0, text.length());
   if (auto* omnibox_view_views =
           static_cast<OmniboxViewViews*>(omnibox_view_)) {
@@ -82,7 +85,8 @@ void OmniboxPopupViewFullWebUI::SyncNativeStateToWebUI() {
     // the input text and risk resetting DOM input state or scroll position.
     popup_handler->SetInputState(
         base::UTF16ToUTF8(text), selection, user_input_in_progress,
-        base::UTF16ToUTF8(full_url), controller()->edit_model()->has_focus());
+        base::UTF16ToUTF8(full_url), controller()->edit_model()->has_focus(),
+        base::UTF16ToUTF8(permanent_display_text));
     last_sent_text_ = text;
   }
 }
@@ -214,16 +218,17 @@ void OmniboxPopupViewFullWebUI::OnTabChanged(content::WebContents* contents) {
   if (auto* popup_handler = GetPopupHandler()) {
     bool user_input_in_progress =
         state ? state->model_state.user_input_in_progress : false;
-    std::u16string text =
-        user_input_in_progress
-            ? state->model_state.user_text
-            : controller()->edit_model()->GetPermanentDisplayText();
+    std::u16string permanent_display_text =
+        controller()->edit_model()->GetPermanentDisplayText();
+    std::u16string text = user_input_in_progress ? state->model_state.user_text
+                                                 : permanent_display_text;
     gfx::Range selection = state ? state->selection : gfx::Range(0, 0);
     const std::u16string full_url =
         controller()->client()->GetFormattedFullURL();
     popup_handler->SetInputState(
         base::UTF16ToUTF8(text), selection, user_input_in_progress,
-        base::UTF16ToUTF8(full_url), should_focus_popup);
+        base::UTF16ToUTF8(full_url), should_focus_popup,
+        base::UTF16ToUTF8(permanent_display_text));
     last_sent_text_ = text;
   }
 }

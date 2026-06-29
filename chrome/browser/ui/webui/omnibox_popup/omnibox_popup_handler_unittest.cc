@@ -68,6 +68,7 @@ TEST_F(OmniboxPopupHandlerTest, SetInputState) {
   std::string test_text = "test input";
   gfx::Range test_selection(1, 5);
   std::string full_url = "test.com";
+  std::string permanent_display_text = "permanent.com";
   EXPECT_CALL(page_, SetInputState(testing::_))
       .WillOnce([&](omnibox_popup::mojom::OmniboxInputStatePtr state) {
         EXPECT_EQ(state->text, test_text);
@@ -75,10 +76,11 @@ TEST_F(OmniboxPopupHandlerTest, SetInputState) {
         EXPECT_TRUE(state->user_input_in_progress);
         EXPECT_EQ(state->full_url, full_url);
         EXPECT_TRUE(state->is_focused);
+        EXPECT_EQ(state->permanent_display_text, permanent_display_text);
       });
   handler_->SetInputState(test_text, test_selection,
                           /*user_input_in_progress=*/true, full_url,
-                          /*is_focused=*/true);
+                          /*is_focused=*/true, permanent_display_text);
   page_.FlushForTesting();
 }
 
@@ -94,8 +96,8 @@ TEST_F(OmniboxPopupHandlerTest, OnSelectionChangedSequenceGuard) {
   handler_->OnSelectionChanged(selection1, 0);
   EXPECT_EQ(handler_->latest_selection(), selection1);
 
-  // `SetInputState increments the sequence number to 1.
-  handler_->SetInputState("test", gfx::Range(0, 0), false, "", true);
+  // `SetInputState` increments the sequence number to 1.
+  handler_->SetInputState("test", gfx::Range(0, 0), false, "", true, "");
 
   // A call with stale sequence number 0 should be discarded.
   gfx::Range selection2(2, 6);

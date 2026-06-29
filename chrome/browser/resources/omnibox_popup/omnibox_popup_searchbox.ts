@@ -18,7 +18,7 @@ import type {PropertyValues} from '//resources/lit/v3_0/lit.rollup.js';
 import {CrLitElement} from '//resources/lit/v3_0/lit.rollup.js';
 import type {AutocompleteResult, PageCallbackRouter as SearchboxPageCallbackRouter, PageHandlerInterface as SearchboxPageHandlerInterface} from '//resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 
-import {browserProxyFactory} from './omnibox_popup.mojom-webui.js';
+import {browserProxyFactory, OmniboxEscapeAction} from './omnibox_popup.mojom-webui.js';
 import type {OmniboxInputState, PageCallbackRouter as PopupPageCallbackRouter, PageHandlerInterface as PopupPageHandlerInterface} from './omnibox_popup.mojom-webui.js';
 import {getCss} from './omnibox_popup_searchbox.css.js';
 import {getHtml} from './omnibox_popup_searchbox.html.js';
@@ -131,6 +131,7 @@ export class OmniboxPopupSearchboxElement extends
   private isComposing_: boolean = false;
   private fullUrl_: string = '';
   private pendingFocusSelection_: {start: number, end: number}|null = null;
+  private permanentDisplayText_: string = '';
 
   constructor() {
     super();
@@ -312,6 +313,7 @@ export class OmniboxPopupSearchboxElement extends
     this.currentSequenceNum_ = state.sequenceNumber;
     this.fullUrl_ = state.fullUrl;
     this.lastQueriedInput = state.text;
+    this.permanentDisplayText_ = state.permanentDisplayText;
 
     if (state.isFocused) {
       this.$.input.focus();
@@ -319,9 +321,9 @@ export class OmniboxPopupSearchboxElement extends
       this.$.input.blur();
     }
 
-    // Input gets focused on init which triggers Blink's
-    // `UpdateSelectionOnFocus`. Set `pendingFocusSelection_` so that this
-    // update does not trigger `onSelectionChanged()`. See line 348 of
+    // Input gets focused on init which triggers blink UpdateSelectionOnFocus.
+    // Set pendingFocusSelection_ so that this update does not trigger
+    // onSelectionChanged(). See line 348 of
     // third_party/blink/renderer/core/html/forms/html_input_element.cc.
     this.pendingFocusSelection_ = state.selection;
     this.selectRange(state.selection);
@@ -396,15 +398,37 @@ export class OmniboxPopupSearchboxElement extends
 
   override async handleKeyNavigation(e: KeyboardEvent) {
     if (e.key === 'Escape') {
-      if (!this.dropdownIsVisible) {
-        if (this.getInputElement().inputElement.value) {
-          this.getInputElement().setInput({text: '', inline: ''});
+      if (this.dropdownIsVisible) {
+        e.preventDefault();
+        if (this.selectedMatchIndex > 0) {
+          // If there is temporary text (i.e. a non default suggestion is
+          // selected), then revert it.
+          await this.getDropdownElement().selectFirst();
+          this.popupPageHandler_.logEscapeAction(
+              OmniboxEscapeAction.kRevertTemporaryText);
         } else {
-          this.popupPageHandler_.closeUI();
+          // Otherwise, close the popup if it's open.
+          this.clearAutocompleteMatches();
+          this.popupPageHandler_.logEscapeAction(
+              OmniboxEscapeAction.kClosePopup);
         }
       } else {
-        this.clearAutocompleteMatches();
-        e.preventDefault();
+        if (this.getInputElement().inputElement.value !==
+            this.permanentDisplayText_) {
+          e.preventDefault();
+          // Clear the input by restoring the permanent display text.
+          this.getInputElement().setInput({
+            text: this.permanentDisplayText_,
+            inline: '',
+          });
+          this.getInputElement().select();
+          this.popupPageHandler_.logEscapeAction(
+              OmniboxEscapeAction.kClearUserInput);
+        } else {
+          // Blur the Omnibox popup by closing it.
+          this.popupPageHandler_.closeUI();
+          this.popupPageHandler_.logEscapeAction(OmniboxEscapeAction.kBlur);
+        }
       }
       return;
     }

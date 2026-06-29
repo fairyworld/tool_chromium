@@ -42,6 +42,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: false,
       fullUrl: '',
       isFocused: false,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
 
@@ -71,6 +72,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: true,
       fullUrl: '',
       isFocused: true,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
 
@@ -121,6 +123,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: false,
       fullUrl: '',
       isFocused: false,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
 
@@ -137,6 +140,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: true,
       fullUrl: '',
       isFocused: true,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
 
@@ -152,6 +156,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: false,
       fullUrl: '',
       isFocused: true,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
 
@@ -169,6 +174,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: true,
       fullUrl: '',
       isFocused: true,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
 
@@ -203,6 +209,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: true,
       fullUrl: '',
       isFocused: true,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
     handler.reset();
@@ -246,6 +253,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: true,
       fullUrl: full_url,
       isFocused: true,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
     handler.reset();
@@ -263,6 +271,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: false,
       fullUrl: '',
       isFocused: true,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
 
@@ -277,6 +286,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: false,
       fullUrl: '',
       isFocused: false,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
 
@@ -307,6 +317,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: true,
       fullUrl: '',
       isFocused: true,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
 
@@ -335,6 +346,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       userInputInProgress: true,
       fullUrl: '',
       isFocused: true,
+      permanentDisplayText: '',
     });
     await microtasksFinished();
 

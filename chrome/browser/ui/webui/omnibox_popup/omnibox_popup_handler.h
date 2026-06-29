@@ -46,6 +46,8 @@ class OmniboxPopupHandler : public omnibox_popup::mojom::PageHandler {
   void OnSelectionChanged(const gfx::Range& selection,
                           uint32_t sequence_number) override;
   void Revert(uint32_t sequence_number) override;
+  void LogEscapeAction(
+      omnibox_popup::mojom::OmniboxEscapeAction action) override;
 
   // omnibox_popup::mojom::Page:
   void OnShow();
@@ -54,7 +56,8 @@ class OmniboxPopupHandler : public omnibox_popup::mojom::PageHandler {
                      const gfx::Range& selection,
                      bool user_input_in_progress,
                      const std::string& full_url,
-                     bool is_focused);
+                     bool is_focused,
+                     const std::string& permanent_display_text);
 
   const gfx::Range& latest_selection() const { return latest_selection_; }
 
