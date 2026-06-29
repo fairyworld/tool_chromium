@@ -6,6 +6,7 @@ package org.chromium.chrome.browser.tasks.tab_management.vertical_tabs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -27,6 +28,7 @@ import android.view.ViewConfiguration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.filters.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +43,7 @@ import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabSelectionType;
 import org.chromium.chrome.browser.tabmodel.TabModel;
+import org.chromium.chrome.browser.tasks.tab_management.TabGridItemLongPressOrchestrator;
 import org.chromium.chrome.browser.tasks.tab_management.TabListModel;
 import org.chromium.chrome.browser.tasks.tab_management.TabProperties;
 import org.chromium.chrome.tab_ui.R;
@@ -153,6 +156,51 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
         mTargetPropertyModel.set(TabProperties.IS_PINNED, true);
 
         assertTrue(mCallback.canDropOver(mRecyclerView, mViewHolder, mTargetViewHolder));
+    }
+
+    @Test
+    @SmallTest
+    public void testSetOnLongPressTabItemEventListener_WiresCallbackCorrectly() {
+        // Set up mock listener.
+        TabGridItemLongPressOrchestrator.OnLongPressTabItemEventListener mockListener =
+                mock(TabGridItemLongPressOrchestrator.OnLongPressTabItemEventListener.class);
+
+        mCallback.setOnLongPressTabItemEventListener(mockListener);
+
+        TabGridItemLongPressOrchestrator orchestrator =
+                mCallback.getTabGridItemLongPressOrchestratorForTesting();
+
+        assertNotNull(
+                "Orchestrator should be initialized when listener is provided.", orchestrator);
+    }
+
+    @Test
+    @SmallTest
+    public void testOnSelectedChanged_DragStateTriggersOrchestrator() {
+        // Set up the callback with a mock orchestrator so we can verify the execution.
+        TabGridItemLongPressOrchestrator mockOrchestrator =
+                mock(TabGridItemLongPressOrchestrator.class);
+        mCallback.setTabGridItemLongPressOrchestratorForTesting(mockOrchestrator);
+
+        // Create a real ViewHolder instance using an empty lambda for the ViewBinder.
+        View dummyView = mock(View.class);
+        SimpleRecyclerViewAdapter.ViewHolder realViewHolder =
+                new SimpleRecyclerViewAdapter.ViewHolder(dummyView, (model, view, key) -> {});
+
+        // Inject a mock PropertyModel to prevent the NPE inside hasTabPropertiesModel().
+        PropertyModel mockPropertyModel = mock(PropertyModel.class);
+        realViewHolder.model = mockPropertyModel;
+        doReturn(TabProperties.UiType.TAB)
+                .when(mockPropertyModel)
+                .get(TabListModel.CardProperties.CARD_TYPE);
+
+        mCallback.onSelectedChanged(realViewHolder, ItemTouchHelper.ACTION_STATE_DRAG);
+
+        // Verify that the long-press pipeline correctly intercepts the dragging state change.
+        verify(mockOrchestrator)
+                .onSelectedChanged(
+                        realViewHolder.getBindingAdapterPosition(),
+                        ItemTouchHelper.ACTION_STATE_DRAG);
     }
 
     @Test

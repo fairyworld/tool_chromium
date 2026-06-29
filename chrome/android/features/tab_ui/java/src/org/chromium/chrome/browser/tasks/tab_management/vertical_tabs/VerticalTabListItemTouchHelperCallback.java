@@ -23,6 +23,7 @@ import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabSelectionType;
 import org.chromium.chrome.browser.tabmodel.TabGroupUtils;
 import org.chromium.chrome.browser.tabmodel.TabModel;
+import org.chromium.chrome.browser.tasks.tab_management.TabGridItemLongPressOrchestrator;
 import org.chromium.chrome.browser.tasks.tab_management.TabListItemTouchHelperCallback;
 import org.chromium.chrome.browser.tasks.tab_management.TabListModel;
 import org.chromium.chrome.browser.tasks.tab_management.TabProperties;
@@ -44,6 +45,7 @@ import java.util.function.Supplier;
  */
 @NullMarked
 public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelperCallback {
+    private static final long CONTEXT_MENU_ORCHESTRATOR_DELAY_MS = 10L;
     private final int mMouseDragThresholdSquared;
     private final Set<Integer> mDraggedChildTabIds = new HashSet<>();
     private final List<Integer> mSelectedGroupTabIds = new ArrayList<>();
@@ -66,6 +68,10 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
      */
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+        if (mRecyclerViewSupplier.get() == null) {
+            mRecyclerViewSupplier.set(recyclerView);
+        }
+
         if (!hasTabPropertiesModel(viewHolder)) return 0;
 
         // Regular and child tabs can move vertically.
@@ -193,6 +199,11 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
     public void onSelectedChanged(RecyclerView.@Nullable ViewHolder viewHolder, int actionState) {
         super.onSelectedChanged(viewHolder, actionState);
 
+        if (mTabGridItemLongPressOrchestrator != null && viewHolder != null) {
+            int position = viewHolder.getBindingAdapterPosition();
+            mTabGridItemLongPressOrchestrator.onSelectedChanged(position, actionState);
+        }
+
         if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
             mSelectedGroupTabIds.clear();
             if (!hasTabPropertiesModel(viewHolder)) return;
@@ -251,6 +262,24 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
     }
 
     @Override
+    public void setOnLongPressTabItemEventListener(
+            TabGridItemLongPressOrchestrator.@Nullable OnLongPressTabItemEventListener listener) {
+        if (listener != null) {
+            // Use 10ms so that the context menu appears almost immediately after the ~500ms
+            // long-press.
+            mTabGridItemLongPressOrchestrator =
+                    new TabGridItemLongPressOrchestrator(
+                            mRecyclerViewSupplier,
+                            mModel,
+                            listener,
+                            mLongPressDpCancelThreshold,
+                            CONTEXT_MENU_ORCHESTRATOR_DELAY_MS);
+        } else {
+            mTabGridItemLongPressOrchestrator = null;
+        }
+    }
+
+    @Override
     public void onChildDraw(
             Canvas c,
             RecyclerView recyclerView,
@@ -260,6 +289,10 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
             int actionState,
             boolean isCurrentlyActive) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        if (mTabGridItemLongPressOrchestrator != null) {
+            float displacementSquared = calcMagnitudeSquared(dX, dY);
+            mTabGridItemLongPressOrchestrator.processChildDisplacement(displacementSquared);
+        }
 
         if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
             if (!hasTabPropertiesModel(viewHolder)) return;
@@ -332,6 +365,10 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
     @Override
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
+        // Safeguard finger lift: explicitly wipe out any running timer threads.
+        if (mTabGridItemLongPressOrchestrator != null) {
+            mTabGridItemLongPressOrchestrator.cancel();
+        }
         setBeingDragged(viewHolder, /* isBeingDragged= */ false);
         // When the drag completely finishes, clean up all manual visual overrides on children.
         if (viewHolder.getItemViewType() == TabProperties.UiType.TAB_GROUP) {
@@ -531,5 +568,10 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
                 return false;
             }
         };
+    }
+
+    void setTabGridItemLongPressOrchestratorForTesting(
+            TabGridItemLongPressOrchestrator orchestrator) {
+        mTabGridItemLongPressOrchestrator = orchestrator;
     }
 }
