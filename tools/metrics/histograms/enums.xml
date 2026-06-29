@@ -11727,6 +11727,8 @@ from previous Chrome versions.
   <int value="-898005938" label="disable-pinch-virtual-viewport"/>
   <int value="-897994913"
       label="OmniboxUIExperimentRevealSteadyStateUrlPathQueryAndRefOnHover:enabled"/>
+  <int value="-897739776"
+      label="EnableAndroidEnterpriseScreenshotProtection:enabled"/>
   <int value="-897718456" label="ProcessIsolationSettings:disabled"/>
   <int value="-897660267" label="BluetoothDisconnectWarning:enabled"/>
   <int value="-897069393"
@@ -14871,6 +14873,8 @@ from previous Chrome versions.
   <int value="116666324" label="MainNodeAnnotations:disabled"/>
   <int value="116697601" label="OmniboxSuggestionButtonRow:disabled"/>
   <int value="116712802" label="AudioSelectionImprovement:enabled"/>
+  <int value="116740141"
+      label="EnableAndroidEnterpriseScreenshotProtection:disabled"/>
   <int value="117076190" label="DriveFsBidirectionalNativeMessaging:disabled"/>
   <int value="117497596" label="SidePanelDragAndDrop:disabled"/>
   <int value="118551757" label="TranslateOpenSettings:disabled"/>

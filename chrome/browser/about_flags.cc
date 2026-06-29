@@ -114,6 +114,7 @@
 #include "components/enterprise/client_certificates/core/features.h"
 #include "components/enterprise/connectors/core/features.h"
 #include "components/enterprise/data_controls/core/browser/features.h"
+#include "components/enterprise/data_protection/features.h"
 #include "components/enterprise/isolated_mode/settings.h"
 #include "components/enterprise/network_header_injection/core/features.h"
 #include "components/error_page/common/error_page_switches.h"
@@ -13225,6 +13226,15 @@ const FeatureEntry kFeatureEntries[] = {
      kOsWin | kOsMac | kOsLinux,
      FEATURE_VALUE_TYPE(policy::features::kDeviceSignalsBackfillDisclaimer)},
 #endif
+#if BUILDFLAG(IS_ANDROID)
+    {"enable-android-enterprise-screenshot-protection",
+     flag_descriptions::kAndroidEnterpriseScreenshotProtectionName,
+     flag_descriptions::kAndroidEnterpriseScreenshotProtectionDescription,
+     kOsAndroid,
+     FEATURE_VALUE_TYPE(enterprise_data_protection::
+                            kEnableAndroidEnterpriseScreenshotProtection)},
+#endif  // BUILDFLAG(IS_ANDROID)
+
     // Add new entries above this line.
     // NOTE: Adding a new flag requires adding a corresponding entry to enum
     // "LoginCustomFlags" in tools/metrics/histograms/enums.xml. See "Flag
