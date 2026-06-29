@@ -1530,6 +1530,17 @@ void ChromeAutofillClient::ShowAutofillAiFetchFromWalletFailureNotification() {
 #endif  // BUILDFLAG(IS_ANDROID)
 }
 
+void ChromeAutofillClient::ShowAutofillAiPreFetchFailureNotification() {
+#if BUILDFLAG(IS_ANDROID)
+  // TODO(crbug.com/503303085): Implement.
+#else
+  if (ToastController* toast_controller = GetToastController()) {
+    ToastParams params(ToastId::kAutofillAiPreFetchErrorMessage);
+    toast_controller->MaybeShowToast(std::move(params));
+  }
+#endif  // BUILDFLAG(IS_ANDROID)
+}
+
 ToastController* ChromeAutofillClient::GetToastController() {
 #if BUILDFLAG(IS_ANDROID)
   return nullptr;

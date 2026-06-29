@@ -43,9 +43,11 @@ using ::testing::_;
 using ::testing::DoAll;
 using ::testing::ElementsAre;
 using ::testing::ElementsAreArray;
+using ::testing::Eq;
 using ::testing::InSequence;
 using ::testing::IsEmpty;
 using ::testing::MockFunction;
+using ::testing::Optional;
 using ::testing::Property;
 using ::testing::ResultOf;
 using ::testing::Truly;
@@ -75,11 +77,15 @@ using RequestStatus = PersonalContextAccessManager::RequestStatus;
 }
 
 template <size_t I = 0, typename T>
-auto SaveSpanToVector(std::vector<T>* vector_ptr) {
+auto SaveOptSpanToVector(std::vector<T>* vector_ptr) {
   return [vector_ptr](auto&&... args) {
-    auto span = std::get<I>(
+    auto opt_span = std::get<I>(
         std::forward_as_tuple(std::forward<decltype(args)>(args)...));
-    vector_ptr->assign(span.begin(), span.end());
+    if (opt_span.has_value()) {
+      vector_ptr->assign(opt_span->begin(), opt_span->end());
+    } else {
+      vector_ptr->clear();
+    }
   };
 }
 
@@ -92,7 +98,7 @@ class MockPersonalContextAccessManagerObserver
   MOCK_METHOD(void,
               OnPrefetchContextComplete,
               (const PersonalContextAccessManager& manager,
-               base::span<const EntityInstance> entities),
+               std::optional<base::span<const EntityInstance>> entities),
               (override));
   MOCK_METHOD(void,
               OnMaskedEntityTypeEvicted,
@@ -196,7 +202,7 @@ TEST_F(PersonalContextAccessManagerImplTest, PrefetchContextSuccess) {
 
   std::vector<EntityInstance> entities;
   EXPECT_CALL(mock_observer(), OnPrefetchContextComplete)
-      .WillOnce(SaveSpanToVector<1>(&entities));
+      .WillOnce(SaveOptSpanToVector<1>(&entities));
   PrefetchContextSync(requested_types, expected_response);
 
   EXPECT_TRUE(
@@ -297,7 +303,7 @@ TEST_F(PersonalContextAccessManagerImplTest, PrefetchContextFailure) {
           _, _))
       .WillOnce(RunOnceCallback<3>(personal_context::FetchContextResult(
           base::unexpected(expected_error))));
-  EXPECT_CALL(mock_observer(), OnPrefetchContextComplete(_, IsEmpty()));
+  EXPECT_CALL(mock_observer(), OnPrefetchContextComplete(_, Eq(std::nullopt)));
   access_manager().PrefetchContext(requested_types);
   EXPECT_FALSE(
       access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
@@ -453,7 +459,7 @@ TEST_F(PersonalContextAccessManagerImplTest,
 
   std::vector<EntityInstance> entities;
   EXPECT_CALL(mock_observer(), OnPrefetchContextComplete)
-      .WillOnce(SaveSpanToVector<1>(&entities));
+      .WillOnce(SaveOptSpanToVector<1>(&entities));
   PrefetchContextSync({EntityType(EntityTypeName::kPassport)},
                       passport_response);
   EXPECT_TRUE(
@@ -511,7 +517,7 @@ TEST_F(PersonalContextAccessManagerImplTest,
 
   std::vector<EntityInstance> entities;
   EXPECT_CALL(mock_observer(), OnPrefetchContextComplete)
-      .WillOnce(SaveSpanToVector<1>(&entities));
+      .WillOnce(SaveOptSpanToVector<1>(&entities));
   PrefetchContextSync({EntityType(EntityTypeName::kPassport)}, response);
   ASSERT_TRUE(
       access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
@@ -574,7 +580,7 @@ TEST_F(PersonalContextAccessManagerImplTest,
   response.add_entities()->mutable_passport()->set_number("P123");
   std::vector<EntityInstance> entities;
   EXPECT_CALL(mock_observer(), OnPrefetchContextComplete)
-      .WillOnce(SaveSpanToVector<1>(&entities));
+      .WillOnce(SaveOptSpanToVector<1>(&entities));
   PrefetchContextSync({EntityType(EntityTypeName::kPassport)}, response);
   ASSERT_EQ(entities.size(), 1u);
   EntityInstance::EntityId passport_guid = entities[0].guid();
@@ -599,7 +605,7 @@ TEST_F(PersonalContextAccessManagerImplTest, WipeStateOnDisablement) {
   passport_response.add_entities()->mutable_passport()->set_number("P123");
   std::vector<EntityInstance> entities;
   EXPECT_CALL(mock_observer(), OnPrefetchContextComplete)
-      .WillOnce(SaveSpanToVector<1>(&entities));
+      .WillOnce(SaveOptSpanToVector<1>(&entities));
   PrefetchContextSync({EntityType(EntityTypeName::kPassport)},
                       passport_response);
   EXPECT_TRUE(
@@ -804,7 +810,8 @@ TEST_F(PersonalContextAccessManagerImplTest, PrefetchStatusAndObserverSuccess) {
   personal_context::proto::Any any_response;
   response.SerializeToString(any_response.mutable_value());
 
-  EXPECT_CALL(mock_observer(), OnPrefetchContextComplete(_, IsEmpty()));
+  EXPECT_CALL(mock_observer(),
+              OnPrefetchContextComplete(_, Optional(IsEmpty())));
   future.Take().Run(
       personal_context::FetchContextResult(base::ok(std::move(any_response))));
 
@@ -838,7 +845,7 @@ TEST_F(PersonalContextAccessManagerImplTest, PrefetchStatusAndObserverFailure) {
 
   // 2. Resolve request with failure. Status should transition to `kFailure`,
   // and observer should be notified with success = false.
-  EXPECT_CALL(mock_observer(), OnPrefetchContextComplete(_, IsEmpty()));
+  EXPECT_CALL(mock_observer(), OnPrefetchContextComplete(_, Eq(std::nullopt)));
   ContextMemoryError expected_error = ContextMemoryError::FromExecutionError(
       ContextMemoryError::ExecutionError::kGenericFailure);
   future.Take().Run(
@@ -868,7 +875,7 @@ TEST_F(PersonalContextAccessManagerImplTest,
   PrefetchContextSync({EntityType(EntityTypeName::kPassport)}, response);
 
   // 2. Call Prefetch again. Expect observer to be notified synchronously.
-  EXPECT_CALL(observer, OnPrefetchContextComplete(_, IsEmpty()));
+  EXPECT_CALL(observer, OnPrefetchContextComplete(_, Optional(IsEmpty())));
   access_manager().PrefetchContext({EntityType(EntityTypeName::kPassport)});
 }
 
@@ -881,7 +888,7 @@ TEST_F(PersonalContextAccessManagerImplTest,
 
   std::vector<EntityInstance> entities;
   EXPECT_CALL(mock_observer(), OnPrefetchContextComplete)
-      .WillOnce(SaveSpanToVector<1>(&entities));
+      .WillOnce(SaveOptSpanToVector<1>(&entities));
   PrefetchContextSync({EntityType(EntityTypeName::kPassport)}, response);
   ASSERT_TRUE(
       access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));

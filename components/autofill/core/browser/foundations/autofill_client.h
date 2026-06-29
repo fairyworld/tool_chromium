@@ -842,6 +842,9 @@ class AutofillClient {
   // Notifies the user that operation to fetch data from Wallet failed.
   virtual void ShowAutofillAiFetchFromWalletFailureNotification();
 
+  // Notifies the user that prefetching Autofill AI entities failed.
+  virtual void ShowAutofillAiPreFetchFailureNotification();
+
   virtual void ShowEmailVerifiedToast(const GURL& issuer);
 
   // Shows a yes/no prompt asking the user to confirm that they want to verify

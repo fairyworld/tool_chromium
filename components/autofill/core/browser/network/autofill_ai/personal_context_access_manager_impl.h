@@ -157,7 +157,8 @@ class PersonalContextAccessManagerImpl
   void SetTypeStatus(EntityType type, RequestStatus status);
 
   // Notifies observers of the prefetch status.
-  void NotifyPrefetchStatusObservers(base::span<const EntityInstance> entities);
+  void NotifyPrefetchStatusObservers(
+      std::optional<base::span<const EntityInstance>> entities);
 
   // Caches an unmasked SPII `entity`, so it can be refilled without an
   // additional network round trip for `kUnmaskedSpiiCacheTTL`.

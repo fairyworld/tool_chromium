@@ -28,7 +28,7 @@ class PersonalContextAccessManager : public KeyedService {
     // `entities` is empty.
     virtual void OnPrefetchContextComplete(
         const PersonalContextAccessManager& manager,
-        base::span<const EntityInstance> entities) {}
+        std::optional<base::span<const EntityInstance>> entities) {}
     // Called whenever a prefetched entity reaches its TTL or expires for
     // another reason (eligibility to pContext changed, etc).
     virtual void OnMaskedEntityTypeEvicted(

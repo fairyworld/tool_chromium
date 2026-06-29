@@ -96,7 +96,7 @@ void PersonalContextAccessManagerImpl::PrefetchContext(
   }
 
   if (types_to_request.empty()) {
-    NotifyPrefetchStatusObservers({});
+    NotifyPrefetchStatusObservers(base::span<const EntityInstance>());
     return;
   }
 
@@ -121,7 +121,7 @@ void PersonalContextAccessManagerImpl::OnPrefetchContextRequestComplete(
     for (const EntityType& type : requested_types) {
       SetTypeStatus(type, RequestStatus::kFailure);
     }
-    NotifyPrefetchStatusObservers({});
+    NotifyPrefetchStatusObservers(std::nullopt);
     return;
   }
 
@@ -134,7 +134,7 @@ void PersonalContextAccessManagerImpl::OnPrefetchContextRequestComplete(
     for (const EntityType& type : requested_types) {
       SetTypeStatus(type, RequestStatus::kFailure);
     }
-    NotifyPrefetchStatusObservers({});
+    NotifyPrefetchStatusObservers(std::nullopt);
     return;
   }
 
@@ -411,7 +411,7 @@ void PersonalContextAccessManagerImpl::SetTypeStatus(EntityType type,
 }
 
 void PersonalContextAccessManagerImpl::NotifyPrefetchStatusObservers(
-    base::span<const EntityInstance> entities) {
+    std::optional<base::span<const EntityInstance>> entities) {
   observers_.Notify(
       &PersonalContextAccessManager::Observer::OnPrefetchContextComplete, *this,
       entities);

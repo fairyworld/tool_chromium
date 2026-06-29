@@ -434,9 +434,7 @@ void ToastService::RegisterToasts(
           .Build());
 
   if (base::FeatureList::IsEnabled(
-          autofill::features::kAutofillAiWalletPrivatePasses) ||
-      base::FeatureList::IsEnabled(
-          autofill::features::kAutofillAmbientAutofill)) {
+          autofill::features::kAutofillAiWalletPrivatePasses)) {
     toast_registry_->RegisterToast(
         ToastId::kAutofillAiFetchFromWalletErrorMessage,
         ToastSpecification::Builder(
@@ -639,4 +637,16 @@ void ToastService::RegisterToasts(
           .AddCloseButton()
           .AddGlobalScoped()
           .Build());
+
+  if (base::FeatureList::IsEnabled(
+          autofill::features::kAutofillAmbientAutofill)) {
+    toast_registry_->RegisterToast(
+        ToastId::kAutofillAiPreFetchErrorMessage,
+        ToastSpecification::Builder(features::IsRoundedIconsEnabled()
+                                        ? kTextAnalysisIcon
+                                        : kTextAnalysisOldIcon,
+                                    IDS_AUTOFILL_AI_PRE_FETCH_ERROR_MESSAGE)
+            .AddGlobalScoped()
+            .Build());
+  }
 }  // RegisterToasts() end.

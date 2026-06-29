@@ -3159,7 +3159,7 @@ TEST_F(AutofillExternalDelegateWithAmbientAutofillTest,
       full_passport.attribute(kPassportNumberType)->GetCompleteRawInfo(),
       masked_passport.attribute(kPassportNumberType)->GetCompleteRawInfo());
   autofill_client().GetEntityDataManager()->OnPrefetchContextComplete(
-      personal_context_manager(), {masked_passport});
+      personal_context_manager(), std::vector<EntityInstance>{masked_passport});
 
   IssueOnQuery({.fields = {{.role = PASSPORT_NUMBER}}});
   Suggestion fill_suggestion(SuggestionType::kFillAutofillAi);
