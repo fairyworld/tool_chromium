@@ -8,11 +8,13 @@
 
 #include "base/run_loop.h"
 #include "base/task/thread_pool.h"
+#include "base/test/gtest_util.h"
 #include "base/test/task_environment.h"
 #include "base/threading/thread_restrictions.h"
 #include "net/base/net_errors.h"
 #include "net/http/http_response_headers.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/federated_compute/src/fcp/client/http/in_memory_request_response.h"
 
 namespace private_insights {
 
@@ -199,6 +201,137 @@ TEST(ConvertResponseHeadersToFcp, NullHeaders) {
   fcp::client::http::HeaderList result = ConvertResponseHeadersToFcp(
       nullptr, /*request_had_explicit_accept_encoding=*/false);
   EXPECT_TRUE(result.empty());
+}
+
+TEST(ReadRequestBodyTest, EmptyBody) {
+  auto request_or = fcp::client::http::InMemoryHttpRequest::Create(
+      "https://example.com", fcp::client::http::HttpRequest::Method::kGet,
+      /*extra_headers=*/{}, /*body=*/"", /*use_compression=*/false);
+  ASSERT_TRUE(request_or.ok());
+  auto body_or = ReadRequestBody(**request_or);
+  ASSERT_TRUE(body_or.ok());
+  EXPECT_TRUE(body_or->empty());
+}
+
+TEST(ReadRequestBodyTest, NonEmptyBody) {
+  std::string expected_body = "test payload data";
+  auto request_or = fcp::client::http::InMemoryHttpRequest::Create(
+      "https://example.com", fcp::client::http::HttpRequest::Method::kPost,
+      /*extra_headers=*/{}, expected_body, /*use_compression=*/false);
+  ASSERT_TRUE(request_or.ok());
+  auto body_or = ReadRequestBody(**request_or);
+  ASSERT_TRUE(body_or.ok());
+  EXPECT_EQ(*body_or, expected_body);
+}
+
+TEST(ReadRequestBodyTest, MultipleChunks) {
+  class MultipleChunksHttpRequest : public fcp::client::http::HttpRequest {
+   public:
+    absl::string_view uri() const override { return "https://example.com"; }
+
+    Method method() const override { return Method::kPost; }
+
+    const fcp::client::http::HeaderList& extra_headers() const override {
+      return headers_;
+    }
+
+    bool HasBody() const override { return true; }
+
+    absl::StatusOr<int64_t> ReadBody(  // nocheck
+        char* buffer,
+        int64_t requested) override {
+      if (chunk_index_ >= chunks_.size()) {
+        return absl::OutOfRangeError("End of sequence");
+      }
+      const std::string& chunk = chunks_[chunk_index_++];
+      EXPECT_GT(requested, static_cast<int64_t>(chunk.size()));
+      std::copy(chunk.begin(), chunk.end(), buffer);
+      return static_cast<int64_t>(chunk.size());
+    }
+
+    std::unique_ptr<HttpRequest> Clone() const override {
+      ADD_FAILURE() << "Clone() should not be called";
+      return nullptr;
+    }
+
+   private:
+    std::vector<std::string> chunks_ = {"hello ", "world! ", "multi-chunk ",
+                                        "test"};
+    size_t chunk_index_ = 0;
+    fcp::client::http::HeaderList headers_;
+  };
+
+  MultipleChunksHttpRequest request;
+  auto body_or = ReadRequestBody(request);
+  ASSERT_TRUE(body_or.ok());
+  EXPECT_EQ(*body_or, "hello world! multi-chunk test");
+}
+
+TEST(ReadRequestBodyTest, ZeroBytesReturned) {
+  class ZeroByteHttpRequest : public fcp::client::http::HttpRequest {
+   public:
+    absl::string_view uri() const override { return "https://example.com"; }
+
+    Method method() const override { return Method::kPost; }
+
+    const fcp::client::http::HeaderList& extra_headers() const override {
+      return headers_;
+    }
+
+    bool HasBody() const override { return true; }
+
+    absl::StatusOr<int64_t> ReadBody(  // nocheck
+        char* buffer,
+        int64_t requested) override {
+      return 0;
+    }
+
+    std::unique_ptr<HttpRequest> Clone() const override {
+      ADD_FAILURE() << "Clone() should not be called";
+      return nullptr;
+    }
+
+   private:
+    fcp::client::http::HeaderList headers_;
+  };
+
+  ZeroByteHttpRequest request;
+  EXPECT_DCHECK_DEATH((void)ReadRequestBody(request));
+}
+
+TEST(ReadRequestBodyTest, ErrorReadingBody) {
+  class ErrorHttpRequest : public fcp::client::http::HttpRequest {
+   public:
+    absl::string_view uri() const override { return "https://example.com"; }
+
+    Method method() const override { return Method::kPost; }
+
+    const fcp::client::http::HeaderList& extra_headers() const override {
+      return headers_;
+    }
+
+    bool HasBody() const override { return true; }
+
+    absl::StatusOr<int64_t> ReadBody(  // nocheck
+        char* buffer,
+        int64_t requested) override {
+      return absl::ResourceExhaustedError("Custom quota exceeded error");
+    }
+
+    std::unique_ptr<HttpRequest> Clone() const override {
+      ADD_FAILURE() << "Clone() should not be called";
+      return nullptr;
+    }
+
+   private:
+    fcp::client::http::HeaderList headers_;
+  };
+
+  ErrorHttpRequest request;
+  auto body_or = ReadRequestBody(request);
+  EXPECT_FALSE(body_or.ok());
+  EXPECT_EQ(body_or.status().code(), absl::StatusCode::kResourceExhausted);
+  EXPECT_EQ(body_or.status().message(), "Custom quota exceeded error");
 }
 
 TEST(CountdownLatchTest, ZeroInitialCount) {

@@ -13,6 +13,7 @@
 #include "base/synchronization/waitable_event.h"
 #include "net/http/http_request_headers.h"
 #include "third_party/abseil-cpp/absl/status/status.h"
+#include "third_party/abseil-cpp/absl/status/statusor.h"
 #include "third_party/federated_compute/src/fcp/client/http/http_client.h"
 
 namespace net {
@@ -43,6 +44,12 @@ ProcessedRequestHeaders ProcessFcpRequestHeaders(
 fcp::client::http::HeaderList ConvertResponseHeadersToFcp(
     const net::HttpResponseHeaders* headers,
     bool request_had_explicit_accept_encoding);
+
+// Reads the request body from an FCP HTTP request into a string. Returns an
+// error if reading the request body fails, propagating the status returned by
+// `HttpRequest::ReadBody`.
+absl::StatusOr<std::string> ReadRequestBody(  // nocheck
+    fcp::client::http::HttpRequest& request);
 
 // Thread-safe synchronization primitive that allows threads to wait until a
 // set of operations decrement the counter to zero.

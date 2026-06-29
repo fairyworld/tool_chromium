@@ -152,6 +152,41 @@ fcp::client::http::HeaderList ConvertResponseHeadersToFcp(
   return result;
 }
 
+absl::StatusOr<std::string> ReadRequestBody(  // nocheck
+    fcp::client::http::HttpRequest& request) {
+  std::string body;
+  if (!request.HasBody()) {
+    return body;
+  }
+
+  char buffer[4096];
+  while (true) {
+    auto read_or = request.ReadBody(buffer, sizeof(buffer));
+    if (!read_or.ok()) {
+      // As per `ReadBody`'s contract, kOutOfRange means no more data.
+      if (read_or.status().code() == absl::StatusCode::kOutOfRange) {
+        break;
+      }
+
+      // As per `OnResponseError`'s docs, if `ReadBody` returned an unexpected
+      // error, then `OnResponseError` should be called with that error, that's
+      // why we need to return it.
+      return read_or.status();
+    }
+
+    // ReadBody should return at least one byte. If that doesn't happen, handle
+    // this case gracefully instead of falling into a potentially infinite loop.
+    DCHECK_GT(*read_or, 0);
+    if (*read_or == 0) {
+      break;
+    }
+
+    body.append(buffer, *read_or);
+  }
+
+  return body;
+}
+
 CountdownLatch::CountdownLatch(size_t count)
     : count_(count),
       done_event_(base::WaitableEvent::ResetPolicy::MANUAL,

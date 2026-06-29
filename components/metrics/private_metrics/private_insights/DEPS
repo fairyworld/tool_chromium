@@ -6,15 +6,13 @@ include_rules = [
 ]
 
 specific_include_rules = {
-  # FCP event publisher implements FCP's interfaces that need absl.
-  "fcp_event_publisher\\.(cc|h)": [
+  # FCP files implements FCP's interfaces that need absl.
+  "fcp_.*": [
     "+third_party/abseil-cpp/absl/strings",
     "+third_party/abseil-cpp/absl/time",
-  ],
-  "private_insights_service\\.cc": [
     "+third_party/abseil-cpp/absl/status",
   ],
-  "fcp_http_client\\.(cc|h)": [
+  "private_insights_service\\.cc": [
     "+third_party/abseil-cpp/absl/status",
   ],
 }
