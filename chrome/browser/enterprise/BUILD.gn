@@ -211,7 +211,7 @@ source_set("enterprise") {
     ]
   }
 
-  if (enterprise_watermark) {
+  if (enterprise_watermark && toolkit_views) {
     public_deps += [
       "//chrome/browser/enterprise/data_protection:data_protection_view_lib",
     ]
