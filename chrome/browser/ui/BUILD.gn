@@ -5746,10 +5746,15 @@ if (!is_android) {
       "browser_tab_strip_model_delegate.h",
       "browser_tab_strip_tracker.h",
       "browser_tab_strip_tracker_delegate.h",
+      "unload_controller.h",
     ]
     public_deps = [
       "//base",
+      "//chrome/browser/tab_contents",
+      "//chrome/browser/ui/browser_window",
       "//chrome/browser/ui/tabs:tab_strip",
+      "//chrome/browser/ui/tabs:tabs_public",
+      "//ui/base/unowned_user_data",
     ]
   }
 
