@@ -705,4 +705,17 @@ TEST_F(GlicMediaContextTest, PrefBlocksTranscription) {
   EXPECT_EQ(GetTranscriptText(context()), "");
 }
 
+TEST_F(GlicMediaContextTest, ClearAllTranscriptsClearsTranscripts) {
+  // Populate the context with transcripts.
+  context()->OnResult(CreateSpeechRecognitionResult("Transcript one", true));
+  EXPECT_EQ(GetTranscriptText(context()), "Transcript one");
+
+  // Clear them.
+  context()->ClearAllTranscripts();
+
+  // Verify that it is now empty.
+  EXPECT_EQ(GetTranscriptText(context()), "");
+  EXPECT_FALSE(context()->HasTranscriptChunks());
+}
+
 }  // namespace glic

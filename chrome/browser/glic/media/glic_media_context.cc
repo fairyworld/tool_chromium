@@ -260,6 +260,10 @@ bool GlicMediaContext::HasTranscriptChunks() const {
          !transcript->transcript_chunks_.empty();
 }
 
+void GlicMediaContext::ClearAllTranscripts() {
+  transcripts_by_title_.clear();
+}
+
 void GlicMediaContext::OnPeerConnectionAdded() {
   num_peer_connections_++;
 }
