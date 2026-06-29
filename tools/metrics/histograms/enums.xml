@@ -5185,6 +5185,8 @@ shown properly on the user-facing crash UI.
   <int value="-2140127227" label="MF_TYPE_ERR"/>
   <int value="-2089484281" label="WEB_E_INVALID_JSON_STRING"/>
   <int value="-2089418750" label="E_INVALID_PROTOCOL_FORMAT"/>
+  <int value="-2018574335"
+      label="SQLITE_E_ERROR (Windows Audio DB Corruption)"/>
   <int value="-2005532292" label="D3DERR_OUTOFVIDEOMEMORY"/>
   <int value="-2005270527" label="DXGI_ERROR_INVALID_CALL"/>
   <int value="-2005270526" label="DXGI_ERROR_NOT_FOUND"/>
@@ -5615,6 +5617,7 @@ shown properly on the user-facing crash UI.
   <int value="-805306212" label="STATUS_DEVICE_DATA_ERROR"/>
   <int value="-805306067" label="STATUS_COMMITMENT_LIMIT"/>
   <int value="-805305979" label="STATUS_IO_DEVICE_ERROR"/>
+  <int value="-536870363" label="ERROR_NO_SUCH_DEVICE_INTERFACE"/>
   <int value="0" label="S_OK"/>
   <int value="866008" label="MF_S_MULTIPLE_BEGIN"/>
   <int value="866045" label="MF_S_ACTIVATE_REPLACED"/>
