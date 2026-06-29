@@ -637,6 +637,18 @@ class TestDialogController
                 : IdentityRequestDialogController::PassiveDialogVolume::
                       kDefault) {}
 
+  void UpdateConfiguration(MockConfiguration config) {
+    accounts_dialog_action_ = config.accounts_dialog_action;
+    idp_signin_status_mismatch_dialog_action_ =
+        config.idp_signin_status_mismatch_dialog_action;
+    error_dialog_action_ = config.error_dialog_action;
+    loading_dialog_action_ = config.loading_dialog_action;
+    passive_dialog_volume_ =
+        config.suppressed_by_segmentation_platform
+            ? IdentityRequestDialogController::PassiveDialogVolume::kAmbient
+            : IdentityRequestDialogController::PassiveDialogVolume::kDefault;
+  }
+
   ~TestDialogController() override = default;
   TestDialogController(TestDialogController&) = delete;
   TestDialogController& operator=(TestDialogController&) = delete;
@@ -1327,15 +1339,21 @@ class RequestTest : public RenderViewHostImplTestHarness {
       const MockConfiguration& configuration,
       AuthRequestCallbackHelper* auth_helper = nullptr,
       mojo::Remote<FederatedRequest>* request_remote = nullptr) {
-    if (!custom_dialog_controller_) {
-      custom_dialog_controller_ =
-          std::make_unique<TestDialogController>(configuration);
+    if (custom_dialog_controller_) {
+      active_mock_dialog_controller_ = custom_dialog_controller_->AsWeakPtr();
+      active_mock_dialog_controller_->SetState(&dialog_controller_state_);
+      RequestService::GetOrCreateForCurrentDocument(main_test_rfh())
+          ->SetDialogControllerForTests(std::move(custom_dialog_controller_));
+    } else if (!active_mock_dialog_controller_) {
+      auto mock = std::make_unique<TestDialogController>(configuration);
+      active_mock_dialog_controller_ = mock->AsWeakPtr();
+      active_mock_dialog_controller_->SetState(&dialog_controller_state_);
+      RequestService::GetOrCreateForCurrentDocument(main_test_rfh())
+          ->SetDialogControllerForTests(std::move(mock));
+    } else {
+      active_mock_dialog_controller_->UpdateConfiguration(configuration);
     }
-
     dialog_controller_state_ = TestDialogController::State();
-    custom_dialog_controller_->SetState(&dialog_controller_state_);
-    RequestService::GetOrCreateForCurrentDocument(main_test_rfh())
-        ->SetDialogControllerForTests(std::move(custom_dialog_controller_));
 
     SetConfig(configuration);
 
@@ -2048,6 +2066,7 @@ class RequestTest : public RenderViewHostImplTestHarness {
 
  private:
   std::unique_ptr<TestDialogController> custom_dialog_controller_;
+  base::WeakPtr<TestDialogController> active_mock_dialog_controller_;
   std::unique_ptr<ukm::TestAutoSetUkmRecorder> ukm_recorder_;
 };
 

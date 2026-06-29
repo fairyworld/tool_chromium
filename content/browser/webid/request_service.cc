@@ -152,6 +152,7 @@ void RequestService::StartTokenRequest(
     // 6. If it failed immediately, discard the new request and restore the old
     // one!
     active_request_ = std::move(old_request);
+    MaybeDestroyDialogController();
   }
 }
 
@@ -192,6 +193,7 @@ void RequestService::OnTokenRequestComplete(
 void RequestService::CleanUpCompletedRequest(Request* request) {
   std::erase_if(completed_requests_,
                 [&](const auto& r) { return r.get() == request; });
+  MaybeDestroyDialogController();
 }
 
 void RequestService::SetNetworkManagerForTests(
@@ -311,8 +313,7 @@ bool RequestService::SetupIdentityRegistryFromPopup() {
   if (identity_registry_) {
     return true;
   }
-  std::unique_ptr<IdentityRequestDialogController> controller =
-      CreateDialogController();
+  IdentityRequestDialogController* controller = GetOrCreateDialogController();
   CHECK(controller);
   // Because ShowModalDialog does not return the web contents on Android, we
   // need to set up the IdentityRegistry now.
@@ -507,12 +508,25 @@ void RequestService::ResolveTokenRequest(
   std::move(callback).Run(accepted);
 }
 
+IdentityRequestDialogController* RequestService::GetOrCreateDialogController() {
+  if (mock_dialog_controller_) {
+    return mock_dialog_controller_.get();
+  }
+  if (!dialog_controller_) {
+    dialog_controller_ = CreateDialogController();
+  }
+  return dialog_controller_.get();
+}
+
+IdentityRequestDialogController* RequestService::GetDialogController() const {
+  if (mock_dialog_controller_) {
+    return mock_dialog_controller_.get();
+  }
+  return dialog_controller_.get();
+}
+
 std::unique_ptr<IdentityRequestDialogController>
 RequestService::CreateDialogController() {
-  if (mock_dialog_controller_) {
-    return std::move(mock_dialog_controller_);
-  }
-
   WebContents* web_contents =
       WebContents::FromRenderFrameHost(&render_frame_host());
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(
@@ -528,6 +542,12 @@ RequestService::CreateDialogController() {
 
   return GetContentClient()->browser()->CreateIdentityRequestDialogController(
       web_contents);
+}
+
+void RequestService::MaybeDestroyDialogController() {
+  if (!active_request_ && completed_requests_.empty()) {
+    dialog_controller_.reset();
+  }
 }
 
 void RequestService::SetDialogControllerForTests(

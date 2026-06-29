@@ -116,7 +116,8 @@ class CONTENT_EXPORT RequestService
       std::unique_ptr<IdpNetworkRequestManager> manager);
   std::unique_ptr<IdpNetworkRequestManager> CreateNetworkManager();
   void CloseModalDialogView();
-  std::unique_ptr<IdentityRequestDialogController> CreateDialogController();
+  IdentityRequestDialogController* GetOrCreateDialogController();
+  IdentityRequestDialogController* GetDialogController() const;
   void SetDialogControllerForTests(
       std::unique_ptr<IdentityRequestDialogController> controller);
 
@@ -164,6 +165,8 @@ class CONTENT_EXPORT RequestService
       bool is_auto_selected);
   void CleanUpCompletedRequest(Request* request);
   std::unique_ptr<Metrics> CreateFedCmMetrics();
+  std::unique_ptr<IdentityRequestDialogController> CreateDialogController();
+  void MaybeDestroyDialogController();
 
   std::unique_ptr<Request> active_request_;
   // Temporary storage for completed requests pending destruction.
@@ -194,6 +197,8 @@ class CONTENT_EXPORT RequestService
   raw_ptr<FederatedIdentityPermissionContextDelegate> permission_delegate_ =
       nullptr;
   std::unique_ptr<DisconnectRequest> disconnect_request_;
+
+  std::unique_ptr<IdentityRequestDialogController> dialog_controller_;
   std::unique_ptr<IdentityRequestDialogController> mock_dialog_controller_;
 
   base::WeakPtrFactory<RequestService> weak_ptr_factory_{this};

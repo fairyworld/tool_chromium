@@ -179,9 +179,7 @@ class CONTENT_EXPORT Request
   GetApiPermissionStatus();
 
   // For use by the devtools protocol for browser automation.
-  IdentityRequestDialogController* GetDialogController() {
-    return request_dialog_controller_.get();
-  }
+  IdentityRequestDialogController* GetDialogController();
 
   const std::vector<IdentityProviderDataPtr>& GetSortedIdpData() const {
     return idp_data_for_display_;
@@ -442,7 +440,6 @@ class CONTENT_EXPORT Request
       bool is_auto_selected);
 
   std::unique_ptr<IdpNetworkRequestManager> CreateNetworkManager();
-  std::unique_ptr<IdentityRequestDialogController> CreateDialogController();
 
   // Creates an inspector issue related to a federated authentication request to
   // the Issues panel in DevTools.
@@ -505,7 +502,6 @@ class CONTENT_EXPORT Request
   RelyingPartyData CreateRpData(bool client_metadata_received) const;
 
   std::unique_ptr<IdpNetworkRequestManager> network_manager_;
-  std::unique_ptr<IdentityRequestDialogController> request_dialog_controller_;
 
   // Helper that records FedCM UMA and UKM metrics. Initialized in the
   // RequestToken() method, so all metrics must be recorded after that.
