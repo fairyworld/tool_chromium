@@ -956,13 +956,11 @@ UIWindow* WindowWithAccessibilityIdentifier(NSString* accessibility_id) {
 }
 
 + (id<GREYMatcher>)addressesAndMoreButton {
-  return [ChromeMatchersAppInterface
-      buttonWithAccessibilityLabelID:(IDS_AUTOFILL_ADDRESSES_SETTINGS_TITLE)];
+  return grey_accessibilityID(kSettingsAddressesAndMoreCellId);
 }
 
 + (id<GREYMatcher>)paymentMethodsButton {
-  return [ChromeMatchersAppInterface
-      buttonWithAccessibilityLabelID:(IDS_AUTOFILL_PAYMENT_METHODS)];
+  return grey_accessibilityID(kSettingsPaymentMethodsCellId);
 }
 
 + (id<GREYMatcher>)languagesButton {
