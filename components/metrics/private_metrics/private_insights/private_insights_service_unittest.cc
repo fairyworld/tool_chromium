@@ -240,4 +240,42 @@ TEST_F(PrivateInsightsServiceTest, PopulationNameFinchParam) {
   EXPECT_EQ(GetLastPopulationName(), "custom_population_name");
 }
 
+TEST_F(PrivateInsightsServiceTest, LogContextualCueEvent) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeatureWithParameters(
+      kPrivateInsightsFeature, {{"max_contextual_cue_events", "2"}});
+
+  TestingPrefServiceSimple local_state;
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
+                                 test_shared_url_loader_factory_);
+  DCHECK_CALLED_ON_VALID_SEQUENCE(service.sequence_checker_);
+
+  EXPECT_EQ(service.contextual_cue_events_.size(), 0u);
+
+  events::ContextualCueLogEvent event1;
+  event1.set_cue_id("cue_1");
+  service.LogContextualCueEvent(event1);
+
+  EXPECT_EQ(service.contextual_cue_events_.size(), 1u);
+  EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_1");
+
+  events::ContextualCueLogEvent event2;
+  event2.set_cue_id("cue_2");
+  service.LogContextualCueEvent(event2);
+
+  EXPECT_EQ(service.contextual_cue_events_.size(), 2u);
+  EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_1");
+  EXPECT_EQ(service.contextual_cue_events_[1].event.cue_id(), "cue_2");
+
+  // Logging a third event should drop the oldest event ("cue_1") due to
+  // max_events=2.
+  events::ContextualCueLogEvent event3;
+  event3.set_cue_id("cue_3");
+  service.LogContextualCueEvent(event3);
+
+  EXPECT_EQ(service.contextual_cue_events_.size(), 2u);
+  EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_2");
+  EXPECT_EQ(service.contextual_cue_events_[1].event.cue_id(), "cue_3");
+}
+
 }  // namespace private_insights

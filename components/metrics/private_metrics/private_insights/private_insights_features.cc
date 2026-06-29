@@ -60,4 +60,7 @@ const base::FeatureParam<base::TimeDelta> kFcpPermanentErrorsRetryDelay{
     &kPrivateInsightsFeature, "fcp_permanent_errors_retry_delay",
     base::Hours(4)};
 
+const base::FeatureParam<int> kMaxContextualCueEvents{
+    &kPrivateInsightsFeature, "max_contextual_cue_events", 20};
+
 }  // namespace private_insights

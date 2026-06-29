@@ -9,16 +9,19 @@
 #include <string>
 
 #include "base/component_export.h"
+#include "base/containers/circular_deque.h"
 #include "base/files/file_path.h"
 #include "base/gtest_prod_util.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/sequence_checker.h"
+#include "base/thread_annotations.h"
 #include "base/time/time.h"
 #include "base/timer/timer.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/metrics/metrics_service_accessor.h"
+#include "components/metrics/private_metrics/private_insights/events/contextual_cue_log_event.pb.h"
 #include "components/prefs/pref_change_registrar.h"
 
 class PrefService;
@@ -125,7 +128,14 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
         func ? func : &PrivateInsightsService::RunFederatedComputation;
   }
 
+  void LogContextualCueEvent(events::ContextualCueLogEvent event);
+
  private:
+  struct ContextualCueEventEntry {
+    base::Time timestamp;
+    events::ContextualCueLogEvent event;
+  };
+
   void OnMetricsChoiceChanged();
 
   void TriggerUpload();
@@ -151,6 +161,9 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
 
   scoped_refptr<FcpSimpleTaskEnvironment> fcp_task_env_;
 
+  base::circular_deque<ContextualCueEventEntry> contextual_cue_events_
+      GUARDED_BY_CONTEXT(sequence_checker_);
+
   SEQUENCE_CHECKER(sequence_checker_);
   base::WeakPtrFactory<PrivateInsightsService> weak_ptr_factory_{this};
 
@@ -163,6 +176,7 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
                            UploadSkippedWhenServerUriEmpty);
   FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
                            PopulationNameFinchParam);
+  FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest, LogContextualCueEvent);
 };
 
 }  // namespace private_insights

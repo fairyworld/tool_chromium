@@ -193,6 +193,16 @@ void PrivateInsightsService::Shutdown() {
   Stop();
 }
 
+void PrivateInsightsService::LogContextualCueEvent(
+    events::ContextualCueLogEvent event) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+  int max_events = kMaxContextualCueEvents.Get();
+  contextual_cue_events_.emplace_back(base::Time::Now(), std::move(event));
+  while (static_cast<int>(contextual_cue_events_.size()) > max_events) {
+    contextual_cue_events_.pop_front();
+  }
+}
+
 void PrivateInsightsService::TriggerUpload() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   if (is_upload_running_) {

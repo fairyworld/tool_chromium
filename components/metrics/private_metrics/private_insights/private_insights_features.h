@@ -67,6 +67,9 @@ extern const base::FeatureParam<base::TimeDelta> kFcpTransientErrorsRetryDelay;
 COMPONENT_EXPORT(PRIVATE_INSIGHTS)
 extern const base::FeatureParam<base::TimeDelta> kFcpPermanentErrorsRetryDelay;
 
+COMPONENT_EXPORT(PRIVATE_INSIGHTS)
+extern const base::FeatureParam<int> kMaxContextualCueEvents;
+
 }  // namespace private_insights
 
 #endif  // COMPONENTS_METRICS_PRIVATE_METRICS_PRIVATE_INSIGHTS_PRIVATE_INSIGHTS_FEATURES_H_

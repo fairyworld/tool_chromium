@@ -17,6 +17,7 @@ component("private_insights") {
   public_deps = [
     "//components/keyed_service/core",
     "//components/metrics",
+    "//components/metrics/private_metrics/private_insights/events:contextual_cue_log_event_proto",
     "//components/prefs",
   ]
   deps = [
@@ -97,6 +98,7 @@ source_set("unit_tests") {
     "//base",
     "//base/test:test_support",
     "//components/metrics",
+    "//components/metrics/private_metrics/private_insights/events:contextual_cue_log_event_proto",
     "//components/prefs:test_support",
     "//services/network:test_support",
     "//testing/gtest",
