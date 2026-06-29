@@ -68,6 +68,11 @@ inline constexpr char kContextualCueEventsLoggingQueuedCountHistogram[] =
     "PrivateMetrics.PrivateInsights.ContextualCueEvents.Logging.QueuedCount";
 inline constexpr char kContextualCueEventsLoggingRemovedCountHistogram[] =
     "PrivateMetrics.PrivateInsights.ContextualCueEvents.Logging.RemovedCount";
+inline constexpr char kContextualCueEventsRequeuingRequeuedCountHistogram[] =
+    "PrivateMetrics.PrivateInsights.ContextualCueEvents.Requeuing."
+    "RequeuedCount";
+inline constexpr char kContextualCueEventsRequeuingDroppedCountHistogram[] =
+    "PrivateMetrics.PrivateInsights.ContextualCueEvents.Requeuing.DroppedCount";
 
 class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
     : public KeyedService {

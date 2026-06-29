@@ -357,11 +357,19 @@ void PrivateInsightsService::RequeueEvents(
   }
 
   int max_events = kMaxContextualCueEvents.Get();
+  int requeued_count = 0;
   while (!events.empty() &&
          static_cast<int>(contextual_cue_events_.size()) < max_events) {
     contextual_cue_events_.push_front(std::move(events.back()));
     events.pop_back();
+    requeued_count++;
   }
+  int dropped_count = static_cast<int>(events.size());
+
+  base::UmaHistogramCounts100(
+      kContextualCueEventsRequeuingRequeuedCountHistogram, requeued_count);
+  base::UmaHistogramCounts100(
+      kContextualCueEventsRequeuingDroppedCountHistogram, dropped_count);
 }
 
 // static

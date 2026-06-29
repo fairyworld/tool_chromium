@@ -362,6 +362,7 @@ TEST_F(PrivateInsightsServiceTest, RequeueEventsEmpty) {
 }
 
 TEST_F(PrivateInsightsServiceTest, RequeueEventsPrependsRequeuedEvents) {
+  base::HistogramTester histogram_tester;
   TestingPrefServiceSimple local_state;
   PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
                                  test_shared_url_loader_factory_);
@@ -392,9 +393,15 @@ TEST_F(PrivateInsightsServiceTest, RequeueEventsPrependsRequeuedEvents) {
   EXPECT_EQ(service.contextual_cue_events_[1].event.cue_id(), "cue_2");
   EXPECT_EQ(service.contextual_cue_events_[2].event.cue_id(), "cue_3");
   EXPECT_EQ(service.contextual_cue_events_[3].event.cue_id(), "cue_4");
+
+  histogram_tester.ExpectUniqueSample(
+      kContextualCueEventsRequeuingRequeuedCountHistogram, 2, 1);
+  histogram_tester.ExpectUniqueSample(
+      kContextualCueEventsRequeuingDroppedCountHistogram, 0, 1);
 }
 
 TEST_F(PrivateInsightsServiceTest, RequeueEventsExceedsMaxEvents) {
+  base::HistogramTester histogram_tester;
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeatureWithParameters(
       kPrivateInsightsFeature, {{"max_contextual_cue_events", "2"}});
@@ -424,6 +431,11 @@ TEST_F(PrivateInsightsServiceTest, RequeueEventsExceedsMaxEvents) {
   EXPECT_EQ(service.contextual_cue_events_.size(), 2u);
   EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_2");
   EXPECT_EQ(service.contextual_cue_events_[1].event.cue_id(), "cue_3");
+
+  histogram_tester.ExpectUniqueSample(
+      kContextualCueEventsRequeuingRequeuedCountHistogram, 1, 1);
+  histogram_tester.ExpectUniqueSample(
+      kContextualCueEventsRequeuingDroppedCountHistogram, 1, 1);
 }
 
 struct TriggerUploadTestParams {
