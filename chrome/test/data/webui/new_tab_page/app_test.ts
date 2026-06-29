@@ -3106,11 +3106,11 @@ suite('NewTabPageAppTest', () => {
       }
 
       test(
-          'autosubmitEnabled = false prevents automatic submission and ' +
-              'relies on recording-stopped',
+          'autosubmitEnabled = true automatically submits the query upon ' +
+              'voice recognition end',
           async () => {
             loadTimeData.overrideValues({
-              googleBaseUrl: 'https://www.google.com/',
+              googleBaseUrl: 'chrome://new-tab-page/',
               voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
             });
             await recreateApp();
@@ -3125,33 +3125,24 @@ suite('NewTabPageAppTest', () => {
                 app.shadowRoot.querySelector('cr-composebox-voice-search');
             assertTrue(!!voiceSearch);
 
-            // Verify that autosubmitEnabled is false.
-            assertFalse(voiceSearch.autosubmitEnabled);
+            // Verify that autosubmitEnabled is true.
+            assertTrue(voiceSearch.autosubmitEnabled);
 
             // Simulate speech recognition result (user speaks).
             const results = createResults('test query', /*isFinal=*/ true);
             mockSpeechRecognition.onresult!(results);
             await microtasksFinished();
 
-            // Override setInputText to verify it is called.
-            const searchboxEl = searchbox as NtpSearchboxElement;
-            let setInputTextCalledWith = '';
-            const originalSetInputText = searchboxEl.setInputText;
-            searchboxEl.setInputText = (text: string) => {
-              setInputTextCalledWith = text;
-              originalSetInputText.call(searchboxEl, text);
-            };
-
             // Simulate speech recognition natural finish.
             mockSpeechRecognition.onend!();
             await microtasksFinished();
 
-            // Verify that the query is NOT submitted or navigated.
-            assertEquals(0, searchboxHandler.getCallCount('submitQuery'));
-            assertEquals(0, windowProxy.getCallCount('navigate'));
-
-            // Verify setInputText was called with correct query.
-            assertEquals('test query', setInputTextCalledWith);
+            // Verify that the query is submitted via navigation.
+            assertEquals(1, windowProxy.getCallCount('navigate'));
+            const navigatedUrl = windowProxy.getArgs('navigate')[0];
+            assertEquals(
+                'chrome://new-tab-page/search?q=test+query&gs_ivs=1&sourceid=chrome',
+                navigatedUrl);
           });
 
       test(
@@ -3160,7 +3151,7 @@ suite('NewTabPageAppTest', () => {
               'coherence experiment is enabled',
           async () => {
             loadTimeData.overrideValues({
-              googleBaseUrl: 'https://www.google.com/',
+              googleBaseUrl: 'chrome://new-tab-page/',
               voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
             });
             await recreateApp();
@@ -3185,27 +3176,19 @@ suite('NewTabPageAppTest', () => {
 
             assertEquals(0, windowProxy.getCallCount('navigate'));
 
-            // Override setInputText to verify it is called.
-            const searchboxEl = searchbox as NtpSearchboxElement;
-            let setInputTextCalledWith = '';
-            const originalSetInputText = searchboxEl.setInputText;
-            searchboxEl.setInputText = (text: string) => {
-              setInputTextCalledWith = text;
-              originalSetInputText.call(searchboxEl, text);
-            };
-
             // Construct a long transcript exceeding the limit (121 chars).
             const longTranscript = 'a'.repeat(121);
             mockSpeechRecognition.onresult!
                 (createResults(longTranscript, /*isFinal=*/ false));
             await microtasksFinished();
 
-            // Verify that the query is NOT submitted or navigated.
-            assertEquals(0, searchboxHandler.getCallCount('submitQuery'));
-            assertEquals(0, windowProxy.getCallCount('navigate'));
-
-            // Verify setInputText was called with correct query.
-            assertEquals(longTranscript, setInputTextCalledWith);
+            // Verify that the query is force-submitted via navigation.
+            assertEquals(1, windowProxy.getCallCount('navigate'));
+            const navigatedUrl = windowProxy.getArgs('navigate')[0];
+            assertEquals(
+                `chrome://new-tab-page/search?q=${
+                    longTranscript}&gs_ivs=1&sourceid=chrome`,
+                navigatedUrl);
           });
 
       test(
