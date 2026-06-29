@@ -597,11 +597,11 @@ bool HasGuid(const Suggestion::Payload& payload) {
     switch (popup_suggestion.type) {
       case SuggestionType::kAddressEntry:
       case SuggestionType::kAddressFieldByFieldFilling:
-      case SuggestionType::kCreditCardEntry:
-      case SuggestionType::kVirtualCreditCardEntry:
-      case SuggestionType::kSaveAndFillCreditCardEntry:
-      case SuggestionType::kFillAutofillAi:
       case SuggestionType::kAutocompleteEntry:
+      case SuggestionType::kCreditCardEntry:
+      case SuggestionType::kFillAutofillAi:
+      case SuggestionType::kSaveAndFillCreditCardEntry:
+      case SuggestionType::kVirtualCreditCardEntry:
         if ((!base::FeatureList::IsEnabled(
                  autofill::features::
                      kAutofillEnableBottomSheetScanCardAndFill) &&
@@ -648,14 +648,20 @@ bool HasGuid(const Suggestion::Payload& payload) {
         value = SysUTF16ToNSString(popup_suggestion.main_text.value);
         break;
 
-      case SuggestionType::kAddressEntryOnTyping:
-      case SuggestionType::kDevtoolsTestAddresses:
-      case SuggestionType::kLoyaltyCardEntry:
-      case SuggestionType::kOneTimePasswordEntry:
       case SuggestionType::kAccountStoragePasswordEntry:
+      case SuggestionType::kAddressEntryOnTyping:
       case SuggestionType::kAllLoyaltyCardsEntry:
       case SuggestionType::kAllSavedPasswordsEntry:
+      case SuggestionType::kAtMemoryGenericError:
+      case SuggestionType::kAtMemoryInactivityNudge:
+      case SuggestionType::kAtMemoryNoConnection:
+      case SuggestionType::kAtMemorySearchAffordance:
+      case SuggestionType::kAtMemorySearchResult:
+      case SuggestionType::kAutocompleteAtMemoryButton:
+      case SuggestionType::kAutofillAiOtherOrders:
+      case SuggestionType::kBackupPasswordEntry:
       case SuggestionType::kBnplEntry:
+      case SuggestionType::kBnplFootnote:
       case SuggestionType::kComposeDisable:
       case SuggestionType::kComposeGoToSettings:
       case SuggestionType::kComposeNeverShowOnThisSiteAgain:
@@ -665,10 +671,15 @@ bool HasGuid(const Suggestion::Payload& payload) {
       case SuggestionType::kDatalistEntry:
       case SuggestionType::kDevtoolsTestAddressByCountry:
       case SuggestionType::kDevtoolsTestAddressEntry:
+      case SuggestionType::kDevtoolsTestAddresses:
       case SuggestionType::kFillPassword:
+      case SuggestionType::kFreeformFooter:
       case SuggestionType::kGeneratePasswordEntry:
       case SuggestionType::kIbanEntry:
+      case SuggestionType::kIdentityCredential:
       case SuggestionType::kInsecureContextPaymentDisabledMessage:
+      case SuggestionType::kLoadingThrobber:
+      case SuggestionType::kLoyaltyCardEntry:
       case SuggestionType::kManageAddress:
       case SuggestionType::kManageAutofillAi:
       case SuggestionType::kManageAutofillAiIdentityDocs:
@@ -677,35 +688,24 @@ bool HasGuid(const Suggestion::Payload& payload) {
       case SuggestionType::kManageCreditCard:
       case SuggestionType::kManageIban:
       case SuggestionType::kManageLoyaltyCard:
+      case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       case SuggestionType::kMerchantPromoCodeEntry:
       case SuggestionType::kMixedFormMessage:
+      case SuggestionType::kOneTimePasswordEntry:
+      case SuggestionType::kOpenGemini:
       case SuggestionType::kPasswordEntry:
-      case SuggestionType::kBackupPasswordEntry:
-      case SuggestionType::kTroubleSigningInEntry:
-      case SuggestionType::kFreeformFooter:
       case SuggestionType::kPasswordFieldByFieldFilling:
+      case SuggestionType::kPendingStateSignin:
+      case SuggestionType::kPersonalContextNotice:
       case SuggestionType::kScanCreditCard:
       case SuggestionType::kSeePromoCodeDetails:
       case SuggestionType::kSeparator:
       case SuggestionType::kTitle:
+      case SuggestionType::kTroubleSigningInEntry:
       case SuggestionType::kViewPasswordDetails:
-      case SuggestionType::kIdentityCredential:
       case SuggestionType::kWebauthnCredential:
-      case SuggestionType::kWebauthnSignInWithAnotherDevice:
       case SuggestionType::kWebauthnPasskeyQrCode:
-      case SuggestionType::kPendingStateSignin:
-      case SuggestionType::kLoadingThrobber:
-      case SuggestionType::kAtMemorySearchResult:
-      case SuggestionType::kAtMemoryInactivityNudge:
-      case SuggestionType::kAtMemorySearchAffordance:
-      case SuggestionType::kBnplFootnote:
-      case SuggestionType::kAutocompleteAtMemoryButton:
-      case SuggestionType::kOpenGemini:
-      case SuggestionType::kAtMemoryNoConnection:
-      case SuggestionType::kAtMemoryGenericError:
-      case SuggestionType::kPersonalContextNotice:
-      case SuggestionType::kAutofillAiOtherOrders:
-      case SuggestionType::kMaximizeCreditCardBenefitsEntry:
+      case SuggestionType::kWebauthnSignInWithAnotherDevice:
         break;
     }
 

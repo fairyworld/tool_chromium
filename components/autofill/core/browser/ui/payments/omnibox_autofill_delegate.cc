@@ -42,13 +42,14 @@ bool IsValidOmniboxAutofillSuggestion(SuggestionType type) {
     case SuggestionType::kAddressFieldByFieldFilling:
     case SuggestionType::kAllLoyaltyCardsEntry:
     case SuggestionType::kAllSavedPasswordsEntry:
+    case SuggestionType::kAtMemoryGenericError:
     case SuggestionType::kAtMemoryInactivityNudge:
     case SuggestionType::kAtMemoryNoConnection:
-    case SuggestionType::kAtMemoryGenericError:
     case SuggestionType::kAtMemorySearchAffordance:
     case SuggestionType::kAtMemorySearchResult:
     case SuggestionType::kAutocompleteAtMemoryButton:
     case SuggestionType::kAutocompleteEntry:
+    case SuggestionType::kAutofillAiOtherOrders:
     case SuggestionType::kBackupPasswordEntry:
     case SuggestionType::kBnplEntry:
     case SuggestionType::kBnplFootnote:
@@ -63,7 +64,6 @@ bool IsValidOmniboxAutofillSuggestion(SuggestionType type) {
     case SuggestionType::kDevtoolsTestAddressEntry:
     case SuggestionType::kDevtoolsTestAddresses:
     case SuggestionType::kFetchingAmbientData:
-    case SuggestionType::kAutofillAiOtherOrders:
     case SuggestionType::kFillAutofillAi:
     case SuggestionType::kFillPassword:
     case SuggestionType::kFreeformFooter:
@@ -86,8 +86,8 @@ bool IsValidOmniboxAutofillSuggestion(SuggestionType type) {
     case SuggestionType::kMixedFormMessage:
     case SuggestionType::kOneTimePasswordEntry:
     case SuggestionType::kOpenGemini:
-    case SuggestionType::kPasswordFieldByFieldFilling:
     case SuggestionType::kPasswordEntry:
+    case SuggestionType::kPasswordFieldByFieldFilling:
     case SuggestionType::kPendingStateSignin:
     case SuggestionType::kPersonalContextNotice:
     case SuggestionType::kSaveAndFillCreditCardEntry:

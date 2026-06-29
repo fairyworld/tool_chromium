@@ -271,8 +271,38 @@ FillDataType GetEventTypeFromSingleFieldSuggestionType(SuggestionType type) {
     case SuggestionType::kAccountStoragePasswordEntry:
     case SuggestionType::kAddressEntry:
     case SuggestionType::kAddressEntryOnTyping:
+    case SuggestionType::kAddressFieldByFieldFilling:
     case SuggestionType::kAllLoyaltyCardsEntry:
     case SuggestionType::kAllSavedPasswordsEntry:
+    case SuggestionType::kAtMemoryGenericError:
+    case SuggestionType::kAtMemoryInactivityNudge:
+    case SuggestionType::kAtMemoryNoConnection:
+    case SuggestionType::kAtMemorySearchAffordance:
+    case SuggestionType::kAtMemorySearchResult:
+    case SuggestionType::kAutocompleteAtMemoryButton:
+    case SuggestionType::kAutofillAiOtherOrders:
+    case SuggestionType::kBackupPasswordEntry:
+    case SuggestionType::kBnplEntry:
+    case SuggestionType::kBnplFootnote:
+    case SuggestionType::kComposeDisable:
+    case SuggestionType::kComposeGoToSettings:
+    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
+    case SuggestionType::kComposeProactiveNudge:
+    case SuggestionType::kComposeResumeNudge:
+    case SuggestionType::kComposeSavedStateNotification:
+    case SuggestionType::kCreditCardEntry:
+    case SuggestionType::kDatalistEntry:
+    case SuggestionType::kDevtoolsTestAddressByCountry:
+    case SuggestionType::kDevtoolsTestAddressEntry:
+    case SuggestionType::kDevtoolsTestAddresses:
+    case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kFillAutofillAi:
+    case SuggestionType::kFillPassword:
+    case SuggestionType::kFreeformFooter:
+    case SuggestionType::kGeneratePasswordEntry:
+    case SuggestionType::kIdentityCredential:
+    case SuggestionType::kInsecureContextPaymentDisabledMessage:
+    case SuggestionType::kLoadingThrobber:
     case SuggestionType::kManageAddress:
     case SuggestionType::kManageAutofillAi:
     case SuggestionType::kManageAutofillAiIdentityDocs:
@@ -281,56 +311,26 @@ FillDataType GetEventTypeFromSingleFieldSuggestionType(SuggestionType type) {
     case SuggestionType::kManageCreditCard:
     case SuggestionType::kManageIban:
     case SuggestionType::kManageLoyaltyCard:
-    case SuggestionType::kUndoOrClear:
-    case SuggestionType::kComposeResumeNudge:
-    case SuggestionType::kComposeDisable:
-    case SuggestionType::kComposeGoToSettings:
-    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
-    case SuggestionType::kComposeProactiveNudge:
-    case SuggestionType::kComposeSavedStateNotification:
-    case SuggestionType::kCreditCardEntry:
-    case SuggestionType::kBnplEntry:
-    case SuggestionType::kDatalistEntry:
-    case SuggestionType::kAddressFieldByFieldFilling:
-    case SuggestionType::kGeneratePasswordEntry:
-    case SuggestionType::kInsecureContextPaymentDisabledMessage:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
     case SuggestionType::kMixedFormMessage:
+    case SuggestionType::kOneTimePasswordEntry:
+    case SuggestionType::kOpenGemini:
     case SuggestionType::kPasswordEntry:
-    case SuggestionType::kBackupPasswordEntry:
-    case SuggestionType::kTroubleSigningInEntry:
-    case SuggestionType::kFreeformFooter:
     case SuggestionType::kPasswordFieldByFieldFilling:
-    case SuggestionType::kFillPassword:
-    case SuggestionType::kViewPasswordDetails:
+    case SuggestionType::kPendingStateSignin:
+    case SuggestionType::kPersonalContextNotice:
+    case SuggestionType::kSaveAndFillCreditCardEntry:
     case SuggestionType::kScanCreditCard:
     case SuggestionType::kSeePromoCodeDetails:
-    case SuggestionType::kTitle:
     case SuggestionType::kSeparator:
-    case SuggestionType::kSaveAndFillCreditCardEntry:
+    case SuggestionType::kTitle:
+    case SuggestionType::kTroubleSigningInEntry:
+    case SuggestionType::kUndoOrClear:
+    case SuggestionType::kViewPasswordDetails:
     case SuggestionType::kVirtualCreditCardEntry:
-    case SuggestionType::kIdentityCredential:
     case SuggestionType::kWebauthnCredential:
-    case SuggestionType::kWebauthnSignInWithAnotherDevice:
     case SuggestionType::kWebauthnPasskeyQrCode:
-    case SuggestionType::kDevtoolsTestAddresses:
-    case SuggestionType::kDevtoolsTestAddressByCountry:
-    case SuggestionType::kDevtoolsTestAddressEntry:
-    case SuggestionType::kFillAutofillAi:
-    case SuggestionType::kPendingStateSignin:
-    case SuggestionType::kOneTimePasswordEntry:
-    case SuggestionType::kLoadingThrobber:
-    case SuggestionType::kAtMemorySearchResult:
-    case SuggestionType::kAtMemoryInactivityNudge:
-    case SuggestionType::kBnplFootnote:
-    case SuggestionType::kAutocompleteAtMemoryButton:
-    case SuggestionType::kOpenGemini:
-    case SuggestionType::kAtMemoryNoConnection:
-    case SuggestionType::kAtMemoryGenericError:
-    case SuggestionType::kAtMemorySearchAffordance:
-    case SuggestionType::kPersonalContextNotice:
-    case SuggestionType::kFetchingAmbientData:
-    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
-    case SuggestionType::kAutofillAiOtherOrders:
+    case SuggestionType::kWebauthnSignInWithAnotherDevice:
       NOTREACHED();
   }
   NOTREACHED();
@@ -697,65 +697,65 @@ bool IsManagementFooterOption(const Suggestion& suggestion) {
     case SuggestionType::kManageCreditCard:
     case SuggestionType::kManageIban:
     case SuggestionType::kManageLoyaltyCard:
-    case SuggestionType::kWebauthnSignInWithAnotherDevice:
-    case SuggestionType::kWebauthnPasskeyQrCode:
     case SuggestionType::kOpenGemini:
+    case SuggestionType::kWebauthnPasskeyQrCode:
+    case SuggestionType::kWebauthnSignInWithAnotherDevice:
       return true;
-    case SuggestionType::kAutocompleteEntry:
+    case SuggestionType::kAccountStoragePasswordEntry:
     case SuggestionType::kAddressEntry:
-    case SuggestionType::kAddressFieldByFieldFilling:
     case SuggestionType::kAddressEntryOnTyping:
+    case SuggestionType::kAddressFieldByFieldFilling:
+    case SuggestionType::kAllLoyaltyCardsEntry:
+    case SuggestionType::kAllSavedPasswordsEntry:
+    case SuggestionType::kAtMemoryGenericError:
+    case SuggestionType::kAtMemoryInactivityNudge:
+    case SuggestionType::kAtMemoryNoConnection:
+    case SuggestionType::kAtMemorySearchAffordance:
+    case SuggestionType::kAtMemorySearchResult:
+    case SuggestionType::kAutocompleteAtMemoryButton:
+    case SuggestionType::kAutocompleteEntry:
+    case SuggestionType::kAutofillAiOtherOrders:
+    case SuggestionType::kBackupPasswordEntry:
+    case SuggestionType::kBnplEntry:
+    case SuggestionType::kBnplFootnote:
+    case SuggestionType::kComposeDisable:
+    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
     case SuggestionType::kComposeProactiveNudge:
     case SuggestionType::kComposeResumeNudge:
     case SuggestionType::kComposeSavedStateNotification:
-    case SuggestionType::kComposeDisable:
-    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
-    case SuggestionType::kDatalistEntry:
-    case SuggestionType::kPasswordEntry:
-    case SuggestionType::kBackupPasswordEntry:
-    case SuggestionType::kTroubleSigningInEntry:
-    case SuggestionType::kAllSavedPasswordsEntry:
-    case SuggestionType::kGeneratePasswordEntry:
-    case SuggestionType::kAccountStoragePasswordEntry:
-    case SuggestionType::kPasswordFieldByFieldFilling:
-    case SuggestionType::kFillPassword:
-    case SuggestionType::kViewPasswordDetails:
-    case SuggestionType::kFreeformFooter:
     case SuggestionType::kCreditCardEntry:
-    case SuggestionType::kInsecureContextPaymentDisabledMessage:
-    case SuggestionType::kScanCreditCard:
-    case SuggestionType::kVirtualCreditCardEntry:
-    case SuggestionType::kIbanEntry:
-    case SuggestionType::kBnplEntry:
-    case SuggestionType::kSaveAndFillCreditCardEntry:
-    case SuggestionType::kMerchantPromoCodeEntry:
-    case SuggestionType::kSeePromoCodeDetails:
-    case SuggestionType::kIdentityCredential:
-    case SuggestionType::kLoyaltyCardEntry:
-    case SuggestionType::kAllLoyaltyCardsEntry:
-    case SuggestionType::kWebauthnCredential:
-    case SuggestionType::kOneTimePasswordEntry:
-    case SuggestionType::kTitle:
-    case SuggestionType::kSeparator:
-    case SuggestionType::kUndoOrClear:
-    case SuggestionType::kMixedFormMessage:
-    case SuggestionType::kDevtoolsTestAddresses:
-    case SuggestionType::kDevtoolsTestAddressEntry:
+    case SuggestionType::kDatalistEntry:
     case SuggestionType::kDevtoolsTestAddressByCountry:
-    case SuggestionType::kAtMemorySearchResult:
-    case SuggestionType::kAtMemoryInactivityNudge:
-    case SuggestionType::kFillAutofillAi:
-    case SuggestionType::kPendingStateSignin:
-    case SuggestionType::kLoadingThrobber:
+    case SuggestionType::kDevtoolsTestAddressEntry:
+    case SuggestionType::kDevtoolsTestAddresses:
     case SuggestionType::kFetchingAmbientData:
-    case SuggestionType::kAutofillAiOtherOrders:
-    case SuggestionType::kBnplFootnote:
-    case SuggestionType::kAutocompleteAtMemoryButton:
-    case SuggestionType::kAtMemoryNoConnection:
-    case SuggestionType::kAtMemoryGenericError:
-    case SuggestionType::kAtMemorySearchAffordance:
-    case SuggestionType::kPersonalContextNotice:
+    case SuggestionType::kFillAutofillAi:
+    case SuggestionType::kFillPassword:
+    case SuggestionType::kFreeformFooter:
+    case SuggestionType::kGeneratePasswordEntry:
+    case SuggestionType::kIbanEntry:
+    case SuggestionType::kIdentityCredential:
+    case SuggestionType::kInsecureContextPaymentDisabledMessage:
+    case SuggestionType::kLoadingThrobber:
+    case SuggestionType::kLoyaltyCardEntry:
     case SuggestionType::kMaximizeCreditCardBenefitsEntry:
+    case SuggestionType::kMerchantPromoCodeEntry:
+    case SuggestionType::kMixedFormMessage:
+    case SuggestionType::kOneTimePasswordEntry:
+    case SuggestionType::kPasswordEntry:
+    case SuggestionType::kPasswordFieldByFieldFilling:
+    case SuggestionType::kPendingStateSignin:
+    case SuggestionType::kPersonalContextNotice:
+    case SuggestionType::kSaveAndFillCreditCardEntry:
+    case SuggestionType::kScanCreditCard:
+    case SuggestionType::kSeePromoCodeDetails:
+    case SuggestionType::kSeparator:
+    case SuggestionType::kTitle:
+    case SuggestionType::kTroubleSigningInEntry:
+    case SuggestionType::kUndoOrClear:
+    case SuggestionType::kViewPasswordDetails:
+    case SuggestionType::kVirtualCreditCardEntry:
+    case SuggestionType::kWebauthnCredential:
       return false;
   }
 }
