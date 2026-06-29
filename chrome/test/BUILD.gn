@@ -1641,7 +1641,6 @@ if (is_android) {
       "../browser/policy/test/v8_optimizer_policy_browsertest.cc",
       "../browser/profiles/profile_browsertest_android.cc",
       "../browser/renderer_host/javascript_optimizer_feature_browsertest.cc",
-      "../browser/ssl/chrome_security_state_client_browsertest.cc",
       "../browser/ui/webui/policy/policy_test_ui_browsertest.cc",
       "../browser/ui/webui/policy/policy_ui_browsertest.cc",
       "../browser/webid/identity_provider_service_browsertest.cc",
@@ -1724,6 +1723,8 @@ if (is_android) {
       "//chrome/browser/send_tab_to_self:browser_tests",
       "//chrome/browser/site_protection",
       "//chrome/browser/site_protection:utils",
+      "//chrome/browser/ssl:android_browsertests",
+      "//chrome/browser/ssl:cert_verifier_test_support",
       "//chrome/browser/supervised_user:android_browser_tests",
       "//chrome/browser/sync",
       "//chrome/browser/sync/test/integration:sync_integration_test_support",
@@ -2069,8 +2070,6 @@ if (is_android) {
     testonly = true
 
     sources = [
-      "../browser/ssl/cert_verifier_platform_browser_test.cc",
-      "../browser/ssl/cert_verifier_platform_browser_test.h",
       "base/android/android_browser_test.cc",
       "base/android/android_browser_test.h",
       "base/interactive_test_utils.cc",
@@ -2504,6 +2503,7 @@ if (!is_android) {
       "//chrome/browser/skills:browser_tests",
       "//chrome/browser/ssl",
       "//chrome/browser/ssl:browser_tests",
+      "//chrome/browser/ssl:cert_verifier_test_support",
       "//chrome/browser/ssl:impl",
       "//chrome/browser/storage:browser_tests",
       "//chrome/browser/storage_access_api",
@@ -3373,10 +3373,6 @@ if (!is_android) {
       "../browser/secure_origin_allowlist_browsertest.cc",
       "../browser/signin/e2e_tests/live_sign_in_test.cc",
       "../browser/signin/remove_local_account_browsertest.cc",
-      "../browser/ssl/certificate_transparency_browsertest.cc",
-      "../browser/ssl/security_state_tab_helper_browsertest.cc",
-      "../browser/ssl/ssl_browsertest.cc",
-      "../browser/ssl/stateful_ssl_host_state_delegate_test.cc",
       "../browser/ui/ask_google_for_suggestions_dialog_browsertest.cc",
       "../browser/ui/breadcrumb_manager_browser_agent_browsertest.cc",
       "../browser/ui/browser_actions_browsertest.cc",
@@ -4059,8 +4055,6 @@ if (!is_android) {
     }
 
     if (enable_captive_portal_detection) {
-      sources +=
-          [ "../browser/ssl/captive_portal_blocking_page_browsertest.cc" ]
       deps += [ "//chrome/browser/captive_portal" ]
     }
 
@@ -5035,7 +5029,6 @@ if (!is_android) {
         "../browser/safe_browsing/tailored_security/chrome_tailored_security_service_browsertest.cc",
         "../browser/safe_browsing/url_lookup_service_browsertest.cc",
         "../browser/safe_browsing/v4_embedded_test_server_browsertest.cc",
-        "../browser/ssl/sct_reporting_service_browsertest.cc",
         "../renderer/safe_browsing/threat_dom_details_browsertest.cc",
       ]
       deps += [
@@ -9188,10 +9181,6 @@ if (!is_android) {
     sources = [
       "../browser/interstitials/security_interstitial_idn_test.cc",
       "../browser/interstitials/security_interstitial_idn_test.h",
-      "../browser/ssl/cert_verifier_browser_test.cc",
-      "../browser/ssl/cert_verifier_browser_test.h",
-      "../browser/ssl/cert_verifier_platform_browser_test.cc",
-      "../browser/ssl/cert_verifier_platform_browser_test.h",
       "../browser/ui/views/autofill/payments/card_unmask_prompt_view_tester_views.cc",
       "../browser/ui/views/autofill/payments/card_unmask_prompt_view_tester_views.h",
       "../browser/ui/views/autofill/payments/offer_notification_bubble_views_test_base.cc",
@@ -9816,6 +9805,7 @@ if (!is_android && !is_chromeos_device) {
       "//chrome/browser/site_isolation:interactive_ui_tests",
       "//chrome/browser/skills",
       "//chrome/browser/ssl",
+      "//chrome/browser/ssl:cert_verifier_test_support",
       "//chrome/browser/ssl:interactive_ui_tests",
       "//chrome/browser/status_icons",
       "//chrome/browser/supervised_user:interactive_ui_tests",
