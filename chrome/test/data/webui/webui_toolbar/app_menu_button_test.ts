@@ -216,4 +216,24 @@ suite('AppMenuButtonTest', function() {
     await microtasksFinished();
     assertTrue(button.classList.contains('has-severity'));
   });
+
+  test('Trailing Margin', async function() {
+    const button =
+        appMenuButton.shadowRoot.querySelector('toolbar-chip-button');
+    assertTrue(!!button);
+
+    // Default is 0px
+    assertEquals(
+        '0px', button.style.getPropertyValue('--toolbar-chip-trailing-margin'));
+
+    // Set non-zero margin
+    appMenuButton.state = {
+      ...appMenuButton.state,
+      trailingMargin: 16,
+    };
+    await microtasksFinished();
+    assertEquals(
+        '16px',
+        button.style.getPropertyValue('--toolbar-chip-trailing-margin'));
+  });
 });

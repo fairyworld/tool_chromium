@@ -170,7 +170,7 @@ class WebUIToolbarPixelInteractiveUiTest : public InteractiveBrowserTest {
         {features::kInitialWebUI, features::kWebUIReloadButton,
          features::kWebUISplitTabsButton, features::kWebUIBackForwardButton,
          features::kWebUIHomeButton, features::kWebUIPinnedToolbarActions,
-         features::kWebUILocationBar,
+         features::kWebUILocationBar, features::kWebUIAppMenuButton,
          features::kSkipIPCChannelPausingForNonGuests,
          features::kWebUIInProcessResourceLoadingV2},
         {});

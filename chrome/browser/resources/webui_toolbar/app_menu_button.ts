@@ -45,7 +45,6 @@ export class AppMenuButtonElement extends AppMenuButtonElementBase {
     accessibilityText: '',
     tooltip: '',
     isContextMenuVisible: false,
-    // TODO(crbug.com/510825650): Connect the trailing margin.
     trailingMargin: 0,
   };
 
