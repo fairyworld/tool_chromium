@@ -82,6 +82,7 @@ BASE_DECLARE_FEATURE(kOmniboxWebUIPopupMarkAsHidden);
 
 // Omnibox UI - these affect the UI or function of the location bar (not the
 // popup).
+BASE_DECLARE_FEATURE(kAimEligibilityComponentExtension);
 BASE_DECLARE_FEATURE(kDynamicAimSubmit);
 extern const base::FeatureParam<bool> kShowRhsAimHint;
 BASE_DECLARE_FEATURE(kHideAimEntrypointOnUserInput);
