@@ -74,17 +74,8 @@ void OpensPasswordsInOtherApps() {
   [PasswordsInOtherAppsAppInterface startFakeManagerWithAutoFillStatus:YES];
 
   [ChromeEarlGreyUI openSettingsMenu];
-  if ([ChromeEarlGrey isYourSavedInfoSettingsPageIosEnabled]) {
-    [ChromeEarlGreyUI
-        tapSettingsMenuButton:grey_accessibilityID(
-                                  @"kSettingsAutofillAndPasswordsCellId")];
-    [[EarlGrey selectElementWithMatcher:chrome_test_util::
-                                            SettingsMenuPasswordsButton()]
-        performAction:grey_tap()];
-  } else {
-    [ChromeEarlGreyUI
-        tapSettingsMenuButton:chrome_test_util::SettingsMenuPasswordsButton()];
-  }
+  [ChromeEarlGreyUI
+      tapSettingsMenuButton:chrome_test_util::SettingsMenuPasswordsButton()];
   [[EarlGrey selectElementWithMatcher:grey_accessibilityID(
                                           kSettingsToolbarSettingsButtonId)]
       performAction:grey_tap()];

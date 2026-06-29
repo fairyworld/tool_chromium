@@ -606,9 +606,6 @@ enum class TipsNotificationType;
 // Returns whether the UseLensToSearchForImage feature is enabled.
 + (BOOL)isUseLensToSearchForImageEnabled;
 
-// Returns whether the YourSavedInfoSettingsPageIos feature is enabled.
-+ (BOOL)isYourSavedInfoSettingsPageIosEnabled;
-
 // Returns whether the current layout is showing the bottom omnibox.
 + (BOOL)isCurrentLayoutBottomOmnibox;
 

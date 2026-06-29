@@ -273,17 +273,8 @@ void SaveHiddenPasskeyToStore(NSString* rpId,
 
 void OpenPasswordManager() {
   [ChromeEarlGreyUI openSettingsMenu];
-  if ([ChromeEarlGrey isYourSavedInfoSettingsPageIosEnabled]) {
-    [ChromeEarlGreyUI
-        tapSettingsMenuButton:grey_accessibilityID(
-                                  @"kSettingsAutofillAndPasswordsCellId")];
-    [[EarlGrey selectElementWithMatcher:chrome_test_util::
-                                            SettingsMenuPasswordsButton()]
-        performAction:grey_tap()];
-  } else {
-    [ChromeEarlGreyUI
-        tapSettingsMenuButton:chrome_test_util::SettingsMenuPasswordsButton()];
-  }
+  [ChromeEarlGreyUI
+      tapSettingsMenuButton:chrome_test_util::SettingsMenuPasswordsButton()];
   // The settings page requested results from PasswordStore. Make sure they
   // have already been delivered by posting a task to PasswordStore's
   // background task runner and wait until it is finished. Because the
