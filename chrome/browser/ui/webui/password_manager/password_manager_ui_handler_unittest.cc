@@ -413,4 +413,33 @@ TEST_F(PasswordManagerUIHandlerUnitTest,
   mock_page_.FlushForTesting();
 }
 
+TEST_F(PasswordManagerUIHandlerUnitTest,
+       RemovePasswordException_CallsDelegate) {
+  EXPECT_CALL(mock_delegate(), RemovePasswordException(42));
+
+  handler().RemovePasswordException(42);
+}
+
+TEST_F(PasswordManagerUIHandlerUnitTest, StartBulkPasswordCheck_CallsDelegate) {
+  EXPECT_CALL(mock_delegate(), StartPasswordCheck(_));
+
+  handler().StartBulkPasswordCheck();
+}
+
+TEST_F(PasswordManagerUIHandlerUnitTest, MovePasswordsToAccount_CallsDelegate) {
+  const std::vector<int32_t> kIds = {1, 2, 3};
+  EXPECT_CALL(mock_delegate(), MovePasswordsToAccount(kIds));
+
+  handler().MovePasswordsToAccount(kIds);
+}
+
+TEST_F(PasswordManagerUIHandlerUnitTest, ResetImporter_CallsDelegate) {
+  base::test::TestFuture<void> future;
+  EXPECT_CALL(mock_delegate(), ResetImporter(true));
+
+  handler().ResetImporter(/*delete_file=*/true, future.GetCallback());
+
+  EXPECT_TRUE(future.Wait());
+}
+
 }  // namespace password_manager
