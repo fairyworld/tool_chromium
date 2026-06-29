@@ -342,7 +342,6 @@
 #if BUILDFLAG(IS_WIN)
 #include "chrome/browser/startup/startup_features.h"
 #include "chrome/browser/tracing/tracing_features.h"
-#include "chrome/browser/win/mica_titlebar.h"
 #include "components/stylus_handwriting/win/features.h"
 #endif
 
@@ -7406,9 +7405,6 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kGamepadRawInputChangeEventDescription, kOsWin,
      FEATURE_VALUE_TYPE(features::kGamepadRawInputChangeEvent)},
 
-    {"windows11-mica-titlebar", flag_descriptions::kWindows11MicaTitlebarName,
-     flag_descriptions::kWindows11MicaTitlebarDescription, kOsWin,
-     FEATURE_VALUE_TYPE(kWindows11MicaTitlebar)},
 #endif
 
 #if BUILDFLAG(IS_ANDROID)
