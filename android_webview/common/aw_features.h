@@ -75,7 +75,6 @@ extern const base::FeatureParam<base::TimeDelta>
 BASE_DECLARE_FEATURE(kWebViewEnableApiCallUserActions);
 BASE_DECLARE_FEATURE(kWebViewWebPerformanceMetricsReporting);
 BASE_DECLARE_FEATURE(kWebViewTestNonembeddedLowEntropySource);
-BASE_DECLARE_FEATURE(kWebViewUseNonembeddedLowEntropySource);
 BASE_DECLARE_FEATURE(kWebViewFasterGetDefaultUserAgent);
 BASE_DECLARE_FEATURE(kWebViewSaveStateIncludeHeaders);
 BASE_DECLARE_FEATURE(kWebViewStaticMethodsNotTriggerStartup);

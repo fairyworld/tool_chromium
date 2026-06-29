@@ -285,11 +285,6 @@ BASE_FEATURE(kWebViewWebPerformanceMetricsReporting,
 BASE_FEATURE(kWebViewTestNonembeddedLowEntropySource,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// When enabled, WebView uses the low entropy source provided by the nonembedded
-// WebView service.
-BASE_FEATURE(kWebViewUseNonembeddedLowEntropySource,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // When enabled, the default user agent string is fetched more quickly without
 // waiting for chromium startup to complete.
 BASE_FEATURE(kWebViewFasterGetDefaultUserAgent,

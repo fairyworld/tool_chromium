@@ -1274,10 +1274,6 @@ public final class ProductionSupportedFlagList {
                 "Enables the Rust based XML parser in situations where the XML document is"
                         + " guaranteed to not trigger XSLT processing."),
         Flag.baseFeature(
-                AwFeatures.WEBVIEW_USE_NONEMBEDDED_LOW_ENTROPY_SOURCE,
-                "When enabled, WebView uses the low entropy source provided by the "
-                        + "nonembedded WebView service."),
-        Flag.baseFeature(
                 AwFeatures.WEBVIEW_TEST_NONEMBEDDED_LOW_ENTROPY_SOURCE,
                 "No-op experiment to verify WebView uses low entropy source provided by the"
                         + " nonembedded WebView services work."),
