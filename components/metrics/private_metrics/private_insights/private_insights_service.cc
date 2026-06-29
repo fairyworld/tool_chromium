@@ -198,9 +198,17 @@ void PrivateInsightsService::LogContextualCueEvent(
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   int max_events = kMaxContextualCueEvents.Get();
   contextual_cue_events_.emplace_back(base::Time::Now(), std::move(event));
+  int removed_count = 0;
   while (static_cast<int>(contextual_cue_events_.size()) > max_events) {
     contextual_cue_events_.pop_front();
+    removed_count++;
   }
+  if (removed_count > 0) {
+    base::UmaHistogramCounts100(
+        kContextualCueEventsLoggingRemovedCountHistogram, removed_count);
+  }
+  base::UmaHistogramCounts100(kContextualCueEventsLoggingQueuedCountHistogram,
+                              static_cast<int>(contextual_cue_events_.size()));
 }
 
 void PrivateInsightsService::TriggerUpload() {

@@ -59,6 +59,10 @@ inline constexpr char kContributedTaskCountHistogram[] =
     "PrivateMetrics.PrivateInsights.ContributedTaskCount";
 inline constexpr char kFederatedComputationOutcomeHistogram[] =
     "PrivateMetrics.PrivateInsights.FederatedComputationOutcome";
+inline constexpr char kContextualCueEventsLoggingQueuedCountHistogram[] =
+    "PrivateMetrics.PrivateInsights.ContextualCueEvents.Logging.QueuedCount";
+inline constexpr char kContextualCueEventsLoggingRemovedCountHistogram[] =
+    "PrivateMetrics.PrivateInsights.ContextualCueEvents.Logging.RemovedCount";
 
 class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
     : public KeyedService {

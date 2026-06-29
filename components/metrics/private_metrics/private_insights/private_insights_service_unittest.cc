@@ -241,6 +241,7 @@ TEST_F(PrivateInsightsServiceTest, PopulationNameFinchParam) {
 }
 
 TEST_F(PrivateInsightsServiceTest, LogContextualCueEvent) {
+  base::HistogramTester histogram_tester;
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeatureWithParameters(
       kPrivateInsightsFeature, {{"max_contextual_cue_events", "2"}});
@@ -258,6 +259,8 @@ TEST_F(PrivateInsightsServiceTest, LogContextualCueEvent) {
 
   EXPECT_EQ(service.contextual_cue_events_.size(), 1u);
   EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_1");
+  histogram_tester.ExpectBucketCount(
+      kContextualCueEventsLoggingQueuedCountHistogram, 1, 1);
 
   events::ContextualCueLogEvent event2;
   event2.set_cue_id("cue_2");
@@ -266,6 +269,10 @@ TEST_F(PrivateInsightsServiceTest, LogContextualCueEvent) {
   EXPECT_EQ(service.contextual_cue_events_.size(), 2u);
   EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_1");
   EXPECT_EQ(service.contextual_cue_events_[1].event.cue_id(), "cue_2");
+  histogram_tester.ExpectBucketCount(
+      kContextualCueEventsLoggingQueuedCountHistogram, 2, 1);
+  histogram_tester.ExpectTotalCount(
+      kContextualCueEventsLoggingRemovedCountHistogram, 0);
 
   // Logging a third event should drop the oldest event ("cue_1") due to
   // max_events=2.
@@ -276,6 +283,10 @@ TEST_F(PrivateInsightsServiceTest, LogContextualCueEvent) {
   EXPECT_EQ(service.contextual_cue_events_.size(), 2u);
   EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_2");
   EXPECT_EQ(service.contextual_cue_events_[1].event.cue_id(), "cue_3");
+  histogram_tester.ExpectBucketCount(
+      kContextualCueEventsLoggingQueuedCountHistogram, 2, 2);
+  histogram_tester.ExpectUniqueSample(
+      kContextualCueEventsLoggingRemovedCountHistogram, 1, 1);
 }
 
 }  // namespace private_insights
