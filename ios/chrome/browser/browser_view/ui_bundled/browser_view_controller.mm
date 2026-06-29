@@ -2325,10 +2325,22 @@ bool IsFullscreenNextIAEnabled() {
     return;
   }
 
-  const CGFloat isolatedDelta =
-      std::max(0.0, expandedHeight - [self collapsedBottomToolbarHeight]);
-  const CGFloat offset = AlignValueToPixel((1.0 - progress) * isolatedDelta);
-  const CGFloat height = expandedHeight - offset;
+  CGFloat height = expandedHeight;
+  if (IsAppBarHiddenInFullscreen() &&
+      self.layoutState.appBarPosition == AppBarPosition::kBottom) {
+    CGFloat safeAreaBottom = self.safeAreaProvider.safeArea.bottom;
+    CGFloat collapsedHeightWithSafeArea =
+        [self collapsedBottomToolbarHeight] + safeAreaBottom;
+    CGFloat targetHeight =
+        collapsedHeightWithSafeArea +
+        progress * (expandedHeight - collapsedHeightWithSafeArea);
+    height = AlignValueToPixel(targetHeight);
+  } else {
+    const CGFloat isolatedDelta =
+        std::max(0.0, expandedHeight - [self collapsedBottomToolbarHeight]);
+    const CGFloat offset = AlignValueToPixel((1.0 - progress) * isolatedDelta);
+    height = expandedHeight - offset;
+  }
 
   self.secondaryToolbarHeightConstraint.constant = height;
 }
@@ -3101,7 +3113,9 @@ bool IsFullscreenNextIAEnabled() {
     // already taller by the height of the App Bar, so we subtract the App Bar
     // height.
     if (self.layoutState.appBarPosition == AppBarPosition::kBottom) {
-      keyboardAttachedOffset -= kAppBarHeightFullscreen;
+      CGFloat minHeight =
+          IsAppBarHiddenInFullscreen() ? 0 : kAppBarHeightFullscreen;
+      keyboardAttachedOffset -= minHeight;
     }
   }
   CGFloat baseHeight = [self secondaryToolbarHeightWithInset];

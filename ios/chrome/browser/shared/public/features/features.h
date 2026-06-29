@@ -1071,4 +1071,10 @@ extern const base::FeatureParam<base::TimeDelta>
 extern const base::FeatureParam<base::TimeDelta>
     kDiscoverFeedBackgroundRefreshMinBuffer;
 
+// Feature to completely hide the App Bar when in fullscreen.
+BASE_DECLARE_FEATURE(kAppBarHideInFullscreen);
+
+// Returns true if the App Bar should be completely hidden when in fullscreen.
+bool IsAppBarHiddenInFullscreen();
+
 #endif  // IOS_CHROME_BROWSER_SHARED_PUBLIC_FEATURES_FEATURES_H_

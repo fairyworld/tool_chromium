@@ -627,9 +627,11 @@ inline LayoutStateScenePassKey PassKey() {
       break;
 
     case AppBarPosition::kBottom: {
-      CGFloat appBarHeight = kAppBarHeightFullscreen -
-                             _fullscreenProgress * (kAppBarHeightFullscreen -
-                                                    AppBarHeightPortrait());
+      CGFloat minHeight =
+          IsAppBarHiddenInFullscreen() ? 0 : kAppBarHeightFullscreen;
+      CGFloat appBarHeight =
+          minHeight -
+          _fullscreenProgress * (minHeight - AppBarHeightPortrait());
       insets.bottom += appBarHeight;
       break;
     }

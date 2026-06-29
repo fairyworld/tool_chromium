@@ -1289,3 +1289,9 @@ const base::FeatureParam<base::TimeDelta>
     kDiscoverFeedBackgroundRefreshMinBuffer{&kEnableDiscoverBackgroundRefresh,
                                             "discover_refresh_min_buffer",
                                             base::Minutes(15)};
+
+BASE_FEATURE(kAppBarHideInFullscreen, base::FEATURE_DISABLED_BY_DEFAULT);
+
+bool IsAppBarHiddenInFullscreen() {
+  return base::FeatureList::IsEnabled(kAppBarHideInFullscreen);
+}
