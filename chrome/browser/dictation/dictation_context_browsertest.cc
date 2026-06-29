@@ -103,6 +103,36 @@ IN_PROC_BROWSER_TEST_F(DictationContextBrowserTest, SelectedTextCaptured) {
   EXPECT_EQ(*context->editable_content, "hello world");
 }
 
+IN_PROC_BROWSER_TEST_F(DictationContextBrowserTest, InnerTextCaptured) {
+  ASSERT_TRUE(embedded_test_server()->Start());
+
+  LoadTestExtensionInManualMode(profile());
+
+  const GURL url = embedded_test_server()->GetURL("/simple.html");
+  ASSERT_TRUE(content::NavigateToURL(web_contents(), url));
+
+  dictation_service().StartSession(
+      *GetBrowserWindowInterface(),
+      std::make_unique<Target>(web_contents()->GetPrimaryMainFrame(), ""));
+
+  SessionController* controller = dictation_service().session_controller();
+  ASSERT_NE(controller, nullptr);
+
+  ListenerStreamProvider* provider = static_cast<ListenerStreamProvider*>(
+      controller->attached_stream_provider());
+  ASSERT_NE(provider, nullptr);
+
+  ExtensionWaitForStreamStart(profile(), provider->stream_id_for_testing());
+  std::optional<DictationContext> context = ExtensionGetStartStreamDetails(
+      profile(), provider->stream_id_for_testing());
+  ASSERT_TRUE(context.has_value());
+
+  // Verify that the inner text was captured.
+  ASSERT_TRUE(context->inner_text.has_value());
+  EXPECT_EQ(base::TrimWhitespaceASCII(*context->inner_text, base::TRIM_ALL),
+            "Non empty simple page");
+}
+
 class DictationContextAsyncBrowserTest : public DictationContextBrowserTest {
  public:
   DictationContextAsyncBrowserTest() {
