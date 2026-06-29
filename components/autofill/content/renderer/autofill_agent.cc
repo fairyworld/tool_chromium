@@ -1774,8 +1774,21 @@ void AutofillAgent::SendEmailVerificationToken(FieldRendererId email_field_id,
                                                const std::string& email,
                                                FieldRendererId token_field_id,
                                                const std::string& token) {
+  if (token.empty()) {
+    return;
+  }
+
   email_verification_observer_.StoreEmailVerificationToken(
       email_field_id, email, token_field_id, token);
+
+  blink::WebInputElement input_element =
+      form_util::GetFormControlByRendererId(email_field_id)
+          .DynamicTo<blink::WebInputElement>();
+  if (!input_element) {
+    return;
+  }
+  input_element.SetEmailVerificationState(
+      blink::EmailVerificationState::kVerified);
 }
 
 void AutofillAgent::DoFillFieldWithValue(std::u16string_view value,
