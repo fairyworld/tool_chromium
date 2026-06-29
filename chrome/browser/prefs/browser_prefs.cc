@@ -299,6 +299,7 @@
 #include "chrome/browser/desktop_to_mobile_promos/promos_utils.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/gcm/gcm_product_util.h"
 #include "chrome/browser/hid/hid_policy_allowed_devices.h"
+#include "chrome/browser/indigo/indigo_prefs.h"
 #include "chrome/browser/intranet_redirect_detector.h"
 #include "chrome/browser/media/router/discovery/access_code/access_code_cast_feature.h"
 #include "chrome/browser/media/router/media_router_feature.h"
@@ -1803,6 +1804,9 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   registry->RegisterIntegerPref(prefs::kVoiceTypingSettings, 0);
   registry->RegisterBooleanPref(prefs::kPrefDictationOnboardingCompleted,
                                 false);
+#if !BUILDFLAG(IS_ANDROID)
+  indigo::prefs::RegisterProfilePrefs(registry);
+#endif
   RegisterPrefersDefaultScrollbarStylesPrefs(registry);
   RegisterSafetyHubProfilePrefs(registry);
 #if BUILDFLAG(IS_CHROMEOS)
