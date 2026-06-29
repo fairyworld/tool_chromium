@@ -1345,6 +1345,85 @@ TEST_F(PasswordSuggestionGeneratorTest,
 }
 
 TEST_F(PasswordSuggestionGeneratorTest,
+       ManualFallback_BothSections_GroupedCredentials) {
+  PasswordForm form_1 =
+      CreateEntry("first@google.com", "first", GURL("https://google.com/"),
+                  PasswordForm::MatchType::kExact);
+
+  PasswordForm form_2 =
+      CreateEntry("second@google.com", "second", GURL("https://microsoft.com/"),
+                  PasswordForm::MatchType::kGrouped);
+
+  std::vector<Suggestion> suggestions = GenerateBothSections(
+      {form_1, form_2},
+      {CredentialUIEntry({form_1}), CredentialUIEntry({form_2})},
+      IsTriggeredOnPasswordForm(true));
+
+  // Expected suggestions are:
+  // 0. Suggested passwords section title.
+  // 1. Suggestion for google.com.
+  // 2. Suggestion for microsoft.com.
+  // 3. All passwords section title.
+  // 4. Suggestion for google.com.
+  // 5. Suggestion for microsoft.com.
+  // 6. Footer section separator.
+  // 7. "Manage passwords" suggestion.
+  EXPECT_THAT(
+      suggestions,
+      ElementsAre(
+          EqualsSuggestion(
+              SuggestionType::kTitle,
+              l10n_util::GetStringUTF16(
+                  IDS_PASSWORD_MANAGER_MANUAL_FALLBACK_SUGGESTED_PASSWORDS_SECTION_TITLE)),
+          EqualsManualFallbackSuggestion(
+              SuggestionType::kPasswordEntry, u"google.com",
+              u"first@google.com", Suggestion::Icon::kGlobe,
+              /*is_acceptable=*/true,
+              Suggestion::FaviconDetails(
+                  /*domain_url=*/GURL("https://google.com/")),
+              Suggestion::PasswordSuggestionDetails(
+                  u"first@google.com", u"first", "https://google.com/",
+                  u"google.com",
+                  /*is_cross_domain=*/false)),
+          EqualsManualFallbackSuggestion(
+              SuggestionType::kPasswordEntry, u"microsoft.com",
+              u"second@google.com", Suggestion::Icon::kGlobe,
+              /*is_acceptable=*/true,
+              Suggestion::FaviconDetails(
+                  /*domain_url=*/GURL("https://microsoft.com/")),
+              Suggestion::PasswordSuggestionDetails(
+                  u"second@google.com", u"second", "https://microsoft.com/",
+                  u"microsoft.com",
+                  /*is_cross_domain=*/true)),
+          EqualsSuggestion(
+              SuggestionType::kTitle,
+              l10n_util::GetStringUTF16(
+                  IDS_PASSWORD_MANAGER_MANUAL_FALLBACK_ALL_PASSWORDS_SECTION_TITLE)),
+          EqualsManualFallbackSuggestion(
+              SuggestionType::kPasswordEntry, u"google.com",
+              u"first@google.com", Suggestion::Icon::kGlobe,
+              /*is_acceptable=*/true,
+              Suggestion::FaviconDetails(
+                  /*domain_url=*/GURL("https://google.com/")),
+              Suggestion::PasswordSuggestionDetails(
+                  u"first@google.com", u"first", "https://google.com/",
+                  u"google.com",
+                  /*is_cross_domain=*/false)),
+          EqualsManualFallbackSuggestion(
+              SuggestionType::kPasswordEntry, u"microsoft.com",
+              u"second@google.com", Suggestion::Icon::kGlobe,
+              /*is_acceptable=*/true,
+              Suggestion::FaviconDetails(
+                  /*domain_url=*/GURL("https://microsoft.com/")),
+              Suggestion::PasswordSuggestionDetails(
+                  u"second@google.com", u"second", "https://microsoft.com/",
+                  u"microsoft.com",
+                  /*is_cross_domain=*/true)),
+          EqualsSuggestion(SuggestionType::kSeparator),
+          EqualsManagePasswordsSuggestion()));
+}
+
+TEST_F(PasswordSuggestionGeneratorTest,
        ManualFallback_BothSections_OnlyAllPasswordsSectionIsSorted) {
   PasswordForm form_1 =
       CreateEntry("first@google.com", "first", GURL("https://microsoft.com/"),
