@@ -175,12 +175,6 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
   return GaiaIdHash::FromGaiaId(gaia_id);
 }
 
-// Returns the default `GaiaIdHash` to use for account-keyed prefs if no user
-// is signed in.
-[[nodiscard]] GaiaIdHash GetDefaultGaiaIdHash() {
-  return {};
-}
-
 // Returns whether the `entity_type` is enabled in settings.
 [[nodiscard]] bool EntityTypeIsEnabledInSettings(
     const PrefService& prefs,
@@ -550,6 +544,12 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
       }
       break;
     }
+    case AutofillAiAction::kOptIn: {
+      if (!GetAccountGaiaIdHash(identity_manager).has_value()) {
+        return false;
+      }
+      break;
+    }
     case AutofillAiAction::kAddLocalEntityInstanceInSettings:
     case AutofillAiAction::kCrowdsourcingVote:
     case AutofillAiAction::kEditAndDeleteEntityInstanceInSettings:
@@ -558,7 +558,6 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
     case AutofillAiAction::kIphForOptIn:
     case AutofillAiAction::kListEntityInstancesInSettings:
     case AutofillAiAction::kLogToMqls:
-    case AutofillAiAction::kOptIn:
     case AutofillAiAction::kEnableOrDisable:
     case AutofillAiAction::kServerClassificationModel:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
@@ -808,14 +807,6 @@ bool GetAutofillAiOptInStatus(const PrefService* prefs,
     return true;
   }
 
-  // Check the account-independent opt-in setting.
-  if (const base::Value* value = syncer::GetAccountKeyedPrefValue(
-          prefs, prefs::kAutofillAiOptInStatus, GetDefaultGaiaIdHash());
-      value && value->GetIfBool().value_or(false)) {
-    return true;
-  }
-
-  // Check the account-dependent opt-in setting.
   const std::optional<GaiaIdHash> signed_in_hash =
       GetAccountGaiaIdHash(identity_manager);
   if (!signed_in_hash) {
@@ -869,34 +860,14 @@ bool SetAutofillAiOptInStatus(
 
   const std::optional<GaiaIdHash> signed_in_hash =
       GetAccountGaiaIdHash(identity_manager);
-  if (signed_in_hash) {
-    syncer::SetAccountKeyedPrefValue(
-        prefs, prefs::kAutofillAiOptInStatus, *signed_in_hash,
-        base::Value(opt_in_status == AutofillAiOptInStatus::kOptedIn));
-  }
-
-  // If the user is signed out or is an opt-out, then we need to make sure that
-  // it also applies to the pref for the signed out state.
-  if (!signed_in_hash || opt_in_status == AutofillAiOptInStatus::kOptedOut) {
-    syncer::SetAccountKeyedPrefValue(
-        prefs, prefs::kAutofillAiOptInStatus, GetDefaultGaiaIdHash(),
-        base::Value(opt_in_status == AutofillAiOptInStatus::kOptedIn));
-  }
+  // Guaranteed by MayPerformAutofillAiAction(kOptIn).
+  CHECK(signed_in_hash.has_value());
+  syncer::SetAccountKeyedPrefValue(
+      prefs, prefs::kAutofillAiOptInStatus, *signed_in_hash,
+      base::Value(opt_in_status == AutofillAiOptInStatus::kOptedIn));
 
   base::UmaHistogramEnumeration("Autofill.Ai.OptIn.Change", opt_in_status);
   return true;
-}
-
-[[nodiscard]] bool HasSetLocalAutofillAiOptInStatus(
-    const PrefService* prefs,
-    const signin::IdentityManager* identity_manager) {
-  const std::optional<GaiaIdHash> signed_in_hash =
-      GetAccountGaiaIdHash(identity_manager);
-  return syncer::GetAccountKeyedPrefValue(prefs, prefs::kAutofillAiOptInStatus,
-                                          GetDefaultGaiaIdHash()) ||
-         (signed_in_hash &&
-          syncer::GetAccountKeyedPrefValue(prefs, prefs::kAutofillAiOptInStatus,
-                                           *signed_in_hash));
 }
 
 bool IsAutofillAiEntityTypeBlockedByPolicy(const AutofillClient& client,

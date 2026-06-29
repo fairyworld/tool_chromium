@@ -200,6 +200,7 @@
 #include "components/subresource_filter/core/common/constants.h"
 #include "components/subscription_eligibility/subscription_eligibility_prefs.h"
 #include "components/supervised_user/core/browser/supervised_user_preferences.h"
+#include "components/sync/base/account_pref_utils.h"
 #include "components/sync/base/pref_names.h"
 #include "components/sync/service/device_statistics_scheduler.h"
 #include "components/sync/service/glue/sync_transport_data_prefs.h"
@@ -2661,6 +2662,10 @@ void MigrateObsoleteProfilePrefs(PrefService* profile_prefs,
   // Added 06/2026.
   profile_prefs->ClearPref(kMetricsUserReportingLevel);
 #endif  // BUILDFLAG(IS_CHROMEOS)
+
+  // Added 06/2026.
+  syncer::ClearAccountKeyedPrefValue(
+      profile_prefs, autofill::prefs::kAutofillAiOptInStatus, {});
 
   // Please don't delete the following line. It is used by PRESUBMIT.py.
   // END_MIGRATE_OBSOLETE_PROFILE_PREFS
