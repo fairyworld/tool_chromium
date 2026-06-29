@@ -7387,7 +7387,7 @@ Handoff must also be enabled in the General section of Settings, and your device
         Site address copied
       </message>
       <message name="IDS_IOS_SETTINGS_START_SURFACE_TITLE" desc="Title for the setting to show the start surface after period of inactivity. [iOS only]">
-        Show start page after period of inactivity
+        Open a new tab when you return to Chrome after 4 hours
       </message>
       <message name="IDS_IOS_SETTINGS_SWIPE_DOWN_DISCARD" desc="Button displayed along with a message alert whenever a user tries to dismiss a Settings screen which is being edited, or information is being added to it. Selecting this option will discard the current changes and dismiss the screen.">
         Discard changes
