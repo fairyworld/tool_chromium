@@ -268,7 +268,13 @@ targets.mixin(
         # cros_test_tags_exclude will honor the suite's settings. for
         # chrome_all_tast_tests suite, all informational or
         # dep:no_chrome_dcheck tests will be filtered out.
-        cros_test_names_from_file = ["chromeos/tast_control_cq_tests.txt"],
+        cros_test_names_from_file = [
+            "chromeos/tast_control_cq_tests.txt",
+        ],
+        cros_test_names_exclude_from_file = [
+            "chromeos/tast_control_disabled_tests.txt",
+            "chromeos/tast_control_flaky_tests.txt",
+        ],
         cros_test_max_in_shard = 20,
     ),
 )

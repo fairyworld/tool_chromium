@@ -533,6 +533,15 @@ targets.binaries.generated_script(
     module_scheme = "tast",
 )
 
+targets.binaries.generated_script(
+    name = "chrome_flaky_tast_tests",
+    label = "//chromeos:chrome_flaky_tast_tests",
+    args = [
+        "--logs-dir=${ISOLATED_OUTDIR}",
+    ],
+    module_scheme = "tast",
+)
+
 targets.binaries.console_test_launcher(
     name = "chrome_elf_unittests",
     label = "//chrome/chrome_elf:chrome_elf_unittests",

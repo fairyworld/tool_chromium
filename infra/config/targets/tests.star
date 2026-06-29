@@ -551,6 +551,10 @@ targets.tests.gtest_test(
 )
 
 targets.tests.gtest_test(
+    name = "chrome_flaky_tast_tests",
+)
+
+targets.tests.gtest_test(
     name = "chrome_elf_unittests",
 )
 

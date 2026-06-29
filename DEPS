@@ -4999,7 +4999,8 @@ hooks = [
                '-t', 'src/chromeos/tast_control.gni.template',
                '-i', 'src/chromeos/tast_control_disabled_tests.txt',
                '--input-public',
-               'src/chromeos/tast_control_disabled_tests_public_builders.txt'],
+               'src/chromeos/tast_control_disabled_tests_public_builders.txt',
+               '-f', 'src/chromeos/tast_control_flaky_tests.txt'],
   },
   {
     # Update chromeos/tast_control_cq_tests.txt
