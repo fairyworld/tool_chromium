@@ -7555,6 +7555,12 @@ Keep your key file in a safe place. You will need it to create new versions of y
       <message name="IDS_NTP_DRIVE_DISCLAIMER_CONNECT" desc="Label on the button to proceed with connecting Google Drive.">
         Connect
       </message>
+      <message name="IDS_NTP_DRIVE_DISCLAIMER_ERROR" desc="Error message displayed when connecting to Google Drive fails.">
+        Couldn't connect to your Google Drive account
+      </message>
+      <message name="IDS_NTP_DRIVE_DISCLAIMER_TRY_AGAIN" desc="Label on the button to retry connecting to Google Drive.">
+        Try again
+      </message>
       <message name="IDS_GOOGLE_SEARCH_BOX_EMPTY_HINT_MD" desc="The text displayed in the fakebox (on the New Tab page) when it is empty, Google is the default search engine, and the Material Design UI is enabled.">
         Search Google or type a URL
       </message>
