@@ -2315,7 +2315,9 @@ test("content_browsertests") {
       "//ui/events:motionevent_jni_headers",
       "//ui/touch_selection",
     ]
-
+    if (enable_javaless_renderers) {
+      deps += [ "//content/app:javaless_renderer" ]
+    }
     android_manifest =
         "${target_gen_dir}/content_browsertests_manifest/AndroidManifest.xml"
     android_manifest_dep = ":content_browsertests_manifest"
