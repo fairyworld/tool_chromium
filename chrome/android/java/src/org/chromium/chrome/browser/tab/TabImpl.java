@@ -135,7 +135,7 @@ import java.util.Objects;
  * class is not intended to be extended.
  */
 @NullMarked
-class TabImpl implements Tab {
+class TabImpl implements Tab, TabInternal {
     /** Used for logging. */
     private static final String TAG = "Tab";
 
@@ -2116,8 +2116,9 @@ class TabImpl implements Tab {
     /**
      * @return The native pointer representing the native side of this {@link TabImpl} object.
      */
+    @Override
     @CalledByNative
-    private long getNativePtr() {
+    public long getNativePtr() {
         return mNativeTabAndroid;
     }
 
@@ -2154,17 +2155,6 @@ class TabImpl implements Tab {
     @CalledByNative
     private static @Nullable TabImpl getJavaObject(long nativePtr) {
         return sTabMap.get(nativePtr);
-    }
-
-    @CalledByNative
-    private static long @Nullable [] getAllNativePtrs(Tab @Nullable [] tabsArray) {
-        if (tabsArray == null) return null;
-
-        long[] tabsPtrArray = new long[tabsArray.length];
-        for (int i = 0; i < tabsArray.length; i++) {
-            tabsPtrArray[i] = ((TabImpl) tabsArray[i]).getNativePtr();
-        }
-        return tabsPtrArray;
     }
 
     @CalledByNative

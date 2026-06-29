@@ -86,11 +86,6 @@ class TabAndroid : public tabs::TabInterface,
   static TabAndroid* GetNativeTab(JNIEnv* env,
                                   const base::android::JavaRef<jobject>& obj);
 
-  // Returns the a vector of native TabAndroid stored in the Java Tab array
-  // represented by |obj_array|.
-  static std::vector<raw_ptr<TabAndroid, VectorExperimental>> GetAllNativeTabs(
-      JNIEnv* env,
-      const base::android::ScopedJavaLocalRef<jobjectArray>& obj_array);
 
   // Function to attach helpers to the `web_contents`.
   static void AttachTabHelpers(content::WebContents* web_contents);
