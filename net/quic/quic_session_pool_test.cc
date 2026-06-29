@@ -1426,6 +1426,100 @@ TEST_P(QuicSessionPoolTest, ServerNetworkStatsWithNetworkAnonymizationKey) {
   }
 }
 
+// QUIC sessions tunneled through a proxy chain do not share ServerNetworkStats
+// with direct sessions to the same destination, since the observed RTT depends
+// on the path.
+TEST_P(QuicSessionPoolTest, ServerNetworkStatsProxyChain) {
+  Initialize();
+
+  GURL proxy(kProxy1Url);
+  auto proxy_origin = url::SchemeHostPort(proxy);
+  auto proxy_chain = ProxyChain::ForIpProtection({
+      ProxyServer::FromSchemeHostAndPort(ProxyServer::SCHEME_QUIC,
+                                         proxy_origin.host(), 443),
+  });
+  ASSERT_TRUE(proxy_chain.IsValid());
+
+  ProofVerifyDetailsChromium verify_details = DefaultProofVerifyDetails();
+  crypto_client_stream_factory_.AddProofVerifyDetails(&verify_details);
+  crypto_client_stream_factory_.AddProofVerifyDetails(&verify_details);
+  client_maker_.set_use_priority_header(false);
+
+  QuicTestPacketMaker endpoint_maker(
+      version_,
+      quic::QuicUtils::CreateRandomConnectionId(context_.random_generator()),
+      context_.clock(), kDefaultServerHostName, quic::Perspective::IS_CLIENT,
+      /*client_priority_uses_incremental=*/true,
+      /*use_priority_header=*/true);
+
+  const uint64_t stream_id = GetNthClientInitiatedBidirectionalStreamId(0);
+  MockQuicData socket_data(version_);
+  socket_data.AddWrite(SYNCHRONOUS, ConstructInitialSettingsPacket(1));
+  socket_data.AddWrite(
+      SYNCHRONOUS, ConstructConnectUdpRequestPacket(
+                       2, stream_id, proxy.GetHost(),
+                       "/.well-known/masque/udp/www.example.org/443/", false));
+  socket_data.AddRead(ASYNC, ConstructServerSettingsPacket(3));
+  socket_data.AddRead(ASYNC, ConstructOkResponsePacket(4, stream_id, true));
+  socket_data.AddReadPauseForever();
+  socket_data.AddWrite(ASYNC,
+                       client_maker_.Packet(3).AddAckFrame(3, 4, 3).Build());
+  socket_data.AddWrite(ASYNC, ConstructClientH3DatagramPacket(
+                                  4, stream_id, kConnectUdpContextId,
+                                  endpoint_maker.MakeInitialSettingsPacket(1)));
+  socket_data.AddSocketDataToFactory(socket_factory_.get());
+
+  RequestBuilder builder(this);
+  builder.proxy_chain = proxy_chain;
+  builder.http_user_agent_settings = &http_user_agent_settings_;
+  EXPECT_EQ(ERR_IO_PENDING, builder.CallRequest());
+  ASSERT_THAT(callback_.WaitForResult(), IsOk());
+  std::unique_ptr<HttpStream> stream = CreateStream(&builder.request);
+  EXPECT_TRUE(stream.get());
+  ASSERT_TRUE(base::test::RunUntil(
+      [&]() { return socket_data.AllWriteDataConsumed(); }));
+
+  QuicChromiumClientSession* session =
+      GetActiveSession(kDefaultDestination, PRIVACY_MODE_DISABLED,
+                       NetworkAnonymizationKey(), proxy_chain);
+  session->OnHttp3GoAway(0);
+  EXPECT_FALSE(HasActiveSession(kDefaultDestination, PRIVACY_MODE_DISABLED,
+                                NetworkAnonymizationKey(), proxy_chain));
+
+  // Stats from the tunneled session must not be recorded under the key that a
+  // direct connection to the same destination would use.
+  EXPECT_FALSE(http_server_properties_->GetServerNetworkStats(
+      url::SchemeHostPort(GURL(kDefaultUrl)), NetworkAnonymizationKey()));
+
+  // Now record stats for a direct connection and verify that the tunneled path
+  // does not consume them when computing the waiting-job delay.
+  ServerNetworkStats direct_stats;
+  direct_stats.srtt = base::Milliseconds(10);
+  http_server_properties_->SetServerNetworkStats(
+      url::SchemeHostPort(GURL(kDefaultUrl)), NetworkAnonymizationKey(),
+      direct_stats);
+  base::TimeDelta direct_delay =
+      pool_->GetTimeDelayForWaitingJob(QuicSessionKey(
+          kDefaultServerHostName, kDefaultServerPort, PRIVACY_MODE_DISABLED,
+          ProxyChain::Direct(), SessionUsage::kDestination, SocketTag(),
+          NetworkAnonymizationKey(), SecureDnsPolicy::kAllow,
+          /*require_dns_https_alpn=*/false,
+          /*disable_cert_verification_network_fetches=*/false,
+          handles::kInvalidNetworkHandle));
+  base::TimeDelta proxied_delay =
+      pool_->GetTimeDelayForWaitingJob(QuicSessionKey(
+          kDefaultServerHostName, kDefaultServerPort, PRIVACY_MODE_DISABLED,
+          proxy_chain, SessionUsage::kDestination, SocketTag(),
+          NetworkAnonymizationKey(), SecureDnsPolicy::kAllow,
+          /*require_dns_https_alpn=*/false,
+          /*disable_cert_verification_network_fetches=*/false,
+          handles::kInvalidNetworkHandle));
+  EXPECT_NE(direct_delay, proxied_delay);
+
+  socket_data.ExpectAllReadDataConsumed();
+  socket_data.ExpectAllWriteDataConsumed();
+}
+
 TEST_P(QuicSessionPoolTest, MemoryPressureGlobalExclusion) {
   base::MemoryPressureListenerRegistry memory_pressure_listener_registry;
   base::test::ScopedFeatureList scoped_feature_list;
