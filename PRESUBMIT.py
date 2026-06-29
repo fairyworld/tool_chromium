@@ -486,6 +486,16 @@ _BANNED_IOS_OBJC_FUNCTIONS = (
             'ios/web_view',
         ),
     ),
+    BanRule(
+        r'/\bUIDevice\b(.*?)\buserInterfaceIdiom\b',
+        ('UIDevice.currentDevice.userInterfaceIdiom should not be used.',
+         'Use GetDeviceFormFactor() instead.'),
+        True,
+        excluded_paths=(
+            r'^ui/base/device_form_factor_ios\.mm$',
+            r'^ios/third_party/',
+        ),
+    ),
 )
 
 _BANNED_IOS_EGTEST_FUNCTIONS: Sequence[BanRule] = (BanRule(
