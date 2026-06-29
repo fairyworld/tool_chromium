@@ -1121,3 +1121,192 @@ def cleanup_binaries(args, chrome_version):
     send_ssh_command(args.sender, args.username,
                      cleanup_command[args.sender_os])
     logging.info("Cleaned up remote version-specific directory.")
+
+
+def start_glances_monitoring(args, csv_remote_path):
+    """Starts glances or ChromeOS power monitoring in the background."""
+    if args.sender_os == 'cros':
+        # ChromeOS: run a background loop writing battery power_now to a file
+        # We save the PID to /tmp/cros_power.pid so we can kill it later.
+        cros_cmd = (
+            "sh -c 'echo $$ > /tmp/cros_power.pid; "
+            "while true; do "
+            "if [ -f /sys/class/power_supply/battery/power_now ]; then "
+            "cat /sys/class/power_supply/battery/power_now; "
+            "elif [ -f /sys/class/power_supply/sbat0/power_now ]; then "
+            "cat /sys/class/power_supply/sbat0/power_now; "
+            "else echo 0; fi >> /tmp/cros_power.txt; "
+            "sleep 1; done'"
+        )
+        logging.info("Starting ChromeOS power monitoring in background...")
+        return send_ssh_command(
+            args.sender, args.username, cros_cmd, blocking=False)
+
+    # Linux, macOS, Windows: run glances
+    python_cmd = 'python' if args.sender_os == 'win' else 'python3'
+    glances_cmd = (
+        f"{python_cmd} -m glances -t 1 --export csv "
+        f"--export-csv-file {csv_remote_path} --quiet"
+    )
+    logging.info("Starting Glances monitoring on sender...")
+    return send_ssh_command(
+        args.sender, args.username, glances_cmd, blocking=False)
+
+
+def stop_glances_monitoring(
+    args, glances_proc, csv_remote_path, csv_local_path):
+    """Stops the monitoring process, pulls the output file, and cleans up."""
+    import shutil
+    logging.info("Stopping Glances/Power monitoring...")
+
+    if args.sender_os == 'cros':
+        # 1. Kill the ChromeOS background loop using the saved PID
+        kill_cmd = (
+            "if [ -f /tmp/cros_power.pid ]; then "
+            "kill -9 $(cat /tmp/cros_power.pid) 2>/dev/null || true; "
+            "rm -f /tmp/cros_power.pid; "
+            "fi"
+        )
+        send_ssh_command(args.sender, args.username, kill_cmd, blocking=True)
+
+        # 2. SCP the power log file back
+        remote_log = "/tmp/cros_power.txt"
+        if args.sender in ['localhost', '127.0.0.1', None]:
+            if os.path.exists(remote_log):
+                shutil.copy(remote_log, csv_local_path)
+        else:
+            key_path = os.path.expanduser('~/.ssh/id_ed25519')
+            subprocess.run([
+                'scp', '-i', key_path,
+                '-o', 'StrictHostKeyChecking=no',
+                f'{args.username}@{args.sender}:{remote_log}',
+                csv_local_path
+            ], check=False, timeout=30)
+
+        # 3. Clean up remote file
+        cleanup_cmd = f"rm -f {remote_log}"
+        send_ssh_command(
+            args.sender, args.username, cleanup_cmd, blocking=True)
+        return
+
+    # Non-ChromeOS (Glances):
+    # 1. Terminate the background Popen process
+    if glances_proc:
+        try:
+            glances_proc.terminate()
+            glances_proc.wait(timeout=5)
+        except Exception:
+            pass
+
+    # Also send a kill command over SSH just in case
+    if args.sender_os == 'win':
+        kill_cmd = (
+            'powershell -Command "Get-WmiObject Win32_Process | '
+            'Where-Object { $_.CommandLine -like \'*glances*\' } | '
+            'ForEach-Object { Stop-Process $_.ProcessId -Force }"'
+        )
+    else:
+        kill_cmd = "pkill -f glances"
+    send_ssh_command(args.sender, args.username, kill_cmd, blocking=True)
+
+    # 2. SCP the CSV file back to the host
+    if args.sender in ['localhost', '127.0.0.1', None]:
+        if os.path.exists(csv_remote_path):
+            shutil.copy(csv_remote_path, csv_local_path)
+    else:
+        key_path = os.path.expanduser('~/.ssh/id_ed25519')
+        subprocess.run([
+            'scp', '-i', key_path,
+            '-o', 'StrictHostKeyChecking=no',
+            f'{args.username}@{args.sender}:{csv_remote_path}',
+            csv_local_path
+        ], check=False, timeout=30)
+
+    # 3. Clean up remote file
+    cleanup_cmd = f"rm -f {csv_remote_path}"
+    send_ssh_command(args.sender, args.username, cleanup_cmd, blocking=True)
+
+
+def parse_glances_csv_and_record(video_file, csv_local_path, sender_os):
+    """Parses the glances/power log and records metrics.
+
+    Args:
+        video_file: The name of the video file.
+        csv_local_path: The local path to the CSV/log file.
+        sender_os: The OS of the sender device.
+    """
+    import csv
+    if not os.path.exists(csv_local_path):
+        logging.warning(
+            "Monitoring log file not found at %s. Skipping metric parsing.",
+            csv_local_path)
+        return
+
+    try:
+        if sender_os == 'cros':
+            # ChromeOS power log is a simple text file with one value per line
+            power_draws = []
+            with open(csv_local_path, mode='r', encoding='utf-8') as f:
+                for line in f:
+                    val = line.strip()
+                    if val:
+                        power_draws.append(float(val))
+
+            if power_draws:
+                avg_raw = sum(power_draws) / len(power_draws)
+                # Auto-scale: if the raw value is very large, it is in
+                # microwatts
+                if avg_raw > 10000:
+                    avg_power = avg_raw / 1000000.0
+                elif avg_raw > 10:
+                    avg_power = avg_raw / 1000.0
+                else:
+                    avg_power = avg_raw
+
+                measures.average(
+                    video_file, 'video_perf',
+                    'power_consumption_watts').record(avg_power)
+                logging.info("ChromeOS Average Power Draw: %.2f W", avg_power)
+            return
+
+        # Non-ChromeOS (Glances CSV)
+        cpu_usages = []
+        power_draws = []
+
+        import re
+        def parse_float(val):
+            """Parses a float value from a string, ignoring formatting."""
+            if not val:
+                return None
+            match = re.search(r'[-+]?\d+(?:\.\d+)?', val)
+            return float(match.group(0)) if match else None
+
+        with open(csv_local_path, mode='r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                # Glances CPU key
+                cpu_val = parse_float(row.get('cpu.total'))
+                if cpu_val is not None:
+                    cpu_usages.append(cpu_val)
+
+                # Check for battery/power keys
+                power_val = parse_float(row.get('sensors.Battery.value'))
+                if power_val is not None:
+                    power_draws.append(power_val)
+
+        if cpu_usages:
+            avg_cpu = sum(cpu_usages) / len(cpu_usages)
+            measures.average(
+                video_file, 'video_perf', 'cpu_utilization').record(avg_cpu)
+            logging.info("Average CPU utilization: %.2f%%", avg_cpu)
+
+        if power_draws:
+            avg_power = sum(power_draws) / len(power_draws)
+            measures.average(
+                video_file, 'video_perf',
+                'power_consumption_watts').record(avg_power)
+            logging.info("Average Power Draw: %.2f W", avg_power)
+
+    except Exception as e:
+        logging.error("Failed to parse monitoring log: %s", e)
+
