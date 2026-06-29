@@ -896,7 +896,8 @@ bool IsAutofillAiEntityTypeBlockedByPolicy(const AutofillClient& client,
           url, AutofillClient::AutofillPolicyDataCategory::kTravel);
     case EntityTypeName::kOrder:
     case EntityTypeName::kShipment:
-      return false;
+      return client.IsAutofillTypeBlockedByPolicy(
+          url, AutofillClient::AutofillPolicyDataCategory::kShopping);
   }
   return false;
 }

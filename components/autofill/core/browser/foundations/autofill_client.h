@@ -192,6 +192,8 @@ class AutofillClient {
     kIdentityDocs,
     // Autofill AI travel/booking details (e.g. flights, vehicles).
     kTravel,
+    // Autofill AI shopping details (e.g. orders, shipments).
+    kShopping,
   };
 
   // Represents the user's possible decisions or outcomes in response to a
