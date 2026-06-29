@@ -122,6 +122,7 @@ source_set("misc") {
     "//chrome/browser/sessions",
     "//chrome/browser/ssl",
     "//chrome/browser/storage",
+    "//chrome/browser/subscription_eligibility",
     "//chrome/browser/transition_manager",
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/startup",
