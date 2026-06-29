@@ -52,9 +52,11 @@ class ExtensionApiTestStreamProvider : public dictation::StreamProvider {
     target_ = std::move(target);
     api::dictation_private::StartStreamDetails details;
     details.stream_id = stream_id_.value();
-    details.annotated_page_content = std::vector<uint8_t>{1, 2, 3};
-    details.inner_text = "Foo Bar";
-    details.editable_content = "Existing content";
+    api::dictation_private::DictationContext context;
+    context.annotated_page_content = std::vector<uint8_t>{1, 2, 3};
+    context.inner_text = "Foo Bar";
+    context.editable_content = "Existing content";
+    details.context = std::move(context);
 
     base::ListValue event_args =
         api::dictation_private::OnStartStream::Create(details);

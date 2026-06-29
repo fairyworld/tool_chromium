@@ -6,6 +6,8 @@ const OFFSCREEN_PATH = 'offscreen.html';
 
 const startedStreams = new Map();
 const streamStartWaiters = new Map();
+const updatedContexts = new Map();
+const contextUpdateWaiters = new Map();
 
 function notifyStreamStarted(streamId, details) {
   startedStreams.set(streamId, details);
@@ -27,6 +29,29 @@ globalThis.waitForStreamStart = function(streamId) {
       streamStartWaiters.set(streamId, []);
     }
     streamStartWaiters.get(streamId).push(resolve);
+  });
+};
+
+function notifyContextUpdated(streamId, details) {
+  updatedContexts.set(streamId, details);
+  const waiters = contextUpdateWaiters.get(streamId);
+  if (waiters) {
+    for (const resolve of waiters) {
+      resolve(details);
+    }
+    contextUpdateWaiters.delete(streamId);
+  }
+}
+
+globalThis.waitForContextUpdate = function(streamId) {
+  if (updatedContexts.has(streamId)) {
+    return Promise.resolve(updatedContexts.get(streamId));
+  }
+  return new Promise((resolve) => {
+    if (!contextUpdateWaiters.has(streamId)) {
+      contextUpdateWaiters.set(streamId, []);
+    }
+    contextUpdateWaiters.get(streamId).push(resolve);
   });
 };
 
@@ -120,7 +145,7 @@ chrome.dictationPrivate.onStartStream.addListener(async (details) => {
 
   console.info(
       '[onStartStream] Selected text received from Chrome:',
-      details.editableContent);
+      details.context.editableContent);
   startStream(details.streamId);
 });
 
@@ -136,4 +161,18 @@ chrome.dictationPrivate.onEndStream.addListener(async (details) => {
   await endStream(streamId);
   chrome.dictationPrivate.setStreamState(
       {streamId, state: chrome.dictationPrivate.StreamState.COMPLETE});
+});
+
+chrome.dictationPrivate.onContextUpdate.addListener(async (details) => {
+  if (await isManualTest()) {
+    if (!startedStreams.has(details.streamId)) {
+      chrome.test.fail(
+          'Context update received before start stream for stream ' +
+          details.streamId);
+      return;
+    }
+    notifyContextUpdated(details.streamId, details);
+    return;
+  }
+  console.info('[onContextUpdate] Context updated:', details.context);
 });

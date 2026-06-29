@@ -54,7 +54,9 @@ class ListenerStreamProvider : public StreamProvider {
 
  private:
   DictationMultiplexer& GetMultiplexer() const;
-  void OnPageContextCaptured(DictationContext result);
+  void StartStream(std::optional<DictationContext> context);
+  void OnStartContextCaptured(DictationContext result);
+  void OnAsyncContextCaptured(DictationContext result);
 
   // Owns this
   const base::raw_ref<StreamProviderDelegate> delegate_;

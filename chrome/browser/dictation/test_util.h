@@ -68,8 +68,15 @@ void ExtensionWaitForStreamStart(Profile* profile,
 
 // Blocks until the extension has received the OnStartStream event for the given
 // stream ID, and returns the DictationContext containing the page context
+// passed to the extension, or nullopt if no context was passed.
+std::optional<DictationContext> ExtensionGetStartStreamDetails(
+    Profile* profile,
+    DictationMultiplexer::StreamId stream_id);
+
+// Blocks until the extension has received the OnContextUpdate event for the
+// given stream ID, and returns the DictationContext containing the page context
 // passed to the extension.
-DictationContext ExtensionGetDictationContext(
+DictationContext ExtensionGetUpdatedContext(
     Profile* profile,
     DictationMultiplexer::StreamId stream_id);
 

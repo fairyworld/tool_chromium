@@ -84,6 +84,9 @@ Core dictation logic
   provider with an id and receives messages from the connector extension via
   the private dictation API. This object is responsible for routing the
   messages to the appropriate stream provider object.
+* dictation_context_fetcher.h - Responsible for collecting any relevant context
+  from the page being dictated into. Used by a stream provider to send page
+  context to the connector extension.
 
 ### chrome/browser/extensions/api/dictation_private/
 
@@ -123,4 +126,3 @@ See test extension [README.md](/chrome/test/data/extensions/dictation/README.md)
 * background.js - Service worker script for the "test extension" used by
   dictation tests. Dictation tests put this test into "manual mode" and use it
   to communicate with the other side of the extension API.
-
