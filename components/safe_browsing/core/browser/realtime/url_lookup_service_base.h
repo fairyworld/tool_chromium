@@ -75,7 +75,8 @@ class RealTimeUrlLookupServiceBase : public KeyedService {
     kSuccess = 0,
     kTimeout = 1,
     kError = 2,
-    kMaxValue = kError,
+    kSkipped = 3,
+    kMaxValue = kSkipped,
   };
   // LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:SafeBrowsingRtDnsResolutionResult)
 
@@ -299,8 +300,6 @@ class RealTimeUrlLookupServiceBase : public KeyedService {
     // The callback to run when the request is fully populated.
     base::OnceCallback<void(std::unique_ptr<RTLookupRequest>)> callback;
     // The host resolver used for DNS resolution.
-    // TODO(bcl): Implement a ProxyAwareHostResolver and use it instead
-    // to prevent local DNS resolution in proxied situations.
     std::unique_ptr<network::SimpleHostResolver> simple_host_resolver;
     // The time when DNS resolution started.
     base::TimeTicks dns_start_time;

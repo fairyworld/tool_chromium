@@ -815,10 +815,15 @@ void RealTimeUrlLookupServiceBase::StartFillingRequestProto(
     auto nak =
         net::NetworkAnonymizationKey::CreateSameSite(net::SchemefulSite(url));
 
+    // When a request would be proxied, resolving via local DNS could be a
+    // privacy leak or inaccurate, so skip these.
+    auto optional_parameters = network::mojom::ResolveHostParameters::New();
+    optional_parameters->direct_only = true;
+
     pending_state->simple_host_resolver->ResolveHost(
         network::mojom::HostResolverHost::NewHostPortPair(
             net::HostPortPair::FromURL(url)),
-        nak, network::mojom::ResolveHostParameters::New(),
+        nak, std::move(optional_parameters),
         base::BindOnce(&RealTimeUrlLookupServiceBase::OnDnsResolved,
                        GetWeakPtr(), url, barrier_closure));
 
@@ -866,7 +871,10 @@ void RealTimeUrlLookupServiceBase::OnDnsResolved(
   if (result == net::OK && !resolved_addresses.empty()) {
     resolution_result = DnsResolutionResult::kSuccess;
     dns_ip = resolved_addresses.front().ToStringWithoutPort();
-  }  // TODO(bcl): add OK && addresses.empty() after ProxyAwareHostResolver
+  } else if (result == net::ERR_DNS_DIRECT_ONLY) {
+    // ERR_DNS_DIRECT_ONLY indicates a skip due to direct_only.
+    resolution_result = DnsResolutionResult::kSkipped;
+  }
 
   DnsResolutionComplete(url, barrier_closure, resolution_result,
                         std::move(dns_ip));
