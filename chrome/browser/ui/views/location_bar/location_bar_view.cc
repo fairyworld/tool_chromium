@@ -2170,6 +2170,10 @@ bool LocationBarView::IsEditingOrEmpty() const {
   return omnibox_view_ && omnibox_view_->IsEditingOrEmpty();
 }
 
+bool LocationBarView::IsMouseHovered() const {
+  return views::View::IsMouseHovered();
+}
+
 bool LocationBarView::OpenContextMenu() {
   if (browser_ && ShouldShowAddContextButton()) {
     auto* web_contents = GetWrappedWebContents();

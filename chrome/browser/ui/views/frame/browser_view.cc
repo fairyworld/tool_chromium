@@ -3032,7 +3032,7 @@ ShowTranslateBubbleResult BrowserView::ShowTranslateBubble(
     bool is_user_gesture) {
   views::View* contents_view = GetActiveContentsWebView();
 
-  if (contents_view->HasFocus() && !GetLocationBarView()->IsMouseHovered() &&
+  if (contents_view->HasFocus() && !GetLocationBar()->IsMouseHovered() &&
       web_contents->IsFocusedElementEditable()) {
     return ShowTranslateBubbleResult::kEditableFieldIsActive;
   }
