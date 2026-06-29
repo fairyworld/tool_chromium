@@ -123,6 +123,13 @@ void FakeSendTabToSelfModel::MarkEntryOpened(std::string_view guid) {
   }
 }
 
+void FakeSendTabToSelfModel::MarkEntryActivated(
+    std::string_view guid,
+    ShareActivatedEntryPoint entry_point) {
+  last_activated_guid_ = std::string(guid);
+  last_activated_entry_point_ = entry_point;
+}
+
 bool FakeSendTabToSelfModel::IsReady() {
   return is_ready_;
 }

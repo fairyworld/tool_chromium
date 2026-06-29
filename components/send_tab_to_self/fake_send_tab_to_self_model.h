@@ -48,6 +48,8 @@ class FakeSendTabToSelfModel final : public SendTabToSelfModel {
       ShareEntryPoint entry_point) override;
   void DismissEntry(std::string_view guid) override;
   void MarkEntryOpened(std::string_view guid) override;
+  void MarkEntryActivated(std::string_view guid,
+                          ShareActivatedEntryPoint entry_point) override;
   bool IsReady() override;
   bool HasValidTargetDevice() override;
   std::vector<TargetDeviceInfo> GetTargetDeviceInfoSortedList() override;
@@ -83,6 +85,12 @@ class FakeSendTabToSelfModel final : public SendTabToSelfModel {
   const std::string& last_dismissed_guid() const {
     return last_dismissed_guid_;
   }
+  const std::string& last_activated_guid() const {
+    return last_activated_guid_;
+  }
+  std::optional<ShareActivatedEntryPoint> last_activated_entry_point() const {
+    return last_activated_entry_point_;
+  }
 
  private:
   bool is_ready_ = true;
@@ -94,6 +102,8 @@ class FakeSendTabToSelfModel final : public SendTabToSelfModel {
   std::vector<TargetDeviceInfo> devices_;
   std::string last_opened_guid_;
   std::string last_dismissed_guid_;
+  std::string last_activated_guid_;
+  std::optional<ShareActivatedEntryPoint> last_activated_entry_point_;
   SendEntryCallback send_entry_callback_;
   SendTabToSelfResult send_result_ = SendTabToSelfResult::kSuccess;
 };

@@ -101,6 +101,11 @@ class SendTabToSelfModel {
   // SendTabToSelfModel, to avoid showing the same notification twice.
   virtual void MarkEntryOpened(std::string_view guid) = 0;
 
+  // Marks the entry as activated (interacted with by the user) and records
+  // activation metrics.
+  virtual void MarkEntryActivated(std::string_view guid,
+                                  ShareActivatedEntryPoint entry_point) = 0;
+
   // Guarantee that the model is operational and syncing, i.e., the local
   // database is started and the initial data has been downloaded.
   // This call and SendTabToSelfModelObserver::SendTabToSelfModelLoaded overlap,
