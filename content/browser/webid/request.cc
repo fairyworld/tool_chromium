@@ -214,6 +214,9 @@ void Request::OnConnectionError() {
 }
 
 void Request::ReportBadMessage(const char* message) {
+  if (!is_mojo_) {
+    return;
+  }
   mojo::ReportBadMessage(message);
 }
 
@@ -269,6 +272,7 @@ bool Request::RequestToken(
     NavigationHandle* navigation_handle,
     const GURL& intercepted_url,
     RequestTokenCallback callback) {
+  is_mojo_ = (navigation_handle == nullptr);
   if (ShouldTerminateRequest(idp_get_params_ptrs, requirement,
                              navigation_handle)) {
     std::move(callback).Run(RequestTokenStatus::kError, std::nullopt,
