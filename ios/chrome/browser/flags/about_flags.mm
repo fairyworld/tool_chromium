@@ -2862,7 +2862,12 @@ constexpr auto kFeatureEntries = std::to_array<flags_ui::FeatureEntry>({
      flag_descriptions::kEnableDiscoverBackgroundRefreshName,
      flag_descriptions::kEnableDiscoverBackgroundRefreshDescription,
      flags_ui::kOsIos, FEATURE_VALUE_TYPE(kEnableDiscoverBackgroundRefresh)},
-
+    {"enable-bulk-data-entry-connector-ios",
+     flag_descriptions::kEnableBulkDataEntryConnectorIOSName,
+     flag_descriptions::kEnableBulkDataEntryConnectorIOSDescription,
+     flags_ui::kOsIos,
+     FEATURE_VALUE_TYPE(
+         enterprise_connectors::kEnableBulkDataEntryConnectorIOS)},
 });
 
 bool SkipConditionalFeatureEntry(const flags_ui::FeatureEntry& entry) {

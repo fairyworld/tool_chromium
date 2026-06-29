@@ -656,6 +656,12 @@ inline constexpr char kEnableAutofillAddressSavePromptName[] =
 inline constexpr char kEnableAutofillAddressSavePromptDescription[] =
     "Enable the Autofill address save prompts.";
 
+inline constexpr char kEnableBulkDataEntryConnectorIOSName[] =
+    "Enable bulk data entry connectors on iOS";
+inline constexpr char kEnableBulkDataEntryConnectorIOSDescription[] =
+    "When enabled, the enterprise pasted content DLP feature is available on "
+    "iOS.";
+
 inline constexpr char kEnableClientCertificateProvisioningOnIOSName[] =
     "Enable client certificate provisioning on iOS";
 inline constexpr char kEnableClientCertificateProvisioningOnIOSDescription[] =

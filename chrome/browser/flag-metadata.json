@@ -3138,6 +3138,11 @@
     "expiry_milestone": 140
   },
   {
+    "name": "enable-bulk-data-entry-connector-ios",
+    "owners": [ "yixiwu@google.com", "bling-enterprise@google.com" ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "enable-cancel-upload-on-content-analysis",
     "owners": [ "valadkevich@chromium.org" ],
     "expiry_milestone": 160
