@@ -24,14 +24,4 @@ void FailWithInvalidTokenError(
   std::move(result_callback).Run(mojom::ConfigureResult::kInvalidTokenError);
 }
 
-void FailWithInvalidTokenError(
-    base::Location from_here,
-    base::OnceCallback<
-        void(base::expected<mojom::PasswordComplexity, mojom::ConfigureResult>)>
-        result_callback) {
-  SYSLOG(ERROR) << "(LOGIN) Invalid auth token: " << from_here.ToString();
-  std::move(result_callback)
-      .Run(base::unexpected(mojom::ConfigureResult::kInvalidTokenError));
-}
-
 }  // namespace ash::auth

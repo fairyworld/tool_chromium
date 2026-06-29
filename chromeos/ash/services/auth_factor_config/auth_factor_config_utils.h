@@ -10,6 +10,7 @@
 
 #include "base/functional/callback.h"
 #include "base/location.h"
+#include "base/syslog_logging.h"
 #include "base/types/expected.h"
 #include "chromeos/ash/components/login/auth/public/user_context.h"
 #include "chromeos/ash/components/osauth/public/auth_session_storage.h"
@@ -21,6 +22,9 @@ class AuthFactor;
 
 namespace ash::auth {
 
+using ConfigureResultCallback =
+    base::OnceCallback<void(mojom::ConfigureResult)>;
+
 bool IsGaiaPassword(const cryptohome::AuthFactor& factor);
 
 bool IsLocalPassword(const cryptohome::AuthFactor& factor);
@@ -29,11 +33,15 @@ void FailWithInvalidTokenError(
     base::Location from_here,
     base::OnceCallback<void(mojom::ConfigureResult)> result_callback);
 
+template <typename T>
 void FailWithInvalidTokenError(
     base::Location from_here,
-    base::OnceCallback<
-        void(base::expected<mojom::PasswordComplexity, mojom::ConfigureResult>)>
-        result_callback);
+    base::OnceCallback<void(base::expected<T, mojom::ConfigureResult>)>
+        result_callback) {
+  SYSLOG(ERROR) << "(LOGIN) Invalid auth token: " << from_here.ToString();
+  std::move(result_callback)
+      .Run(base::unexpected(mojom::ConfigureResult::kInvalidTokenError));
+}
 
 template <typename ResultCallback, typename Continuation>
 void OnContextBorrowed(base::Location from_here,
