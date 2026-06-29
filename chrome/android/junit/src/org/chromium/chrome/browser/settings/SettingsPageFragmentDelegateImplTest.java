@@ -4,11 +4,14 @@
 
 package org.chromium.chrome.browser.settings;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,6 +39,8 @@ import org.mockito.junit.MockitoRule;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.chrome.R;
+import org.chromium.chrome.browser.feedback.HelpAndFeedbackLauncher;
+import org.chromium.chrome.browser.feedback.HelpAndFeedbackLauncherImpl;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
@@ -83,6 +88,8 @@ public class SettingsPageFragmentDelegateImplTest {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         when(mActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                 .thenReturn(layoutInflater);
+        when(mActivity.getResources()).thenReturn(context.getResources());
+        when(mActivity.getTheme()).thenReturn(context.getTheme());
 
         mDelegate =
                 new SettingsPageFragmentDelegateImpl(
@@ -152,5 +159,36 @@ public class SettingsPageFragmentDelegateImplTest {
 
         // Verify commits, 1 for init, 1 for destroy.
         verify(mFragmentTransaction, Mockito.times(2)).commitAllowingStateLoss();
+    }
+
+    @Test
+    public void testGetMainFragment() {
+        when(mFragmentManager.findFragmentByTag("settings_native_page"))
+                .thenReturn(mMockSettingsHostFragment);
+        mDelegate.initSettings(mContainerView);
+
+        Fragment mockFragment = mock(Fragment.class);
+        when(mMockSettingsHostFragment.getActiveFragment()).thenReturn(mockFragment);
+
+        assertEquals(mockFragment, mDelegate.getMainFragment());
+    }
+
+    @Test
+    public void testGetMultiColumnSettings() {
+        when(mFragmentManager.findFragmentByTag("settings_native_page"))
+                .thenReturn(mMockSettingsHostFragment);
+        mDelegate.initSettings(mContainerView);
+
+        MultiColumnSettings mockMultiColumnSettings = mock(MultiColumnSettings.class);
+        when(mMockSettingsHostFragment.getActiveFragment()).thenReturn(mockMultiColumnSettings);
+
+        assertEquals(mockMultiColumnSettings, mDelegate.getMultiColumnSettings());
+    }
+
+    @Test
+    public void testGetHelpAndFeedbackLauncher() {
+        HelpAndFeedbackLauncher launcher = mDelegate.getHelpAndFeedbackLauncher();
+        assertNotNull(launcher);
+        assertTrue(launcher instanceof HelpAndFeedbackLauncherImpl);
     }
 }

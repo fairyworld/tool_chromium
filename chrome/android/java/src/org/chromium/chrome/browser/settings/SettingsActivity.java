@@ -42,7 +42,6 @@ import org.chromium.base.CallbackUtils;
 import org.chromium.base.DeviceInfo;
 import org.chromium.base.Log;
 import org.chromium.base.metrics.RecordHistogram;
-import org.chromium.base.metrics.RecordUserAction;
 import org.chromium.base.supplier.MonotonicObservableSupplier;
 import org.chromium.base.supplier.ObservableSuppliers;
 import org.chromium.base.supplier.OneshotSupplierImpl;
@@ -83,7 +82,6 @@ import org.chromium.components.browser_ui.settings.SettingsUtils;
 import org.chromium.components.browser_ui.settings.search.SettingsIndexData;
 import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.components.browser_ui.util.ToolbarUtils;
-import org.chromium.components.browser_ui.util.TraceEventVectorDrawableCompat;
 import org.chromium.components.browser_ui.widget.containment.ContainmentItemController;
 import org.chromium.components.browser_ui.widget.containment.ContainmentItemDecoration;
 import org.chromium.components.browser_ui.widget.gesture.BackPressHandler;
@@ -130,7 +128,8 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
         implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
                 SnackbarManageable,
                 AppHeaderObserver,
-                PreferenceUpdateObserver {
+                PreferenceUpdateObserver,
+                SettingsMenuHelper.Delegate {
     private static final String TAG = "SettingsActivity";
 
     // Key used to store activity start time in the Bundle to have it survive activity re-creation.
@@ -986,6 +985,7 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
      * PreferenceFragmentCompat}. This does not include dialogs or other {@link Fragment}s shown on
      * top of the main content.
      */
+    @Override
     @VisibleForTesting
     public @Nullable Fragment getMainFragment() {
         if (mMultiColumnSettings == null) {
@@ -997,8 +997,9 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
     }
 
     /** Returns the MultiColumnSettings if it is running in SettingsMultiColumn mode. */
+    @Override
     @VisibleForTesting
-    @Nullable MultiColumnSettings getMultiColumnSettings() {
+    public @Nullable MultiColumnSettings getMultiColumnSettings() {
         return mMultiColumnSettings;
     }
 
@@ -1014,62 +1015,37 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // By default, every screen in Settings shows a "Help & feedback" menu item.
-        MenuItem help =
-                menu.add(
-                        Menu.NONE,
-                        R.id.menu_id_general_help,
-                        Menu.CATEGORY_SECONDARY,
-                        HelpAndFeedbackLauncher.getHelpMenuStringRes());
-        help.setIcon(
-                TraceEventVectorDrawableCompat.create(
-                        getResources(), R.drawable.ic_help_24dp, getTheme()));
+        SettingsMenuHelper.onCreateOptionsMenu(menu, this);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (menu.size() == 1) {
-            MenuItem item = menu.getItem(0);
-            if (item.getIcon() != null) item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        }
+        SettingsMenuHelper.onPrepareOptionsMenu(menu);
         return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Fragment mainFragment = getMainFragment();
-        if (mainFragment != null && mainFragment.onOptionsItemSelected(item)) {
-            if (item.getItemId() == R.id.menu_id_targeted_help) {
-                RecordUserAction.record("Settings.MobileHelpAndFeedback");
-            }
-            return true;
-        }
-
-        if (item.getItemId() == android.R.id.home) {
-            if (mMultiColumnSettings != null) {
-                if (mMultiColumnSettings.isTwoColumn()) {
-                    // In two pane mode, selecting back always exits from the settings activity.
-                    finish();
-                } else {
-                    // PreferenceHeaderFragmentCompat implements back button behavior.
-                    // In order to forward the event to there, translate the event to the back
-                    // button.
-                    onBackPressed();
-                }
-            } else if (!(mSearchCoordinator != null && mSearchCoordinator.handleBackAction())) {
-                // Search UI may handle the back action if it's showing its own fragment. Finish
-                // the main fragment only it didn't.
-                finishCurrentSettings(assumeNonNull(mainFragment));
-            }
-            return true;
-        } else if (item.getItemId() == R.id.menu_id_general_help) {
-            RecordUserAction.record("Settings.MobileHelpAndFeedback");
-            HelpAndFeedbackLauncherImpl.getForProfile(mProfile)
-                    .show(this, getString(R.string.help_context_settings), null);
+        if (SettingsMenuHelper.onOptionsItemSelected(item, this, this)) {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public @Nullable SettingsSearchCoordinator getSearchCoordinator() {
+        return mSearchCoordinator;
+    }
+
+    @Override
+    public HelpAndFeedbackLauncher getHelpAndFeedbackLauncher() {
+        return HelpAndFeedbackLauncherImpl.getForProfile(mProfile);
+    }
+
+    @Override
+    public void finishSettings() {
+        finish();
     }
 
     @Override
@@ -1210,7 +1186,8 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
      * @param fragment The expected current fragment.
      */
     @SuppressLint("ReferenceEquality")
-    void finishCurrentSettings(Fragment fragment) {
+    @Override
+    public void finishCurrentSettings(Fragment fragment) {
         if (getMainFragment() != fragment) {
             return;
         }
@@ -1272,6 +1249,8 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
         }
     }
 
+    // TODO(crbug.com/521895796): Extract to a shared class so it can be reused by
+    // SettingsPageFragmentDelegateImpl.
     private class TitleUpdater extends FragmentManager.FragmentLifecycleCallbacks {
         private final Callback<String> mSetTitleCallback =
                 (title) -> {
@@ -1298,6 +1277,8 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
         }
     }
 
+    // TODO(crbug.com/521895796): Extract to a shared class so it can be reused by
+    // SettingsPageFragmentDelegateImpl.
     private class WideDisplayPaddingApplier extends FragmentManager.FragmentLifecycleCallbacks {
         @Override
         public void onFragmentViewCreated(

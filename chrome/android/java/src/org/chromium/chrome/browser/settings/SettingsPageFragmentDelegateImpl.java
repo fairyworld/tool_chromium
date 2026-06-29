@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
@@ -19,7 +21,10 @@ import org.chromium.base.supplier.OneshotSupplierImpl;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.R;
+import org.chromium.chrome.browser.feedback.HelpAndFeedbackLauncher;
+import org.chromium.chrome.browser.feedback.HelpAndFeedbackLauncherImpl;
 import org.chromium.chrome.browser.profiles.Profile;
+import org.chromium.chrome.browser.settings.search.SettingsSearchCoordinator;
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 import org.chromium.ui.base.ActivityResultTracker;
@@ -32,7 +37,8 @@ import org.chromium.ui.modaldialog.ModalDialogManager;
  * some of the dependencies needed by {@link FragmentDependencyProvider}.
  */
 @NullMarked
-public class SettingsPageFragmentDelegateImpl implements SettingsPage.FragmentDelegate {
+public class SettingsPageFragmentDelegateImpl
+        implements SettingsPage.FragmentDelegate, SettingsMenuHelper.Delegate {
     private static final String SETTINGS_NATIVE_PAGE_TAG = "settings_native_page";
 
     private final Activity mActivity;
@@ -68,6 +74,7 @@ public class SettingsPageFragmentDelegateImpl implements SettingsPage.FragmentDe
         FragmentManager fragmentManager =
                 ((FragmentActivity) mActivity).getSupportFragmentManager();
 
+        // Create the dependency provider for settings fragments.
         OneshotSupplierImpl<WindowAndroid> windowAndroidSupplier = new OneshotSupplierImpl<>();
         windowAndroidSupplier.set(mWindowAndroid);
 
@@ -102,6 +109,25 @@ public class SettingsPageFragmentDelegateImpl implements SettingsPage.FragmentDe
                 LayoutInflater.from(mActivity).inflate(R.layout.settings_activity, null);
         containerView.addView(settingsView);
         ViewGroup fragmentContainer = settingsView.findViewById(R.id.content);
+        Toolbar toolbar = settingsView.findViewById(R.id.action_bar);
+
+        // Set up the back navigation arrow in the toolbar.
+        // TODO(crbug.com/521895796): This is a placeholder for testing. Move the arrow to
+        // the right column before launch.
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        toolbar.setNavigationOnClickListener(v -> mActivity.onBackPressed());
+
+        toolbar.setTitle(R.string.settings);
+
+        // TODO(crbug.com/521895796): Set up title updater.
+
+        // TODO(crbug.com/521895796): Set up search coordinator.
+
+        // Set up Help Menu on Toolbar.
+        SettingsMenuHelper.onCreateOptionsMenu(toolbar.getMenu(), mActivity);
+        SettingsMenuHelper.onPrepareOptionsMenu(toolbar.getMenu());
+        toolbar.setOnMenuItemClickListener(
+                item -> SettingsMenuHelper.onOptionsItemSelected(item, mActivity, this));
 
         mSettingsHostFragment =
                 (SettingsHostFragment) fragmentManager.findFragmentByTag(SETTINGS_NATIVE_PAGE_TAG);
@@ -124,5 +150,41 @@ public class SettingsPageFragmentDelegateImpl implements SettingsPage.FragmentDe
         assumeNonNull(mSettingsHostFragment);
         fragmentManager.beginTransaction().remove(mSettingsHostFragment).commitAllowingStateLoss();
         mSettingsHostFragment = null;
+    }
+
+    @Override
+    public @Nullable Fragment getMainFragment() {
+        return assumeNonNull(mSettingsHostFragment).getActiveFragment();
+    }
+
+    @Override
+    public @Nullable MultiColumnSettings getMultiColumnSettings() {
+        return (MultiColumnSettings) getMainFragment();
+    }
+
+    @Override
+    public @Nullable SettingsSearchCoordinator getSearchCoordinator() {
+        // TODO(crbug.com/521895796): Set up search coordinator.
+        return null;
+    }
+
+    @Override
+    public HelpAndFeedbackLauncher getHelpAndFeedbackLauncher() {
+        return HelpAndFeedbackLauncherImpl.getForProfile(mProfile);
+    }
+
+    @Override
+    public void finishSettings() {
+        // TODO(crbug.com/521895796): Define settings-in-tab close behavior.
+    }
+
+    @Override
+    public void onBackPressed() {
+        mActivity.onBackPressed();
+    }
+
+    @Override
+    public void finishCurrentSettings(Fragment fragment) {
+        // TODO(crbug.com/521895796): Define settings-in-tab finish/back behavior.
     }
 }

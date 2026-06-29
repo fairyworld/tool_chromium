@@ -76,4 +76,9 @@ public class SettingsHostFragment extends Fragment
                 .commitAllowingStateLoss();
         return true;
     }
+
+    /** Returns the currently active fragment hosted by this fragment. */
+    public @Nullable Fragment getActiveFragment() {
+        return getChildFragmentManager().findFragmentById(CONTAINER_ID);
+    }
 }
