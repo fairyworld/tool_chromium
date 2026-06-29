@@ -1049,9 +1049,17 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
 
     if (isAiPage && isZeroState) {
       this.isZeroState_ = true;
-      if (!this.isInitialFrameLoad_ && this.isDomContentLoaded_ &&
-          this.isShownInTab_) {
-        this.playZeroStateAnimations_();
+      if (!this.isInitialFrameLoad_) {
+        // Tab instances synchronize animations with the web document lifecycle
+        // (waiting for DOM load), while side panel instances trigger them
+        // immediately to match the native UI transition.
+        if (this.isShownInTab_) {
+          if (this.isDomContentLoaded_) {
+            this.playZeroStateAnimations_();
+          }
+        } else {
+          this.playZeroStateAnimations_();
+        }
       }
     }
 
