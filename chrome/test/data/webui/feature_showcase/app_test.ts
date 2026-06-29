@@ -33,7 +33,20 @@ suite('FeatureShowcaseAppTest', function() {
 
   setup(function() {
     document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    window.history.replaceState({}, '', '?steps=example');
+    window.history.replaceState({}, '', '?steps=password-manager');
+
+    const passwordManagerTestHandler:
+        TestMock<PasswordManagerPageHandlerRemote>&
+        PasswordManagerPageHandlerRemote =
+        TestMock.fromClass(PasswordManagerPageHandlerRemote);
+    PasswordManagerBrowserProxyImpl.setInstance(
+        {handler: passwordManagerTestHandler});
+
+    const defaultBrowserTestHandler: TestMock<DefaultBrowserPageHandlerRemote>&
+        DefaultBrowserPageHandlerRemote =
+        TestMock.fromClass(DefaultBrowserPageHandlerRemote);
+    DefaultBrowserBrowserProxyImpl.setInstance(
+        {handler: defaultBrowserTestHandler});
 
     originalMatchMedia = window.matchMedia;
     mockMediaQueryList = new EventTarget() as EventTarget & {matches: boolean};
@@ -51,20 +64,22 @@ suite('FeatureShowcaseAppTest', function() {
     window.matchMedia = originalMatchMedia;
   });
 
-  test('continue button clicked', async function() {
-    await microtasksFinished();
+  test(
+      'finish feature showcase after only step continue button clicked',
+      async function() {
+        await microtasksFinished();
 
-    const exampleStep =
-        appElement.shadowRoot.querySelector('feature-showcase-example-step');
-    assertTrue(!!exampleStep);
+        const firstStep = appElement.shadowRoot.querySelector(
+            'feature-showcase-password-manager-step');
+        assertTrue(!!firstStep);
 
-    const button =
-        exampleStep.shadowRoot.querySelector<HTMLElement>('#confirm-button');
-    assertTrue(!!button);
-    button.click();
+        const button =
+            firstStep.shadowRoot.querySelector<HTMLElement>('#confirm-button');
+        assertTrue(!!button);
+        button.click();
 
-    await testHandler.whenCalled('finishFeatureShowcase');
-  });
+        await testHandler.whenCalled('finishFeatureShowcase');
+      });
 
   test('nextStepShown called on init', async function() {
     await testHandler.whenCalled('nextStepShown');
@@ -73,7 +88,8 @@ suite('FeatureShowcaseAppTest', function() {
   test('nextStepShown called on transition', async function() {
     // Setup app with 2 steps.
     document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    window.history.replaceState({}, '', '?steps=example,password-manager');
+    window.history.replaceState(
+        {}, '', '?steps=default-browser,password-manager');
 
     testHandler = TestMock.fromClass(FeatureShowcasePageHandlerRemote);
     FeatureShowcaseBrowserProxyImpl.setInstance({handler: testHandler});
@@ -85,12 +101,12 @@ suite('FeatureShowcaseAppTest', function() {
 
     testHandler.resetResolver('nextStepShown');
 
-    const exampleStep =
-        appElement.shadowRoot.querySelector('feature-showcase-example-step');
-    assertTrue(!!exampleStep);
+    const firstStep = appElement.shadowRoot.querySelector(
+        'feature-showcase-default-browser-step');
+    assertTrue(!!firstStep);
 
     const button =
-        exampleStep.shadowRoot.querySelector<HTMLElement>('#confirm-button');
+        firstStep.shadowRoot.querySelector<HTMLElement>('#confirm-button');
     assertTrue(!!button);
     button.click();
 
@@ -99,7 +115,8 @@ suite('FeatureShowcaseAppTest', function() {
 
   test('animation stays at correct frame on theme change', async function() {
     document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    window.history.replaceState({}, '', '?steps=example,password-manager');
+    window.history.replaceState(
+        {}, '', '?steps=default-browser,password-manager');
     appElement = document.createElement('feature-showcase-app');
     document.body.appendChild(appElement);
     await microtasksFinished();
@@ -124,9 +141,9 @@ suite('FeatureShowcaseAppTest', function() {
     assertDeepEquals([0, 1], rightSegments);
     assertDeepEquals([0, 1], bottomSegments);
 
-    const exampleStep =
-        appElement.shadowRoot.querySelector('feature-showcase-example-step');
-    exampleStep!.dispatchEvent(new CustomEvent('step-completed'));
+    const firstStep = appElement.shadowRoot.querySelector(
+        'feature-showcase-default-browser-step');
+    firstStep!.dispatchEvent(new CustomEvent('step-completed'));
     await microtasksFinished();
 
     // Trigger another theme change

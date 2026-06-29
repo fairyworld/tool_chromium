@@ -38,8 +38,6 @@ build_webui("build") {
     "themes_and_customization/themes_and_customization_browser_proxy.ts",
     "themes_and_customization/themes_and_customization_step.ts",
     "themes_and_customization/themes_and_customization_step.html.ts",
-    "example/example_step.ts",
-    "example/example_step.html.ts",
     "password_manager/password_manager_browser_proxy.ts",
     "password_manager/password_manager_step.ts",
     "password_manager/password_manager_step.html.ts",
@@ -51,7 +49,6 @@ build_webui("build") {
     "feature_showcase_step.css",
     "google_lens/google_lens_step.css",
     "themes_and_customization/themes_and_customization_step.css",
-    "example/example_step.css",
     "password_manager/password_manager_step.css",
   ]
 

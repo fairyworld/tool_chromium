@@ -83,7 +83,7 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://extensions-zero-state",
       "chrome://family-link-user-internals",
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
-      "chrome://feature-showcase/?steps=example",
+      "chrome://feature-showcase/?steps=password-manager",
 #endif
       "chrome://flags",
       "chrome://gcm-internals",
