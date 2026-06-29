@@ -37,7 +37,6 @@ import org.mockito.Mockito;
 import org.chromium.base.Log;
 import org.chromium.base.test.BaseJUnit4ClassRunner;
 import org.chromium.base.test.util.Batch;
-import org.chromium.base.test.util.DisabledTest;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.base.test.util.MinAndroidSdkLevel;
 import org.chromium.base.test.util.UrlUtils;
@@ -455,10 +454,9 @@ WebView focusable focused actions:[CLEAR_FOCUS, AX_FOCUS] bundle:[chromeRole="ro
     @Test
     @SmallTest
     @MinAndroidSdkLevel(Build.VERSION_CODES.BAKLAVA)
-    @DisabledTest(message = "https://crbug.com/517964367")
     public void testFindFocus() throws Throwable {
-        // Load a page with 56 arbitrary buttons and two focusable elements and a tall div.
-        // The idea behind 56 buttons comes from the flakyness of the test: we do a scroll to clear
+        // Load a page with 100 arbitrary buttons and two focusable elements and a tall div.
+        // The idea behind 100 buttons comes from the flakiness of the test: we do a scroll to clear
         // cache focus but somehow there is a race condition where the cache gets refilled just
         // after the scroll event is fired. The most probable responsible is the logic in
         // ({frameworks/base/core/java/android/view/AccessibilityInteractionController.java.AccessibilityNodePrefetcher})
@@ -471,7 +469,7 @@ WebView focusable focused actions:[CLEAR_FOCUS, AX_FOCUS] bundle:[chromeRole="ro
         String html =
                 """
                 <script>
-                  for (let i = 0; i < 56; i++) {
+                  for (let i = 0; i < 100; i++) {
                     document.body.appendChild(document.createElement('button'));
                   }
                 </script>
@@ -558,10 +556,6 @@ WebView focusable focused actions:[CLEAR_FOCUS, AX_FOCUS] bundle:[chromeRole="ro
                 waitForEvent(
                         new EventMatcherBuilder()
                                 .setEventType(AccessibilityEvent.TYPE_VIEW_SCROLLED)
-                                .setSourceMatcher(
-                                        new NodeMatcherBuilder()
-                                                .setClassName("android.webkit.WebView")
-                                                .build())
                                 .build());
         Assert.assertTrue("Service did not receive scroll event", scrollEventReceived);
 
@@ -711,7 +705,6 @@ WebView focusable actions:[FOCUS, AX_FOCUS] bundle:[chromeRole="rootWebArea"]
     @Test
     @SmallTest
     @MinAndroidSdkLevel(Build.VERSION_CODES.UPSIDE_DOWN_CAKE) // API Level 34
-    @DisabledTest(message = "https://crbug.com/508702929")
     public void fireGeneratedEvent_ariaInvalidChangesToFalse_firesContentInvalid()
             throws Throwable {
         // Create an HTML document where there is an input element and an element containing
