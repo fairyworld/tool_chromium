@@ -3197,6 +3197,7 @@ test("content_unittests") {
     "ActionsParserFuzzTest.ParsesJSONCorrectly",
     "FirstPartySetFuzzer.ParsesSetsCorrectly",
     "IndexedDbLevelDbCodingFuzzTest.CompareHandlesAnyInput",
+    "ClearSiteDataHandlerFuzzerTest.ParseHeader",
   ]
 
   if (is_mac) {
