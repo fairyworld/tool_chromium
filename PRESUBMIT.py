@@ -1886,6 +1886,16 @@ _BANNED_CPP_FUNCTIONS: Sequence[BanRule] = (
         ),
     ),
     BanRule(
+        r'/\bTRACE_(COPY_)?COUNTER(_ID)?[12]\b',
+        (
+            'Please use TRACE_COUNTER macro with perfetto::CounterTrack ',
+            'instead of legacy TRACE_COUNTER1/2 macros which are not well ',
+            'supported in perfetto.',
+        ),
+        True,
+        (),
+    ),
+    BanRule(
         r'/\bperfetto::Track(\(|\{|::(Global|FromPointer|ThreadScoped)\b)',
         (
             'Creating tracks directly with perfetto::Track is discouraged. ',
