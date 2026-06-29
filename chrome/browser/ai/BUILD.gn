@@ -21,6 +21,7 @@ source_set("ai") {
     "ai_on_device_session.h",
     "ai_proofreader.h",
     "ai_rewriter.h",
+    "ai_semantic_embedder_service_launcher.h",
     "ai_summarizer.h",
     "ai_utils.h",
     "ai_writer.h",
@@ -40,7 +41,9 @@ source_set("ai") {
     "//components/component_updater",
     "//components/on_device_ai",
     "//components/optimization_guide/core",
+    "//components/passage_embeddings/core",
     "//content/public/browser",
+    "//services/passage_embeddings/public/mojom",
   ]
 }
 
@@ -56,6 +59,7 @@ source_set("impl") {
     "ai_on_device_session.cc",
     "ai_proofreader.cc",
     "ai_rewriter.cc",
+    "ai_semantic_embedder_service_launcher.cc",
     "ai_summarizer.cc",
     "ai_utils.cc",
     "ai_writer.cc",
@@ -134,6 +138,7 @@ source_set("unit_tests") {
       "ai_language_model_unittest.cc",
       "ai_proofreader_unittest.cc",
       "ai_rewriter_unittest.cc",
+      "ai_semantic_embedder_service_launcher_unittest.cc",
       "ai_writer_unittest.cc",
     ]
   }
@@ -144,5 +149,6 @@ source_set("unit_tests") {
     "//components/on_device_ai",
     "//components/optimization_guide/core:manifest_broker_test_support",
     "//components/optimization_guide/core:test_support",
+    "//components/passage_embeddings/core:test_support",
   ]
 }
