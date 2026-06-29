@@ -36,7 +36,10 @@
 #include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_hats_util.h"
+#include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/hats/survey_config.h"
+#include "chrome/browser/ui/singleton_tabs.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/profiles/feature_showcase/default_browser_step_eligibility_checker.h"
 #include "chrome/browser/ui/views/profiles/feature_showcase/feature_showcase_eligibility_tracker.h"
@@ -54,6 +57,7 @@
 #include "chrome/browser/ui/webui/feature_showcase/feature_showcase_ui.h"
 #include "chrome/browser/ui/webui/intro/intro_ui.h"
 #include "chrome/browser/ui/webui/signin/signin_ui_error.h"
+#include "chrome/browser/ui/webui/whats_new/whats_new_fetcher.h"
 #include "chrome/common/channel_info.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"
@@ -441,7 +445,7 @@ class FinishOrContinueStepController : public ProfileManagementStepController {
       ProfilePickerWebContentsHost* host,
       base::OnceCallback<bool()> eligibility_callback,
       base::RepeatingCallback<bool()> query_effects_callback,
-      base::OnceClosure step_completed_callback)
+      base::OnceCallback<void(FinishOrContinueChoice)> step_completed_callback)
       : ProfileManagementStepController(host),
         eligibility_callback_(std::move(eligibility_callback)),
         query_effects_callback_(std::move(query_effects_callback)),
@@ -480,13 +484,22 @@ class FinishOrContinueStepController : public ProfileManagementStepController {
     CHECK(!step_shown_callback_->is_null());
     std::move(step_shown_callback_.value()).Run(/*success=*/true);
     UpdateAnimationsState();
-    // TODO(crbug.com/516392211): Remove once button actions are implemented.
-    OnStepCompleted();
+
+    IntroUI* intro_ui = host()
+                            ->GetPickerContents()
+                            ->GetWebUI()
+                            ->GetController()
+                            ->GetAs<IntroUI>();
+    CHECK(intro_ui);
+
+    intro_ui->SetFinishOrContinueCallback(
+        base::BindOnce(&FinishOrContinueStepController::OnStepCompleted,
+                       weak_ptr_factory_.GetWeakPtr()));
   }
 
-  void OnStepCompleted() {
+  void OnStepCompleted(FinishOrContinueChoice choice) {
     CHECK(step_completed_callback_);
-    std::move(step_completed_callback_).Run();
+    std::move(step_completed_callback_).Run(choice);
   }
 
   void UpdateAnimationsState() {
@@ -506,7 +519,7 @@ class FinishOrContinueStepController : public ProfileManagementStepController {
 
   base::OnceCallback<bool()> eligibility_callback_;
   const base::RepeatingCallback<bool()> query_effects_callback_;
-  base::OnceClosure step_completed_callback_;
+  base::OnceCallback<void(FinishOrContinueChoice)> step_completed_callback_;
   StepSwitchFinishedCallback step_shown_callback_;
   base::WeakPtrFactory<FinishOrContinueStepController> weak_ptr_factory_{this};
 };
@@ -835,7 +848,7 @@ std::unique_ptr<ProfileManagementStepController> CreateFinishOrContinueStep(
     ProfilePickerWebContentsHost* host,
     base::OnceCallback<bool()> eligibility_callback,
     base::RepeatingCallback<bool()> query_effects_callback,
-    base::OnceClosure step_completed_callback) {
+    base::OnceCallback<void(FinishOrContinueChoice)> step_completed_callback) {
   return std::make_unique<FinishOrContinueStepController>(
       host, std::move(eligibility_callback), std::move(query_effects_callback),
       std::move(step_completed_callback));
@@ -874,6 +887,35 @@ FirstRunFlowController::~FirstRunFlowController() {
     std::move(first_run_exited_callback_)
         .Run(ProfilePicker::FirstRunExitStatus::kQuitAtEnd);
   }
+}
+
+void FirstRunFlowController::OnFinishOrContinueChoice(
+    FinishOrContinueChoice choice) {
+  finish_or_continue_choice_ = choice;
+  AdvanceToNextPostIdentityStep();
+}
+
+void FirstRunFlowController::OnFlowFinished(
+    PostHostClearedCallback post_host_cleared_callback) {
+  PostHostClearedCallback combined_callback =
+      std::move(post_host_cleared_callback);
+  if (finish_or_continue_choice_ ==
+      FinishOrContinueChoice::kContinueEducation) {
+    std::vector<PostHostClearedCallback> callbacks;
+    callbacks.emplace_back(std::move(combined_callback));
+    callbacks.emplace_back(
+        base::BindOnce([](BrowserWindowInterface* browser_window) {
+          if (browser_window) {
+            ShowSingletonTabOverwritingNTP(
+                browser_window,
+                GURL(whats_new::kChromeWhatsNewURL).Resolve("archive/"));
+          }
+        }));
+    combined_callback =
+        CombineCallbacks<PostHostClearedCallback, BrowserWindowInterface*>(
+            std::move(callbacks));
+  }
+  FinishFlowAndRunInBrowser(profile_, std::move(combined_callback));
 }
 
 void FirstRunFlowController::ShowSigninError(Profile* profile,
@@ -1162,11 +1204,8 @@ FirstRunFlowController::RegisterPostIdentitySteps(
   base::queue<ProfileManagementFlowController::Step> post_identity_steps;
 
   finish_flow_callback_ = base::BindOnce(
-      &FirstRunFlowController::FinishFlowAndRunInBrowser,
-      base::Unretained(this),
-      // Unretained ok: the steps register a profile keep-alive and
-      // will be alive until this callback runs.
-      base::Unretained(profile_), std::move(post_host_cleared_callback));
+      &FirstRunFlowController::OnFlowFinished, base::Unretained(this),
+      std::move(post_host_cleared_callback));
 
   auto search_engine_choice_step_completed =
       base::BindOnce(&FirstRunFlowController::AdvanceToNextPostIdentityStep,
@@ -1221,7 +1260,7 @@ FirstRunFlowController::RegisterPostIdentitySteps(
         ProfileManagementFlowController::Step::kFeatureShowcase);
 
     auto finish_or_continue_step_completed =
-        base::BindOnce(&FirstRunFlowController::AdvanceToNextPostIdentityStep,
+        base::BindOnce(&FirstRunFlowController::OnFinishOrContinueChoice,
                        base::Unretained(this));
     RegisterStep(
         Step::kFinishOrContinue,

@@ -21,6 +21,7 @@
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_toolbar.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_web_contents_host.h"
+#include "chrome/browser/ui/webui/intro/finish_or_continue_handler.h"
 #include "services/audio/public/cpp/sounds/sounds_manager.h"
 
 struct CoreAccountInfo;
@@ -65,7 +66,7 @@ std::unique_ptr<ProfileManagementStepController> CreateFinishOrContinueStep(
     ProfilePickerWebContentsHost* host,
     base::OnceCallback<bool()> eligibility_callback,
     base::RepeatingCallback<bool()> query_effects_callback,
-    base::OnceClosure step_completed_callback);
+    base::OnceCallback<void(FinishOrContinueChoice)> step_completed_callback);
 
 class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
  public:
@@ -143,8 +144,14 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
 
   void MaybeTriggerHatsSurvey();
 
+  void OnFlowFinished(PostHostClearedCallback post_host_cleared_callback);
+  void OnFinishOrContinueChoice(FinishOrContinueChoice choice);
+
   const raw_ptr<Profile> profile_;
   ProfilePicker::FirstRunExitedCallback first_run_exited_callback_;
+
+  FinishOrContinueChoice finish_or_continue_choice_ =
+      FinishOrContinueChoice::kStartBrowsing;
 
   // The callback that will finish the flow and open the browser.
   base::OnceClosure finish_flow_callback_;

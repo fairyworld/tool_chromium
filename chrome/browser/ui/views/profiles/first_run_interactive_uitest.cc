@@ -53,6 +53,7 @@
 #include "chrome/browser/ui/webui/signin/managed_user_profile_notice_ui.h"
 #include "chrome/browser/ui/webui/signin/signin_ui_error.h"
 #include "chrome/browser/ui/webui/signin/signin_url_utils.h"
+#include "chrome/browser/ui/webui/whats_new/whats_new_fetcher.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/browser_resources.h"
@@ -427,6 +428,18 @@ class FirstRunInteractiveUiBaseTest
     }
   }
 
+  const DeepQuery& GetFinishOrContinueStartBrowsingButtonQuery() const {
+    static const base::NoDestructor<DeepQuery> kQuery(
+        {"finish-or-continue-app", "#startBrowsingButton"});
+    return *kQuery;
+  }
+
+  const DeepQuery& GetFinishOrContinueEducationButtonQuery() const {
+    static const base::NoDestructor<DeepQuery> kQuery(
+        {"finish-or-continue-app", "#continueEducationButton"});
+    return *kQuery;
+  }
+
   const DeepQuery& GetOptInSyncButtonQuery() const {
     if (UseRefreshedView()) {
       static const base::NoDestructor<DeepQuery> kQuery(
@@ -793,6 +806,20 @@ class FirstRunInteractiveUiBaseTest
         params_.flow_version);
   }
 
+  auto CompleteFinishOrContinueStep(bool start_browsing = true) {
+    const GURL finish_or_continue_url = net::AppendQueryParameter(
+        GURL(chrome::kChromeUIIntroURL)
+            .Resolve(chrome::kChromeUIIntroFinishOrContinueSubPage),
+        "showcase", base::ToString(!GetForcedFeatureShowcaseSteps().empty()));
+    const DeepQuery& button =
+        start_browsing ? GetFinishOrContinueStartBrowsingButtonQuery()
+                       : GetFinishOrContinueEducationButtonQuery();
+    return Steps(
+        WaitForWebContentsNavigation(kWebContentsId, finish_or_continue_url),
+        EnsurePresent(kWebContentsId, button),
+        PressJsButton(kWebContentsId, button));
+  }
+
  private:
   TestParam params_;
 
@@ -976,6 +1003,11 @@ IN_PROC_BROWSER_TEST_P(FirstRunInteractiveUiTestWithSyncService, MAYBE_SignIn) {
         PressJsButton(kWebContentsId, GetDontSyncButtonQuery())
             .SetMustRemainVisible(false));
   }
+
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      If([this]() { return UseRevampedView(); },
+         Then(CompleteFinishOrContinueStep())));
 
   WaitForPickerClosed();
 
@@ -1313,7 +1345,9 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTest,
 
       CompleteSearchEngineChoiceStep(),
       If([this]() { return !UseRevampedView(); },
-         Then(CompleteDefaultBrowserStep())));
+         Then(CompleteDefaultBrowserStep())),
+      If([this]() { return UseRevampedView(); },
+         Then(CompleteFinishOrContinueStep())));
 
   WaitForPickerClosed();
   EXPECT_TRUE(proceed_future.Get());
@@ -1425,7 +1459,9 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTest,
 
       CompleteSearchEngineChoiceStep(),
       If([this]() { return !UseRevampedView(); },
-         Then(CompleteDefaultBrowserStep())));
+         Then(CompleteDefaultBrowserStep())),
+      If([this]() { return UseRevampedView(); },
+         Then(CompleteFinishOrContinueStep())));
 
   // Wait for the picker to be closed and deleted.
   WaitForPickerClosed();
@@ -1583,7 +1619,9 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTestWithSyncService,
 
         CompleteSearchEngineChoiceStep(),
         If([this]() { return !UseRevampedView(); },
-           Then(CompleteDefaultBrowserStep())));
+           Then(CompleteDefaultBrowserStep())),
+        If([this]() { return UseRevampedView(); },
+           Then(CompleteFinishOrContinueStep())));
   } else {
     GURL sync_page_url = AppendSyncConfirmationQueryParams(
         GURL("chrome://sync-confirmation/"), SyncConfirmationStyle::kWindow,
@@ -1607,7 +1645,9 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTestWithSyncService,
 
         CompleteSearchEngineChoiceStep(),
         If([this]() { return !UseRevampedView(); },
-           Then(CompleteDefaultBrowserStep())));
+           Then(CompleteDefaultBrowserStep())),
+        If([this]() { return UseRevampedView(); },
+           Then(CompleteFinishOrContinueStep())));
   }
 
   WaitForPickerClosed();
@@ -1751,7 +1791,9 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTestWithSyncService,
 
         CompleteSearchEngineChoiceStep(),
         If([this]() { return !UseRevampedView(); },
-           Then(CompleteDefaultBrowserStep())));
+           Then(CompleteDefaultBrowserStep())),
+        If([this]() { return UseRevampedView(); },
+           Then(CompleteFinishOrContinueStep())));
   } else {
     RunTestSequenceInContext(
         views::ElementTrackerViews::GetContextForView(view()),
@@ -1770,7 +1812,9 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTestWithSyncService,
 
         CompleteSearchEngineChoiceStep(),
         If([this]() { return !UseRevampedView(); },
-           Then(CompleteDefaultBrowserStep())));
+           Then(CompleteDefaultBrowserStep())),
+        If([this]() { return UseRevampedView(); },
+           Then(CompleteFinishOrContinueStep())));
   }
 
   // Wait for the picker to be closed and deleted.
@@ -1933,10 +1977,14 @@ IN_PROC_BROWSER_TEST_P(FirstRunWithHatsInteractiveUiTest,
       WaitForShow(kProfilePickerViewId),
       InstrumentNonTabWebView(kWebContentsId, web_view()),
       CompleteIntroStep(/*sign_in=*/false),
-      If([this]() { return IsFeatureShowcaseEligible(); },
-         Then(Steps(
-             WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
-             PressButton(kProfilePickerToolbarStartBrowsingButtonElementId)))));
+      If([this]() { return UseRevampedView(); },
+         Then(If(
+             [this]() { return IsFeatureShowcaseEligible(); },
+             Then(Steps(
+                 WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
+                 PressButton(
+                     kProfilePickerToolbarStartBrowsingButtonElementId))),
+             Else(CompleteFinishOrContinueStep())))));
 
   WaitForPickerClosed();
 
@@ -2024,10 +2072,14 @@ IN_PROC_BROWSER_TEST_P(FirstRunWithHatsInteractiveUiTestWithSyncService,
              GURL(chrome::kChromeUIIntroURL)
                  .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage)))),
       DeclineHistorySync(),
-      If([this]() { return IsFeatureShowcaseEligible(); },
-         Then(Steps(
-             WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
-             PressButton(kProfilePickerToolbarStartBrowsingButtonElementId)))));
+      If([this]() { return UseRevampedView(); },
+         Then(If(
+             [this]() { return IsFeatureShowcaseEligible(); },
+             Then(Steps(
+                 WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
+                 PressButton(
+                     kProfilePickerToolbarStartBrowsingButtonElementId))),
+             Else(CompleteFinishOrContinueStep())))));
 
   WaitForPickerClosed();
 
@@ -2104,10 +2156,14 @@ IN_PROC_BROWSER_TEST_P(FirstRunWithHatsInteractiveUiTestWithSyncService,
       EnsurePresent(kWebContentsId, GetAcceptManagementButtonQuery()),
       PressJsButton(kWebContentsId, GetAcceptManagementButtonQuery()),
       DeclineHistorySync(),
-      If([this]() { return IsFeatureShowcaseEligible(); },
-         Then(Steps(
-             WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
-             PressButton(kProfilePickerToolbarStartBrowsingButtonElementId)))));
+      If([this]() { return UseRevampedView(); },
+         Then(If(
+             [this]() { return IsFeatureShowcaseEligible(); },
+             Then(Steps(
+                 WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
+                 PressButton(
+                     kProfilePickerToolbarStartBrowsingButtonElementId))),
+             Else(CompleteFinishOrContinueStep())))));
 
   WaitForPickerClosed();
 
@@ -2165,10 +2221,14 @@ IN_PROC_BROWSER_TEST_P(FirstRunWithHatsAndUnrelatedFeatureSetInteractiveUiTest,
              GURL(chrome::kChromeUIIntroURL)
                  .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage)))),
       DeclineHistorySync(),
-      If([this]() { return IsFeatureShowcaseEligible(); },
-         Then(Steps(
-             WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
-             PressButton(kProfilePickerToolbarStartBrowsingButtonElementId)))));
+      If([this]() { return UseRevampedView(); },
+         Then(If(
+             [this]() { return IsFeatureShowcaseEligible(); },
+             Then(Steps(
+                 WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
+                 PressButton(
+                     kProfilePickerToolbarStartBrowsingButtonElementId))),
+             Else(CompleteFinishOrContinueStep())))));
 
   WaitForPickerClosed();
 
@@ -2369,6 +2429,13 @@ class FirstRunRevampInteractiveUiTest : public FirstRunInteractiveUiBaseTest {
   const DeepQuery& GetFeatureShowcaseDefaultBrowserSkipButtonQuery() const {
     static const base::NoDestructor<DeepQuery> kQuery(
         {"feature-showcase-app", "feature-showcase-default-browser-step",
+         "#skip-button"});
+    return *kQuery;
+  }
+
+  const DeepQuery& GetFeatureShowcaseGoogleLensSkipButtonQuery() const {
+    static const base::NoDestructor<DeepQuery> kQuery(
+        {"feature-showcase-app", "feature-showcase-google-lens-step",
          "#skip-button"});
     return *kQuery;
   }
@@ -2798,6 +2865,47 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
   histogram_tester().ExpectUniqueSample(
       "ProfilePicker.FREFlow.FeatureShowcase.StartBrowsing",
       FeatureShowcaseStep::kDefaultBrowser, 1);
+}
+
+IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
+                       ClickContinueEducationOpenWhatsNew) {
+  ASSERT_TRUE(fre_service()->ShouldOpenFirstRun());
+
+  base::test::TestFuture<bool> proceed_future;
+  OpenFirstRun(proceed_future.GetCallback());
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      WaitForShow(kProfilePickerViewId),
+      InstrumentNonTabWebView(kWebContentsId, web_view()),
+      // Do not sign in to proceed to the feature showcase.
+      CompleteIntroStep(/*sign_in=*/false),
+      // Complete the feature showcase steps.
+      WaitForWebContentsNavigation(kWebContentsId, GetFeatureShowcaseUrl()),
+      WaitForButtonEnabled(kWebContentsId,
+                           GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
+      EnsurePresent(kWebContentsId,
+                    GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
+      PressJsButton(kWebContentsId,
+                    GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
+      WaitForButtonEnabled(kWebContentsId,
+                           GetFeatureShowcaseGoogleLensSkipButtonQuery()),
+      EnsurePresent(kWebContentsId,
+                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
+      PressJsButton(kWebContentsId,
+                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
+      // Choose to continue education on the finish or continue step.
+      CompleteFinishOrContinueStep(/*start_browsing=*/false));
+
+  WaitForPickerClosed();
+  EXPECT_TRUE(proceed_future.Get());
+  EXPECT_TRUE(GetFirstRunFinishedPrefValue());
+
+  // Verify that the browser was opened with only the archive page tab.
+  ASSERT_TRUE(browser());
+  EXPECT_EQ(browser()->tab_strip_model()->count(), 1);
+  EXPECT_EQ(
+      browser()->tab_strip_model()->GetActiveWebContents()->GetVisibleURL(),
+      GURL(whats_new::kChromeWhatsNewURL).Resolve("archive/"));
 }
 
 class FirstRunRevampTurnOnSyncCelebrationInteractiveUiTest

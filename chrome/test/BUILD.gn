@@ -10768,6 +10768,7 @@ if (!is_android && !is_chromeos_device) {
       deps += [
         "//chrome/browser/ui/startup:test_support_ui",
         "//chrome/browser/ui/webui/intro",
+        "//chrome/browser/ui/webui/whats_new",
         "//components/enterprise/idle",
         "//services/audio/public/cpp",
       ]
