@@ -54,6 +54,11 @@ RequestService::RequestService(RenderFrameHost* rfh)
 }
 
 RequestService::~RequestService() {
+  // Destroy the active request first, while weak pointers are still valid,
+  // so that its destructor can successfully run the pending token request
+  // callback via OnTokenRequestComplete.
+  active_request_.reset();
+
   // Invalidate weak pointers before clearing `user_info_requests_` to prevent
   // the destroying UserInfoRequests from calling back re-entrantly into
   // CompleteUserInfoRequest (which would cause container corruption during
@@ -89,24 +94,6 @@ void RequestService::SetDelegatesForTesting(
   identity_registry_ = identity_registry;
 }
 
-Request& RequestService::CreateRequestForTesting(
-    mojo::PendingReceiver<blink::mojom::FederatedAuthRequest> receiver,
-    FederatedIdentityApiPermissionContextDelegate* api_permission_delegate,
-    FederatedIdentityAutoReauthnPermissionContextDelegate*
-        auto_reauthn_permission_delegate,
-    FederatedIdentityPermissionContextDelegate* permission_delegate,
-    IdentityRegistry* identity_registry) {
-  api_permission_delegate_ = api_permission_delegate;
-  auto_reauthn_permission_delegate_ = auto_reauthn_permission_delegate;
-  permission_delegate_ = permission_delegate;
-  identity_registry_ = identity_registry;
-  active_request_ = std::make_unique<Request>(
-      &render_frame_host(), *this, api_permission_delegate,
-      auto_reauthn_permission_delegate, permission_delegate);
-  active_request_->BindReceiver(std::move(receiver));
-  return *active_request_;
-}
-
 Request* RequestService::GetOrCreateActiveRequest() {
   if (!active_request_) {
     RenderFrameHost& rfh = render_frame_host();
@@ -114,6 +101,10 @@ Request* RequestService::GetOrCreateActiveRequest() {
         &rfh, *this, api_permission_delegate_,
         auto_reauthn_permission_delegate_, permission_delegate_);
   }
+  return active_request_.get();
+}
+
+Request* RequestService::GetActiveRequestForTesting() const {
   return active_request_.get();
 }
 

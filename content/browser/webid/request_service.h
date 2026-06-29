@@ -122,17 +122,9 @@ class CONTENT_EXPORT RequestService
 
   // Returns the active Request if one exists, or instantiates a new one if not.
   Request* GetOrCreateActiveRequest();
+  Request* GetActiveRequestForTesting() const;
 
   void SetDelegatesForTesting(
-      FederatedIdentityApiPermissionContextDelegate* api_permission_delegate,
-      FederatedIdentityAutoReauthnPermissionContextDelegate*
-          auto_reauthn_permission_delegate,
-      FederatedIdentityPermissionContextDelegate* permission_delegate,
-      IdentityRegistry* identity_registry);
-
-  // Creates a Request for testing.
-  Request& CreateRequestForTesting(
-      mojo::PendingReceiver<blink::mojom::FederatedAuthRequest> receiver,
       FederatedIdentityApiPermissionContextDelegate* api_permission_delegate,
       FederatedIdentityAutoReauthnPermissionContextDelegate*
           auto_reauthn_permission_delegate,

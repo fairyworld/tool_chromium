@@ -214,13 +214,7 @@ void Request::OnConnectionError() {
 }
 
 void Request::ReportBadMessage(const char* message) {
-  if (auth_request_receivers_.current_receiver()) {
-    auth_request_receivers_.ReportBadMessage(message);
-  } else if (receivers_.current_receiver()) {
-    receivers_.ReportBadMessage(message);
-  } else {
-    mojo::ReportBadMessage(message);
-  }
+  mojo::ReportBadMessage(message);
 }
 
 std::vector<IdentityProviderRequestOptionsPtr>
@@ -277,6 +271,10 @@ bool Request::RequestToken(
     RequestTokenCallback callback) {
   if (ShouldTerminateRequest(idp_get_params_ptrs, requirement,
                              navigation_handle)) {
+    std::move(callback).Run(RequestTokenStatus::kError, std::nullopt,
+                            std::nullopt,
+                            /*error=*/nullptr,
+                            /*is_auto_selected=*/false);
     return false;
   }
   bool intercept = false;

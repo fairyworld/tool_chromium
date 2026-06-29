@@ -56,7 +56,8 @@ using AuthRequestCallbackHelper =
 using FedCmEntry = ukm::builders::Blink_FedCm;
 using FedCmIdpEntry = ukm::builders::Blink_FedCmIdp;
 using RequesterFrameType = content::webid::RequesterFrameType;
-using RequestTokenCallback = content::webid::Request::RequestTokenCallback;
+using StartTokenRequestCallback =
+    blink::mojom::FederatedRequestService::StartTokenRequestCallback;
 using blink::mojom::FederatedRequest;
 using blink::mojom::FederatedRequestService;
 using blink::mojom::RequestTokenStatus;
@@ -345,7 +346,7 @@ class RequestMultipleFramesTest : public RenderViewHostImplTestHarness {
 
   void DoRequestToken(mojo::Remote<FederatedRequestService>& service_remote,
                       mojo::Remote<FederatedRequest>& request_remote,
-                      RequestTokenCallback callback,
+                      StartTokenRequestCallback callback,
                       const char* provider = kProviderUrlFull) {
     auto config_ptr = blink::mojom::IdentityProviderConfig::New();
     config_ptr->config_url = GURL(provider);
@@ -364,30 +365,7 @@ class RequestMultipleFramesTest : public RenderViewHostImplTestHarness {
 
     service_remote->StartTokenRequest(
         std::move(idp_get_params), MediationRequirement::kOptional,
-        request_remote.BindNewPipeAndPassReceiver(),
-        base::BindOnce(
-            [](RequestTokenCallback callback,
-               base::expected<TokenRequestSuccessPtr, TokenRequestFailurePtr>
-                   result) {
-              if (callback.is_null()) {
-                return;
-              }
-              if (result.has_value()) {
-                TokenRequestSuccessPtr& success = result.value();
-                std::move(callback).Run(
-                    RequestTokenStatus::kSuccess,
-                    success->selected_idp_config_url, std::move(success->token),
-                    /*error=*/nullptr, success->is_auto_selected);
-              } else {
-                TokenRequestFailurePtr& failure = result.error();
-                std::move(callback).Run(failure->status,
-                                        /*selected_idp_config_url=*/GURL(),
-                                        /*token=*/std::nullopt,
-                                        std::move(failure->error),
-                                        /*is_auto_selected=*/false);
-              }
-            },
-            std::move(callback)));
+        request_remote.BindNewPipeAndPassReceiver(), std::move(callback));
     service_remote.FlushForTesting();
   }
 
@@ -451,7 +429,7 @@ TEST_F(RequestMultipleFramesTest, IframeTooManyRequests) {
                 TestDialogController::AccountsDialogAction::kNone,
                 &main_frame_dialog_state);
   DoRequestToken(main_frame_service_remote, main_frame_request_remote,
-                 RequestTokenCallback());
+                 StartTokenRequestCallback());
   EXPECT_TRUE(main_frame_dialog_state.did_show_accounts_dialog);
 
   RenderFrameHost* iframe_rfh = content::RenderFrameHostTester::For(main_rfh())
@@ -485,7 +463,7 @@ TEST_F(RequestMultipleFramesTest, IframeTooManyRequestsDifferentIdP) {
                 TestDialogController::AccountsDialogAction::kNone,
                 &main_frame_dialog_state);
   DoRequestToken(main_frame_service_remote, main_frame_request_remote,
-                 RequestTokenCallback());
+                 StartTokenRequestCallback());
   EXPECT_TRUE(main_frame_dialog_state.did_show_accounts_dialog);
 
   RenderFrameHost* iframe_rfh = content::RenderFrameHostTester::For(main_rfh())
@@ -499,7 +477,7 @@ TEST_F(RequestMultipleFramesTest, IframeTooManyRequestsDifferentIdP) {
 
   // Initiates a new API call with a different IdP.
   DoRequestToken(iframe_service_remote, iframe_request_remote,
-                 RequestTokenCallback(), kProviderUrlTwoFull);
+                 StartTokenRequestCallback(), kProviderUrlTwoFull);
   EXPECT_FALSE(iframe_dialog_state.did_show_accounts_dialog);
   histogram_tester.ExpectUniqueSample(
       "Blink.FedCm.MultipleRequestsFromDifferentIdPs", 1, 1);
