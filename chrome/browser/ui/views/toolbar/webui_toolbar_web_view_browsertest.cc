@@ -4139,6 +4139,8 @@ class WebUIPinnedToolbarActionsBrowserTest
   WebUIPinnedToolbarActionsBrowserTest()
       : WebUIToolbarWebViewBrowserTest(
             {features::kInitialWebUI, features::kWebUIPinnedToolbarActions,
+             // Enable another control to prevent WebView going to 0 width.
+             features::kWebUIReloadButton,
              features::kSkipIPCChannelPausingForNonGuests,
              features::kWebUIInProcessResourceLoadingV2,
              // `WebUIPinnedToolbarActionsBrowserTest.LensOverlayResultsIcon`
@@ -4348,7 +4350,7 @@ class WebUIPinnedToolbarActionsBrowserTest
                      R"(
         (() => {
           const el = %s;
-          return el ? el.getBoundingClientRect().width : -1;
+          return el ? Math.round(el.getBoundingClientRect().width) : -1;
         })();
       )",
                      GetButtonAppJS("#pinnedToolbarActions").c_str()))
