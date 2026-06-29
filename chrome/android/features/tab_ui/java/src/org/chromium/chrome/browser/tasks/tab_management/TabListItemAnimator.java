@@ -562,6 +562,8 @@ public class TabListItemAnimator extends SimpleItemAnimator {
     private ValueAnimator buildOutlineClipAnimator(View view, boolean expanding) {
         int height = view.getHeight() > 0 ? view.getHeight() : view.getMeasuredHeight();
         int width = view.getWidth() > 0 ? view.getWidth() : view.getMeasuredWidth();
+        Object tag = view.getTag(R.id.tab_clip_from_top);
+        final boolean clipFromTop = !expanding && Boolean.TRUE.equals(tag);
         final int cornerRadius =
                 view.getResources().getDimensionPixelSize(R.dimen.vertical_tab_item_corner_radius);
         final int[] currentHeight = new int[] {expanding ? 0 : height};
@@ -571,7 +573,12 @@ public class TabListItemAnimator extends SimpleItemAnimator {
                 new ViewOutlineProvider() {
                     @Override
                     public void getOutline(View view, Outline outline) {
-                        outline.setRoundRect(0, 0, width, currentHeight[0], cornerRadius);
+                        if (clipFromTop) {
+                            int clipTop = height - currentHeight[0];
+                            outline.setRoundRect(0, clipTop, width, height, cornerRadius);
+                        } else {
+                            outline.setRoundRect(0, 0, width, currentHeight[0], cornerRadius);
+                        }
                     }
                 });
 

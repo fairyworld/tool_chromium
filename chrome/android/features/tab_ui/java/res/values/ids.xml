@@ -38,4 +38,7 @@ found in the LICENSE file.
     <item type="id" name="tag_original_shape_appearance" />
     <item type="id" name="tag_unchecked_shape" />
     <item type="id" name="tag_checked_shape" />
+
+    <!-- Vertical Tabs Animations. -->
+    <item type="id" name="tab_clip_from_top" />
 </resources>

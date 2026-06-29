@@ -1440,7 +1440,17 @@ public class TabListMediator implements TabListNotificationHandler {
                             View view, int tabId, @Nullable MotionEventInfo triggeringMotion) {
                         // TODO(crbug.com/40638921): Consider disabling all touch events during
                         // animation.
-                        if (mModelList.indexFromTabId(tabId) == TabModel.INVALID_TAB_INDEX) return;
+
+                        int closingTabIndex = mModelList.indexFromTabId(tabId);
+                        if (closingTabIndex == TabModel.INVALID_TAB_INDEX) return;
+
+                        if (mLayoutType == TabListLayoutType.NESTED) {
+                            // The last tab is clipped from top during animation.
+                            if (view != null && view.getParent() instanceof View rootItemView) {
+                                boolean isLastTab = closingTabIndex == mModelList.size() - 1;
+                                rootItemView.setTag(R.id.tab_clip_from_top, isLastTab);
+                            }
+                        }
 
                         TabModel tabModel = getCurrentTabModelChecked();
                         Tab closingTab = tabModel.getTabById(tabId);

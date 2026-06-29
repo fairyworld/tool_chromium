@@ -484,7 +484,10 @@ public class TabListItemAnimatorUnitTest {
 
     @Test
     public void animateAdd_WithClipAnimations_RunToCompletion() {
-        mItemAnimator = spy(new TabListItemAnimator(mIsAnimatorRunningSupplier, true));
+        mItemAnimator =
+                spy(
+                        new TabListItemAnimator(
+                                mIsAnimatorRunningSupplier, /* useClipAnimations= */ true));
         assertEquals(TabListItemAnimator.DEFAULT_REMOVE_DURATION, mItemAnimator.getMoveDuration());
         assertEquals(TabListItemAnimator.DEFAULT_REMOVE_DURATION, mItemAnimator.getAddDuration());
         assertEquals(
@@ -510,9 +513,37 @@ public class TabListItemAnimatorUnitTest {
 
     @Test
     public void animateRemove_WithClipAnimations_RunToCompletion() {
-        mItemAnimator = spy(new TabListItemAnimator(mIsAnimatorRunningSupplier, true));
+        mItemAnimator =
+                spy(
+                        new TabListItemAnimator(
+                                mIsAnimatorRunningSupplier, /* useClipAnimations= */ true));
 
         var holder = buildViewHolder(TAB, /* useShrinkCloseAnimation= */ false);
+
+        assertTrue(mItemAnimator.animateRemove(holder));
+        verify(holder.itemView).setClipToOutline(true);
+        verify(holder.itemView).setOutlineProvider(any(ViewOutlineProvider.class));
+
+        assertTrue(mItemAnimator.isRunning());
+
+        runAnimationToCompletion();
+
+        verify(holder.itemView, atLeastOnce()).setAlpha(1f);
+        verify(holder.itemView).setOutlineProvider(eq(ViewOutlineProvider.BACKGROUND));
+        verify(holder.itemView).setClipToOutline(false);
+        verify(mItemAnimator).dispatchRemoveFinished(holder);
+        assertFalse(mItemAnimator.isRunning());
+    }
+
+    @Test
+    public void animateRemove_WithClipAnimations_ClipFromTop_RunToCompletion() {
+        mItemAnimator =
+                spy(
+                        new TabListItemAnimator(
+                                mIsAnimatorRunningSupplier, /* useClipAnimations= */ true));
+
+        var holder = buildViewHolder(TAB, /* useShrinkCloseAnimation= */ false);
+        when(holder.itemView.getTag(R.id.tab_clip_from_top)).thenReturn(true);
 
         assertTrue(mItemAnimator.animateRemove(holder));
         verify(holder.itemView).setClipToOutline(true);
