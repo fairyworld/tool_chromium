@@ -23,7 +23,7 @@ namespace actor {
 // codebase based on an AgentContainerConfig proto.
 class ActorContainerConfig {
  public:
-  ActorContainerConfig();
+  ActorContainerConfig() = delete;
   ActorContainerConfig(const ActorContainerConfig&);
   ActorContainerConfig(ActorContainerConfig&&);
   ActorContainerConfig& operator=(const ActorContainerConfig& other) = delete;

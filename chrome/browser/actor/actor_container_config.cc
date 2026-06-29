@@ -75,8 +75,6 @@ base::expected<url::Origin, std::string_view> ConvertOrigin(
 
 }  // namespace
 
-ActorContainerConfig::ActorContainerConfig() = default;
-
 ActorContainerConfig::ActorContainerConfig(const ActorContainerConfig&) =
     default;
 
