@@ -4717,6 +4717,25 @@
             ]
         }
     ],
+    "CacheGurlSchemeIsHttpOrHttpsResult": [
+        {
+            "platforms": [
+                "android",
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_20260629",
+                    "enable_features": [
+                        "CacheGurlSchemeIsHttpOrHttpsResult"
+                    ]
+                }
+            ]
+        }
+    ],
     "CacheIdentityListInChrome": [
         {
             "platforms": [
