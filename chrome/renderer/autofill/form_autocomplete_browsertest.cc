@@ -12,7 +12,7 @@
 #include "base/functional/bind.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/run_loop.h"
-#include "base/time/time.h"
+#include "base/test/gmock_callback_support.h"
 #include "chrome/test/base/chrome_render_view_test.h"
 #include "components/autofill/content/common/mojom/autofill_driver.mojom.h"
 #include "components/autofill/content/renderer/autofill_agent.h"
@@ -23,12 +23,14 @@
 #include "components/autofill/core/common/autofill_test_utils.h"
 #include "components/autofill/core/common/field_data_manager.h"
 #include "components/autofill/core/common/form_data.h"
+#include "components/autofill/core/common/form_field_data.h"
 #include "components/autofill/core/common/mojom/autofill_types.mojom.h"
+#include "components/autofill/core/common/test_utils/autofill_form_test_utils.h"
 #include "components/autofill/core/common/unique_ids.h"
 #include "content/public/renderer/render_frame.h"
-#include "mojo/public/cpp/bindings/associated_receiver_set.h"
 #include "mojo/public/cpp/bindings/pending_associated_receiver.h"
 #include "mojo/public/cpp/bindings/scoped_interface_endpoint_handle.h"
+#include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
 #include "third_party/blink/public/platform/web_string.h"
@@ -38,109 +40,21 @@
 #include "third_party/blink/public/web/web_form_element.h"
 #include "third_party/blink/public/web/web_input_element.h"
 #include "third_party/blink/public/web/web_local_frame.h"
-#include "ui/gfx/geometry/rect.h"
-
-using blink::WebDocument;
-using blink::WebElement;
-using blink::WebFormControlElement;
-using blink::WebInputElement;
-using blink::WebString;
 
 namespace autofill {
 
-using mojom::SubmissionSource;
-
 namespace {
 
-class FakeContentAutofillDriver : public mojom::AutofillDriver {
- public:
-  FakeContentAutofillDriver() = default;
-
-  ~FakeContentAutofillDriver() override = default;
-
-  void BindReceiver(
-      mojo::PendingAssociatedReceiver<mojom::AutofillDriver> receiver) {
-    receivers_.Add(this, std::move(receiver));
-  }
-
-  const FormData* form_submitted() const { return form_submitted_.get(); }
-
-  SubmissionSource submission_source() const { return submission_source_; }
-
-  const FormData* select_control_changed() const {
-    return select_control_changed_.get();
-  }
-
- private:
-  // mojom::AutofillDriver:
-  void FormsSeen(const std::vector<FormData>& updated_forms,
-                 const std::vector<FormRendererId>& removed_forms) override {}
-
-  void FormSubmitted(const FormData& form,
-                     SubmissionSource source) override {
-    form_submitted_ = std::make_unique<FormData>(form);
-    submission_source_ = source;
-  }
-
-  void CaretMovedInFormField(const FormData& form,
-                             FieldRendererId field_id,
-                             const gfx::Rect& caret_bounds) override {}
-
-  void TextFieldValueChanged(const FormData& form,
-                             FieldRendererId field_id,
-                             base::TimeTicks timestamp) override {}
-
-  void TextFieldDidScroll(const FormData& form,
-                          FieldRendererId field_id) override {}
-
-  void SelectControlSelectionChanged(const FormData& form,
-                                     FieldRendererId field_id) override {
-    select_control_changed_ = std::make_unique<FormData>(form);
-  }
-
-  void JavaScriptChangedAutofilledValue(
-      const FormData& form,
-      FieldRendererId field_id,
-      const std::u16string& old_value) override {}
-
-  void AskForValuesToFill(const FormData& form,
-                          FieldRendererId field_id,
-                          const gfx::Rect& caret_bounds,
-                          AutofillSuggestionTriggerSource trigger_source,
-                          const std::optional<PasswordSuggestionRequest>&
-                              password_request) override {}
-
-  void HidePopup() override {}
-
-  void SuppressAutomaticRefills(const FillId& fill_id) override {}
-
-  void RequestRefill(const FillId& fill_id) override {}
-
-  void FocusOnNonFormField() override {}
-
-  void FocusOnFormField(const FormData& form,
-                        FieldRendererId field_id) override {}
-
-  void DidAutofillForm(const FormData& form) override {}
-
-  void DidEndTextFieldEditing() override {}
-
-  void SelectFieldOptionsDidChange(const FormData& form,
-                                   FieldRendererId field_id) override {}
-
-  void FormWithEmailVerificationTokenSubmitted(
-      const FormData& form,
-      FieldRendererId field_id) override {}
-
-  // Records the form data received via FormSubmitted() call.
-  std::unique_ptr<FormData> form_submitted_;
-
-  SubmissionSource submission_source_;
-
-  std::unique_ptr<FormData> select_control_changed_;
-
-  mojo::AssociatedReceiverSet<mojom::AutofillDriver> receivers_;
-};
+using ::base::test::RunOnceClosure;
+using ::blink::WebDocument;
+using ::blink::WebElement;
+using ::blink::WebFormControlElement;
+using ::blink::WebInputElement;
+using ::blink::WebString;
+using ::testing::_;
+using ::testing::ElementsAre;
+using ::testing::NiceMock;
+using ::testing::Property;
 
 constexpr CallTimerState kCallTimerStateDummy = {
     .call_site = CallTimerState::CallSite::kUpdateFormCache,
@@ -174,9 +88,7 @@ class FormAutocompleteTest : public ChromeRenderViewTest {
   }
 
   void BindAutofillDriver(mojo::ScopedInterfaceEndpointHandle handle) {
-    fake_driver_.BindReceiver(
-        mojo::PendingAssociatedReceiver<mojom::AutofillDriver>(
-            std::move(handle)));
+    autofill_driver_.BindPendingReceiver(std::move(handle));
   }
 
   void SimulateElementClick(const WebElement element) {
@@ -226,10 +138,16 @@ class FormAutocompleteTest : public ChromeRenderViewTest {
       }
     }
 
+    base::RunLoop run_loop;
+    EXPECT_CALL(
+        autofill_driver_,
+        DidAutofillForm(Property(&FormData::global_id, form_data.global_id())))
+        .WillOnce(RunOnceClosure(run_loop.QuitClosure()));
     autofill_agent_->ApplyFieldsAction(mojom::FormActionType::kFill,
                                        mojom::ActionPersistence::kFill,
                                        fields_for_filling, FillId::Create(),
                                        /*supports_refill=*/false);
+    std::move(run_loop).Run();
   }
 
   std::string GetFocusLog() {
@@ -237,7 +155,7 @@ class FormAutocompleteTest : public ChromeRenderViewTest {
   }
 
   test::AutofillBrowserTestEnvironment autofill_test_environment_;
-  FakeContentAutofillDriver fake_driver_;
+  NiceMock<test::MockAutofillDriver> autofill_driver_;
   std::unique_ptr<test::FocusTestUtils> focus_test_utils_;
 };
 
@@ -258,7 +176,6 @@ TEST_F(FormAutocompleteTest, VerifyFocusAndBlurEventsAfterAutofill) {
 
   // Simulate filling the form using Autofill.
   SimulateFillForm();
-  base::RunLoop().RunUntilIdle();
 
   // Expected Result in order:
   // * Change fname
@@ -286,7 +203,6 @@ TEST_F(FormAutocompleteTest,
 
   // Simulate filling the form using Autofill.
   SimulateFillForm();
-  base::RunLoop().RunUntilIdle();
 
   // Expected Result in order:
   // * Change fname
@@ -314,7 +230,6 @@ TEST_F(FormAutocompleteTest,
 
   // Simulate filling the form using Autofill.
   SimulateFillForm();
-  base::RunLoop().RunUntilIdle();
 
   // Expected Result in order:
   // * Change fname
@@ -353,7 +268,6 @@ TEST_F(FormAutocompleteTest, VerifyFocusAndBlurEventAfterElementAdded) {
       "document.getElementById('fname').insertAdjacentHTML('beforebegin', "
       "'<label>Zip code:</label><input id=\"zip_code\"/>');");
   SimulateFillForm(data);
-  base::RunLoop().RunUntilIdle();
 
   // Expected Result in order:
   // * Change fname
@@ -391,7 +305,6 @@ TEST_F(FormAutocompleteTest, VerifyFocusAndBlurEventAfterElementRemoved) {
   ASSERT_TRUE(form);
   ExecuteJavaScriptForTests("document.getElementById('lname').remove()");
   SimulateFillForm(*form);
-  base::RunLoop().RunUntilIdle();
 
   // Expected Result in order:
   // * Change fname
@@ -461,19 +374,21 @@ TEST_F(FormAutocompleteTest, SelectControlChanged) {
       "var color = document.getElementById('color');"
       "color.selectedIndex = 1;";
 
+  base::RunLoop run_loop;
+  EXPECT_CALL(autofill_driver_,
+              SelectControlSelectionChanged(
+                  Property(&FormData::fields,
+                           ElementsAre(test::FormFieldDescriptionEq(
+                               {.name = u"color", .value = u"blue"}))),
+                  _))
+      .WillOnce(RunOnceClosure(run_loop.QuitClosure()));
   // The click simulation is necessary to give the frame transient user
   // activation, otherwise the select value-change event will be ignored by the
   // agent.
   SimulateElementClick(
       GetMainFrame()->GetDocument().GetElementById(blink::WebString("color")));
   ExecuteJavaScriptForTests(change_value.c_str());
-  base::RunLoop().RunUntilIdle();
-
-  const FormData* form = fake_driver_.select_control_changed();
-  ASSERT_TRUE(form);
-  ASSERT_EQ(form->fields().size(), 1u);
-  EXPECT_EQ(u"color", form->fields()[0].name());
-  EXPECT_EQ(u"blue", form->fields()[0].value());
+  std::move(run_loop).Run();
 }
 
 }  // namespace
