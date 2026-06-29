@@ -308,8 +308,10 @@ void AppendManualFallbackSuggestions(
     suggestion.filtration_policy = filtration_policy;
 
     if (!replaced) {
-      suggestion.children.emplace_back(
-          maybe_username, SuggestionType::kPasswordFieldByFieldFilling);
+      Suggestion fill_username_suggestion{
+          maybe_username, SuggestionType::kPasswordFieldByFieldFilling};
+      fill_username_suggestion.payload = payload;
+      suggestion.children.emplace_back(std::move(fill_username_suggestion));
     }
     suggestion.children.push_back(
         CreateFillPasswordChildSuggestion(credential, is_cross_origin));
