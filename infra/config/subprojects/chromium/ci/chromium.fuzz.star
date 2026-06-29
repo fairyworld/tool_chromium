@@ -267,6 +267,7 @@ def fuzz_target_builder(
         clusterfuzz_archive_subdir = None,
         clusterfuzz_ios_targets_only = None,
         clusterfuzz_v8_targets_only = None,
+        use_ssd_for_test_builder = False,
         contact_team_email = "chrome-fuzzing-core@google.com",
         **kwargs):
     if not name and not test_builder_name:
@@ -346,6 +347,9 @@ def fuzz_target_builder(
     description = "Builds and runs fuzz target tests."
     if name:
         description += " Mirrors the build configuration of \"" + name + "\"."
+
+    if "ssd" in kwargs:
+        kwargs["ssd"] = use_ssd_for_test_builder
 
     ci_builder(
         name = test_builder_name,
@@ -950,6 +954,7 @@ libfuzzer_linux_asan_builder(
 
 libfuzzer_linux_asan_builder(
     name = "Libfuzzer Upload Linux ASan Debug",
+    ssd = True,
     free_space = builders.free_space.high,
     build_config = builder_config.build_config.DEBUG,
     target_bits = 64,
