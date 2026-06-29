@@ -2906,7 +2906,17 @@ IN_PROC_BROWSER_TEST_P(AutoSpeculationRulesPrerenderBrowserTestWithHoldback,
   // request, and it should be ignored.
   registry_observer.WaitForTrigger(prerendering_url);
   EXPECT_FALSE(HasHostForUrl(prerendering_url));
-  EXPECT_EQ(GetRequestCount(prerendering_url), 0);
+  if (IsPrerender2FallbackPrefetchSpecRulesEnabled()) {
+    // kPrerender2FallbackPrefetchSpecRules is enabled by default on
+    // non-Android platforms (and disabled on Android). When it is on, a
+    // held-back prerender falls back to a prefetch, which issues a single
+    // request to the prerendering URL. Wait for that request before
+    // asserting so the check does not race the asynchronous prefetch.
+    WaitForRequest(prerendering_url, 1);
+    EXPECT_EQ(GetRequestCount(prerendering_url), 1);
+  } else {
+    EXPECT_EQ(GetRequestCount(prerendering_url), 0);
+  }
 
   NavigationHandleObserver next_page_observer(web_contents(), prerendering_url);
   NavigatePrimaryPage(prerendering_url);
