@@ -10,10 +10,30 @@
 class Browser;
 class Profile;
 
+// These values are persisted to logs. Entries should not be renumbered and
+// numeric values should never be reused.
+// LINT.IfChange(CrossDeviceSigninPromoEntryPoint)
 enum class CrossDeviceSigninPromoEntryPoint {
-  kProfileMenu,
-  kHistoryPage,
+  kProfileMenu = 0,
+  kHistoryPage = 1,
+  kMaxValue = kHistoryPage,
 };
+// LINT.ThenChange(//tools/metrics/histograms/enums.xml:CrossDeviceSigninPromoEntryPoint)
+
+// These values are persisted to UMA logs. Entries should not be renumbered and
+// numeric values should never be reused.
+// LINT.IfChange(CrossDeviceSigninPromoShouldShowResult)
+enum class CrossDeviceSigninPromoShouldShowResult {
+  kCanShow = 0,
+  kNotSignedIn = 1,
+  kHasOtherDevices = 2,
+  kDataTypeNotEnabled = 3,
+  kShownLimitReached = 4,
+  kCooldownActive = 5,
+  kAlreadyShownAfterDismissalLimitReached = 6,
+  kMaxValue = kAlreadyShownAfterDismissalLimitReached,
+};
+// LINT.ThenChange(//tools/metrics/histograms/enums.xml:CrossDeviceSigninPromoShouldShowResult)
 
 // Returns true if the cross-device sign-in promo should be shown.
 bool ShouldShowCrossDeviceSigninPromo(
@@ -33,6 +53,7 @@ void OnCrossDeviceSigninPromoDismissed(
 // `browser` window.
 // `closing_callback` is run when the bubble closes.
 void OpenSigninToPhoneQrCodeBubble(Browser* browser,
+                                   CrossDeviceSigninPromoEntryPoint entry_point,
                                    base::OnceClosure closing_callback);
 
 #endif  // CHROME_BROWSER_SIGNIN_CROSS_DEVICE_SIGNIN_PROMO_MANAGER_H_

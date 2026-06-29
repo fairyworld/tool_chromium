@@ -1256,7 +1256,9 @@ void ProfileMenuView::OnCrossDeviceSigninButtonClicked() {
   }
   Browser* browser_ptr = &browser();
   GetWidget()->CloseWithReason(views::Widget::ClosedReason::kUnspecified);
-  OpenSigninToPhoneQrCodeBubble(browser_ptr, base::DoNothing());
+  OpenSigninToPhoneQrCodeBubble(browser_ptr,
+                                CrossDeviceSigninPromoEntryPoint::kProfileMenu,
+                                base::DoNothing());
 }
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 

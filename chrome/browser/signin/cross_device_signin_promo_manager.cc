@@ -10,7 +10,9 @@
 #include "base/feature_list.h"
 #include "base/functional/callback.h"
 #include "base/json/values_util.h"
+#include "base/metrics/histogram_functions.h"
 #include "base/notreached.h"
+#include "base/strings/strcat.h"
 #include "base/time/time.h"
 #include "base/values.h"
 #include "chrome/browser/profiles/profile.h"
@@ -48,6 +50,26 @@ struct CrossDeviceSigninPromoData {
   base::Time last_dismissed_time;
   bool shown_after_dismissal = false;
 };
+
+std::string_view GetEntryPointHistogramSuffix(
+    CrossDeviceSigninPromoEntryPoint entry_point) {
+  // LINT.IfChange(CrossDeviceSigninPromoEntryPointVariant)
+  switch (entry_point) {
+    case CrossDeviceSigninPromoEntryPoint::kHistoryPage:
+      return "HistoryPage";
+    case CrossDeviceSigninPromoEntryPoint::kProfileMenu:
+      return "ProfileMenu";
+  }
+  // LINT.ThenChange(//tools/metrics/histograms/metadata/signin/histograms.xml:CrossDeviceSigninPromoEntryPointVariant)
+}
+
+void RecordShouldShowResult(CrossDeviceSigninPromoEntryPoint entry_point,
+                            CrossDeviceSigninPromoShouldShowResult result) {
+  base::UmaHistogramEnumeration(
+      base::StrCat({"Signin.CrossDeviceSigninPromo.ShouldShowResult.",
+                    GetEntryPointHistogramSuffix(entry_point)}),
+      result);
+}
 
 // Key used for the data type specific sub-dictionary that holds the promo data.
 std::string_view GetEntryPointPrefKey(
@@ -128,16 +150,26 @@ std::optional<CrossDeviceSigninPromoData> GetPromoDataForDismissibleEntryPoint(
 // - Promo can be shown at most 5 times.
 // - Promo can be shown at most once after dismissal.
 // - Cooldown period of 7 days after dismissal.
-bool IsDismissiblePromoLimitReached(const CrossDeviceSigninPromoData& data) {
+bool IsDismissiblePromoLimitReached(
+    const CrossDeviceSigninPromoData& data,
+    CrossDeviceSigninPromoEntryPoint entry_point) {
   if (data.shown_count >= kMaxShownCount) {
+    RecordShouldShowResult(
+        entry_point,
+        CrossDeviceSigninPromoShouldShowResult::kShownLimitReached);
     return true;
   }
   if (data.shown_after_dismissal) {
+    RecordShouldShowResult(entry_point,
+                           CrossDeviceSigninPromoShouldShowResult::
+                               kAlreadyShownAfterDismissalLimitReached);
     return true;
   }
   if (!data.last_dismissed_time.is_null()) {
     if (base::Time::Now() <
         data.last_dismissed_time + kDismissiblePromoCooldownPeriod) {
+      RecordShouldShowResult(
+          entry_point, CrossDeviceSigninPromoShouldShowResult::kCooldownActive);
       return true;
     }
   }
@@ -190,7 +222,14 @@ bool ShouldShowCrossDeviceSigninPromo(
   }
 
   // 1. General eligibility: Signed in with no errors, and has NO other devices.
-  if (!IsUserSignedInWithNoError(profile) || HasOtherSignedInDevices(profile)) {
+  if (!IsUserSignedInWithNoError(profile)) {
+    RecordShouldShowResult(
+        entry_point, CrossDeviceSigninPromoShouldShowResult::kNotSignedIn);
+    return false;
+  }
+  if (HasOtherSignedInDevices(profile)) {
+    RecordShouldShowResult(
+        entry_point, CrossDeviceSigninPromoShouldShowResult::kHasOtherDevices);
     return false;
   }
 
@@ -198,6 +237,9 @@ bool ShouldShowCrossDeviceSigninPromo(
   switch (entry_point) {
     case CrossDeviceSigninPromoEntryPoint::kHistoryPage:
       if (!IsHistorySyncEnabled(profile)) {
+        RecordShouldShowResult(
+            entry_point,
+            CrossDeviceSigninPromoShouldShowResult::kDataTypeNotEnabled);
         return false;
       }
       break;
@@ -209,10 +251,12 @@ bool ShouldShowCrossDeviceSigninPromo(
   // 3. Dismissible limit checking - only for dismissible entry points.
   std::optional<CrossDeviceSigninPromoData> data =
       GetPromoDataForDismissibleEntryPoint(profile, entry_point);
-  if (data.has_value() && IsDismissiblePromoLimitReached(data.value())) {
+  if (data.has_value() && IsDismissiblePromoLimitReached(*data, entry_point)) {
     return false;
   }
 
+  RecordShouldShowResult(entry_point,
+                         CrossDeviceSigninPromoShouldShowResult::kCanShow);
   return true;
 }
 
@@ -230,6 +274,11 @@ void OnCrossDeviceSigninPromoShown(CrossDeviceSigninPromoEntryPoint entry_point,
     data->shown_after_dismissal = true;
   }
   WriteDismissiblePromoData(profile, entry_point, *data);
+
+  base::UmaHistogramExactLinear(
+      base::StrCat({"Signin.CrossDeviceSigninPromo.ShownCount.",
+                    GetEntryPointHistogramSuffix(entry_point)}),
+      data->shown_count, kMaxShownCount + 1);
 }
 
 void OnCrossDeviceSigninPromoDismissed(
@@ -244,11 +293,19 @@ void OnCrossDeviceSigninPromoDismissed(
 
   data->last_dismissed_time = base::Time::Now();
   WriteDismissiblePromoData(profile, entry_point, *data);
+
+  base::UmaHistogramExactLinear(
+      base::StrCat({"Signin.CrossDeviceSigninPromo.DismissedAtShownCount.",
+                    GetEntryPointHistogramSuffix(entry_point)}),
+      data->shown_count, kMaxShownCount + 1);
 }
 
 void OpenSigninToPhoneQrCodeBubble(Browser* browser,
+                                   CrossDeviceSigninPromoEntryPoint entry_point,
                                    base::OnceClosure closing_callback) {
   CHECK(base::FeatureList::IsEnabled(switches::kCrossDeviceSigninFromDesktop));
+  base::UmaHistogramEnumeration(
+      "Signin.CrossDeviceSigninPromo.OpenedQrCodeBubble", entry_point);
   // TODO(crbug.com/527889253): Implement the actual logic.
   std::move(closing_callback).Run();
 }
