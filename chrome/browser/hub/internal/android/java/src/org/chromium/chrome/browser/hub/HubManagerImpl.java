@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.FrameLayout.LayoutParams;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.ValueChangedCallback;
 import org.chromium.base.supplier.MonotonicObservableSupplier;
@@ -308,7 +309,8 @@ public class HubManagerImpl implements HubManager, HubController {
         }
     }
 
-    @Nullable HubCoordinator getHubCoordinatorForTesting() {
+    @VisibleForTesting
+    public @Nullable HubCoordinator getHubCoordinatorForTesting() {
         return mHubCoordinator;
     }
 
