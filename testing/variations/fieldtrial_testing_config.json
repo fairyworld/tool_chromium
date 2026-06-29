@@ -8150,25 +8150,6 @@
             ]
         }
     ],
-    "DataControlsDragEnforcement": [
-        {
-            "platforms": [
-                "android",
-                "chromeos",
-                "linux",
-                "mac",
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled_20260223",
-                    "enable_features": [
-                        "DataControlsDragEnforcement"
-                    ]
-                }
-            ]
-        }
-    ],
     "DataUrlWorkerOpaqueOrigin": [
         {
             "platforms": [

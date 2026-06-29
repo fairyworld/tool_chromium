@@ -10280,11 +10280,6 @@ const FeatureEntry kFeatureEntries[] = {
          sensitive_content::features::kSensitiveContentWhileSwitchingTabs)},
 #endif  // BUILDFLAG(IS_ANDROID)
 
-    {"data-controls-drag-enforcement",
-     flag_descriptions::kDataControlsDragEnforcementName,
-     flag_descriptions::kDataControlsDragEnforcementDescription, kOsAll,
-     FEATURE_VALUE_TYPE(data_controls::kDataControlsDragEnforcement)},
-
     {"data-controls-search-with",
      flag_descriptions::kDataControlsSearchWithName,
      flag_descriptions::kDataControlsSearchWithDescription, kOsAll,

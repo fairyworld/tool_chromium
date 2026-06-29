@@ -448,11 +448,6 @@ inline constexpr char
         "Requires #customize-chrome-wallpaper-search to be enabled too.";
 
 
-inline constexpr char kDataControlsDragEnforcementName[] =
-    "Data Controls drag-and-drop enforcement";
-inline constexpr char kDataControlsDragEnforcementDescription[] =
-    "Enables Data Controls drag-and-drop enforcement.";
-
 inline constexpr char kEnableCancelUploadOnContentAnalysisName[] =
     "Cancel file uploads on content analysis";
 inline constexpr char kEnableCancelUploadOnContentAnalysisDescription[] =

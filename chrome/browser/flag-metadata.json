@@ -2250,11 +2250,6 @@
     "expiry_milestone": 160
   },
   {
-    "name": "data-controls-drag-enforcement",
-    "owners": [ "rslan@google.com", "cep-se@google.com" ],
-    "expiry_milestone": 150
-  },
-  {
     "name": "data-controls-search-with",
     "owners": [ "anaercegovac@google.com", "cep-se@google.com" ],
     "expiry_milestone": 154
