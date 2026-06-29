@@ -498,6 +498,9 @@ try_.orchestrator_builder(
         on_default_cq = True,
     ),
     siso_configs = ["builder", "default-remote"],
+    # TODO(crbug.com/529185604): Remove this once the missing input issue is resolved.
+    # We need to download all outputs to prevent build failures caused by missing inputs.
+    siso_output_local_strategy = "full",
     use_clang_coverage = True,
 )
 
