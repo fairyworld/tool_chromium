@@ -66,6 +66,7 @@ BASE_DECLARE_FEATURE(kWebViewReducedSeedExpiration);
 BASE_DECLARE_FEATURE(kWebViewReducedSeedRequestPeriod);
 BASE_DECLARE_FEATURE(kWebViewOptInToGmsBindServiceOptimization);
 BASE_DECLARE_FEATURE(kWebViewMoveWorkToProviderInit);
+BASE_DECLARE_FEATURE(kWebViewMoveWorkToProviderInitThreadPool);
 BASE_DECLARE_FEATURE(kWebViewBypassProvisionalCookieManager);
 BASE_DECLARE_FEATURE(kWebViewPersistentMetricsInNoBackupDir);
 BASE_DECLARE_FEATURE(kPrerender2WarmUpCompositorForWebView);

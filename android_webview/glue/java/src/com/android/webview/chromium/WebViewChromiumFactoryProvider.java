@@ -588,6 +588,18 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
                             dataDirectoryBasePath, cacheDirectoryBasePath, dataDirectorySuffix);
                 }
 
+                if (WebViewCachedFlags.get()
+                                .isCachedFeatureEnabled(
+                                        AwFeatures.WEBVIEW_MOVE_WORK_TO_PROVIDER_INIT)
+                        && WebViewCachedFlags.get()
+                                .isCachedFeatureEnabled(
+                                        AwFeatures
+                                                .WEBVIEW_MOVE_WORK_TO_PROVIDER_INIT_THREAD_POOL)) {
+                    PostTask.postTask(
+                            TaskTraits.USER_VISIBLE,
+                            () -> mAwInit.runNonUiThreadCapableStartupTasks());
+                }
+
                 boolean enableSystemTracing =
                         WebViewCachedFlags.get()
                                 .isCachedFeatureEnabled(
@@ -668,7 +680,10 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
             }
 
             if (WebViewCachedFlags.get()
-                    .isCachedFeatureEnabled(AwFeatures.WEBVIEW_MOVE_WORK_TO_PROVIDER_INIT)) {
+                            .isCachedFeatureEnabled(AwFeatures.WEBVIEW_MOVE_WORK_TO_PROVIDER_INIT)
+                    && !WebViewCachedFlags.get()
+                            .isCachedFeatureEnabled(
+                                    AwFeatures.WEBVIEW_MOVE_WORK_TO_PROVIDER_INIT_THREAD_POOL)) {
                 mAwInit.runNonUiThreadCapableStartupTasks();
             }
 

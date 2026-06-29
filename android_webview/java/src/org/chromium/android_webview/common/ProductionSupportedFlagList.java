@@ -1114,6 +1114,11 @@ public final class ProductionSupportedFlagList {
                     + " beforehand during WebView provider initialization. This is expected to"
                     + " improve startup performance especially when async startup takes place."),
         Flag.baseFeature(
+                AwFeatures.WEBVIEW_MOVE_WORK_TO_PROVIDER_INIT_THREAD_POOL,
+                "Runs WebViewMoveWorkToProviderInit tasks on a posted task instead of synchronously"
+                        + " during WebView provider initialization. Only has any effect if"
+                        + " `WEBVIEW_MOVE_WORK_TO_PROVIDER_INIT` is enabled."),
+        Flag.baseFeature(
                 AwFeatures.WEBVIEW_BACKGROUND_CLASS_PRELOADING,
                 "Enables preloading WebView classes on a background thread during early startup."),
         Flag.baseFeature(

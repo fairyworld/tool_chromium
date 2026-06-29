@@ -60,6 +60,7 @@ const base::Feature* const kFeaturesExposedToJava[] = {
     &features::kWebViewInvokeZoomPickerOnGSU,
     &features::kWebViewMixedContentAutoupgrades,
     &features::kWebViewMoveWorkToProviderInit,
+    &features::kWebViewMoveWorkToProviderInitThreadPool,
     &features::kWebViewNavigate,
     &features::kWebViewOptInToGmsBindServiceOptimization,
     &features::kWebViewPersistHttpServerProperties,

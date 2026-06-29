@@ -246,6 +246,12 @@ BASE_FEATURE(kWebViewOptInToGmsBindServiceOptimization,
 // when async startup takes place.
 BASE_FEATURE(kWebViewMoveWorkToProviderInit, base::FEATURE_DISABLED_BY_DEFAULT);
 
+// When enabled, WebViewMoveWorkToProviderInit tasks are run on a posted task
+// instead of synchronously during WebView provider initialization. Only has any
+// effect if `kWebViewMoveWorkToProviderInit` is also enabled.
+BASE_FEATURE(kWebViewMoveWorkToProviderInitThreadPool,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 // When enabled, the temporary cookie manager used before WebView startup is
 // bypassed. If WebView isn't already started up, calling
 // `CookieManager.getInstance()` will trigger WebView startup on the main looper
