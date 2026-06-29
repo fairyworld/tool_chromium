@@ -4,16 +4,14 @@
 
 package org.chromium.ui.accessibility.testservice;
 
-parcelable WaitForEventParams {
+import org.chromium.ui.accessibility.testservice.NodeMatcher;
+
+parcelable EventMatcher {
     /** The type of event to wait for (e.g., AccessibilityEvent.TYPE_VIEW_FOCUSED). */
     int eventType;
-    /** The expected class name of the event source. Null or empty string matches any class name. */
-    String className;
     /** The event ContentChangeTypes (e.g., AccessibilityEvent.CONTENT_CHANGE_TYPE_ERROR).
     Optional - assign 0 to match any ContentChangeType or lack thereof. */
     int contentChangeTypes;
-    /** The expected text of the event source. Null or empty string matches any text. */
-    String text;
-    /** The maximum time to wait in milliseconds. */
-    long timeoutMs;
+    /** Expected parameters for the source node linked to this event. */
+    NodeMatcher sourceMatcher;
 }
