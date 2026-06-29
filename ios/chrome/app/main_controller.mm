@@ -50,6 +50,7 @@
 #import "ios/chrome/app/application_delegate/memory_warning_helper.h"
 #import "ios/chrome/app/application_delegate/metrics_mediator.h"
 #import "ios/chrome/app/background_refresh/background_refresh_app_agent.h"
+#import "ios/chrome/app/background_refresh/discover_feed_provider.h"
 #import "ios/chrome/app/background_refresh/test_refresher.h"
 #import "ios/chrome/app/blocking_scene_commands.h"
 #import "ios/chrome/app/change_profile_animator.h"
@@ -1184,6 +1185,10 @@ std::string GetProfileNameForChoice(ProfileChoice choice,
   refreshAgent.audience = _appState;
   [_appState addAgent:refreshAgent];
   // Register background refresh providers.
+  if (IsDiscoverBackgroundRefreshEnabled()) {
+    [refreshAgent addAppRefreshProvider:[[DiscoverFeedProvider alloc] init]];
+  }
+
   [refreshAgent addAppRefreshProvider:[[TestRefresher alloc]
                                           initWithAppState:self.appState]];
 
