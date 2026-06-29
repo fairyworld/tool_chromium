@@ -9,18 +9,85 @@
 #include <memory>
 #include <vector>
 
+#include "base/functional/callback.h"
+#include "base/gtest_prod_util.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/sequence_checker.h"
+#include "base/thread_annotations.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
+#include "services/network/public/cpp/simple_url_loader.h"
+#include "services/network/public/cpp/simple_url_loader_stream_consumer.h"
+#include "services/network/public/mojom/url_loader_factory.mojom.h"
+#include "services/network/public/mojom/url_response_head.mojom.h"
 #include "third_party/abseil-cpp/absl/status/status.h"
 #include "third_party/federated_compute/src/fcp/client/http/http_client.h"
+#include "url/gurl.h"
 
 namespace base {
 class SequencedTaskRunner;
 }
 
 namespace private_insights {
+
+class FcpHttpRequestHandle;
+class FcpHttpRequestManager;
+
+// Manages the execution of an individual FCP HTTP request using
+// SimpleURLLoader.
+class FcpHttpRequestRunner : public network::SimpleURLLoaderStreamConsumer {
+ public:
+  FcpHttpRequestRunner(network::mojom::URLLoaderFactory* url_loader_factory,
+                       FcpHttpRequestHandle* handle,
+                       std::string upload_body,
+                       fcp::client::http::HttpRequestCallback* callback);
+  ~FcpHttpRequestRunner() override;
+
+  FcpHttpRequestRunner(const FcpHttpRequestRunner&) = delete;
+  FcpHttpRequestRunner& operator=(const FcpHttpRequestRunner&) = delete;
+
+  void set_on_complete_callback(base::OnceClosure callback);
+
+  // SimpleURLLoaderStreamConsumer:
+  void OnDataReceived(std::string_view string_piece,
+                      base::OnceClosure resume) override;
+  void OnComplete(bool success) override;
+  void OnRetry(base::OnceClosure start_retry) override;
+
+  void Cancel();
+
+ private:
+  void AbortInternal();
+  void ClearReferences();
+  void OnResponseStarted(const GURL& final_url,
+                         const network::mojom::URLResponseHead& response_head);
+  void OnUploadProgress(uint64_t position, uint64_t total);
+  void OnDownloadProgress(uint64_t current);
+
+  raw_ptr<FcpHttpRequestHandle> handle_ GUARDED_BY_CONTEXT(sequence_checker_);
+  raw_ptr<fcp::client::http::HttpRequest> request_
+      GUARDED_BY_CONTEXT(sequence_checker_);
+  raw_ptr<fcp::client::http::HttpRequestCallback> callback_
+      GUARDED_BY_CONTEXT(sequence_checker_);
+  base::OnceClosure on_complete_callback_ GUARDED_BY_CONTEXT(sequence_checker_);
+  raw_ptr<std::atomic<int64_t>> sent_bytes_ptr_
+      GUARDED_BY_CONTEXT(sequence_checker_);
+  raw_ptr<std::atomic<int64_t>> received_bytes_ptr_
+      GUARDED_BY_CONTEXT(sequence_checker_);
+
+  // FCP has logic dependent on whether there was an Accept-Encoding header
+  // present or not (see "Response body decompression & decoding" on
+  // fcp::client::http::HttpClient).
+  bool has_explicit_accept_encoding_ GUARDED_BY_CONTEXT(sequence_checker_) =
+      false;
+
+  std::unique_ptr<network::SimpleURLLoader> loader_
+      GUARDED_BY_CONTEXT(sequence_checker_);
+  raw_ptr<fcp::client::http::HttpResponse> response_
+      GUARDED_BY_CONTEXT(sequence_checker_) = nullptr;
+
+  SEQUENCE_CHECKER(sequence_checker_);
+};
 
 // A thread-compatible proxy wrapper around
 // scoped_refptr<network::SharedURLLoaderFactory>.

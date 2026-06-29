@@ -26,6 +26,7 @@ component("private_insights") {
     ":fcp_http_client",
     ":fcp_log_manager",
     ":fcp_simple_task_environment",
+    ":fcp_utils",
     "//base",
     "//base:i18n",
     "//components/version_info",
@@ -88,8 +89,11 @@ source_set("fcp_http_client") {
   sources = [ "fcp_http_client.cc" ]
   public_deps = [ "//third_party/federated_compute:fl_runner" ]
   deps = [
+    ":fcp_utils",
     "//base",
+    "//net",
     "//services/network/public/cpp",
+    "//url",
   ]
 }
 
