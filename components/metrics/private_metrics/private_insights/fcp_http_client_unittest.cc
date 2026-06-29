@@ -4,14 +4,19 @@
 
 #include "components/metrics/private_metrics/private_insights/fcp_http_client.h"
 
+#include <atomic>
 #include <memory>
 #include <utility>
 #include <vector>
 
+#include "base/functional/callback_helpers.h"
+#include "base/task/thread_pool.h"
 #include "base/test/run_until.h"
 #include "base/test/task_environment.h"
+#include "base/test/test_future.h"
 #include "net/base/net_errors.h"
 #include "net/http/http_util.h"
+#include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/abseil-cpp/absl/status/status.h"
@@ -21,17 +26,61 @@ namespace private_insights {
 
 class FcpHttpClientTest : public testing::Test {
  public:
-  FcpHttpClientTest() = default;
+  FcpHttpClientTest()
+      : request_manager_(test_url_loader_factory_.GetSafeWeakWrapper(),
+                         task_environment_.GetMainThreadTaskRunner()) {}
   ~FcpHttpClientTest() override = default;
+
+ protected:
+  void PostPerformRequestsTask(
+      FcpHttpClient* client,
+      std::vector<std::pair<fcp::client::http::HttpRequestHandle*,
+                            fcp::client::http::HttpRequestCallback*>> requests,
+      absl::Status* status,
+      std::atomic<bool>* done) {
+    auto main_thread = task_environment_.GetMainThreadTaskRunner();
+    base::ThreadPool::PostTask(
+        FROM_HERE, {base::MayBlock(), base::WithBaseSyncPrimitives()},
+        base::BindOnce(
+            [](FcpHttpClient* client,
+               std::vector<std::pair<fcp::client::http::HttpRequestHandle*,
+                                     fcp::client::http::HttpRequestCallback*>>
+                   requests,
+               absl::Status* status, std::atomic<bool>* done,
+               scoped_refptr<base::SequencedTaskRunner> main_thread) {
+              *status = client->PerformRequests(std::move(requests));
+              *done = true;
+              // Wake up the main thread's RunLoop to evaluate the RunUntil
+              // condition.
+              main_thread->PostTask(FROM_HERE, base::DoNothing());
+            },
+            client, std::move(requests), status, done, main_thread));
+  }
+
+  absl::Status PerformRequestsAndWait(
+      FcpHttpClient* client,
+      std::vector<std::pair<fcp::client::http::HttpRequestHandle*,
+                            fcp::client::http::HttpRequestCallback*>>
+          requests) {
+    absl::Status status;
+    std::atomic<bool> done{false};
+    PostPerformRequestsTask(client, std::move(requests), &status, &done);
+    EXPECT_TRUE(base::test::RunUntil([&]() { return done.load(); }));
+    return status;
+  }
+
+  base::test::TaskEnvironment task_environment_;
+  network::TestURLLoaderFactory test_url_loader_factory_;
+  FcpHttpRequestManager request_manager_;
 };
 
 TEST_F(FcpHttpClientTest, PerformRequestsEmpty) {
-  FcpHttpClient client(nullptr);
+  FcpHttpClient client(&request_manager_);
   EXPECT_TRUE(client.PerformRequests({}).ok());
 }
 
 TEST_F(FcpHttpClientTest, PerformRequestsCanceledRequest) {
-  FcpHttpClient client(nullptr);
+  FcpHttpClient client(&request_manager_);
   auto request =
       fcp::client::http::InMemoryHttpRequest::Create(
           "https://example.com", fcp::client::http::HttpRequest::Method::kGet,
@@ -53,7 +102,7 @@ TEST_F(FcpHttpClientTest, PerformRequestsCanceledRequest) {
 }
 
 TEST_F(FcpHttpClientTest, TotalSentReceivedBytesInitial) {
-  FcpHttpClient client(nullptr);
+  FcpHttpClient client(&request_manager_);
   auto request =
       fcp::client::http::InMemoryHttpRequest::Create(
           "https://example.com", fcp::client::http::HttpRequest::Method::kGet,
@@ -67,7 +116,7 @@ TEST_F(FcpHttpClientTest, TotalSentReceivedBytesInitial) {
 }
 
 TEST_F(FcpHttpClientTest, TotalSentReceivedBytesUpdate) {
-  FcpHttpClient client(nullptr);
+  FcpHttpClient client(&request_manager_);
   auto request =
       fcp::client::http::InMemoryHttpRequest::Create(
           "https://example.com", fcp::client::http::HttpRequest::Method::kPost,
@@ -137,6 +186,132 @@ class TestHttpRequestCallback : public fcp::client::http::HttpRequestCallback {
   absl::Status on_response_body_status_ = absl::OkStatus();
 };
 
+class ErrorHttpRequest : public fcp::client::http::HttpRequest {
+ public:
+  absl::string_view uri() const override { return "https://example.com/error"; }
+
+  Method method() const override { return Method::kPost; }
+
+  const fcp::client::http::HeaderList& extra_headers() const override {
+    return headers_;
+  }
+
+  bool HasBody() const override { return true; }
+
+  absl::StatusOr<int64_t> ReadBody(  // nocheck
+      char* buffer,
+      int64_t requested) override {
+    return absl::InternalError("ReadBody failed");
+  }
+
+  std::unique_ptr<HttpRequest> Clone() const override {
+    return std::make_unique<ErrorHttpRequest>();
+  }
+
+ private:
+  fcp::client::http::HeaderList headers_;
+};
+
+TEST_F(FcpHttpClientTest, PerformRequestsSuccessfulSingle) {
+  FcpHttpClient client(&request_manager_);
+  auto request = fcp::client::http::InMemoryHttpRequest::Create(
+                     "https://example.com/test",
+                     fcp::client::http::HttpRequest::Method::kGet,
+                     /*extra_headers=*/{}, /*body=*/"",
+                     /*use_compression=*/false)
+                     .value();
+  auto handle = client.EnqueueRequest(std::move(request));
+  TestHttpRequestCallback callback;
+
+  test_url_loader_factory_.AddResponse("https://example.com/test",
+                                       "response payload");
+
+  absl::Status status =
+      PerformRequestsAndWait(&client, {{handle.get(), &callback}});
+
+  EXPECT_TRUE(status.ok());
+  EXPECT_TRUE(callback.response_started_called_);
+  EXPECT_EQ(callback.status_code_, 200);
+  EXPECT_TRUE(callback.response_body_called_);
+  EXPECT_EQ(callback.body_received_, "response payload");
+  EXPECT_TRUE(callback.response_completed_called_);
+}
+
+TEST_F(FcpHttpClientTest, PerformRequestsSuccessfulBatch) {
+  FcpHttpClient client(&request_manager_);
+  auto request1 = fcp::client::http::InMemoryHttpRequest::Create(
+                      "https://example.com/req1",
+                      fcp::client::http::HttpRequest::Method::kGet,
+                      /*extra_headers=*/{}, /*body=*/"",
+                      /*use_compression=*/false)
+                      .value();
+  auto request2 = fcp::client::http::InMemoryHttpRequest::Create(
+                      "https://example.com/req2",
+                      fcp::client::http::HttpRequest::Method::kPost,
+                      /*extra_headers=*/{}, /*body=*/"post data",
+                      /*use_compression=*/false)
+                      .value();
+
+  auto handle1 = client.EnqueueRequest(std::move(request1));
+  auto handle2 = client.EnqueueRequest(std::move(request2));
+
+  TestHttpRequestCallback callback1;
+  TestHttpRequestCallback callback2;
+
+  test_url_loader_factory_.AddResponse("https://example.com/req1", "resp1");
+  test_url_loader_factory_.AddResponse("https://example.com/req2", "resp2");
+
+  absl::Status status = PerformRequestsAndWait(
+      &client, {{handle1.get(), &callback1}, {handle2.get(), &callback2}});
+
+  EXPECT_TRUE(status.ok());
+  EXPECT_TRUE(callback1.response_completed_called_);
+  EXPECT_EQ(callback1.body_received_, "resp1");
+  EXPECT_TRUE(callback2.response_completed_called_);
+  EXPECT_EQ(callback2.body_received_, "resp2");
+}
+
+TEST_F(FcpHttpClientTest, PerformRequestsReadBodyError) {
+  FcpHttpClient client(&request_manager_);
+  auto handle = client.EnqueueRequest(std::make_unique<ErrorHttpRequest>());
+  TestHttpRequestCallback callback;
+
+  absl::Status status =
+      PerformRequestsAndWait(&client, {{handle.get(), &callback}});
+
+  EXPECT_TRUE(status.ok());
+  EXPECT_TRUE(callback.response_error_called_);
+  EXPECT_EQ(callback.error_status_.code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(callback.error_status_.message(), "ReadBody failed");
+}
+
+TEST_F(FcpHttpClientTest, PerformRequestsCancelViaHandle) {
+  FcpHttpClient client(&request_manager_);
+  auto request = fcp::client::http::InMemoryHttpRequest::Create(
+                     "https://example.com/pending",
+                     fcp::client::http::HttpRequest::Method::kGet,
+                     /*extra_headers=*/{}, /*body=*/"",
+                     /*use_compression=*/false)
+                     .value();
+  auto handle = client.EnqueueRequest(std::move(request));
+  TestHttpRequestCallback callback;
+
+  absl::Status status;
+  std::atomic<bool> done{false};
+  PostPerformRequestsTask(&client, {{handle.get(), &callback}}, &status, &done);
+
+  EXPECT_TRUE(base::test::RunUntil(
+      [&]() { return test_url_loader_factory_.NumPending() == 1; }));
+
+  handle->Cancel();
+
+  EXPECT_TRUE(base::test::RunUntil([&]() { return done.load(); }));
+
+  EXPECT_TRUE(status.ok());
+  EXPECT_TRUE(callback.response_error_called_);
+  EXPECT_EQ(callback.error_status_.code(), absl::StatusCode::kCancelled);
+}
+
 class FcpHttpRequestRunnerTest : public testing::Test {
  protected:
   base::test::TaskEnvironment task_environment_;
@@ -150,7 +325,7 @@ TEST_F(FcpHttpRequestRunnerTest, SuccessfulGetRequest) {
                      /*extra_headers=*/{}, /*body=*/"",
                      /*use_compression=*/false)
                      .value();
-  FcpHttpRequestHandle handle(nullptr, std::move(request));
+  FcpHttpRequestHandle handle(nullptr, /*request_id=*/1, std::move(request));
   TestHttpRequestCallback callback;
 
   bool complete_called = false;
@@ -182,7 +357,7 @@ TEST_F(FcpHttpRequestRunnerTest, SuccessfulPostRequestWithUploadBody) {
                      /*body=*/"upload payload",
                      /*use_compression=*/false)
                      .value();
-  FcpHttpRequestHandle handle(nullptr, std::move(request));
+  FcpHttpRequestHandle handle(nullptr, /*request_id=*/1, std::move(request));
   TestHttpRequestCallback callback;
 
   bool complete_called = false;
@@ -210,7 +385,7 @@ TEST_F(FcpHttpRequestRunnerTest, HttpError404Response) {
                      /*extra_headers=*/{}, /*body=*/"",
                      /*use_compression=*/false)
                      .value();
-  FcpHttpRequestHandle handle(nullptr, std::move(request));
+  FcpHttpRequestHandle handle(nullptr, /*request_id=*/1, std::move(request));
   TestHttpRequestCallback callback;
 
   auto runner =
@@ -236,7 +411,7 @@ TEST_F(FcpHttpRequestRunnerTest, NetworkErrorBeforeResponseStarted) {
                      /*extra_headers=*/{}, /*body=*/"",
                      /*use_compression=*/false)
                      .value();
-  FcpHttpRequestHandle handle(nullptr, std::move(request));
+  FcpHttpRequestHandle handle(nullptr, /*request_id=*/1, std::move(request));
   TestHttpRequestCallback callback;
 
   auto runner =
@@ -261,7 +436,7 @@ TEST_F(FcpHttpRequestRunnerTest, NetworkErrorDuringResponseBody) {
                      /*extra_headers=*/{}, /*body=*/"",
                      /*use_compression=*/false)
                      .value();
-  FcpHttpRequestHandle handle(nullptr, std::move(request));
+  FcpHttpRequestHandle handle(nullptr, /*request_id=*/1, std::move(request));
   TestHttpRequestCallback callback;
 
   auto runner =
@@ -291,7 +466,7 @@ TEST_F(FcpHttpRequestRunnerTest, OnResponseStartedReturnsError) {
                      /*extra_headers=*/{}, /*body=*/"",
                      /*use_compression=*/false)
                      .value();
-  FcpHttpRequestHandle handle(nullptr, std::move(request));
+  FcpHttpRequestHandle handle(nullptr, /*request_id=*/1, std::move(request));
   TestHttpRequestCallback callback;
   callback.on_response_started_status_ =
       absl::InternalError("error in started");
@@ -321,7 +496,7 @@ TEST_F(FcpHttpRequestRunnerTest, OnResponseBodyReturnsError) {
                      /*extra_headers=*/{}, /*body=*/"",
                      /*use_compression=*/false)
                      .value();
-  FcpHttpRequestHandle handle(nullptr, std::move(request));
+  FcpHttpRequestHandle handle(nullptr, /*request_id=*/1, std::move(request));
   TestHttpRequestCallback callback;
   callback.on_response_body_status_ = absl::InternalError("error in body");
 
@@ -350,7 +525,7 @@ TEST_F(FcpHttpRequestRunnerTest, CancelBeforeResponseStarted) {
                      /*extra_headers=*/{}, /*body=*/"",
                      /*use_compression=*/false)
                      .value();
-  FcpHttpRequestHandle handle(nullptr, std::move(request));
+  FcpHttpRequestHandle handle(nullptr, /*request_id=*/1, std::move(request));
   TestHttpRequestCallback callback;
 
   bool complete_called = false;
@@ -378,7 +553,7 @@ TEST_F(FcpHttpRequestRunnerTest, CancelAfterResponseStarted) {
                      /*extra_headers=*/{}, /*body=*/"",
                      /*use_compression=*/false)
                      .value();
-  FcpHttpRequestHandle handle(nullptr, std::move(request));
+  FcpHttpRequestHandle handle(nullptr, /*request_id=*/1, std::move(request));
   TestHttpRequestCallback callback;
 
   bool complete_called = false;
@@ -417,7 +592,7 @@ TEST_F(FcpHttpRequestRunnerTest, ExplicitAcceptEncodingHeader) {
                      /*body=*/"",
                      /*use_compression=*/false)
                      .value();
-  FcpHttpRequestHandle handle(nullptr, std::move(request));
+  FcpHttpRequestHandle handle(nullptr, /*request_id=*/1, std::move(request));
   TestHttpRequestCallback callback;
 
   auto runner =
@@ -457,7 +632,7 @@ TEST_F(FcpHttpRequestRunnerTest, ImplicitAcceptEncodingHeaderStripsHeaders) {
                      /*extra_headers=*/{}, /*body=*/"",
                      /*use_compression=*/false)
                      .value();
-  FcpHttpRequestHandle handle(nullptr, std::move(request));
+  FcpHttpRequestHandle handle(nullptr, /*request_id=*/1, std::move(request));
   TestHttpRequestCallback callback;
 
   auto runner =

@@ -232,7 +232,8 @@ void PrivateInsightsService::TriggerUpload() {
 
   base::ThreadPool::PostTaskAndReplyWithResult(
       FROM_HERE,
-      {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
+      {base::MayBlock(), base::WithBaseSyncPrimitives(),
+       base::TaskPriority::BEST_EFFORT,
        base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN},
       base::BindOnce(&PrivateInsightsService::UploadBlocking, fcp_task_env_,
                      base::TimeTicks::Now()),

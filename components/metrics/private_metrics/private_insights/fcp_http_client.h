@@ -6,6 +6,7 @@
 #define COMPONENTS_METRICS_PRIVATE_METRICS_PRIVATE_INSIGHTS_FCP_HTTP_CLIENT_H_
 
 #include <atomic>
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -15,6 +16,7 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/sequence_checker.h"
 #include "base/thread_annotations.h"
+#include "components/metrics/private_metrics/private_insights/fcp_utils.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/public/cpp/simple_url_loader.h"
 #include "services/network/public/cpp/simple_url_loader_stream_consumer.h"
@@ -89,17 +91,15 @@ class FcpHttpRequestRunner : public network::SimpleURLLoaderStreamConsumer {
   SEQUENCE_CHECKER(sequence_checker_);
 };
 
-// A thread-compatible proxy wrapper around
-// scoped_refptr<network::SharedURLLoaderFactory>.
+// Manages and routes asynchronous FCP HTTP requests between background worker
+// threads and Chrome's UI thread network stack.
 //
-// Since SharedURLLoaderFactory is not thread-safe and must be accessed and
-// released on the sequence it was created on (typically the UI thread), this
-// class ensures that:
-// 1. The factory is safely released back to the UI thread when this proxy is
-//    destroyed on the background thread.
-// 2. Network requests initiated on the background thread are safely routed
-//    and executed on the UI thread.
+// Wraps scoped_refptr<network::SharedURLLoaderFactory> to ensure that network
+// requests and factory destruction occur on the UI sequence, while managing
+// active request runners (FcpHttpRequestRunner) and request cancelation.
 //
+// WARNING: The caller must ensure that an instance of this class outlives all
+// network requests initiated through it, including any posted UI tasks.
 class FcpHttpRequestManager {
  public:
   FcpHttpRequestManager(
@@ -111,9 +111,34 @@ class FcpHttpRequestManager {
 
   ~FcpHttpRequestManager();
 
+  // Starts the request on the UI thread. Can be called from any thread.
+  // `latch` must remain valid until all requests complete and `latch->Wait()`
+  // unblocks.
+  void StartRequest(FcpHttpRequestHandle* handle,
+                    std::string upload_body,
+                    fcp::client::http::HttpRequestCallback* callback,
+                    CountdownLatch* latch);
+
+  uint64_t GetNextRequestId() { return next_request_id_.fetch_add(1); }
+
+  // Cancels the request on the UI thread. Can be called from any thread.
+  void CancelRequest(uint64_t request_id);
+
  private:
+  void StartRequestOnUI(FcpHttpRequestHandle* handle,
+                        std::string upload_body,
+                        fcp::client::http::HttpRequestCallback* callback,
+                        CountdownLatch* latch);
+  void OnRequestComplete(uint64_t request_id,
+                         FcpHttpRequestRunner* runner,
+                         CountdownLatch* latch);
+
   scoped_refptr<base::SequencedTaskRunner> ui_task_runner_;
+
   scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory_
+      GUARDED_BY_CONTEXT(ui_sequence_checker_);
+  std::atomic<uint64_t> next_request_id_{1};
+  std::map<uint64_t, std::unique_ptr<FcpHttpRequestRunner>> runners_
       GUARDED_BY_CONTEXT(ui_sequence_checker_);
 
   SEQUENCE_CHECKER(ui_sequence_checker_);
@@ -127,6 +152,7 @@ class FcpHttpRequestHandle : public fcp::client::http::HttpRequestHandle {
  public:
   // `manager` must outlive `this`.
   FcpHttpRequestHandle(FcpHttpRequestManager* manager,
+                       uint64_t request_id,
                        std::unique_ptr<fcp::client::http::HttpRequest> request);
   ~FcpHttpRequestHandle() override;
 
@@ -134,6 +160,8 @@ class FcpHttpRequestHandle : public fcp::client::http::HttpRequestHandle {
   FcpHttpRequestHandle& operator=(const FcpHttpRequestHandle&) = delete;
 
   fcp::client::http::HttpRequest* request() const { return request_.get(); }
+
+  uint64_t request_id() const { return request_id_; }
 
   bool was_performed() const { return was_performed_.load(); }
   void set_was_performed(bool was_performed) {
@@ -155,6 +183,7 @@ class FcpHttpRequestHandle : public fcp::client::http::HttpRequestHandle {
 
  private:
   raw_ptr<FcpHttpRequestManager> manager_;
+  uint64_t request_id_;
   std::unique_ptr<fcp::client::http::HttpRequest> request_;
   std::unique_ptr<fcp::client::http::HttpResponse> response_;
   std::atomic<bool> was_performed_{false};

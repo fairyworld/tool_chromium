@@ -14,6 +14,8 @@ namespace private_insights {
 
 class FcpHttpRequestManager;
 
+// WARNING: The caller must ensure that this environment outlives the returned
+// HttpClient and all network requests initiated through it.
 class FcpSimpleTaskEnvironment
     : public fcp::client::SimpleTaskEnvironment,
       public base::RefCountedThreadSafe<FcpSimpleTaskEnvironment> {

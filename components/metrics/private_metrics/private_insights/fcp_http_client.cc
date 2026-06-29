@@ -20,10 +20,13 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/notreached.h"
 #include "base/sequence_checker.h"
+#include "base/strings/string_util.h"
 #include "base/task/sequenced_task_runner.h"
 #include "components/metrics/private_metrics/private_insights/fcp_utils.h"
 #include "net/base/load_flags.h"
+#include "net/base/net_errors.h"
 #include "net/filter/source_stream_type.h"
+#include "net/http/http_request_headers.h"
 #include "net/http/http_response_headers.h"
 #include "net/traffic_annotation/network_traffic_annotation.h"
 #include "services/network/public/cpp/resource_request.h"
@@ -313,8 +316,11 @@ void FcpHttpRequestRunner::OnDownloadProgress(uint64_t current) {
 
 FcpHttpRequestHandle::FcpHttpRequestHandle(
     FcpHttpRequestManager* manager,
+    uint64_t request_id,
     std::unique_ptr<fcp::client::http::HttpRequest> request)
-    : manager_(manager), request_(std::move(request)) {}
+    : manager_(manager),
+      request_id_(request_id),
+      request_(std::move(request)) {}
 
 FcpHttpRequestHandle::~FcpHttpRequestHandle() = default;
 
@@ -327,7 +333,9 @@ void FcpHttpRequestHandle::Cancel() {
   if (was_canceled_.exchange(true)) {
     return;
   }
-  // TODO(b/525314527): Implement proper request cancellation.
+  if (manager_) {
+    manager_->CancelRequest(request_id_);
+  }
 }
 
 FcpHttpRequestManager::FcpHttpRequestManager(
@@ -339,14 +347,80 @@ FcpHttpRequestManager::FcpHttpRequestManager(
 }
 
 FcpHttpRequestManager::~FcpHttpRequestManager() {
-  if (url_loader_factory_) {
+  if (url_loader_factory_ || !runners_.empty()) {
     ui_task_runner_->PostTask(
         FROM_HERE,
         base::BindOnce(
-            [](scoped_refptr<network::SharedURLLoaderFactory> factory) {
-              // Body is intentionally empty; factory will be destructed here.
+            [](scoped_refptr<network::SharedURLLoaderFactory> factory,
+               std::map<uint64_t, std::unique_ptr<FcpHttpRequestRunner>>
+                   runners) {
+              // Body is intentionally empty; factory and active runners will be
+              // destructed here on the UI thread sequence.
             },
-            std::move(url_loader_factory_)));
+            std::move(url_loader_factory_), std::move(runners_)));
+  }
+}
+
+void FcpHttpRequestManager::StartRequest(
+    FcpHttpRequestHandle* handle,
+    std::string upload_body,
+    fcp::client::http::HttpRequestCallback* callback,
+    CountdownLatch* latch) {
+  ui_task_runner_->PostTask(
+      FROM_HERE, base::BindOnce(&FcpHttpRequestManager::StartRequestOnUI,
+                                // Note: using base::Unretained(this) is safe
+                                // because the manager outlives all network
+                                // requests initiated through it.
+                                base::Unretained(this), handle,
+                                std::move(upload_body), callback, latch));
+}
+
+void FcpHttpRequestManager::CancelRequest(uint64_t request_id) {
+  ui_task_runner_->PostTask(
+      FROM_HERE,
+      base::BindOnce(
+          [](FcpHttpRequestManager* manager, uint64_t req_id) {
+            DCHECK_CALLED_ON_VALID_SEQUENCE(manager->ui_sequence_checker_);
+            auto it = manager->runners_.find(req_id);
+            if (it != manager->runners_.end()) {
+              it->second->Cancel();
+            }
+          },
+          // Note: using base::Unretained(this) is safe because the manager
+          // outlives all network requests initiated through it.
+          base::Unretained(this), request_id));
+}
+
+void FcpHttpRequestManager::StartRequestOnUI(
+    FcpHttpRequestHandle* handle,
+    std::string upload_body,
+    fcp::client::http::HttpRequestCallback* callback,
+    CountdownLatch* latch) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(ui_sequence_checker_);
+  uint64_t request_id = handle->request_id();
+  auto runner = std::make_unique<FcpHttpRequestRunner>(
+      url_loader_factory_.get(), handle, std::move(upload_body), callback);
+  FcpHttpRequestRunner* runner_ptr = runner.get();
+  runner->set_on_complete_callback(base::BindOnce(
+      &FcpHttpRequestManager::OnRequestComplete,
+      // Note: using base::Unretained(this) is safe because the manager outlives
+      // all network requests initiated through it.
+      base::Unretained(this), request_id, runner_ptr, latch));
+  runners_[request_id] = std::move(runner);
+}
+
+void FcpHttpRequestManager::OnRequestComplete(uint64_t request_id,
+                                              FcpHttpRequestRunner* runner,
+                                              CountdownLatch* latch) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(ui_sequence_checker_);
+  DCHECK(runner);
+
+  latch->CountDown();
+
+  auto it = runners_.find(request_id);
+  if (it != runners_.end()) {
+    ui_task_runner_->DeleteSoon(FROM_HERE, std::move(it->second));
+    runners_.erase(it);
   }
 }
 
@@ -358,8 +432,9 @@ FcpHttpClient::~FcpHttpClient() = default;
 std::unique_ptr<fcp::client::http::HttpRequestHandle>
 FcpHttpClient::EnqueueRequest(
     std::unique_ptr<fcp::client::http::HttpRequest> request) {
-  return std::make_unique<FcpHttpRequestHandle>(request_manager_,
-                                                std::move(request));
+  return std::make_unique<FcpHttpRequestHandle>(
+      request_manager_, request_manager_->GetNextRequestId(),
+      std::move(request));
 }
 
 absl::Status FcpHttpClient::PerformRequests(
@@ -378,6 +453,31 @@ absl::Status FcpHttpClient::PerformRequests(
     }
   }
 
+  CountdownLatch latch(requests.size());
+
+  for (auto& pair : requests) {
+    FcpHttpRequestHandle* fcp_handle =
+        static_cast<FcpHttpRequestHandle*>(pair.first);
+    fcp_handle->set_was_performed(true);
+    fcp::client::http::HttpRequestCallback* callback = pair.second;
+    fcp::client::http::HttpRequest* request = fcp_handle->request();
+
+    // TODO(b/525314527): Implement proper streaming. The current implementation
+    // does not conform to "Request body compression & encoding" from FCP's
+    // requirements.
+
+    auto upload_body_or = ReadRequestBody(*request);
+    if (!upload_body_or.ok()) {
+      callback->OnResponseError(*request, upload_body_or.status());
+      latch.CountDown();
+      continue;
+    }
+
+    request_manager_->StartRequest(fcp_handle, std::move(*upload_body_or),
+                                   callback, &latch);
+  }
+
+  latch.Wait();
   return absl::OkStatus();
 }
 
