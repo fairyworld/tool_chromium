@@ -14,6 +14,7 @@
 #include "base/test/task_environment.h"
 #include "components/metrics/metrics_pref_names.h"
 #include "components/metrics/metrics_reporting_choice_service.h"
+#include "components/metrics/private_metrics/private_insights/fcp_simple_task_environment.h"
 #include "components/metrics/private_metrics/private_insights/private_insights_features.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
@@ -31,7 +32,7 @@ class PrivateInsightsServiceTest : public testing::Test {
     mock_run_federated_computation_call_count_ = 0;
     GetLastPopulationName() = "";
     PrivateInsightsService::SetRunFederatedComputationForTesting(
-        &MockRunFederatedComputation);
+        base::BindRepeating(&MockRunFederatedComputation));
     feature_list_.InitAndEnableFeatureWithParameters(
         kPrivateInsightsFeature,
         {{"fcp_server_uri", "https://example.com/test"}});
@@ -41,7 +42,7 @@ class PrivateInsightsServiceTest : public testing::Test {
   }
 
   void TearDown() override {
-    PrivateInsightsService::SetRunFederatedComputationForTesting(nullptr);
+    PrivateInsightsService::SetRunFederatedComputationForTesting({});
   }
 
   static PrivateInsightsService::FederatedComputationResult
@@ -424,5 +425,103 @@ TEST_F(PrivateInsightsServiceTest, RequeueEventsExceedsMaxEvents) {
   EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_2");
   EXPECT_EQ(service.contextual_cue_events_[1].event.cue_id(), "cue_3");
 }
+
+struct TriggerUploadTestParams {
+  const char* test_name;
+  PrivateInsightsService::FederatedComputationOutcome outcome;
+  bool should_requeue;
+};
+
+class PrivateInsightsServiceTriggerUploadTest
+    : public PrivateInsightsServiceTest,
+      public testing::WithParamInterface<TriggerUploadTestParams> {};
+
+TEST_P(PrivateInsightsServiceTriggerUploadTest, HandleEvents) {
+  const TriggerUploadTestParams& param = GetParam();
+
+  static base::NoDestructor<fcp::client::ExampleQueryResult>
+      captured_query_result;
+  PrivateInsightsService::SetRunFederatedComputationForTesting(
+      base::BindRepeating(
+          [](PrivateInsightsService::FederatedComputationOutcome outcome,
+             const PrivateInsightsService::FederatedComputationParams& params)
+              -> PrivateInsightsService::FederatedComputationResult {
+            *captured_query_result = params.task_env->result();
+            return {
+                .outcome = outcome,
+                .contributed_task_count =
+                    outcome == PrivateInsightsService::
+                                   FederatedComputationOutcome::kSuccess
+                        ? std::make_optional(1)
+                        : std::nullopt,
+            };
+          },
+          param.outcome));
+
+  TestingPrefServiceSimple local_state;
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath(),
+                                 test_shared_url_loader_factory_);
+  DCHECK_CALLED_ON_VALID_SEQUENCE(service.sequence_checker_);
+
+  events::ContextualCueLogEvent event1;
+  event1.set_cue_id("cue_1");
+  service.LogContextualCueEvent(event1);
+
+  EXPECT_EQ(service.contextual_cue_events_.size(), 1u);
+
+  service.TriggerUpload();
+  EXPECT_EQ(service.contextual_cue_events_.size(), 0u);
+
+  // Log a new event while upload is in progress.
+  events::ContextualCueLogEvent event2;
+  event2.set_cue_id("cue_2");
+  service.LogContextualCueEvent(event2);
+
+  ASSERT_TRUE(
+      base::test::RunUntil([&]() { return !service.is_upload_running_; }));
+
+  // Verify federated computation received the queued event.
+  EXPECT_EQ(captured_query_result->stats().output_rows_count(), 1);
+  const auto& vectors = captured_query_result->vector_data().vectors();
+  ASSERT_EQ(vectors.count("entry"), 1u);
+  const auto& entry_bytes = vectors.at("entry").bytes_values();
+  ASSERT_EQ(entry_bytes.value_size(), 1);
+  EXPECT_EQ(entry_bytes.value(0), event1.SerializeAsString());
+
+  if (param.should_requeue) {
+    // Requeued event ("cue_1") should be placed before new event ("cue_2").
+    EXPECT_EQ(service.contextual_cue_events_.size(), 2u);
+    EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_1");
+    EXPECT_EQ(service.contextual_cue_events_[1].event.cue_id(), "cue_2");
+  } else {
+    // Event is not requeued, so only the new event ("cue_2") remains in queue.
+    EXPECT_EQ(service.contextual_cue_events_.size(), 1u);
+    EXPECT_EQ(service.contextual_cue_events_[0].event.cue_id(), "cue_2");
+  }
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    All,
+    PrivateInsightsServiceTriggerUploadTest,
+    testing::Values(
+        TriggerUploadTestParams{
+            "Success",
+            PrivateInsightsService::FederatedComputationOutcome::kSuccess,
+            /*should_requeue=*/false},
+        TriggerUploadTestParams{
+            "Partial",
+            PrivateInsightsService::FederatedComputationOutcome::kPartial,
+            /*should_requeue=*/false},
+        TriggerUploadTestParams{
+            "Failed",
+            PrivateInsightsService::FederatedComputationOutcome::kFailed,
+            /*should_requeue=*/true},
+        TriggerUploadTestParams{
+            "ErrorOther",
+            PrivateInsightsService::FederatedComputationOutcome::kErrorOther,
+            /*should_requeue=*/false}),
+    [](const testing::TestParamInfo<TriggerUploadTestParams>& info) {
+      return info.param.test_name;
+    });
 
 }  // namespace private_insights

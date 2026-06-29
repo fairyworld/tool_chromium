@@ -11,6 +11,7 @@
 #include "base/component_export.h"
 #include "base/containers/circular_deque.h"
 #include "base/files/file_path.h"
+#include "base/functional/callback.h"
 #include "base/gtest_prod_util.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
@@ -104,7 +105,8 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   };
 
   using RunFederatedComputationFunc =
-      FederatedComputationResult (*)(const FederatedComputationParams& params);
+      base::RepeatingCallback<FederatedComputationResult(
+          const FederatedComputationParams& params)>;
 
   // LINT.IfChange(PrivateInsightsTriggerUploadOutcome)
   enum class TriggerUploadOutcome {
@@ -131,10 +133,7 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   void Shutdown() override;
 
   static void SetRunFederatedComputationForTesting(
-      RunFederatedComputationFunc func) {
-    run_federated_computation_func =
-        func ? func : &PrivateInsightsService::RunFederatedComputation;
-  }
+      RunFederatedComputationFunc func);
 
   void LogContextualCueEvent(events::ContextualCueLogEvent event);
 
@@ -156,7 +155,7 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   static FederatedComputationResult RunFederatedComputation(
       const FederatedComputationParams& params);
 
-  static RunFederatedComputationFunc run_federated_computation_func;
+  static RunFederatedComputationFunc& GetRunFederatedComputationFunc();
 
   void OnUploadComplete(
       base::circular_deque<ContextualCueEventEntry> pending_events,
@@ -200,6 +199,8 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
                            RequeueEventsPrependsRequeuedEvents);
   FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
                            RequeueEventsExceedsMaxEvents);
+  FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTriggerUploadTest,
+                           HandleEvents);
 };
 
 }  // namespace private_insights

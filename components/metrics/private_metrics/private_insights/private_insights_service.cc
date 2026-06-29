@@ -11,6 +11,7 @@
 #include "base/functional/bind.h"
 #include "base/i18n/time_formatting.h"
 #include "base/metrics/histogram_functions.h"
+#include "base/no_destructor.h"
 #include "base/sequence_checker.h"
 #include "base/strings/strcat.h"
 #include "base/task/task_traits.h"
@@ -225,8 +226,8 @@ void PrivateInsightsService::TriggerUpload() {
   base::circular_deque<ContextualCueEventEntry> pending_events =
       std::move(contextual_cue_events_);
 
-  // TODO(b/527985497): Prepare the real result here.
-  fcp_task_env_->result() = fcp::client::ExampleQueryResult();
+  fcp_task_env_->result().Clear();
+  SerializeEventsToQueryResult(pending_events, &fcp_task_env_->result());
 
   base::ThreadPool::PostTaskAndReplyWithResult(
       FROM_HERE,
@@ -274,7 +275,8 @@ PrivateInsightsService::UploadBlocking(
       .population_name = kFcpPopulationNameContextualCues.Get(),
   };
 
-  FederatedComputationResult result = run_federated_computation_func(params);
+  FederatedComputationResult result =
+      GetRunFederatedComputationFunc().Run(params);
 
   base::UmaHistogramTimes(kUploadTimeHistogram,
                           base::TimeTicks::Now() - upload_start_time);
@@ -309,9 +311,21 @@ PrivateInsightsService::RunFederatedComputation(
 }
 
 // static
-PrivateInsightsService::RunFederatedComputationFunc
-    PrivateInsightsService::run_federated_computation_func =
-        &PrivateInsightsService::RunFederatedComputation;
+PrivateInsightsService::RunFederatedComputationFunc&
+PrivateInsightsService::GetRunFederatedComputationFunc() {
+  static base::NoDestructor<RunFederatedComputationFunc> func(
+      base::BindRepeating(&PrivateInsightsService::RunFederatedComputation));
+  return *func;
+}
+
+// static
+void PrivateInsightsService::SetRunFederatedComputationForTesting(  // IN-TEST
+    RunFederatedComputationFunc func) {
+  GetRunFederatedComputationFunc() =
+      func ? std::move(func)
+           : base::BindRepeating(
+                 &PrivateInsightsService::RunFederatedComputation);
+}
 
 void PrivateInsightsService::OnUploadComplete(
     base::circular_deque<ContextualCueEventEntry> pending_events,
