@@ -1352,7 +1352,6 @@ public class WebContentsAccessibilityEventsTest {
 
     @Test
     @SmallTest
-    @DisabledTest(message = "https://crbug.com/1186376")
     public void test_scrollHorizontalScrollPercentChanged() {
         performTest(
                 "scroll-horizontal-scroll-percent-change.html",
@@ -1361,7 +1360,6 @@ public class WebContentsAccessibilityEventsTest {
 
     @Test
     @SmallTest
-    @DisabledTest(message = "https://crbug.com/1186376")
     public void test_scrollVerticalScrollPercentChanged() {
         performTest(
                 "scroll-vertical-scroll-percent-change.html",
