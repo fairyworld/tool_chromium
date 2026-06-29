@@ -7,6 +7,9 @@
       "path": "agents/projects/code-health/histogram-cleanup"
     },
     {
+      "path": "agents/projects/code-health/java-inline-fqn-cleanup"
+    },
+    {
       "path": "agents/projects/code-health/hub"
     },
     {
