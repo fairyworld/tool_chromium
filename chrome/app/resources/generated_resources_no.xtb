@@ -1142,6 +1142,7 @@ Du kan når som helst sjekke passordene dine i <ph name="GOOGLE_PASSWORD_MANAGER
 <translation id="1843048149176045210">Kopier nedlastingslinken</translation>
 <translation id="1845060436536902492">Skjermleseren på ChromeOS Flex, ChromeVox, brukes hovedsakelig av blinde eller svaksynte for å lese tekst som vises på skjermen, via talesyntetisering eller en leselist. Trykk på mellomromstasten for å slå på ChromeVox. Når ChromeVox er aktivert, får du en rask innføring.</translation>
 <translation id="1845727111305721124">Nettsteder som har lov til å spille av lyd</translation>
+<translation id="1846100293138248204">Lagre i minnet</translation>
 <translation id="1846308012215045257">Control-klikk for å kjøre <ph name="PLUGIN_NAME" /></translation>
 <translation id="1848219224579402567">Logg av når maskinen lukkes</translation>
 <translation id="184862733444771842">Funksjonsforespørsel</translation>
@@ -6145,6 +6146,7 @@ Bruk Ctrl + Alt + lysstyrke ned for å zoome ut.</translation>
 <translation id="5562588178647493983">Kontakt administratoren din for mer informasjon</translation>
 <translation id="556321030400250233">lokal eller delt fil</translation>
 <translation id="5563234215388768762">Søk i Google eller skriv inn en nettadresse</translation>
+<translation id="5563460629751333413">Vi har problemer med å koble til tjeneren. Prøv igjen senere.</translation>
 <translation id="5563698194918415761">Oppdateringen ble blokkert av nettverksregler eller en proxy-tjener.</translation>
 <translation id="5563824734298958390">Vil du forlate fanegruppen?</translation>
 <translation id="5565735124758917034">Aktiv</translation>
@@ -8184,6 +8186,7 @@ Du har # passord til som er utsatt for sikkerhetsbrudd. Google Passordlagring an
 <translation id="7109543803214225826">Snarveien er fjernet</translation>
 <translation id="7110644433780444336">{NUM_TABS,plural, =1{Legg fanen til i en gruppe}other{Legg fanene til i en gruppe}}</translation>
 <translation id="7111822978084196600">Gi navn til dette vinduet</translation>
+<translation id="7113314569799918830">Gemini i Chrome rulles ut til flere områder, men er ikke tilgjengelig overalt</translation>
 <translation id="7113502843173351041">se e-postadressen din</translation>
 <translation id="7115361495406486998">Ingen kontakter kan nås</translation>
 <translation id="7117228822971127758">Prøv på nytt senere</translation>

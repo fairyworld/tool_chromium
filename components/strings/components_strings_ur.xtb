@@ -1237,6 +1237,7 @@
 <translation id="2929525460561903222">{SHIPPING_ADDRESS,plural, =0{<ph name="SHIPPING_ADDRESS_PREVIEW" />}=1{<ph name="SHIPPING_ADDRESS_PREVIEW" /> اور <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> مزید}other{<ph name="SHIPPING_ADDRESS_PREVIEW" /> اور <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" /> مزید}}</translation>
 <translation id="2930531075747147366">آپ کے دوسرے آلے کا ٹیب</translation>
 <translation id="2930577230479659665">ہر ایک کاپی کے بعد تراشیں</translation>
+<translation id="2931453528659195355">خریداری کی معلومات کا نظم کریں</translation>
 <translation id="2933624813161016821">ایمبوسنگ فوئل</translation>
 <translation id="2935726091208500473">اپنے ٹیبز کا اشتراک کرنا</translation>
 <translation id="293796669683825859">تبصرے</translation>
@@ -1730,6 +1731,7 @@
 <translation id="3681841880472207951">‏‫QuickTime ویڈیو</translation>
 <translation id="3687920599421452763">وینز اور منی وینز</translation>
 <translation id="3693327506115126094">اپنی توثیق کئے جانے کا طریقہ منتخب کریں</translation>
+<translation id="3693516565203081475">ادائیگی کا طریقہ منتخب کریں</translation>
 <translation id="3698353241727597930">آپ کے منتظم نے <ph name="FILES" /> کو آپ کے انٹرپرائز کے زیر انتظام <ph name="CLOUD_STORAGE" /> اسٹوریج میں محفوظ کرنے کیلئے کنفیگر کیا ہے۔ آپ کی جانب سے ان فائلز کو حذف کرنے پر، ان کی نگرانی کی جا سکتی ہے، انہیں آڈٹ کیا جا سکتا اور برقرار رکھا جا سکتا ہے۔</translation>
 <translation id="3698629142018988477">‏سائٹ تخلیق کریں بٹن، Google Sites میں تیزی سے نئی سائٹ تخلیق کرنے کے لیے فعال کریں</translation>
 <translation id="3700094625653511150">بعد میں ادائیگی کے اختیارات کو چھپانے کے لیے، <ph name="IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_FOOTNOTE_HIDE_OPTION_PAYMENT_SETTINGS_LINK_TEXT" /> پر جائیں</translation>
@@ -3539,6 +3541,7 @@
 <translation id="6494750904506170417">پوپ اپس اور ری ڈائریکٹس</translation>
 <translation id="6495664197699704593">یہ پاس ورڈ صرف اس آلے میں محفوظ ہے۔ اسے اپنے دوسرے آلات پر استعمال کرنے کے لیے، <ph name="GOOGLE_PASSWORD_MANAGER" />۔</translation>
 <translation id="649611364763911650">‏‫Chrome میں ایک اور آٹو فِل سروس استعمال کرنے کے لیے، Android کی ترتیبات میں اپنا آٹو فل فراہم کنندہ منتخب کریں</translation>
+<translation id="6496531801333278234">'ذاتی ذہانت' کے ذریعے پایا گیا۔ آپ ترتیبات میں اپنی معلومات کا نظم کر سکتے ہیں۔</translation>
 <translation id="6499038740797743453">پاس ورڈ کو ری سیٹ کریں؟</translation>
 <translation id="6502510275417601303">ادائیگی کی نئی ترتیب کے بارے میں الرٹ بند ہے</translation>
 <translation id="6502991525169604759">آپ کی تبدیلیوں کے بغیر</translation>
@@ -5153,6 +5156,7 @@
 <translation id="9063800855227801443">رازدارانہ مواد کو کیپچر نہیں کیا جا سکتا</translation>
 <translation id="9065203028668620118">تبدیل کریں</translation>
 <translation id="9065745800631924235">سرگزشت سے <ph name="TEXT" /> کی تلاش</translation>
+<translation id="9066116644715286230">{NUM_TABS,plural, =1{ٹیب کے اشتراک کی تفصیلات۔ ‫{WEBSITE_LIST_STR} سے 1 ٹیب کا اشتراک کیا جا رہا ہے}other{ٹیب کے اشتراک کی تفصیلات۔ ‫{WEBSITE_LIST_STR} سے {NUM_TABS} ٹیبز کا اشتراک کیا جا رہا ہے}}</translation>
 <translation id="90695670378604968">پلاسٹک (مَیٹ)</translation>
 <translation id="9069693763241529744">ایک ایکسٹینشن کے ذریعے مسدود کردہ</translation>
 <translation id="9073799351042754113">آپ نے اس سائٹ کے لیے حفاظتی سیکیورٹی انتباہات کو بند کرنے کا انتخاب کیا ہے۔</translation>

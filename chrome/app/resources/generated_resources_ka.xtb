@@ -810,6 +810,7 @@
 <translation id="1605148987885002237">კლავიატურა და შეყვანა</translation>
 <translation id="1605744057217831567">ყველა საიტის მონაცემებისა და ნებართვების ნახვა</translation>
 <translation id="1606077700029460857">მაუსის პარამეტრების შეცვლა</translation>
+<translation id="1606379448341930963">გააგრძელეთ იქიდან, სადაც შეჩერდით, შედით იმავე ანგარიშში ორივე მოწყობილობიდან</translation>
 <translation id="1606566847233779212">გსურთ, ამოიშალოს თქვენ მიერ დამატებული კონკრეტული საიტები?</translation>
 <translation id="160689647589417224">აპი შეზღუდულია ამ რეგიონში.</translation>
 <translation id="1607139524282324606">ჩანაწერის გასუფთავება</translation>
@@ -1073,6 +1074,7 @@
 <translation id="180203835522132923">Search + O, შემდეგ W</translation>
 <translation id="1802624026913571222">დაძინება თავსახურის დახურვისას</translation>
 <translation id="1802687198411089702">გვერდი არ რეაგირებს. შეგიძლიათ დაელოდოთ ან გამოხვიდეთ.</translation>
+<translation id="1803287124763873748">გსურთ ტელეფონში შესვლა?</translation>
 <translation id="1803531841600994172">ენა, რომელზეც უნდა ითარგმნოს</translation>
 <translation id="180441032496361123">დააწკაპუნეთ, <ph name="SEARCH_ENGINE_NAME" /> რომ გაააქტიუროთ</translation>
 <translation id="1805738995123446102">ფონური ჩანართი იყენებს თქვენს მიკროფონს</translation>
@@ -1137,6 +1139,7 @@
 <translation id="1843048149176045210">ჩამოტვირთვის ბმულის კოპირება</translation>
 <translation id="1845060436536902492">ეკრანის წამკითხველი ChromeOS Flex-ზე, ChromeVox, ძირითადად გამოიყენება სიბრმავის ან სუსტი მხედველობის მქონე ადამიანების მიერ ეკრანზე ნაჩვენები ტესტის წასაკითხად მეტყველების სინთეზატორის ან ბრაილის ეკრანის გამოყენებით. ChromeVox-ის ჩასართავად დააჭირეთ შორისის კლავიშს. როცა ChromeVox გააქტიურდება, მის მოკლე ტურს შემოგთავაზებთ.</translation>
 <translation id="1845727111305721124">ხმის დაკვრა დაშვებულია</translation>
+<translation id="1846100293138248204">მოგონებებში შენახვა</translation>
 <translation id="1846308012215045257">დააწკაპუნეთ კლავიშზე Control დაჭერით, რათა გაუშვათ <ph name="PLUGIN_NAME" /></translation>
 <translation id="1848219224579402567">სისტემიდან გამოსვლა თავსახურის დახურვისას</translation>
 <translation id="184862733444771842">ფუნქციის მოთხოვნა</translation>
@@ -1466,6 +1469,7 @@
 <translation id="2088092308059522196">რეგისტრაცია მხარდაჭერილი იქნება მხოლოდ მაშინ, როცა <ph name="DEVICE_OS" /> დაინსტალირდება.</translation>
 <translation id="2088564884469682888">ჩაშენებული TrackPoint</translation>
 <translation id="208928984520943006">მთავარ ეკრანზე ნებისმიერ დროს გადასასვლელად გადაფურცლეთ ქვემოდან ზემოთ.</translation>
+<translation id="2089721837498194588">ჰკითხეთ Gemini-ს „<ph name="SELECTION" />“-ის შესახებ</translation>
 <translation id="2089925163047119068">ან</translation>
 <translation id="2090507354966565596">ავტომატურად უკავშირდება, როცა სისტემაში შედიხართ</translation>
 <translation id="2091523941449737894">სენსორული პანელზე უფრო სწრაფი მოძრაობები კურსორს უფრო შორს გადასწევს</translation>
@@ -1954,6 +1958,7 @@
 <translation id="2461550163693930491">არ დაიშვას საიტებისთვის გაზიარებულ ჩანართებში გადაადგილება და ,მათი მასშტაბირება</translation>
 <translation id="2461593638794842577">სურვილისამებრ, შეგიძლიათ გამორთოთ ეს პარამეტრი, თქვენი პაროლები მხოლოდ ამ მოწყობილობაზე რომ შეინახოს</translation>
 <translation id="2462550463312552298">ამ დოკუმენტის შეჯამება</translation>
+<translation id="2462577132948197840">თქვენს ტელეფონში შესვლა</translation>
 <translation id="246264032905007361">Edge-ის გახსნა</translation>
 <translation id="2462752602710430187"><ph name="PRINTER_NAME" /> დამატებულია</translation>
 <translation id="2464075479326723132">თქვენ ხედავთ შემოთავაზებულ ფაილებს, რომლებიც დაგეხმარებათ, რომ მარტივად დაუბრუნდეთ თქვენს ბოლო აქტივობას Microsoft SharePoint-სა და OneDrive-ში.
@@ -2014,6 +2019,7 @@
 <translation id="2498539833203011245">ჩაკეცვა</translation>
 <translation id="2498765460639677199">ძალიან დიდი</translation>
 <translation id="2500471369733289700">დაიბლოკა თქვენი კონფიდენციალურობის დასაცავად</translation>
+<translation id="2500915336169200382">ჰკითხეთ Gemini-ს „<ph name="SELECTION" />“-ის შესახებ</translation>
 <translation id="2501173422421700905">შეჩერებული სერტიფიკატი</translation>
 <translation id="2501278716633472235">უკან დაბრუნება</translation>
 <translation id="2501797496290880632">აკრიფეთ მალსახმობი</translation>
@@ -3197,6 +3203,7 @@
 <translation id="3373059063088819384">წაკითხვის რეჟიმში გახსნა</translation>
 <translation id="3373701465337594448">ჩართვის შემთხვევაში, აქ გამოჩნდება თქვენ მიერ მონახულებული იმ საიტების სია, რომლებიც თქვენს ინტერესებს პროგნოზირებს</translation>
 <translation id="3374294321938930390">„<ph name="BOOKMARK_TITLE" />“ გადატანილია საქაღალდეში „<ph name="NEW_FOLDER_TITLE" />“.</translation>
+<translation id="3374750024044667358">მარტივად დაუბრუნდით მონახულებულ საიტებს ორივე მოწყობილობაზე ერთი და იმავე ანგარიშით შესვლით</translation>
 <translation id="3376035595160918049">მიმოხილვის აპის განახლება</translation>
 <translation id="3378517653648586174">ლოკალური სერტიფიკატები</translation>
 <translation id="3378572629723696641">შესაძლოა, ეს გაფართოება დაზიანებულია.</translation>
@@ -3353,6 +3360,7 @@
 <translation id="3487007233252413104">ანონიმური ფუნქცია</translation>
 <translation id="3487649228420469005">სკანირება დასრულებულია</translation>
 <translation id="3488199663160411179">სახელი</translation>
+<translation id="3488609300093733298">თქვენს ტელეფონში შესვლა</translation>
 <translation id="3489457144969823485">Chrome აპებმა შეწყვიტა მუშაობა ChromeOS მოწყობილობებში 2025 წლის ივლისში. იფიქრეთ სხვა აპის გამოყენებაზე.</translation>
 <translation id="3490695139702884919">მიმდინარეობს ჩამოტვირთვა… <ph name="PERCENT" />%</translation>
 <translation id="3491171603443463516">PIN-კოდის ან პაროლის დავიწყების შემთხვევაში შესაძლებელი იქნება ადგილობრივი მონაცემების აღდგენა</translation>
@@ -5217,6 +5225,7 @@
 <translation id="4857506880242459832">ჰკითხეთ Google-ს წინა გვერდის შესახებ: <ph name="PAGE_TITLE" /></translation>
 <translation id="485806788160414322">მედიის დაკვრა ან დაპაუზება</translation>
 <translation id="4858913220355269194">ფრიცი</translation>
+<translation id="4860012864737017059">ჩანართი „ბოლოდროინდელი“</translation>
 <translation id="486213875233855629">დადუმებულია თქვენი ადმინისტრატორის მიერ</translation>
 <translation id="4863702650881330715">გაფართოებული თავსებადობა</translation>
 <translation id="4863769717153320198">როგორც ჩანს, გარჩევადობა არის <ph name="WIDTH" /> x <ph name="HEIGHT" /> (ნაგულისხმევი)</translation>
@@ -6146,6 +6155,7 @@
 <translation id="5562588178647493983">დამატებითი ინფორმაციის მისაღებად დაუკავშირდით თქვენს ადმინისტრატორს</translation>
 <translation id="556321030400250233">ადგილობრივი ან გაზიარებული ფაილები</translation>
 <translation id="5563234215388768762">მოიძიეთ Google-ით, ან აკრიფეთ URL</translation>
+<translation id="5563460629751333413">ქსელთან დაკავშირების პრობლემა გვაქვს. ცადეთ მოგვიანებით.</translation>
 <translation id="5563698194918415761">განახლება დაიბლოკა ქსელის წესების გამო ან პროქსი-სერვერის მიერ.</translation>
 <translation id="5563824734298958390">გსურთ ჩანართების ჯგუფიდან გასვლა?</translation>
 <translation id="5565735124758917034">აქტიური</translation>
@@ -8185,6 +8195,7 @@
 <translation id="7109543803214225826">მალსახმობი ამოშლილია</translation>
 <translation id="7110644433780444336">{NUM_TABS,plural, =1{ჩანართის დამატება ჯგუფში}other{ჩანართების დამატება ჯგუფში}}</translation>
 <translation id="7111822978084196600">დაარქვით სახელი ამ ფანჯარას</translation>
+<translation id="7113314569799918830">Gemini Chrome-ში ხელმისაწვდომი ხდება სხვადასხვა ადგილას, მაგრამ არა ყველგან</translation>
 <translation id="7113502843173351041">ეცოდინება თქვენი ელფოსტის მისამართი</translation>
 <translation id="7115361495406486998">კონტაქტები მიუწვდომელია</translation>
 <translation id="7117228822971127758">გთხოვთ, ცადოთ მოგვიანებით</translation>
@@ -9789,6 +9800,7 @@
 <translation id="8300011035382349091">ამ ჩანართისთვის სანიშნის რედაქტირება</translation>
 <translation id="8300374739238450534">შუაღამის ლურჯი</translation>
 <translation id="8303616404642252802">{COUNT,plural, =1{მისამართი}other{# მისამართი}}</translation>
+<translation id="8304171234328378072">გსურთ ტელეფონში შესვლა?</translation>
 <translation id="8306063480506363120">Drive-ზე წვდომის გაუქმება</translation>
 <translation id="8306430106790753902">ChromeOS ქსელის მარშრუტები</translation>
 <translation id="8306885873692337975">ისარგებლეთ უახლესი ფუნქციებითა და უსაფრთხოების გაუმჯობესებებით.</translation>

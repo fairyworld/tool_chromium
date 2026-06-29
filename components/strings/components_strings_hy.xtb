@@ -2373,6 +2373,7 @@
 <translation id="4705573018059932476">Դուք ընտրել եք, որ կայքերում, որոնք օգտվում են <ph name="PROVIDER_ORIGIN" /> մատակարարից, հաստատումը կատարվի <ph name="AUTHENTICATOR" />ի միջոցով։ Հնարավոր է՝ այս մատակարարը տեղեկություններ է պահել ձեր վճարման եղանակի մասին։ Դուք կարող եք այդ տեղեկությունների <ph name="LINK_TEXT" />։</translation>
 <translation id="4708268264240856090">Ձեր կապն ընդհատվել է</translation>
 <translation id="4708276642004148190">Ջրամատակարարում և ջրի մաքրում</translation>
+<translation id="4710249055485272920">Չհաջողվեց գտնել այս տեղեկությունները</translation>
 <translation id="4711628883879888561">Համատեղ աշխատեք ներդիրների խմբի վրա</translation>
 <translation id="4712404868219726379">Windows Hello</translation>
 <translation id="471880041731876836">Դուք այս կայք այցելելու թույլտվություն չունեք</translation>
@@ -3026,6 +3027,7 @@
 <translation id="5707154300732650394">Շարունակել որոնումը</translation>
 <translation id="57094364128775171">Ստեղծել հուսալի գաղտնաբառ…</translation>
 <translation id="570953204696852961">Կարմիր 3</translation>
+<translation id="5710907191777451677">Փոխարենը հարցրեք Gemini-ին Chrome-ում</translation>
 <translation id="571403275720188526">(arm64)</translation>
 <translation id="571510845185711675">Անասնաբույժներ</translation>
 <translation id="5715150588940290235">Ջնջե՞լ անվտանգության պահված կոդերը</translation>

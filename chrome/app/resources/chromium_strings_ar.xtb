@@ -30,6 +30,7 @@
 <translation id="126567311906253476">‏عند تسجيل الدخول إلى خدمات Google، مثل Gmail أو YouTube باستخدام <ph name="USER_EMAIL" />، يمكنك تسجيل الدخول تلقائيًا إلى Chromium باستخدام الحساب نفسه</translation>
 <translation id="1287534462498555020">‏تنزيل Chromium على هاتفك</translation>
 <translation id="1290883685122687410">حدث خطأ أثناء الإعداد: <ph name="METAINSTALLER_EXIT_CODE" />. <ph name="WINDOWS_ERROR" /></translation>
+<translation id="1312200348844120300">صورة توضيحية تعرض كيفية استخدام ميزة "البحث بالصور" للبحث عن منتج</translation>
 <translation id="1315551408014407711">‏إعداد ملفك الشخصي الجديد على Chromium</translation>
 <translation id="132092532143527429">‏يمكنك تجربة "Gemini في Chromium"</translation>
 <translation id="1324107359134968521">‏يجب منح Chromium الإذن بالوصول إلى البلوتوث لاستكشاف 
@@ -92,6 +93,7 @@
 <translation id="1951406923938785464">‏حَظَر Chromium عملية التنزيل هذه لأنّ نوع الملف لا يتم تنزيله عادةً، وقد يكون خطيرًا.</translation>
 <translation id="1953553007165777902">جارٍ التنزيل… عدد الدقائق المتبقّية: <ph name="MINUTE" /></translation>
 <translation id="1966382378801805537">‏يتعذَّر على Chromium تحديد المتصفح التلقائي أو تعيينه</translation>
+<translation id="197326043290947695">التصفّح أذكى مع ميزة "البحث بالصور"</translation>
 <translation id="1990262977744080398">‏التعرّف على سبب حظر بعض الملفات في Chromium، يتم فتح الرابط في علامة تبويب جديدة</translation>
 <translation id="1999715455684970349">‏تساعد هذه الخدمة على تحديث برامج Chromium باستمرار. لذا في حال إيقافها بشكل نهائي أو مؤقت، لن يتم تحديث برامج Chromium باستمرار، ما يعني أنّه لا يمكن إصلاح الثغرات الأمنية التي قد تحدث وقد لا تعمل بعض الميزات. ويتمّ إلغاء تثبيت هذه الخدمة تلقائيًا من الجهاز عند عدم استخدام أي من برامج Chromium لها.</translation>
 <translation id="2008474315282236005">‏سيعمل هذا على حذف عنصر واحد من هذا الجهاز. لاسترداد بياناتك لاحقًا، سجّل الدخول إلى Chromium كـ <ph name="USER_EMAIL" />.</translation>
@@ -234,6 +236,7 @@
 <translation id="3387527074123400161">‏نظام التشغيل Chromium</translation>
 <translation id="3406848076815591792">‏هل تريد الانتقال إلى الملف الشخصي الحالي على Chromium؟</translation>
 <translation id="3412460710772753638">في "مدير كلمات المرور" على هذا الجهاز</translation>
+<translation id="3423442168617177595">‏هذه الخدمة مضمّنة في Chromium لمساعدتك في إنشاء كلمات مرور قوية وحفظها وملئها تلقائيًا. ويمكنك إضافة اختصار للوصول إليها بسهولة</translation>
 <translation id="3455907671758333080">‏بتنزيل Chromium، ستكون "الحماية المحّسنة للتصفح الآمن" متاحة على هاتفك أيضًا</translation>
 <translation id="3461644266919055473">‏جارٍ تخصيص Chromium…</translation>
 <translation id="3474745554856756813">‏سيعمل هذا على حذف <ph name="ITEMS_COUNT" /> من العناصر من هذا الجهاز. لاسترداد بياناتك لاحقًا، سجّل الدخول إلى Chromium كـ <ph name="USER_EMAIL" />.</translation>
@@ -283,6 +286,7 @@
 <translation id="3975724895399328945">‏لمحة عن الإصدار Google Chrome for Testing</translation>
 <translation id="3997429360543082038">‏لمحة عن نظام التشغيل Chromium</translation>
 <translation id="4010059961270896984">‏عند الانتقال إلى موقع إلكتروني، يرسل متصفِّح Chromium جزءًا مشفّرًا من عنوان URL إلى <ph name="BEGIN_LINK" />ميزة "التصفّح الآمن من Google"<ph name="END_LINK" /> من خلال خادم لحماية الخصوصية يُخفي عنوان IP الخاص بجهازك. وفي حال رصد سلوك مريب على موقع إلكتروني، يتم أيضًا إرسال عناوين URL الكاملة وأجزاء من محتوى الصفحة.</translation>
+<translation id="4016217212818346953">أنت في أمان مع "مدير كلمات المرور"</translation>
 <translation id="4019629340646866719">‏أصبح نظام التشغيل Chromium متاحًا من خلال <ph name="BEGIN_LINK_CROS_OSS" />برنامج إضافي مفتوح المصدر<ph name="END_LINK_CROS_OSS" />، كما هو الحال في <ph name="BEGIN_LINK_LINUX_OSS" />بيئة تطوير Linux<ph name="END_LINK_LINUX_OSS" />.</translation>
 <translation id="4022972681110646219">ترجمة محتوى الشاشة</translation>
 <translation id="4023601594785368013">اللغة الأصلية: <ph name="LANGUAGE" /></translation>
@@ -502,6 +506,7 @@
 <translation id="6400112897226594999">‏شعار Chromium على شاشة كمبيوتر</translation>
 <translation id="6403826409255603130">‏ إن Chromium هو متصفح ويب يشغّل صفحات الويب والتطبيقات بسرعة مذهلة. إنه سريع وثابت وسهل الاستخدام. يمكنك تصفح الويب بشكل أكثر أمانًا من خلال ميزات الحماية من البرامج الضارة والتصيّد الاحتيالي المدمجة في Chromium.</translation>
 <translation id="6414624068245092115">‏لضمان إمكانية استخدامك لبيانات Chromium وحفظها في حسابك على Google متى شئت، يجب إثبات هويتك</translation>
+<translation id="6417332166651156371">‏صورة مبسّطة تعرض كيفية الوصول إلى "مدير كلمات المرور" في Chromium</translation>
 <translation id="642132557830635295">‏سيعمل Chromium بشكل أسرع ومن المفترض أن تعمل الميزات التي تستخدِم JavaScript على النحو المطلوب</translation>
 <translation id="6436260184216827876">ميزة "البحث بالصور" ليست متوفرة. يُرجى إعادة المحاولة لاحقًا.</translation>
 <translation id="6442900851116057561">‏إعادة تشغيل نظام التشغيل Chromium</translation>
@@ -593,6 +598,7 @@
 <translation id="7196312274710523067">‏تعذَّر إطلاق Chromium. يُرجى إعادة المحاولة.</translation>
 <translation id="7213008767289637091">‏يمكنك الاحتفاظ بمتصفِّح Chromium في شريط التطبيقات (Dock) للوصول إليه بسرعة في أي وقت</translation>
 <translation id="7213407614656404070">‏يمكنك فتح Chromium عند النقر على الروابط في الرسائل والمستندات والتطبيقات الأخرى</translation>
+<translation id="7216228761061470870">‏عند استخدام ميزة "البحث بالصور" على الكمبيوتر المكتبي، يتم إرسال عنوان الصفحة ومحتواها وعنوان URL الخاص بها، بما في ذلك ملفات PDF، إلى الخادم.</translation>
 <translation id="7223968959479464213">‏إدارة المهام - Chromium</translation>
 <translation id="7252276985725323153">‏بدء التصفّح على الفور: يمكن الآن فتح Chromium تلقائيًا عند بدء تشغيل Windows.</translation>
 <translation id="7274695763216404502">تمّ تثبيت اللوحة. يمكنك استخدام ميزة "البحث بالصور" مرة أخرى من خلال شريط الأدوات</translation>
@@ -682,6 +688,7 @@
 <translation id="8107060931443639922">‏عند فتح Chromium على <ph name="DEVICE_TYPE" /> في المرة القادمة، ستظهر لك رسالة تطلب منك تفعيل تنبيهات ميزة "تتبُّع الأسعار".</translation>
 <translation id="8117908349476699973">‏يمكنك الحصول على تنبيهات عند انخفاض أسعار المنتجات التي تهمّك باستخدام تطبيق Chromium على هاتفك</translation>
 <translation id="8118331347066725040">‏إرسال ملاحظات عن البحث باستخدام "عدسة Google"</translation>
+<translation id="8130609355518033382">‏تخصيص Chromium</translation>
 <translation id="8133124826068723441">‏تعذّر على نظام التشغيل Chromium مزامنة بياناتك لأن المزامنة غير متاحة لنطاقك.</translation>
 <translation id="813913629614996137">تجري التهيئة...</translation>
 <translation id="8161503455832158203">‏يمكنك فتح "Gemini في Chromium" باستخدام اختصار لوحة مفاتيح.</translation>

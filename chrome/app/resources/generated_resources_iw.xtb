@@ -612,6 +612,7 @@
 <translation id="1455119378540982311">גדלים של חלונות בהגדרה קבועה מראש</translation>
 <translation id="1456849775870359518">הכרטיסיות ייפתחו מחדש</translation>
 <translation id="146000042969587795">מסגרת זו נחסמה משום שהיא מכילה תוכן לא בטוח.</translation>
+<translation id="1460573197675781671">סגירת תפריט השפות</translation>
 <translation id="1460751212339734034">חוסכים זמן, מקלידים פחות</translation>
 <translation id="1461041542809785877">ביצועים</translation>
 <translation id="1461177659295855031">העברה לתיקייה 'סרגל הסימניות'</translation>
@@ -2210,6 +2211,7 @@
 <translation id="263796568413910992">‏אפשר לשאול את <ph name="SEARCH_ENGINE_NAME" /> או להקליד כתובת URL</translation>
 <translation id="2640299212685523844">‏שימוש ב-GTK</translation>
 <translation id="264083724974021997">התחברות לטלפון – תיבת דו-שיח</translation>
+<translation id="2641174089709899456">‏תזכורת: גלישה מבוססת-AI – אצלך בכיס</translation>
 <translation id="2642111877055905627">כדורגל</translation>
 <translation id="2642206811783203764">תמיד באתר <ph name="SITE_NAME" /></translation>
 <translation id="2643064289437760082">תמיד אפשר למחוק את נתוני המדידה של ביצועי המודעות על ידי מחיקה של נתוני הגלישה</translation>
@@ -2717,6 +2719,7 @@
 <translation id="3000461861112256445">אודיו במונו</translation>
 <translation id="3001144475369593262">חשבונות לילדים</translation>
 <translation id="3001614333383288217">{COUNT,plural, =0{אין מקשים שהותאמו אישית}=1{מקש אחד שהותאם אישית}one{{COUNT} מקשים שהותאמו אישית}two{{COUNT} מקשים שהותאמו אישית}other{{COUNT} מקשים שהותאמו אישית}}</translation>
+<translation id="3002745665522516995">כדי לחפש, צריך לבחור משהו בדף</translation>
 <translation id="3002864108328203174">‏הגיליון התחתון של Gemini נפתח בחצי מגובה המסך.</translation>
 <translation id="3003144360685731741">רשתות מועדפות</translation>
 <translation id="3003253259757197230">‏במהלך הגלישה, כתובת ה-URL שמבקרים בהן יישלחו אל Google כדי לחזות את האתרים הבאים שעשויים להיפתח וכדי להציג לך מידע נוסף על הדף הנוכחי</translation>
@@ -5638,6 +5641,7 @@
 <translation id="5173668317844998239">הוספה ומחיקה של טביעות אצבע שנשמרו במפתח האבטחה</translation>
 <translation id="5174169235862638850">הסיסמה הועתקה ללוח</translation>
 <translation id="517488401359338823">פתיחת הנעילה של מכשיר האבטחה</translation>
+<translation id="5176671554021050278">‏עם Google Lens אפשר לקבל מידע נוסף על תמונות או טקסטים בדף.</translation>
 <translation id="5177479852722101802">להמשיך לחסום גישה אל המצלמה והמיקרופון</translation>
 <translation id="5178667623289523808">חיפוש הקודם</translation>
 <translation id="5180276433875360121">הצגה של <ph name="CERT_LIST" /></translation>
@@ -6454,6 +6458,7 @@
 <translation id="581911254119283028">כל האפליקציות</translation>
 <translation id="5820751560028604030">הורדה מקומית נחסמה</translation>
 <translation id="5821565227679781414">יצירת קיצור דרך</translation>
+<translation id="5822533500175132614">תזכורת: כל מה שצריך כדי ליהנות מגלישה חלקה – אצלך בכיס</translation>
 <translation id="5824976764713185207">הקראת הדף באופן אוטומטי אחרי שהטעינה שלו מסתיימת</translation>
 <translation id="5826395379250998812">יש לחבר את ה-<ph name="DEVICE_TYPE" /> לטלפון. <ph name="LINK_BEGIN" />מידע נוסף<ph name="LINK_END" /></translation>
 <translation id="5826993284769733527">שקוף למחצה</translation>
@@ -9999,6 +10004,7 @@
 <translation id="8458627787104127436">פתיחת כל הכתובות (<ph name="URL_COUNT" />) בחלון חדש</translation>
 <translation id="8459023460357294721">פתיחת <ph name="FILE_NAME" /> בכל זאת</translation>
 <translation id="8459333762072051247">מצב הכניסה לחשבון</translation>
+<translation id="8459596896605939741">תזכורת: כל מה שצריך לקניות באינטרנט – אצלך בכיס</translation>
 <translation id="8460448946170646641">בדיקה של אמצעי הבקרה החשובים ביותר על פרטיות ואבטחה</translation>
 <translation id="8460490661223303637">‏כדי לחסוך בזיכרון, Chrome הסיר חלק מהתוכן</translation>
 <translation id="8460932807646981183">ניהול של מנועי החיפוש ושל החיפוש באתרים ספציפיים</translation>

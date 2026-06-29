@@ -94,6 +94,7 @@
 <translation id="1838374766361614909">ניקוי חיפוש</translation>
 <translation id="1843347690926158494">‏חיפוש הכרטיסייה הזו באמצעות Google Lens</translation>
 <translation id="1849248141818021764">‏רק מי שיודע את ביטוי הסיסמה יכול לקרוא את הנתונים המוצפנים. ביטוי הסיסמה לא נשלח אל Google ולא מאוחסן אצלה. אם שכחת את ביטוי הסיסמה או שברצונך לשנות את ההגדרה הזו, עליך <ph name="BEGIN_LINK" />למחוק את נתוני Chrome בחשבון<ph name="END_LINK" />.</translation>
+<translation id="1856809424654973980">‏עם אפליקציית Chrome אפשר להמשיך לגלוש תוך כדי תנועה</translation>
 <translation id="1860536484129686729">‏Chrome זקוק להרשאת גישה למצלמה בשביל האתר הזה</translation>
 <translation id="1867503717113754604">‏כדי להשתמש ב-<ph name="START_GLIC_STYLING" />Gemini<ph name="END_GLIC_STYLING" />, צריך להיכנס ל-Chrome באמצעות חשבון Google</translation>
 <translation id="1873233029667955273">‏Google Chrome‏ אינו דפדפן ברירת המחדל שלך</translation>
@@ -103,8 +104,10 @@
 <translation id="1896602904211344018">‏הורדת אפליקציית Chrome</translation>
 <translation id="1919130412786645364">‏התרת כניסה אל Chrome</translation>
 <translation id="1953553007165777902">מתבצעת הורדה… יש עוד <ph name="MINUTE" /> דק'</translation>
+<translation id="1975400514743766362">‏עם אפליקציית Chrome במכשיר <ph name="DEVICE_TYPE" />, תכונות הבטיחות של Google הולכות איתך לכל מקום</translation>
 <translation id="1979600810166324878">‏אפשר ליהנות מאינטרנט בטוח יותר בכל מקום עם הגרסה המשופרת של הגלישה הבטוחה ב-Chrome ל-iOS</translation>
 <translation id="2001586581944147178">‏לאנשים שיש להם גישה לתעבורת הנתונים שלך יהיה קשה יותר לראות את האתרים שביקרת בהם. ‫Chrome משתמש בחיבור מאובטח לחיפוש כתובות IP של אתרים ב-DNS.</translation>
+<translation id="2005658457661191636">‏עם אפליקציית Chrome הכלים הכי טובים לקניות הולכים איתך לכל מקום</translation>
 <translation id="2018528049276128029">‏בכל פרופיל מאוחסנים נתוני Chrome משלו כמו סימניות, היסטוריה, סיסמאות ועוד</translation>
 <translation id="2018879682492276940">ההתקנה נכשלה. יש לנסות שוב.</translation>
 <translation id="2024959665595762054">‏כדי להשתמש בנתוני Chrome ולשמור אותם בחשבון Google, עליך לאמת את הזהות שלך</translation>
@@ -236,6 +239,7 @@
 <translation id="3222857603094643834">‏אפשר לחפש כל דבר בדף הזה באמצעות Google Lens</translation>
 <translation id="3226612997184048185">‏אם הסימניות שלך נשמרות גם בחשבון Google, יש לך אפשרות לעקוב אחרי מחירי מוצרים ב-Chrome ולקבל הודעות כשהמחירים יורדים</translation>
 <translation id="3242123554343253302">‏הוספת פרופיל Chrome</translation>
+<translation id="3242486428260808857">‏עם אפליקציית Chrome במכשיר <ph name="DEVICE_TYPE" />, אפשר ליהנות עוד יותר מהקניות באינטרנט</translation>
 <translation id="3245429137663807393">‏אם בנוסף ישותפו דוחות שימוש ב-Chrome, הדוחות האלה יכללו את כתובות ה-URL שבהן ביקרת</translation>
 <translation id="3259748324892322072">‏הורדת אפליקציית Chrome</translation>
 <translation id="3282568296779691940">‏כניסה ל-Chrome</translation>
@@ -259,6 +263,7 @@
 <translation id="3503306920980160878">‏Chrome זקוק לגישה למיקום שלך כדי לשתף אותו עם האתר הזה</translation>
 <translation id="3512495006767217696">‏מנהל הסיסמאות מובנה ב-Chrome ומאפשר לך ליצור ולשמור סיסמאות חזקות ולמלא אותן אוטומטית. כדי להגיע אליו בקלות, אפשר להוסיף את קיצור הדרך</translation>
 <translation id="3539955434060988644">‏פתיחת הקישור בחלון לגלישה &amp;פרטית של Chrome</translation>
+<translation id="354621070532799440">‏תזכורת: תכונות הבטיחות הכי טובות של Google – אצלך בכיס</translation>
 <translation id="3576528680708590453">‏לפי הגדרת מנהל המערכת, Google Chrome יפתח דפדפן חלופי כדי לגשת אל <ph name="TARGET_URL_HOSTNAME" />.</translation>
 <translation id="3582972582564653026">‏סינכרון והתאמה אישית של Chrome בכל המכשירים שלך</translation>
 <translation id="3583751698304738917">‏כבר נכנסת לחשבון בתור <ph name="USER_EMAIL_ADDRESS" /> בפרופיל Chrome אחר</translation>
@@ -297,6 +302,7 @@
 <translation id="3885770153807205175">הכלי לבחירת שפה</translation>
 <translation id="3889417619312448367">‏הסרת Google Chrome</translation>
 <translation id="3892148308691398805">העתקת הטקסט</translation>
+<translation id="3893650521827656233">‏עם Chrome אפשר ליהנות מתכונות הבטיחות הכי טובות של Google בכל מקום.</translation>
 <translation id="3941890832296813527">שגיאת התקנה: שם הקובץ של מנהל ההתקנה לא תקין או לא נתמך.</translation>
 <translation id="395904275706073188">לא ניתן לקרוא דפים מוגנים. כדאי לנסות דף אחר.</translation>
 <translation id="3965532487635448963">‏הצגת Gemini ב-Chromium במגש המערכת והפעלת מקשי הקיצור</translation>
@@ -329,6 +335,7 @@
 <translation id="4242034826641750751">‏נדרשות הרשאות גישה למצלמה ולמיקרופון ב-Chrome עבור האתר הזה</translation>
 <translation id="424864128008805179">‏האם לצאת מ-Chrome?</translation>
 <translation id="4251615635259297716">‏האם לקשר את הנתונים שלך ב-Chrome לחשבון זה?</translation>
+<translation id="4252262470181310206">‏עם Chrome אפשר להשתמש בקלות ומכל מקום באפליקציות שמעניינות אותך, כמו Google Drive ו-YouTube.</translation>
 <translation id="4266456958461406346">פתיחת תפריט האפשרויות הנוספות <ph name="THREE_DOTS_ICON" /></translation>
 <translation id="4280647692742956593">‏כדי לפתוח או ליצור קבוצות חדשות של כרטיסיות תוך כדי תנועה, צריך להוריד את Chrome לטלפון שלך.</translation>
 <translation id="4281844954008187215">תנאי שירות</translation>
@@ -432,6 +439,7 @@
 <translation id="5386244825306882791">‏הגדרה זו גם קובעת איזה דף מוצג כשמפעילים את Chrome או כשמבצעים חיפוש מסרגל הכתובות.</translation>
 <translation id="5394833366792865639">‏שיתוף כרטיסיית Chrome</translation>
 <translation id="5402307365844630024">‏הפעלה או השבתה של Gemini ב-Chrome בטא</translation>
+<translation id="541844421954567481">‏כשאפליקציית Chrome מותקנת אצלך ב<ph name="DEVICE_TYPE" /> הסיסמאות, הכרטיסיות ועוד הולכים איתך לכל מקום</translation>
 <translation id="5430073640787465221">‏קובץ ההעדפות שלך פגום או לא חוקי. Google Chrome לא יכול לשחזר את ההגדרות שלך.</translation>
 <translation id="5465210843490471889">‏בחירת פרופיל ב-Chrome לשימוש עם <ph name="START_GLIC_STYLING" />Gemini<ph name="END_GLIC_STYLING" /></translation>
 <translation id="547202872422499512">‏‫Chrome מופעל עכשיו יחד עם Windows, כך שאפשר להתחיל לגלוש מיד. ניתן להשבית זאת בהגדרות.</translation>
@@ -447,6 +455,7 @@
 <translation id="5602351063754773347">‏ההמלצה של Chrome היא להסיר אותו. <ph name="BEGIN_LINK" />מידע נוסף על תוספים נתמכים<ph name="END_LINK" /></translation>
 <translation id="5610759359710387751">‏Chrome שלך</translation>
 <translation id="5649156266046089790">‏פרופילים ב-Chrome עוזרים להפריד בין פריטי המידע ששומרים ב-Chrome. אפשר ליצור פרופילים שמיועדים לחברים ולבני משפחה או פרופילים נפרדים לעבודה ולבילויים בשעות הפנאי.</translation>
+<translation id="5655063652337498476">‏עם Chrome ב-iOS אפשר לגלות מוצרים בעזרת המצלמה, לעקוב אחרי ירידות במחירים ועוד, מכל מקום.</translation>
 <translation id="565744775970812598">‏<ph name="FILE_NAME" /> עלול להיות מסוכן, ולכן Chrome חסם אותו.</translation>
 <translation id="566040795510471729">‏&amp;התאמה אישית של Chrome</translation>
 <translation id="566568153320186256">‏‫Chrome חוסך בחיי הסוללה על ידי הגבלת הפעילות ברקע והאפקטים החזותיים, כמו גלילה חלקה וקצב פריימים של סרטונים. <ph name="BEGIN_LINK" />מידע נוסף על מצב חיסכון באנרגיה<ph name="END_LINK" /></translation>
@@ -458,6 +467,7 @@
 <translation id="5709557627224531708">‏הגדרת Chrome כדפדפן ברירת המחדל</translation>
 <translation id="5719246646468301581">‏תנאים והגבלות נוספים של Google Chrome ו-ChromeOS</translation>
 <translation id="5736850870166430177">‏אם באתר כלשהו מתבצע ניסיון לגנוב את הסיסמה שלך, או אם המערכת מזהה הורדה של קובץ מזיק, Chrome עשוי גם לשלוח כתובות URL לבדיקה באמצעות 'גלישה בטוחה'. הנתונים שנשלחים לבדיקה כוללים ביטים מתוכן של דפים</translation>
+<translation id="5742003800414899269">‏עם אפליקציית Chrome אפשר ליהנות מכלי ה-AI הכי טובים בכל מקום</translation>
 <translation id="5756509061973259733">‏כבר קיים במכשיר פרופיל Chrome עם החשבון הזה.</translation>
 <translation id="5759947850379142561">‏אפשר לבחור טקסט או תמונה לחיפוש באמצעות Google Lens או ללחוץ על Escape כדי לצאת מ-Google Lens</translation>
 <translation id="5779427581965287859">‏הגדרת Chrome כדפדפן ברירת המחדל והצמדה שלו לסרגל האפליקציות</translation>
@@ -497,6 +507,7 @@
 <translation id="6113794647360055231">‏Chrome השתפר</translation>
 <translation id="6116004140911290070">‏הפעלת מיומנויות ב-Chrome</translation>
 <translation id="6116252277240876590">‏זו השפה שבה מוצגים תפריטים, הגדרות, התראות וטקסטים אחרים ב-Chrome</translation>
+<translation id="6117557075995890082">‏עם אפליקציית Chrome אפשר ליהנות מתכונות הבטיחות של Google בכל מקום</translation>
 <translation id="6127237283587442951">‏שימוש ב-Chrome כברירת מחדל והצמדה שלו</translation>
 <translation id="6134085236017727171">‏כדי להשתמש במיקרופון, צריך להיכנס אל <ph name="BEGIN_LINK" />הגדרות המערכת<ph name="END_LINK" /> ולתת ל-Chrome גישה</translation>
 <translation id="6135456723633883042">‏הכרטיסיות האלה משתמשות במשאבים נוספים. כדי לשפר את הביצועים, כדאי לאפשר ל-Chrome להשבית אותן.</translation>
@@ -584,6 +595,7 @@
 <translation id="6881299373831449287">‏מתבצע עדכון של Chrome</translation>
 <translation id="6885412569789873916">‏אפליקציות לגרסת הבטא של Chrome</translation>
 <translation id="6893363893008038481">‏הסרת החשבון מ-Chrome</translation>
+<translation id="689368324615299626">‏עם אפליקציית Chrome במכשיר <ph name="DEVICE_TYPE" /> אפשר ליהנות מכל היתרונות של Google</translation>
 <translation id="6896758677409633944">העתקה</translation>
 <translation id="6908182077349113099">‏רוצה לסנכרן את הסיסמאות, הסימניות וההיסטוריה שלך באופן מושלם בין המכשירים? כדי להשתמש בקלות בתכונות המוכרות והאהובות, צריך לעדכן את דפדפן ברירת המחדל ל-Chrome.</translation>
 <translation id="6930294499209825">‏השירות שומר על תוכנות Google מעודכנות. אם השירות יושבת או יופסק, תוכנות Google שמותקנות אצלך לא יתעדכנו יותר באופן קבוע. המשמעות היא שלא ניתן יהיה לתקן פרצות אבטחה שעשויות להיווצר ושתכונות מסוימות לא יפעלו. השירות הזה יוסר באופן אוטומטי אם אין תוכנה של Google שמשתמשת בו.</translation>
@@ -607,6 +619,7 @@
 <translation id="7071827361006050863">‏נתוני הגלישה ב-Chrome יימחקו בקרוב</translation>
 <translation id="7085332316435785646">‏בוחרים אם לכלול את ההיסטוריה ב-Chrome להתאמה אישית מדויקת יותר בשירותי Google</translation>
 <translation id="7088681679121566888">‏Chrome מעודכן</translation>
+<translation id="708972073591616506">‏עם Chromium ב-iOS, המועדפים שלך בכלים שמבוססים על AI Google הולכים איתך לכל מקום.</translation>
 <translation id="7096221564931416126">‏אפשר לבחור טקסט או תמונה לחיפוש באמצעות Google Lens</translation>
 <translation id="7098166902387133879">‏Google Chrome משתמש במיקרופון שלך.</translation>
 <translation id="7099479769133613710">‏הפעלה מחדש לצורך עדכון ‎&amp;ChromeOS</translation>
@@ -641,6 +654,7 @@
 <translation id="7481213027396403996">‏רוצה להשיג את רמת האבטחה הגבוהה ביותר של Chrome?</translation>
 <translation id="749228101751499733">‏כשמחוברים לחשבון, אפשר להשתמש בסיסמאות ובפרטים נוספים מחשבון Google ב-Chrome. אפשר לשנות את ההגדרות של שירותי Google באמצעות קיצור הדרך <ph name="SHORTCUT" />.</translation>
 <translation id="7496017508659652909">‏‫Chrome טוען מראש דפים וכך ניתן לגלוש ולחפש מהר יותר. <ph name="BEGIN_LINK" />מידע נוסף על טעינה מראש של דפים<ph name="END_LINK" /></translation>
+<translation id="7510190804000607802">‏תזכורת: כל היתרונות של Google – אצלך בכיס</translation>
 <translation id="7514258452813684157">‏שירות העדכון של Google</translation>
 <translation id="7515191208480168435">‏אפשר להצמיד את Google Lens כדי לאפשר גישה נוחה</translation>
 <translation id="7535429826459677826">‏גרסת הפיתוח של Google Chrome</translation>
@@ -708,6 +722,7 @@
 <translation id="8010081455002666927">זיהוי אוטומטי</translation>
 <translation id="8013993649590906847">‏אם אין לתמונה תיאור מועיל, Chrome ינסה לספק לך תיאור. כדי ליצור תיאורים, התמונות נשלחות אל Google.</translation>
 <translation id="8019103195866286235">‏הפרסום של התוסף הזה בוטל על ידי המפתח שלו, ויכול להיות שהתוסף לא בטוח. צריך להסיר אותו מ-Chrome כדי לא לאפשר לו יותר להציג ולשנות את הנתונים שלך באתרים שאליהם תתבצע כניסה, כולל הפרטים האישיים שלך.</translation>
+<translation id="8038678618803403071">‏Chrome במכשיר <ph name="DEVICE_TYPE" /> נותנת לך גישה לכל המועדפים שלך ב-Google</translation>
 <translation id="8040768861829554732">‏תוסף מבקש ממך להיכנס ל-Chrome</translation>
 <translation id="8041795619940733262">‏אפשר לשאול את Google<ph name="LINE_BREAK" />לגבי הכרטיסייה הזו</translation>
 <translation id="80471789339884597">תודה שהתקנת. עליך להפעיל מחדש את כל הדפדפנים לפני השימוש ב-<ph name="BUNDLE_NAME" />.</translation>
@@ -797,6 +812,7 @@
 <translation id="8865415417596392024">‏נתוני Chrome בחשבון שלך</translation>
 <translation id="8883862939660515976">‏רוצה לשאול ב-Google Lens על התמונה הזו?</translation>
 <translation id="8914504000324227558">‏הפעלה מחדש של Chrome</translation>
+<translation id="8920304659326707347">‏עם Chrome ב-iOS אפשר להמשיך מהמקום שבו הפסקת.</translation>
 <translation id="8922193594870374009">‏כדי לשלוח מספר מ-<ph name="ORIGIN" /> לטלפון Android, יש להיכנס אל Chrome בשני המכשירים.</translation>
 <translation id="8922998289262614701">‏להסיר את הנתונים של האפליקציה הזאת מ-Chrome?</translation>
 <translation id="8925636929359899517">אנחנו משתמשים במידע כדי לשפר את השירות הזה. אפשר לקרוא את <ph name="BEGIN_LINK1" />מדיניות הפרטיות<ph name="END_LINK1" /> ו<ph name="BEGIN_LINK2" />התנאים וההגבלות<ph name="END_LINK2" />.</translation>
@@ -828,6 +844,7 @@
 <translation id="9134482777260927479">עזרה בשיעורי הבית</translation>
 <translation id="9138603949443464873">‏כדי להחיל את השינויים שביצעת, יש להפעיל מחדש את Chrome</translation>
 <translation id="9148058034647219655">יציאה</translation>
+<translation id="9150331942025550505">‏עם אפליקציית Chrome במכשיר <ph name="DEVICE_TYPE" /> אפשר ליהנות מהיתרונות של AI</translation>
 <translation id="919706545465235479">‏יש לעדכן את Chrome כדי להתחיל את הסנכרון</translation>
 <translation id="922152298093051471">‏התאמה אישית של Chrome</translation>
 <translation id="93760716455950538">‏הפעלה מחדש של ChromeOS Flex</translation>

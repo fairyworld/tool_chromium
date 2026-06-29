@@ -1237,6 +1237,7 @@
 <translation id="2929525460561903222">{SHIPPING_ADDRESS,plural, =0{<ph name="SHIPPING_ADDRESS_PREVIEW" />}=1{<ph name="SHIPPING_ADDRESS_PREVIEW" /> и уште <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" />}one{<ph name="SHIPPING_ADDRESS_PREVIEW" /> и уште <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" />}other{<ph name="SHIPPING_ADDRESS_PREVIEW" /> и уште <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" />}}</translation>
 <translation id="2930531075747147366">Картичка од другиот ваш уред</translation>
 <translation id="2930577230479659665">Кратење по секој примерок</translation>
+<translation id="2931453528659195355">Управувајте со податоците за купување</translation>
 <translation id="2933624813161016821">Фолија за гравирање</translation>
 <translation id="2935726091208500473">споделувањето на вашите картички</translation>
 <translation id="293796669683825859">Коментари</translation>
@@ -1729,6 +1730,7 @@
 <translation id="3681841880472207951">Видео во QuickTime</translation>
 <translation id="3687920599421452763">Комбиња и миникомбиња</translation>
 <translation id="3693327506115126094">Изберете како ќе потврдите дека сте вие</translation>
+<translation id="3693516565203081475">Изберете начин на плаќање</translation>
 <translation id="3698353241727597930">Администраторот конфигурирал да се зачуваат <ph name="FILES" /> во просторот на <ph name="CLOUD_STORAGE" /> управуван од претпријатието. Овие датотеки може да се набљудуваат, ревидираат и задржат кога ќе ги избришете.</translation>
 <translation id="3698629142018988477">Копче за создавање сајт, активирајте го за да набрзина создадете нов сајт во Google Sites</translation>
 <translation id="3700094625653511150">За да ги скриете опциите за „Платете подоцна“, одете во <ph name="IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_FOOTNOTE_HIDE_OPTION_PAYMENT_SETTINGS_LINK_TEXT" /></translation>
@@ -3537,6 +3539,7 @@
 <translation id="6494750904506170417">скокачки програми и пренасочувања</translation>
 <translation id="6495664197699704593">Лозинкава ќе се зачува само на овој уред. За да ја користите на другите ваши уреди, <ph name="GOOGLE_PASSWORD_MANAGER" />.</translation>
 <translation id="649611364763911650">За да користите друга услуга за автоматско пополнување во Chrome, изберете го вашиот давател на услуги за автоматско пополнување во поставките за Android</translation>
+<translation id="6496531801333278234">Најдено од „Лична интелигенција“. Може да управувате со вашите податоци во поставките.</translation>
 <translation id="6499038740797743453">Да се ресетира лозинката?</translation>
 <translation id="6502510275417601303">Известувањето за нова поставка за плаќање е затворено</translation>
 <translation id="6502991525169604759">Без промените</translation>
@@ -5151,6 +5154,7 @@
 <translation id="9063800855227801443">Не може да се сликаат доверливи содржини</translation>
 <translation id="9065203028668620118">Изменете</translation>
 <translation id="9065745800631924235">Пребарување „<ph name="TEXT" />“ од историјата</translation>
+<translation id="9066116644715286230">{NUM_TABS,plural, =1{Детали за споделувањето картички. Се споделува 1 картичка од {WEBSITE_LIST_STR}}one{Детали за споделувањето картички. Се споделуваат {NUM_TABS} картичка од {WEBSITE_LIST_STR}}other{Детали за споделувањето картички. Се споделуваат {NUM_TABS} картички од {WEBSITE_LIST_STR}}}</translation>
 <translation id="90695670378604968">Пластика (мат)</translation>
 <translation id="9069693763241529744">Блокирано од екстензија</translation>
 <translation id="9073799351042754113">Избравте да ги исклучите безбедносните опомени за сајтов.</translation>

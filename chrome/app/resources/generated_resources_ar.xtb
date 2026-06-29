@@ -74,6 +74,7 @@
 <translation id="1046521327593783388">{NUM_PASSWORDS,plural, =1{تم استيراد كلمة مرور واحدة إلى "<ph name="BRAND" />" على هذا الجهاز.}zero{تم استيراد {NUM_PASSWORDS} كلمة مرور إلى "<ph name="BRAND" />" على هذا الجهاز.}two{تم استيراد كلمتَي مرور ({NUM_PASSWORDS}) إلى "<ph name="BRAND" />" على هذا الجهاز.}few{تم استيراد {NUM_PASSWORDS} كلمات مرور إلى "<ph name="BRAND" />" على هذا الجهاز.}many{تم استيراد {NUM_PASSWORDS} كلمة مرور إلى "<ph name="BRAND" />" على هذا الجهاز.}other{تم استيراد {NUM_PASSWORDS} كلمة مرور إلى "<ph name="BRAND" />" على هذا الجهاز.}}</translation>
 <translation id="1046572983040892965">تم نقل النافذة إلى الأعلى وإلى اليسار</translation>
 <translation id="1047431265488717055">نسخ ن&amp;ص الرابط</translation>
+<translation id="1048350929895890054">المواقع الإلكترونية التي تم حظر القائمة العائمة فيها</translation>
 <translation id="1048986595386481879">مخصّص ديناميكيًا</translation>
 <translation id="1049324577536766607">{COUNT,plural, =1{جارٍ استلام <ph name="ATTACHMENTS" /> من جهاز <ph name="DEVICE_NAME" />}zero{جارٍ استلام <ph name="ATTACHMENTS" /> من جهاز <ph name="DEVICE_NAME" />}two{جارٍ استلام <ph name="ATTACHMENTS" /> من جهاز <ph name="DEVICE_NAME" />}few{جارٍ استلام <ph name="ATTACHMENTS" /> من جهاز <ph name="DEVICE_NAME" />}many{جارٍ استلام <ph name="ATTACHMENTS" /> من جهاز <ph name="DEVICE_NAME" />}other{جارٍ استلام <ph name="ATTACHMENTS" /> من جهاز <ph name="DEVICE_NAME" />}}</translation>
 <translation id="1049743911850919806">التصفح المتخفي</translation>
@@ -937,6 +938,7 @@
 <translation id="1695510246756136088">يتعذَّر الاتصال بالإنترنت. يُرجى إعادة المحاولة.</translation>
 <translation id="1696555181932908973">يمكنك تجربة طرق أخرى للمتابعة على "<ph name="SITE_ETLD_PLUS_ONE" />".</translation>
 <translation id="1696685050160038195">يجب عدم تشغيل البرامج أو تثبيتها إلا من مصادر ومطوّرين موثوق بهم للحفاظ على أمان الجهاز.</translation>
+<translation id="1696832149095851409">إظهار قائمة عائمة عند تحديد النص</translation>
 <translation id="1697122132646041614">عند النقر على زر عدم الإعجاب، يتم فتح نموذج لإرسال ملاحظات تفصيلية حول سبب عدم إعجابك بهذه النتائج.</translation>
 <translation id="1697532407822776718">أنت الآن على أتم استعداد.</translation>
 <translation id="1698796500103229697">طرق الدفع</translation>
@@ -1207,6 +1209,7 @@
 <translation id="1897120393475391208">ننصحك باستخدام كلمة مرور قوية.</translation>
 <translation id="1897860317037652061">تعذَّر إجراء عملية الفحص.</translation>
 <translation id="1898804291554630487">طرح سؤال حول هذه الصفحة</translation>
+<translation id="1899172684246105747">يمكنك تخصيص متصفّحك بخيارات، مثل المظاهر و"الوضع الداكن".</translation>
 <translation id="1900305421498694955">‏يمكن أن تتطلب التطبيقات من Google Play إذن الوصول الكامل إلى نظام الملفات لقراءة الملفات وكتابتها على أجهزة التخزين الخارجية. تظهر الملفات والمجلدات التي تم إنشاؤها على الجهاز لأيّ شخص يستخدم محرك الأقراص الخارجي. <ph name="LINK_BEGIN" />مزيد من المعلومات<ph name="LINK_END" /></translation>
 <translation id="1901213235765457754">يُرجى طلب تحديث هذا التطبيق من المشرف</translation>
 <translation id="1901303067676059328">تح&amp;ديد الكلّ</translation>
@@ -2502,6 +2505,7 @@
 <translation id="2845276301195220700">‏مزيد من الإجراءات في "تقويم Google"</translation>
 <translation id="2845382757467349449">عرض شريط الإشارات المرجعية دائمًا</translation>
 <translation id="284581348330507117">يجب إنشاء كلمات مرور فريدة</translation>
+<translation id="2846345106886298325">‏تم إنجاز المهمة والرجوع إلى Gemini Spark</translation>
 <translation id="284884486564166077">‏البحث عن أي صورة باستخدام "عدسة Google"</translation>
 <translation id="2849035674501872372">بحث</translation>
 <translation id="284970761985428403"><ph name="ASCII_NAME" /> (<ph name="UNICODE_NAME" />)</translation>
@@ -3005,6 +3009,7 @@
 <translation id="3223109931751684474">إزالة إمكانية الوصول إلى مفاتيح المرور على هذا الجهاز</translation>
 <translation id="3223531857777746191">الزر "إعادة الضبط"</translation>
 <translation id="3225084153129302039">الأفاتار التلقائي الأرجواني</translation>
+<translation id="3226249862705569834">أدوات الاستشعار قيد الاستخدام</translation>
 <translation id="3226487301970807183">التبديل إلى اللوحة الجانبية التي تمت محاذاتها إلى اليسار</translation>
 <translation id="322708765617468434">يمكنك في أي وقت إضافة مستخدم آخر إلى الجهاز بعد إعداده. ويمكن لكل مستخدم تخصيص تجربته والحفاظ على خصوصية بياناته.</translation>
 <translation id="3227137524299004712">الميكروفون</translation>
@@ -6115,6 +6120,7 @@
 <translation id="5546865291508181392">بحث</translation>
 <translation id="5547868626772433490">‏اسأل Gemini</translation>
 <translation id="5548075230008247516">تم إلغاء اختيار كل الإشارات المرجعية وتم الخروج من وضع التحديد.</translation>
+<translation id="554810465530189549">عدم عرض القائمة العائمة عند تحديد النص</translation>
 <translation id="5548159762883465903">{NUM_OTHER_TABS,plural, =0{"<ph name="TAB_TITLE" />"}=1{"<ph name="TAB_TITLE" />" وعلامة تبويب واحدة أخرى}two{"<ph name="TAB_TITLE" />" وعلامتا تبويب أخريان}few{"<ph name="TAB_TITLE" />" و# علامات تبويب أخرى}many{"<ph name="TAB_TITLE" />" و# علامة تبويب أخرى}other{"<ph name="TAB_TITLE" />" و# علامة تبويب أخرى}}</translation>
 <translation id="554903022911579950">Kerberos</translation>
 <translation id="5549511085333906441">اختيار الإعداد</translation>
@@ -6280,6 +6286,7 @@
 <translation id="5678955352098267522">قراءة بياناتك على <ph name="WEBSITE_1" /></translation>
 <translation id="5680050361008726776">هل تريد إزالة "<ph name="ESIM_PROFILE_NAME" />"؟</translation>
 <translation id="5681586175480958839">جارٍ فتح الملف بالفعل</translation>
+<translation id="5682950763196110705">عرض القائمة العائمة عند تحديد نص</translation>
 <translation id="5684110242705861346">تمت إضافة "<ph name="NAME" />" بموجب سياسة مؤسستك، وهي تتحكّم في هذا الإعداد. <ph name="BEGIN_LINK" />عرض التفاصيل<ph name="END_LINK" /></translation>
 <translation id="5684181005476681636">‏تفاصيل شبكة Wi-Fi</translation>
 <translation id="5684661240348539843">معرّف الأصول</translation>
@@ -8417,6 +8424,7 @@
 <translation id="7289303553784750393">في حالة استمرار حدوث هذه المشكلة أثناء اتصالك بالإنترنت، يمكنك تجربة طرق أخرى للمتابعة على "<ph name="SITE_ETLD_PLUS_ONE" />".</translation>
 <translation id="7289386924227731009">‏<ph name="WINDOW_TITLE" /> - تم طلب الإذن، اضغط على مفتاح F6 للاستجابة للطلب</translation>
 <translation id="7290005709287747471">إيقاف</translation>
+<translation id="7290139233643258082">تطبيق المظهر</translation>
 <translation id="7292067737327289208">تتولّى مؤسستك <ph name="BEGIN_LINK" />إدارة متصفِّحك<ph name="END_LINK" />، ويتولّى <ph name="PROFILE_DOMAIN" /> <ph name="BEGIN_LINK" />إدارة ملفك الشخصي<ph name="END_LINK" />.</translation>
 <translation id="7292147651179697920">اطلب من أحد والدَيك السماح بالوصول في "الإعدادات"</translation>
 <translation id="7292195267473691167"><ph name="LOCALE" /> (<ph name="VARIANT" />)</translation>
@@ -10063,6 +10071,7 @@
 <translation id="8505669004895429027">تم إخلاء جزء صغير من مساحة التخزين</translation>
 <translation id="8507052544157927817">نمط التسطير</translation>
 <translation id="8507227974644337342">درجة دقة الشاشة</translation>
+<translation id="8507443886219296894">الإخفاء على هذا الموقع الإلكتروني</translation>
 <translation id="850763987657366362">تعذّر استيراد الشهادة</translation>
 <translation id="8508532351844333131">‏يريد <ph name="WEBSITE_ORIGIN" /> حفظ المعلومات على جهاز Android الخاص بك</translation>
 <translation id="8509177919508253835">إعادة ضبط مفاتيح الأمان وإنشاء أرقام التعريف الشخصية</translation>
@@ -10123,6 +10132,7 @@
 <translation id="8552102814346875916">الحفظ ضمن قائمة "إبقاء المواقع الإلكترونية التالية نشطة طوال الوقت"</translation>
 <translation id="8552947739661397736">‏تولّي المهمة، ينفِّذ Gemini المهمة حاليًا</translation>
 <translation id="8553342806078037065">إدارة الأشخاص الآخرين</translation>
+<translation id="8554642222921881444">إظهار قائمة عائمة عند تحديد النص</translation>
 <translation id="8554899698005018844">بدون لغة</translation>
 <translation id="8555444629041783356">الجدول الزمني التلقائي للإيقاف النهائي</translation>
 <translation id="8557022314818157177">يُرجى الاستمرار في لمس مفتاح الأمان إلى أن يتم حِفظ بصمة الإصبع.</translation>
@@ -10419,6 +10429,7 @@
 <translation id="8759753423332885148">معرفة المزيد.</translation>
 <translation id="876161309768861172">تعذّر تسجيل دخولك إلى الملف الشخصي. يُرجى إعادة المحاولة.</translation>
 <translation id="8761945298804995673">هذا المستخدم موجود من قبل.</translation>
+<translation id="876287961468788565">‏يمكن أن يعرض Chrome قائمة عائمة تتضمّن إجراءات عند تحديد نص على موقع إلكتروني.</translation>
 <translation id="8762886931014513155">يحتاج <ph name="DEVICE_TYPE" /> إلى تحديث</translation>
 <translation id="8763927697961133303">‏جهاز USB</translation>
 <translation id="8765940060470412555">إزالة تثبيت "وضع القراءة"</translation>

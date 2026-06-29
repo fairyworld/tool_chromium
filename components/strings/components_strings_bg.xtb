@@ -314,6 +314,7 @@
 <translation id="1463793142714244641">Таймшеър и ваканционни имоти</translation>
 <translation id="1465457928007067810">IBAN номерът е запазен в профила ви в Google</translation>
 <translation id="1467432559032391204">Наляво</translation>
+<translation id="1471514598850585811">Лаптоп</translation>
 <translation id="1472675084647422956">Показване на още</translation>
 <translation id="1473183651233018052">JIS B10</translation>
 <translation id="1473495410389165587">Въведете 3 или повече думи, за да получите помощ с писането</translation>
@@ -1236,6 +1237,7 @@
 <translation id="2929525460561903222">{SHIPPING_ADDRESS,plural, =0{<ph name="SHIPPING_ADDRESS_PREVIEW" />}=1{<ph name="SHIPPING_ADDRESS_PREVIEW" /> и още <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" />}other{<ph name="SHIPPING_ADDRESS_PREVIEW" /> и още <ph name="NUMBER_OF_ADDITIONAL_ADDRESSES" />}}</translation>
 <translation id="2930531075747147366">Раздел от другото ви устройство</translation>
 <translation id="2930577230479659665">Отрязване след всяко копие</translation>
+<translation id="2931453528659195355">Управление на информацията за пазаруване</translation>
 <translation id="2933624813161016821">Фолио за гравиране</translation>
 <translation id="2935726091208500473">споделянето на разделите ви</translation>
 <translation id="293796669683825859">Коментари</translation>
@@ -1728,6 +1730,7 @@
 <translation id="3681841880472207951">Видеоклип във формат QuickTime</translation>
 <translation id="3687920599421452763">Ванове и миниванове</translation>
 <translation id="3693327506115126094">Изберете как да потвърдите, че сте вие</translation>
+<translation id="3693516565203081475">Избор на начин на плащане</translation>
 <translation id="3698353241727597930">Администраторът ви е конфигурирал <ph name="FILES" /> да се запазват в корпоративно управляваното ви хранилище в <ph name="CLOUD_STORAGE" />. Тези файлове може да бъдат наблюдавани, одитирани и запазени, след като ги изтриете.</translation>
 <translation id="3698629142018988477">Бутон за създаване на сайт. Активирайте, за да създадете бързо сайт в Google Сайтове</translation>
 <translation id="3700094625653511150">За да скриете опциите за плащане по-късно, отворете <ph name="IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_FOOTNOTE_HIDE_OPTION_PAYMENT_SETTINGS_LINK_TEXT" /></translation>
@@ -5151,6 +5154,7 @@
 <translation id="9063800855227801443">Не е възможно заснемане на поверително съдържание</translation>
 <translation id="9065203028668620118">Редактиране</translation>
 <translation id="9065745800631924235">Търсене на „<ph name="TEXT" />“ от историята</translation>
+<translation id="9066116644715286230">{NUM_TABS,plural, =1{Подробности за споделянето на раздели. Споделя се 1 раздел от {WEBSITE_LIST_STR}}other{Подробности за споделянето на раздели. Споделят се {NUM_TABS} раздела от {WEBSITE_LIST_STR}}}</translation>
 <translation id="90695670378604968">Пластмаса (матирана)</translation>
 <translation id="9069693763241529744">Блокирано от разширение</translation>
 <translation id="9073799351042754113">Избрали сте да изключите предупрежденията, свързани със сигурността, за този сайт.</translation>
