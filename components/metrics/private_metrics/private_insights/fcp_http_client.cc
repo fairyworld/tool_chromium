@@ -59,27 +59,43 @@ namespace {
         }
       })");
 
-class FcpHttpRequestHandle : public fcp::client::http::HttpRequestHandle {
+class FcpHttpResponse : public fcp::client::http::HttpResponse {
  public:
-  explicit FcpHttpRequestHandle(
-      std::unique_ptr<fcp::client::http::HttpRequest> request)
-      : request_(std::move(request)) {}
+  FcpHttpResponse(int code, fcp::client::http::HeaderList headers)
+      : code_(code), headers_(std::move(headers)) {}
+  ~FcpHttpResponse() override = default;
 
-  ~FcpHttpRequestHandle() override = default;
+  int code() const override { return code_; }
 
-  FcpHttpRequestHandle(const FcpHttpRequestHandle&) = delete;
-  FcpHttpRequestHandle& operator=(const FcpHttpRequestHandle&) = delete;
-
-  // HttpRequestHandle overrides:
-  SentReceivedBytes TotalSentReceivedBytes() const override { return {0, 0}; }
-
-  void Cancel() override {}
+  const fcp::client::http::HeaderList& headers() const override {
+    return headers_;
+  }
 
  private:
-  std::unique_ptr<fcp::client::http::HttpRequest> request_;
+  int code_;
+  fcp::client::http::HeaderList headers_;
 };
 
 }  // namespace
+
+FcpHttpRequestHandle::FcpHttpRequestHandle(
+    FcpHttpRequestManager* manager,
+    std::unique_ptr<fcp::client::http::HttpRequest> request)
+    : manager_(manager), request_(std::move(request)) {}
+
+FcpHttpRequestHandle::~FcpHttpRequestHandle() = default;
+
+fcp::client::http::HttpRequestHandle::SentReceivedBytes
+FcpHttpRequestHandle::TotalSentReceivedBytes() const {
+  return {sent_bytes_.load(), received_bytes_.load()};
+}
+
+void FcpHttpRequestHandle::Cancel() {
+  if (was_canceled_.exchange(true)) {
+    return;
+  }
+  // TODO(b/525314527): Implement proper request cancellation.
+}
 
 FcpHttpRequestManager::FcpHttpRequestManager(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
@@ -109,12 +125,26 @@ FcpHttpClient::~FcpHttpClient() = default;
 std::unique_ptr<fcp::client::http::HttpRequestHandle>
 FcpHttpClient::EnqueueRequest(
     std::unique_ptr<fcp::client::http::HttpRequest> request) {
-  return std::make_unique<FcpHttpRequestHandle>(std::move(request));
+  return std::make_unique<FcpHttpRequestHandle>(request_manager_,
+                                                std::move(request));
 }
 
 absl::Status FcpHttpClient::PerformRequests(
     std::vector<std::pair<fcp::client::http::HttpRequestHandle*,
                           fcp::client::http::HttpRequestCallback*>> requests) {
+  if (requests.empty()) {
+    return absl::OkStatus();
+  }
+
+  for (auto& pair : requests) {
+    FcpHttpRequestHandle* fcp_handle =
+        static_cast<FcpHttpRequestHandle*>(pair.first);
+    if (fcp_handle->was_performed() || fcp_handle->was_canceled()) {
+      return absl::InvalidArgumentError(
+          "HttpRequestHandle was already performed or canceled");
+    }
+  }
+
   return absl::OkStatus();
 }
 
