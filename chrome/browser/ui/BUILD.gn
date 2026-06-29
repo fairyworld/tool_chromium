@@ -2743,7 +2743,6 @@ static_library("ui") {
       "//chrome/browser/ui/webui/ash/sys_internals",
       "//chrome/browser/ui/webui/ash/system_web_dialog",
       "//chrome/browser/ui/webui/ash/user_image",
-      "//chrome/browser/ui/webui/ash/vm",
       "//chrome/browser/ui/webui/chromeos/chrome_url_disabled",
       "//chrome/browser/ui/webui/nearby_internals",
       "//chrome/browser/ui/webui/nearby_share",
