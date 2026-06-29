@@ -28,7 +28,7 @@
 class TabCollectionNode;
 class TabStripModel;
 class TabLinkDropHandler;
-class VerticalTabStripRegionView;
+class TabStripRegionView;
 class ExpandOnHoverLock;
 
 enum class DragPositionHint {
@@ -111,10 +111,9 @@ class TabDragHandler {
 class TabDragHandlerImpl : public TabDragHandler, public TabDragContext {
   METADATA_HEADER(TabDragHandlerImpl, TabDragContext)
  public:
-  explicit TabDragHandlerImpl(
-      TabStripModel& tab_strip_model,
-      TabCollectionNode& root_node,
-      VerticalTabStripRegionView& tab_strip_region_view);
+  explicit TabDragHandlerImpl(TabStripModel& tab_strip_model,
+                              TabCollectionNode& root_node,
+                              TabStripRegionView& tab_strip_region_view);
   ~TabDragHandlerImpl() override;
   TabDragHandlerImpl(const TabDragHandlerImpl&) = delete;
   TabDragHandlerImpl& operator=(const TabDragHandlerImpl&) = delete;
@@ -222,7 +221,7 @@ class TabDragHandlerImpl : public TabDragHandler, public TabDragContext {
 
   const raw_ref<TabStripModel> tab_strip_model_;
   const raw_ref<TabCollectionNode> root_node_;
-  const raw_ref<VerticalTabStripRegionView> tab_strip_region_view_;
+  const raw_ref<TabStripRegionView> tab_strip_region_view_;
 
   std::unique_ptr<TabLinkDropHandler> link_drop_handler_;
 

@@ -3957,6 +3957,8 @@ static_library("ui") {
       "views/frame/app_menu_button.cc",
       "views/frame/app_menu_button.h",
       "views/frame/app_menu_button_observer.h",
+      "views/frame/base_tab_strip_region_view.cc",
+      "views/frame/base_tab_strip_region_view.h",
       "views/frame/browser_frame_view.cc",
       "views/frame/browser_frame_view.h",
       "views/frame/browser_native_widget.h",

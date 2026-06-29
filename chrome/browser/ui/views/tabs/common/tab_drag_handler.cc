@@ -172,7 +172,7 @@ int GetInsertionIndexForNode(const TabCollectionNode& node,
 TabDragHandlerImpl::TabDragHandlerImpl(
     TabStripModel& tab_strip_model,
     TabCollectionNode& root_node,
-    VerticalTabStripRegionView& tab_strip_region_view)
+    TabStripRegionView& tab_strip_region_view)
     : tab_strip_model_(tab_strip_model),
       root_node_(root_node),
       tab_strip_region_view_(tab_strip_region_view),
