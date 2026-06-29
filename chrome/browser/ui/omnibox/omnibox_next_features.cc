@@ -370,6 +370,8 @@ const base::FeatureParam<bool> kContextButtonShowSuggestionLabel{
     "Omnibox_ContextButtonShowSuggestionLabel", false};
 const base::FeatureParam<bool> kWebUIOmniboxFullPopupUseBrowserView{
     &kWebUIOmniboxFullPopup, "Omnibox_UseBrowserView", false};
+const base::FeatureParam<bool> kWebUIOmniboxFullPopupMultiline{
+    &kWebUIOmniboxFullPopup, "Omnibox_Multiline", false};
 
 const base::FeatureParam<bool> kAskGCoBrowse{
     &kWebUIOmniboxAskGAboutThisPage, "Omnibox_AskGCoBrowse", false};

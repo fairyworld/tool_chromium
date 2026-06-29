@@ -238,3 +238,13 @@ cr-searchbox-dropdown::part(dropdown-content) {
 .searchbox-icon-button-container.voice {
   margin-inline-end: 4px;
 }
+
+:host([multi-line-enabled]) {
+  height: auto;
+  min-height: var(--cr-searchbox-height);
+}
+
+:host([multi-line-enabled]) cr-searchbox-input::part(searchbox-input) {
+  height: auto;
+  min-height: var(--cr-searchbox-input-height);
+}

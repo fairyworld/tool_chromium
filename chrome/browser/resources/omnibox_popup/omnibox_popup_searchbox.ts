@@ -87,6 +87,10 @@ export class OmniboxPopupSearchboxElement extends
         type: Boolean,
         reflect: true,
       },
+      multiLineEnabled: {
+        type: Boolean,
+        reflect: true,
+      },
     };
   }
 
@@ -102,6 +106,8 @@ export class OmniboxPopupSearchboxElement extends
   protected accessor searchboxLensSearchEnabled_: boolean =
       loadTimeData.getBoolean('searchboxLensSearch');
   protected accessor useWebkitSearchIcons_: boolean = false;
+  override accessor multiLineEnabled: boolean =
+      loadTimeData.getBoolean('searchboxMultiline');
   // TODO(b/519185419): Remove `isTouchUi_` property and from `loadTimeData` and
   // get layout constants and font sizes from a C++ layout helper instead.
   protected accessor isTouchUi_: boolean = loadTimeData.getBoolean('isTouchUi');
@@ -183,7 +189,7 @@ export class OmniboxPopupSearchboxElement extends
 
   override firstUpdated(changedProperties: PropertyValues<this>) {
     super.firstUpdated(changedProperties);
-    this.initialInputScrollHeight = this.$.input.scrollHeight;
+    this.initialInputScrollHeight = this.$.input.inputElement.scrollHeight;
   }
 
   focusInput() {
@@ -214,6 +220,21 @@ export class OmniboxPopupSearchboxElement extends
     super.clearAutocompleteMatches();
     // Revert the `OmniboxEditModel` to the permanent URL (with sequence guard).
     this.popupPageHandler_.revert(this.currentSequenceNum_);
+  }
+
+  // TODO(crbug.com/528331161): Unify this with the NTP searchbox logic and move
+  // it to SearchboxMixin.
+  override updateDropdownVisibility() {
+    super.updateDropdownVisibility();
+
+    if (this.multiLineEnabled && this.dropdownIsVisible) {
+      const shouldSuppressDropdown = this.initialInputScrollHeight > 0 &&
+          this.$.input.inputElement.scrollHeight >
+              this.initialInputScrollHeight;
+      if (shouldSuppressDropdown) {
+        this.dropdownIsVisible = false;
+      }
+    }
   }
 
   isInputEmpty(): boolean {
