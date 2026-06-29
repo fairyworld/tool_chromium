@@ -267,14 +267,37 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
         TabModel tabModel = mCurrentTabModelSupplier.get();
         if (tabModel == null) return false;
 
+        boolean isGroupHeader = fromViewHolder.getItemViewType() == TabProperties.UiType.TAB_GROUP;
+        Token currentGroupId = getTabGroupId(fromViewHolder);
+        boolean isStandaloneTab = !isGroupHeader && currentGroupId == null;
+
         int distance =
                 toViewHolder.getBindingAdapterPosition()
                         - fromViewHolder.getBindingAdapterPosition();
-        List<Tab> destinationTabGroup = getRelatedTabsForId(destinationTabId);
-        int destinationIndex =
-                distance >= 0
-                        ? TabGroupUtils.getLastTabModelIndexForList(tabModel, destinationTabGroup)
-                        : TabGroupUtils.getFirstTabModelIndexForList(tabModel, destinationTabGroup);
+        int destinationIndex;
+        if (isGroupHeader || isStandaloneTab) {
+            // Tab groups should maintain the boundaries of target tab groups
+            // so they do not inadvertently split existing groups during drags.
+            // TODO(crbug.com/518307037): This will be updated when standalone tabs can be dragged
+            // into groups.
+            List<Tab> destinationTabGroup = getRelatedTabsForId(destinationTabId);
+            destinationIndex =
+                    distance >= 0
+                            ? TabGroupUtils.getLastTabModelIndexForList(
+                                    tabModel, destinationTabGroup)
+                            : TabGroupUtils.getFirstTabModelIndexForList(
+                                    tabModel, destinationTabGroup);
+        } else {
+            // Child tabs should be precisely inserted at the literal destination slot within their
+            // group instead of bouncing to the ends of the group boundaries.
+            Tab destinationTab = tabModel.getTabById(destinationTabId);
+            destinationIndex =
+                    destinationTab != null
+                            ? tabModel.indexOf(destinationTab)
+                            : TabModel.INVALID_TAB_INDEX;
+        }
+
+        if (destinationIndex == TabModel.INVALID_TAB_INDEX) return false;
 
         destinationIndex = adjustIndexBasedOnPinning(tabModel, currentTabId, destinationIndex);
 
@@ -286,9 +309,6 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
         //   which TabListMediator observes to update top-level UI rows.
         // - Child tabs use moveTab() because they move within their group, firing
         //   didMoveWithinGroup() which TabListMediator observes.
-        boolean isGroupHeader = fromViewHolder.getItemViewType() == TabProperties.UiType.TAB_GROUP;
-        Token currentGroupId = getTabGroupId(fromViewHolder);
-        boolean isStandaloneTab = !isGroupHeader && currentGroupId == null;
 
         if (isGroupHeader || isStandaloneTab) {
             // TODO(crbug.com/518307037): Needs to handle grouping when a standalone tab is dragged

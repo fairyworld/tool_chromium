@@ -272,6 +272,50 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
     }
 
     @Test
+    public void testOnMove_ChildTab_InsideGroup() {
+        // Verify onMove appropriately moves the tab in the TabModel when swapping with another
+        // child tab in the same group that has more tabs.
+        mPropertyModel.set(TabProperties.TAB_ID, 1);
+        Token groupId = new Token(1L, 2L);
+        mPropertyModel.set(TabProperties.TAB_GROUP_ID, groupId);
+        mTargetPropertyModel.set(TabProperties.TAB_ID, 2);
+
+        Tab tab1 = mock(Tab.class);
+        Tab tab2 = mock(Tab.class);
+        Tab tab3 = mock(Tab.class); // Third tab in the group
+        when(tab1.getIsPinned()).thenReturn(false);
+        when(tab2.getIsPinned()).thenReturn(false);
+        when(tab3.getIsPinned()).thenReturn(false);
+
+        // All tabs are in the same group
+        when(tab1.getTabGroupId()).thenReturn(groupId);
+        when(tab2.getTabGroupId()).thenReturn(groupId);
+        when(tab3.getTabGroupId()).thenReturn(groupId);
+
+        doReturn(tab1).when(mTabModel).getTabById(1);
+        doReturn(tab2).when(mTabModel).getTabById(2);
+
+        // Both tabs share the same related tabs (they are in the same group)
+        List<Tab> relatedTabs = Arrays.asList(tab1, tab2, tab3);
+        doReturn(relatedTabs).when(mTabModel).getRelatedTabList(1);
+        doReturn(relatedTabs).when(mTabModel).getRelatedTabList(2);
+
+        // Set up the indices: tab1 at 4, tab2 at 5, tab3 at 6
+        when(mTabModel.indexOf(tab2)).thenReturn(5);
+        when(mTabModel.findFirstNonPinnedTabIndex()).thenReturn(0);
+
+        // Distance > 0 (dragging downward)
+        when(mViewHolder.getBindingAdapterPosition()).thenReturn(4);
+        when(mTargetViewHolder.getBindingAdapterPosition()).thenReturn(5);
+
+        assertTrue(mCallback.onMove(mRecyclerView, mViewHolder, mTargetViewHolder));
+
+        // It should move to the index of tab2 (which is 5), NOT the end of the group (which would
+        // be 6)
+        verify(mTabModel).moveTab(1, 5);
+    }
+
+    @Test
     public void testIsLongPressDragEnabled() {
         // Mouse input disables long press requirement for instant dragging.
         mCallback.setIsMouseInputSource(true);
