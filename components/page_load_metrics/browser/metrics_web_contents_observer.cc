@@ -585,14 +585,6 @@ void MetricsWebContentsObserver::OnCookiesAccessedImpl(
   }
 }
 
-void MetricsWebContentsObserver::DidActivatePreviewedPage(
-    base::TimeTicks activation_time) {
-  // TODO(b:334709645): Investigate how nullptr cases happen.
-  if (primary_page_) {
-    primary_page_->DidActivatePreviewedPage(activation_time);
-  }
-}
-
 void MetricsWebContentsObserver::OnStorageAccessed(
     content::RenderFrameHost* rfh,
     const GURL& url,
