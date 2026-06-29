@@ -178,6 +178,7 @@ chromium-metrics-reviews@google.com.
   <variant name=".PermissionBlocked"/>
   <variant name=".PermissionPromptLoud"/>
   <variant name=".PermissionUpdate"/>
+  <variant name=".PersonalContextFetchingFailure"/>
   <variant name=".PopupBlocked"/>
   <variant name=".PromptHatsCameraCustomInvitation"/>
   <variant name=".PromptHatsCameraGenericInvitation"/>
