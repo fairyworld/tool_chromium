@@ -11960,6 +11960,27 @@
             ]
         }
     ],
+    "GlicColdWarmingDelay": [
+        {
+            "platforms": [
+                "mac",
+                "windows",
+                "linux",
+                "chromeos"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "params": {
+                        "glic-warming-delay-ms": "20000"
+                    },
+                    "enable_features": [
+                        "GlicWarming"
+                    ]
+                }
+            ]
+        }
+    ],
     "GlicConfirmNavigationToNewOrigins": [
         {
             "platforms": [
@@ -12436,24 +12457,6 @@
                     },
                     "enable_features": [
                         "GlicUserStatusCheck"
-                    ]
-                }
-            ]
-        }
-    ],
-    "GlicWarming": [
-        {
-            "platforms": [
-                "mac",
-                "windows",
-                "linux",
-                "chromeos"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "GlicWarming"
                     ]
                 }
             ]
