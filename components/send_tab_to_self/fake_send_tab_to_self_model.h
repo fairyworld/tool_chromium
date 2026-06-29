@@ -91,6 +91,7 @@ class FakeSendTabToSelfModel final : public SendTabToSelfModel {
   std::optional<ShareActivatedEntryPoint> last_activated_entry_point() const {
     return last_activated_entry_point_;
   }
+  int activated_call_count() const { return activated_call_count_; }
 
  private:
   bool is_ready_ = true;
@@ -104,6 +105,7 @@ class FakeSendTabToSelfModel final : public SendTabToSelfModel {
   std::string last_dismissed_guid_;
   std::string last_activated_guid_;
   std::optional<ShareActivatedEntryPoint> last_activated_entry_point_;
+  int activated_call_count_ = 0;
   SendEntryCallback send_entry_callback_;
   SendTabToSelfResult send_result_ = SendTabToSelfResult::kSuccess;
 };

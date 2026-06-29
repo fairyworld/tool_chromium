@@ -128,6 +128,11 @@ void FakeSendTabToSelfModel::MarkEntryActivated(
     ShareActivatedEntryPoint entry_point) {
   last_activated_guid_ = std::string(guid);
   last_activated_entry_point_ = entry_point;
+  ++activated_call_count_;
+  auto it = entries_.find(guid);
+  if (it != entries_.end()) {
+    it->second->MarkActivated(base::Time::Now());
+  }
 }
 
 bool FakeSendTabToSelfModel::IsReady() {
