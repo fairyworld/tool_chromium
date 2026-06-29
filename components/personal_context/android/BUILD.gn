@@ -23,6 +23,7 @@ android_resources("personal_context_icon_resources") {
   } else {
     sources = [
       "java/res/drawable/personal_context_first_run_card_1.xml",
+      "java/res/drawable/personal_context_first_run_card_2.xml",
     ]
   }
 }

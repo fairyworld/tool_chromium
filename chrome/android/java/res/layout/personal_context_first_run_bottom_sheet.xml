@@ -90,7 +90,7 @@ found in the LICENSE file.
             android:minHeight="?android:attr/listPreferredItemHeightSmall"
             android:padding="@dimen/personal_context_spacing_large"
             android:gravity="center_vertical"
-            android:drawableStart="@drawable/personal_context_first_run_card_1"
+            android:drawableStart="@drawable/personal_context_first_run_card_2"
             android:drawablePadding="@dimen/personal_context_spacing_large"
             android:textAppearance="@style/TextAppearance.TextMediumThick.Primary" />
       </LinearLayout>
