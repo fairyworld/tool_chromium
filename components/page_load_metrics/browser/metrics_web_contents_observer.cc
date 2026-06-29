@@ -684,7 +684,11 @@ void MetricsWebContentsObserver::DidFinishNavigation(
   // don't commit, such as HTTP 204 responses and downloads.
   if (!navigation_handle->HasCommitted() &&
       navigation_handle->GetNetErrorCode() == net::ERR_ABORTED &&
-      navigation_handle->GetResponseHeaders()) {
+      navigation_handle->GetResponseHeaders() &&
+      // WebUI navigations (e.g. chrome://) always receive headers synchronously
+      // on start (see InitialWebUINavigationURLLoader), but they are not
+      // downloads or 204s, so we should not ignore them if they are aborted.
+      !navigation_handle->GetURL().SchemeIs("chrome")) {
     if (navigation_handle_tracker) {
       navigation_handle_tracker->DidInternalNavigationAbort(navigation_handle);
       navigation_handle_tracker->StopTracking();
