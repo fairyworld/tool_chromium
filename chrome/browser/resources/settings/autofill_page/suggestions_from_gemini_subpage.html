@@ -14,11 +14,27 @@
         on-click="onManageConnectedAppsClick_"
         external>
     </cr-link-row>
-    <cr-link-row id="manageSuggestionsLinkRow"
-        label="Lorem ipsum"
-        sub-label="Lorem Ipsum"
-        on-click="onManageSuggestionsClick_"
-        external>
-    </cr-link-row>
+  </div>
+  <div class="card" hidden$="[[!atMemoryTriggerSettingEnabled_()]]">
+    <div class="cr-row keyboard-shortcut-setting"
+        id="atMemoryTriggerSetting">
+      <div class="flex cr-padded-text">
+        <div class="shortcut-label" aria-hidden>
+          $i18n{atMemoryTriggerSettingLabel}
+        </div>
+        <div class="secondary">
+          $i18n{atMemoryTriggerSettingSecondaryLabel}
+        </div>
+      </div>
+      <cr-shortcut-input class="cr-padded-text shortcut-input"
+          input-aria-label="$i18n{atMemoryTriggerSettingInputAreaLabel}"
+          edit-button-aria-label="$i18n{atMemoryTriggerSettingEditButtonLabel}"
+          clear-button-aria-label=
+              "$i18n{atMemoryTriggerSettingClearButtonLabel}"
+          shortcut="[[atMemoryTrigger_]]"
+          allow-ctrl-alt-shortcuts
+          on-shortcut-updated="onAtMemoryTriggerSettingUpdated_">
+      </cr-shortcut-input>
+    </div>
   </div>
 </settings-subpage>
