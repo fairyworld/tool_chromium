@@ -321,8 +321,12 @@ bool AutocompleteHistoryManager::IsFieldNameMeaningfulForAutocomplete(
       // Prefix and suffix matches.
       u"|^otp|otp$"
       // Infix matches.
-      u"|\\botp\\b"
-      u"|cvc|cvn|cvv|captcha|passw|pass2|passcode|pwd|senha|pincode";
+      u"|\\botp\\b|captcha|passw|pass2|passcode|pwd|senha|pincode|"
+      // Suppress flight verification fields.
+      u"flight[-_]?verification|"
+      // Suppress CVC fields.
+      u"csc|cvd|ccv|cvc|cvn|cvv|card[-_]?verification|verification[-_]?code|"
+      u"verify[-_]?(?:card|code)|security[-_]?(?:code|value|number)";
   return !MatchesRegex<kRegex>(name);
 }
 

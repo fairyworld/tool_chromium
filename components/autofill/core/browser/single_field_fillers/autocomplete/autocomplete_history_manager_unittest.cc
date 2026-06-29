@@ -970,6 +970,10 @@ TEST_F(AutocompleteHistoryManagerTest, IsFieldNameMeaningfulForAutocomplete) {
   EXPECT_TRUE(IsMeaningful(u"city"));
   EXPECT_TRUE(IsMeaningful(u"search"));
   EXPECT_TRUE(IsMeaningful(u"payment_info"));
+  EXPECT_TRUE(IsMeaningful(u"email_verification"));
+  EXPECT_TRUE(IsMeaningful(u"verification"));
+  EXPECT_TRUE(IsMeaningful(u"verify"));
+  EXPECT_TRUE(IsMeaningful(u"security"));
 
   // Names that are not meaningful.
   EXPECT_FALSE(IsMeaningful(u"field1"));
@@ -993,6 +997,14 @@ TEST_F(AutocompleteHistoryManagerTest, IsFieldNameMeaningfulForAutocomplete) {
   EXPECT_FALSE(IsMeaningful(u"cc_cvc"));
   EXPECT_FALSE(IsMeaningful(u"cvn_number"));
   EXPECT_FALSE(IsMeaningful(u"cvv"));
+  EXPECT_FALSE(IsMeaningful(u"csc"));
+  EXPECT_FALSE(IsMeaningful(u"my_csc_value"));
+  EXPECT_FALSE(IsMeaningful(u"cvd"));
+  EXPECT_FALSE(IsMeaningful(u"my_cvd_value"));
+  EXPECT_FALSE(IsMeaningful(u"ccv"));
+  EXPECT_FALSE(IsMeaningful(u"my_ccv_value"));
+  EXPECT_FALSE(IsMeaningful(u"cvn"));
+  EXPECT_FALSE(IsMeaningful(u"my_cvn_value"));
   EXPECT_FALSE(IsMeaningful(u"captcha_input"));
   EXPECT_FALSE(IsMeaningful(u"password"));
   EXPECT_FALSE(IsMeaningful(u"pass2"));
@@ -1004,6 +1016,25 @@ TEST_F(AutocompleteHistoryManagerTest, IsFieldNameMeaningfulForAutocomplete) {
   EXPECT_FALSE(IsMeaningful(u"my_senha_value"));
   EXPECT_FALSE(IsMeaningful(u"pincode"));
   EXPECT_FALSE(IsMeaningful(u"my_pincode_value"));
+  EXPECT_FALSE(IsMeaningful(u"flight_verification"));
+  EXPECT_FALSE(IsMeaningful(u"card_verification"));
+  EXPECT_FALSE(IsMeaningful(u"verification_code"));
+  EXPECT_FALSE(IsMeaningful(u"verify_card"));
+  EXPECT_FALSE(IsMeaningful(u"verify_code"));
+  EXPECT_FALSE(IsMeaningful(u"security_code"));
+  EXPECT_FALSE(IsMeaningful(u"card_security_code"));
+  EXPECT_FALSE(IsMeaningful(u"verifycard"));
+  EXPECT_FALSE(IsMeaningful(u"verify-card"));
+  EXPECT_FALSE(IsMeaningful(u"verifycode"));
+  EXPECT_FALSE(IsMeaningful(u"verify-code"));
+  EXPECT_FALSE(IsMeaningful(u"security-code"));
+  EXPECT_FALSE(IsMeaningful(u"securitycode"));
+  EXPECT_FALSE(IsMeaningful(u"security_value"));
+  EXPECT_FALSE(IsMeaningful(u"security-value"));
+  EXPECT_FALSE(IsMeaningful(u"securityvalue"));
+  EXPECT_FALSE(IsMeaningful(u"security_number"));
+  EXPECT_FALSE(IsMeaningful(u"security-number"));
+  EXPECT_FALSE(IsMeaningful(u"securitynumber"));
 }
 
 // Tests that fields with ineligible autocomplete types (e.g., credit card info,
