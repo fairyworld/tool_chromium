@@ -171,7 +171,8 @@ TabAndroid::TabAndroid(JNIEnv* env,
     : tab_id_(tab_id),
       session_window_id_(SessionID::InvalidValue()),
       content_layer_(cc::slim::Layer::Create()),
-      synced_tab_delegate_(new browser_sync::SyncedTabDelegateAndroid(this)),
+      synced_tab_delegate_(
+          std::make_unique<browser_sync::SyncedTabDelegateAndroid>(this)),
       profile_(profile->GetWeakPtr()) {
   Java_TabImpl_setNativePtr(env, obj, reinterpret_cast<intptr_t>(this));
 }
@@ -191,7 +192,7 @@ std::unique_ptr<TabAndroid> TabAndroid::CreateForTesting(
     int tab_id,
     std::unique_ptr<content::WebContents> web_contents) {
   night_mode::WebContentsThemeClient::CreateForWebContents(web_contents.get());
-  std::unique_ptr<TabAndroid> tab(new TabAndroid(profile, tab_id));
+  auto tab = base::WrapUnique(new TabAndroid(profile, tab_id));
   tab->web_contents_ = std::move(web_contents);
   return tab;
 }
@@ -264,12 +265,11 @@ sync_sessions::SyncedTabDelegate* TabAndroid::GetSyncedTabDelegate() const {
 }
 
 bool TabAndroid::IsIncognito() const {
-  JNIEnv* env = AttachCurrentThread();
-  const bool is_incognito = Java_TabImpl_isIncognito(env, GetJavaObject(env));
   if (Profile* p = profile()) {
-    CHECK_EQ(is_incognito, p->IsOffTheRecord());
+    return p->IsOffTheRecord();
   }
-  return is_incognito;
+  JNIEnv* env = AttachCurrentThread();
+  return Java_TabImpl_isIncognito(env, GetJavaObject(env));
 }
 
 base::Time TabAndroid::GetLastShownTimestamp() const {
@@ -469,7 +469,7 @@ void TabAndroid::GetMemoryUsageBytes(
             }
             base::android::RunLongCallbackAndroid(callback, bytes_used);
           },
-          global_callback));
+          std::move(global_callback)));
 }
 
 void TabAndroid::InitializeAutofillIfNecessary() {
@@ -584,13 +584,16 @@ void TabAndroid::ReleaseWebContents() {
   synced_tab_delegate_->ResetWebContents();
 }
 
+// static
 std::unique_ptr<content::WebContents> TabAndroid::TakeWebContentsAndDestroyTab(
+    TabAndroid* tab,
     base::PassKey<TabModelJniBridge>) {
-  content::WebContents* raw_contents = web_contents();
+  DCHECK(tab);
+  content::WebContents* raw_contents = tab->web_contents();
   JNIEnv* env = base::android::AttachCurrentThread();
-  // Destroy the Tab object from both native and Java sides and release the
-  // WebContents.
-  Java_TabImpl_destroyInternal(env, GetJavaObject(),
+  // WARNING: This call synchronously deletes `tab`. Do not access `tab` after
+  // this line.
+  Java_TabImpl_destroyInternal(env, tab->GetJavaObject(),
                                /*deleteNativeWebContents=*/false);
 
   // Wrap and return the WebContents as a unique_ptr.
@@ -615,9 +618,8 @@ void TabAndroid::OnPhysicalBackingSizeChanged(
   web_contents->GetNativeView()->OnPhysicalBackingSizeChanged(size);
 }
 
-void TabAndroid::SetActiveNavigationEntryTitleForUrl(
-    const std::string& url,
-    const std::u16string& title) {
+void TabAndroid::SetActiveNavigationEntryTitleForUrl(const std::string& url,
+                                                     std::u16string title) {
   DCHECK(web_contents());
 
   content::NavigationEntry* entry =
@@ -681,7 +683,7 @@ void TabAndroid::OnDraggingStateChanged(bool is_dragging) {
 }
 
 base::CallbackListSubscription TabAndroid::RegisterDraggingChanged(
-    base::RepeatingCallback<void(TabInterface*, bool)> callback) {
+    DraggingChangedCallback callback) {
   return dragging_changed_callback_list_.Add(std::move(callback));
 }
 
@@ -926,7 +928,8 @@ TabAndroid::TabAndroid(Profile* profile, int tab_id)
     : tab_id_(tab_id),
       session_window_id_(SessionID::InvalidValue()),
       content_layer_(cc::slim::Layer::Create()),
-      synced_tab_delegate_(new browser_sync::SyncedTabDelegateAndroid(this)),
+      synced_tab_delegate_(
+          std::make_unique<browser_sync::SyncedTabDelegateAndroid>(this)),
       profile_(profile->GetWeakPtr()) {
   CHECK_IS_TEST();
 }
