@@ -10786,6 +10786,7 @@ from previous Chrome versions.
   <int value="-1202556733" label="PermissionStorageAccessAPI:disabled"/>
   <int value="-1201741587" label="DataReductionProxyDecidesTransform:disabled"/>
   <int value="-1201183153" label="enable-centered-app-list"/>
+  <int value="-1200367807" label="DesktopFlingCurveOnAndroid:enabled"/>
   <int value="-1200367345" label="SyncAutofillWalletCredentialData:enabled"/>
   <int value="-1199820175"
       label="PrerenderActivationByFormSubmission:disabled"/>
@@ -12854,6 +12855,7 @@ from previous Chrome versions.
       label="AutofillUpstreamEditableCardholderName:enabled"/>
   <int value="-533320253" label="GlicUseToolbarHeightSidePanel:enabled"/>
   <int value="-532827723" label="AVFoundationCaptureV2:enabled"/>
+  <int value="-532263621" label="DesktopFlingCurveOnAndroid:disabled"/>
   <int value="-531869865" label="DeprecatedExternalPickerFunction:disabled"/>
   <int value="-531810064" label="saveas-menu-label"/>
   <int value="-531792555" label="UseModernMediaControls:disabled"/>

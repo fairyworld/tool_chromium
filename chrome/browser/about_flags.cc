@@ -8207,6 +8207,10 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(
          content_settings::kDarkenWebsitesCheckboxInThemesSetting)},
 
+    {"desktop-fling-curve-on-android",
+     flag_descriptions::kDesktopFlingCurveOnAndroidName,
+     flag_descriptions::kDesktopFlingCurveOnAndroidDescription, kOsAndroid,
+     FEATURE_VALUE_TYPE(features::kDesktopFlingCurveOnAndroid)},
 #endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)

@@ -2414,6 +2414,12 @@
     "expiry_milestone": 152
   },
   {
+    "name": "desktop-fling-curve-on-android",
+    "owners": [ "lizeb@google.com", "clank-large-form-factors@google.com" ],
+    "expiry_milestone": 165
+  },
+
+  {
     "name": "desktop-glow-up",
     "owners": [ "emshack@chromium.org", "top-chrome-desktop-ui@google.com" ],
     "expiry_milestone": 160
