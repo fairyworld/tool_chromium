@@ -1596,4 +1596,22 @@
   <message name="IDS_AUTOFILL_WALLET_DATA_SHARING_PROMO_BUTTON_LABEL" desc="Label of the button that opens the Google Wallet app." formatter_data="android_java">
     Open Google Wallet
   </message>
+  <message name="IDS_SETTINGS_SUGGESTIONS_FROM_GEMINI_QUALITY_LOGGING_TITLE" desc="Title of the collapsible quality logging section in Smarter autofill suggestions settings.">
+    You're helping improve enhanced autofill by sharing data with Google
+  </message>
+  <message name="IDS_SETTINGS_SUGGESTIONS_FROM_GEMINI_WHEN_USED_1" desc="Bullet point 1 under When used in the quality logging section.">
+    When you type a request for enhanced autofill, Chrome logs how you use the feature, such as whether you accept, edit, or ignore autofill suggestions
+  </message>
+  <message name="IDS_SETTINGS_SUGGESTIONS_FROM_GEMINI_WHEN_USED_2" desc="Bullet point 2 under When used in the quality logging section.">
+    The requests sent to Personal Intelligence with Gemini are analyzed to improve autofill
+  </message>
+  <message name="IDS_SETTINGS_SUGGESTIONS_FROM_GEMINI_CONSIDER_1" desc="Bullet point 1 under Things to consider in the quality logging section.">
+    Page titles and URLs are sent to Google and may be reviewed by humans
+  </message>
+  <message name="IDS_SETTINGS_SUGGESTIONS_FROM_GEMINI_CONSIDER_2" desc="Bullet point 2 under Things to consider in the quality logging section.">
+    The info you autofill is never seen by anyone
+  </message>
+  <message name="IDS_SETTINGS_SUGGESTIONS_FROM_GEMINI_CONSIDER_3" desc="Bullet point 3 under Things to consider in the quality logging section.">
+    Your content will not be used to improve AI. Your organization may change these settings at any time.
+  </message>
 </grit-part>

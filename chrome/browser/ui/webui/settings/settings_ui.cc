@@ -102,6 +102,7 @@
 #include "chrome/grit/settings_resources_map.h"
 #include "components/account_manager_core/account_manager_facade.h"
 #include "components/autofill/content/browser/content_autofill_client.h"
+#include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
 #include "components/autofill/core/browser/data_manager/payments/payments_data_manager.h"
 #include "components/autofill/core/browser/integrators/personal_context/personal_context_autofill_util.h"
 #include "components/autofill/core/browser/payments/bnpl_manager.h"
@@ -695,6 +696,14 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
       "showSuggestionsFromGeminiSettings",
       autofill::ShouldShowPersonalContextAutofillSetting(
           enablement_service,
+          subscription_eligibility::SubscriptionEligibilityServiceFactory::
+              GetForProfile(profile),
+          profile->GetPrefs(),
+          GoogleGroupsManagerFactory::GetForBrowserContext(profile)));
+  html_source->AddBoolean(
+      "isAtMemoryEnabled",
+      autofill::MayPerformAtMemoryAction(
+          autofill::AtMemoryAction::kShowAtMemoryInSettings, enablement_service,
           subscription_eligibility::SubscriptionEligibilityServiceFactory::
               GetForProfile(profile),
           profile->GetPrefs(),
