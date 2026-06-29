@@ -7218,7 +7218,6 @@ test("unit_tests") {
       "../browser/ui/webui/side_panel/customize_chrome/customize_toolbar/customize_toolbar_handler_unittest.cc",
       "../browser/ui/webui/side_panel/customize_chrome/wallpaper_search/wallpaper_search_handler_unittest.cc",
       "../browser/ui/webui/side_panel/reading_list/reading_list_page_handler_unittest.cc",
-      "../browser/ui/webui/side_panel/tabs_from_other_devices/synced_screenshot_data_source_unittest.cc",
       "../browser/ui/webui/theme_colors_source_manager_unittest.cc",
       "../browser/ui/webui/top_chrome/per_profile_webui_tracker_unittest.cc",
       "../browser/ui/webui/top_chrome/profile_preload_candidate_selector_unittest.cc",
@@ -8297,6 +8296,7 @@ test("unit_tests") {
     deps += [
       "//chrome/browser/ui/webui/password_manager:unit_tests",
       "//chrome/browser/ui/webui/password_manager/promo_cards:unit_tests",
+      "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices:unit_tests",
       "//components/invalidation:test_support",
       "//components/webauthn/core/browser:test_support",
       "//ui/webui/resources/cr_components/history:mojo_bindings",
