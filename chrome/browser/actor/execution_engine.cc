@@ -29,6 +29,8 @@
 #include "base/types/optional_ref.h"
 #include "base/types/pass_key.h"
 #include "chrome/browser/actor/action_tracker_for_metrics.h"
+#include "chrome/browser/actor/actor_container_config.h"
+#include "chrome/browser/actor/actor_container_config_slot.h"
 #include "chrome/browser/actor/actor_keyed_service.h"
 #include "chrome/browser/actor/actor_metrics.h"
 #include "chrome/browser/actor/actor_proto_conversion.h"
@@ -423,8 +425,8 @@ ExecutionEngine::GatingDecision ExecutionEngine::DetermineGatingDecision(
       return GatingDecision::kBlockByStaticList;
   }
 
-  if (actor_container_config_.IsActive()) {
-    return actor_container_config_.IsNavigationAllowed(
+  if (actor_container_config_slot_.has_value()) {
+    return actor_container_config_slot_.value().IsNavigationAllowed(
                url::Origin::Create(source_url),
                url::Origin::Create(destination_url))
                ? GatingDecision::kAllowByContainerConfig
@@ -825,9 +827,10 @@ void ExecutionEngine::SafetyChecksForNextAction() {
   const GURL& url =
       tab->GetContents()->GetPrimaryMainFrame()->GetLastCommittedURL();
 
-  if (actor_container_config_.IsActive()) {
+  if (actor_container_config_slot_.has_value()) {
     bool navigation_allowed =
-        actor_container_config_.IsActuationAllowed(url::Origin::Create(url));
+        actor_container_config_slot_.value().IsActuationAllowed(
+            url::Origin::Create(url));
     OnMayActOnTabDecision(
         tab->GetContents()->GetPrimaryMainFrame()->GetLastCommittedOrigin(),
         navigation_allowed ? MayActOnUrlBlockReason::kAllowed

@@ -19,7 +19,7 @@
 #include "base/types/id_type.h"
 #include "base/types/optional_ref.h"
 #include "base/types/pass_key.h"
-#include "chrome/browser/actor/actor_container_config.h"
+#include "chrome/browser/actor/actor_container_config_slot.h"
 #include "chrome/browser/actor/enterprise_policy_checker.h"
 #include "chrome/browser/actor/site_policy.h"
 #include "chrome/browser/actor/tab_observation_strategy.h"
@@ -306,8 +306,8 @@ class ExecutionEngine : public ToolDelegate,
   // restriction for certain tools to function.
   bool TabsCanOpenNewWebContents() const;
 
-  ActorContainerConfig& actor_container_config() {
-    return actor_container_config_;
+  ActorContainerConfigSlot& actor_container_config_slot() {
+    return actor_container_config_slot_;
   }
 
   // origin_gating::OriginGatingChecker::Delegate
@@ -483,7 +483,7 @@ class ExecutionEngine : public ToolDelegate,
   TabObservationStrategy observation_strategy_;
 
   // Manages the container config settings that have been sent by the server.
-  ActorContainerConfig actor_container_config_;
+  ActorContainerConfigSlot actor_container_config_slot_;
 
   // For multi-step login, this is the credential that the user has chosen to
   // allow the actor to use. The key is the
