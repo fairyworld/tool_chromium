@@ -374,15 +374,6 @@ class RealTimeUrlLookupServiceBase : public KeyedService {
   // ping time of the without-token ping time.
   virtual void MaybeLogLastProtegoPingTimeToPrefs(bool sent_with_token) {}
 
-  // Maybe logs to histograms about whether the ping request had a cookie. The
-  // base class provides this as an empty implementation that subclasses can
-  // implement. `was_first_request` is whether the request was the first request
-  // after service instantiation. `sent_with_token` is whether the ping had
-  // a token, and is used to determine whether the user was signed in.
-  virtual void MaybeLogProtegoPingCookieHistograms(bool request_had_cookie,
-                                                   bool was_first_request,
-                                                   bool sent_with_token) {}
-
   // Fills in the ReferringAppInfo field pertaining to a referring WebAPK, if
   // appropriate. The safe_browsing::ReferringAppInfo message should already
   // have been added to the RTLookupRequest.
@@ -499,10 +490,6 @@ class RealTimeUrlLookupServiceBase : public KeyedService {
 
   // Helper object that manages backoff state.
   std::unique_ptr<BackoffOperator> backoff_operator_;
-
-  // Tracks the start time of the first request after service instantiation, for
-  // metrics.
-  std::optional<base::TimeTicks> first_request_start_time_ = std::nullopt;
 
   // May be null on certain platforms that don't support chrome://safe-browsing
   // and in unit tests. If non-null, guaranteed to outlive this object by
