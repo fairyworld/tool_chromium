@@ -32,11 +32,13 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.test.filters.SmallTest;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.robolectric.annotation.Config;
 
 import org.chromium.base.Token;
@@ -65,6 +67,8 @@ import java.util.function.Supplier;
             "androidx.recyclerview.widget.RecyclerView" // required to mock final
         })
 public class VerticalTabListItemTouchHelperCallbackUnitTest {
+    @Rule public MockitoRule mMockitoRule = MockitoJUnit.rule();
+
     @Mock private Supplier<TabModel> mCurrentTabModelSupplier;
     @Mock private TabModel mTabModel;
     @Mock private RecyclerView mRecyclerView;
@@ -79,7 +83,6 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         Context context = ApplicationProvider.getApplicationContext();
 
         when(mCurrentTabModelSupplier.get()).thenReturn(mTabModel);
@@ -184,9 +187,9 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
         mCallback.setTabGridItemLongPressOrchestratorForTesting(mockOrchestrator);
 
         // Create a real ViewHolder instance using an empty lambda for the ViewBinder.
-        View dummyView = mock(View.class);
+        View placeholderView = mock(View.class);
         SimpleRecyclerViewAdapter.ViewHolder realViewHolder =
-                new SimpleRecyclerViewAdapter.ViewHolder(dummyView, (model, view, key) -> {});
+                new SimpleRecyclerViewAdapter.ViewHolder(placeholderView, (model, view, key) -> {});
 
         // Inject a mock PropertyModel to prevent the NPE inside hasTabPropertiesModel().
         PropertyModel mockPropertyModel = mock(PropertyModel.class);
