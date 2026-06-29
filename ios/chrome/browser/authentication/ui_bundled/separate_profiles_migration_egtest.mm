@@ -445,7 +445,8 @@
       relaunchWithIdentities:@[ personalIdentity, managedIdentity ]
              enabledFeatures:{kSeparateProfilesForManagedAccounts,
                               kSeparateProfilesForManagedAccountsForceMigration}
-            disabledFeatures:{}];
+            disabledFeatures:
+                {kSeparateProfilesForManagedAccountsImmediateForceMigration}];
 
   // Verify that the managed account remained in the personal profile, since it
   // is the primary account.
@@ -482,7 +483,8 @@
       relaunchWithIdentities:@[ personalIdentity, managedIdentity ]
              enabledFeatures:{kSeparateProfilesForManagedAccounts,
                               kSeparateProfilesForManagedAccountsForceMigration}
-            disabledFeatures:{}];
+            disabledFeatures:
+                {kSeparateProfilesForManagedAccountsImmediateForceMigration}];
 
   // Verify that the managed account is now in the converted-to-managed personal
   // profile.
@@ -530,7 +532,8 @@
       relaunchWithIdentities:@[ personalIdentity, managedIdentity ]
              enabledFeatures:{kSeparateProfilesForManagedAccounts,
                               kSeparateProfilesForManagedAccountsForceMigration}
-            disabledFeatures:{}];
+            disabledFeatures:
+                {kSeparateProfilesForManagedAccountsImmediateForceMigration}];
   [[EarlGrey selectElementWithMatcher:
                  grey_accessibilityID(
                      kManagedProfileCreationScreenAccessibilityIdentifier)]

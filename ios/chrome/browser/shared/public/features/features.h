@@ -111,7 +111,6 @@ BASE_DECLARE_FEATURE(kLensOverlayCustomBottomSheet);
 // Feature flag to check headers for lens searches.
 BASE_DECLARE_FEATURE(kLensSearchHeadersCheckEnabled);
 
-
 // Variations of Composebox.
 extern const char kComposeboxParam[];
 extern const char kComposeboxParamAllOmniboxEntrypoints[];
@@ -360,7 +359,6 @@ BASE_DECLARE_FEATURE(kIOSKeyboardAccessoryDefaultView);
 // Returns true if the default input accessory view is enabled.
 bool IsIOSKeyboardAccessoryDefaultViewEnabled();
 
-
 // Kill switch for disabling the navigations when the application is in
 // foreground inactive state after opening an external app.
 BASE_DECLARE_FEATURE(kInactiveNavigationAfterAppLaunchKillSwitch);
@@ -396,16 +394,15 @@ BASE_DECLARE_FEATURE(kSeparateProfilesForManagedAccounts);
 
 // Killswitch for the reauth-first step in AuthenticationFlowInProfile.
 BASE_DECLARE_FEATURE(kAuthenticationFlowReauthFirstKillswitch);
-
-// Feature param for kSeparateProfilesForManagedAccountsForceMigration to
-// specify how much time to wait before force-migrating the primary managed
-// account to its own separate profile.
-extern const base::FeatureParam<base::TimeDelta>
-    kMultiProfileMigrationGracePeriod;
-
 // Feature flag to control force-migrating the primary managed account to its
 // own separate profile.
 BASE_DECLARE_FEATURE(kSeparateProfilesForManagedAccountsForceMigration);
+
+// Feature flag to control force-migrating the primary managed account to its
+// own separate profile *immediately*, i.e. without the usual grace period
+// that's observed by `kSeparateProfilesForManagedAccountsForceMigration`.
+BASE_DECLARE_FEATURE(
+    kSeparateProfilesForManagedAccountsImmediateForceMigration);
 
 // Feature to control resyncing the omaha ping timer on foregrounding.
 BASE_DECLARE_FEATURE(kOmahaResyncTimerOnForeground);

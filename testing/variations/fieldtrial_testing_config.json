@@ -22262,7 +22262,7 @@
             ]
         }
     ],
-    "SeparateProfilesForManagedAccountsForceMigration": [
+    "SeparateProfilesForManagedAccountsImmediateForceMigration": [
         {
             "platforms": [
                 "ios"
@@ -22270,11 +22270,8 @@
             "experiments": [
                 {
                     "name": "Enabled",
-                    "params": {
-                        "MultiProfileMigrationGracePeriod": "0"
-                    },
                     "enable_features": [
-                        "SeparateProfilesForManagedAccountsForceMigration"
+                        "SeparateProfilesForManagedAccountsImmediateForceMigration"
                     ]
                 }
             ]

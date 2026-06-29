@@ -104,7 +104,6 @@ BASE_FEATURE(kLensOverlayCustomBottomSheet, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kLensSearchHeadersCheckEnabled, base::FEATURE_ENABLED_BY_DEFAULT);
 
-
 BASE_FEATURE(kOmniboxDRSPrototype, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kEnableTraitCollectionWorkAround,
@@ -410,14 +409,11 @@ BASE_FEATURE(kSeparateProfilesForManagedAccounts,
 BASE_FEATURE(kAuthenticationFlowReauthFirstKillswitch,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Feature parameter for kSeparateProfilesForManagedAccountsForceMigration.
-constexpr base::FeatureParam<base::TimeDelta> kMultiProfileMigrationGracePeriod{
-    &kSeparateProfilesForManagedAccountsForceMigration,
-    /*name=*/"MultiProfileMigrationGracePeriod",
-    /*default_value=*/base::Days(90)};
-
 BASE_FEATURE(kSeparateProfilesForManagedAccountsForceMigration,
              base::FEATURE_ENABLED_BY_DEFAULT);
+
+BASE_FEATURE(kSeparateProfilesForManagedAccountsImmediateForceMigration,
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kOmahaResyncTimerOnForeground, base::FEATURE_ENABLED_BY_DEFAULT);
 
@@ -654,8 +650,7 @@ bool IsNTPBackgroundColorSliderEnabled() {
   return base::FeatureList::IsEnabled(kNTPBackgroundColorSlider);
 }
 
-BASE_FEATURE(kNTPBackgroundDownsampleImage,
-             base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kNTPBackgroundDownsampleImage, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kRunDefaultStatusCheck, base::FEATURE_ENABLED_BY_DEFAULT);
 
