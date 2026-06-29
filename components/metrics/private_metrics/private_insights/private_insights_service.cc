@@ -133,16 +133,16 @@ PrivateInsightsService::PrivateInsightsService(
   base::FilePath base_dir = private_insights_dir.AppendASCII("base_dir");
   base::FilePath cache_dir = private_insights_dir.AppendASCII("cache_dir");
 
-  std::unique_ptr<SharedURLLoaderFactoryProxy> url_loader_factory_proxy;
+  std::unique_ptr<FcpHttpRequestManager> http_request_manager;
   if (url_loader_factory) {
-    url_loader_factory_proxy = std::make_unique<SharedURLLoaderFactoryProxy>(
+    http_request_manager = std::make_unique<FcpHttpRequestManager>(
         std::move(url_loader_factory),
         base::SequencedTaskRunner::GetCurrentDefault());
   }
 
   fcp_task_env_ = base::MakeRefCounted<FcpSimpleTaskEnvironment>(
       base_dir.AsUTF8Unsafe(), cache_dir.AsUTF8Unsafe(),
-      std::move(url_loader_factory_proxy));
+      std::move(http_request_manager));
 }
 
 PrivateInsightsService::~PrivateInsightsService() {

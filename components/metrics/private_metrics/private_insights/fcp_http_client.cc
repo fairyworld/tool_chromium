@@ -81,13 +81,15 @@ class FcpHttpRequestHandle : public fcp::client::http::HttpRequestHandle {
 
 }  // namespace
 
-SharedURLLoaderFactoryProxy::SharedURLLoaderFactoryProxy(
+FcpHttpRequestManager::FcpHttpRequestManager(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
     scoped_refptr<base::SequencedTaskRunner> ui_task_runner)
-    : url_loader_factory_(std::move(url_loader_factory)),
-      ui_task_runner_(std::move(ui_task_runner)) {}
+    : ui_task_runner_(std::move(ui_task_runner)),
+      url_loader_factory_(std::move(url_loader_factory)) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(ui_sequence_checker_);
+}
 
-SharedURLLoaderFactoryProxy::~SharedURLLoaderFactoryProxy() {
+FcpHttpRequestManager::~FcpHttpRequestManager() {
   if (url_loader_factory_) {
     ui_task_runner_->PostTask(
         FROM_HERE,
@@ -99,8 +101,8 @@ SharedURLLoaderFactoryProxy::~SharedURLLoaderFactoryProxy() {
   }
 }
 
-FcpHttpClient::FcpHttpClient(SharedURLLoaderFactoryProxy* url_loader_factory)
-    : url_loader_factory_proxy_(url_loader_factory) {}
+FcpHttpClient::FcpHttpClient(FcpHttpRequestManager* request_manager)
+    : request_manager_(request_manager) {}
 
 FcpHttpClient::~FcpHttpClient() = default;
 

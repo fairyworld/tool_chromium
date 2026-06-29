@@ -10,6 +10,7 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
+#include "base/sequence_checker.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "third_party/abseil-cpp/absl/status/status.h"
 #include "third_party/federated_compute/src/fcp/client/http/http_client.h"
@@ -31,30 +32,29 @@ namespace private_insights {
 // 2. Network requests initiated on the background thread are safely routed
 //    and executed on the UI thread.
 //
-// FCP's HTTP Client uses this proxy because FCP blocks the background thread
-// during request execution, meaning Chrome's asynchronous Mojo callbacks cannot
-// be processed on that blocked thread and must run on the UI thread instead.
-class SharedURLLoaderFactoryProxy {
+class FcpHttpRequestManager {
  public:
-  SharedURLLoaderFactoryProxy(
+  FcpHttpRequestManager(
       scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
       scoped_refptr<base::SequencedTaskRunner> ui_task_runner);
 
-  SharedURLLoaderFactoryProxy(const SharedURLLoaderFactoryProxy&) = delete;
-  SharedURLLoaderFactoryProxy& operator=(const SharedURLLoaderFactoryProxy&) =
-      delete;
+  FcpHttpRequestManager(const FcpHttpRequestManager&) = delete;
+  FcpHttpRequestManager& operator=(const FcpHttpRequestManager&) = delete;
 
-  ~SharedURLLoaderFactoryProxy();
+  ~FcpHttpRequestManager();
 
  private:
-  scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory_;
   scoped_refptr<base::SequencedTaskRunner> ui_task_runner_;
+  scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory_
+      GUARDED_BY_CONTEXT(ui_sequence_checker_);
+
+  SEQUENCE_CHECKER(ui_sequence_checker_);
 };
 
 class FcpHttpClient : public fcp::client::http::HttpClient {
  public:
-  // The caller must ensure that `url_loader_factory_proxy` outlives `this`.
-  explicit FcpHttpClient(SharedURLLoaderFactoryProxy* url_loader_factory_proxy);
+  // The caller must ensure that `request_manager` outlives `this`.
+  explicit FcpHttpClient(FcpHttpRequestManager* request_manager);
   ~FcpHttpClient() override;
 
   FcpHttpClient(const FcpHttpClient&) = delete;
@@ -70,7 +70,7 @@ class FcpHttpClient : public fcp::client::http::HttpClient {
       override;
 
  private:
-  raw_ptr<SharedURLLoaderFactoryProxy> url_loader_factory_proxy_;
+  raw_ptr<FcpHttpRequestManager> request_manager_;
 };
 
 }  // namespace private_insights

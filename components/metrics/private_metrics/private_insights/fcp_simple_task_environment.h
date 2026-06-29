@@ -12,7 +12,7 @@
 
 namespace private_insights {
 
-class SharedURLLoaderFactoryProxy;
+class FcpHttpRequestManager;
 
 class FcpSimpleTaskEnvironment
     : public fcp::client::SimpleTaskEnvironment,
@@ -21,7 +21,7 @@ class FcpSimpleTaskEnvironment
   FcpSimpleTaskEnvironment(
       std::string base_dir,
       std::string cache_dir,
-      std::unique_ptr<SharedURLLoaderFactoryProxy> url_loader_factory_proxy);
+      std::unique_ptr<FcpHttpRequestManager> http_request_manager);
 
   FcpSimpleTaskEnvironment(const FcpSimpleTaskEnvironment&) = delete;
   FcpSimpleTaskEnvironment& operator=(const FcpSimpleTaskEnvironment&) = delete;
@@ -50,7 +50,7 @@ class FcpSimpleTaskEnvironment
 
   std::string base_dir_;
   std::string cache_dir_;
-  std::unique_ptr<SharedURLLoaderFactoryProxy> url_loader_factory_proxy_;
+  std::unique_ptr<FcpHttpRequestManager> http_request_manager_;
 
   fcp::client::ExampleQueryResult result_;
 };
