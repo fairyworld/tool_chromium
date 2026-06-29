@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "base/check_deref.h"
+#include "base/containers/flat_set.h"
 #include "base/containers/to_vector.h"
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
@@ -39,8 +40,27 @@
 
 namespace autofill {
 
+namespace {
+
 using optimization_guide::proto::AutofillAiTypeRequest;
 using optimization_guide::proto::AutofillAiTypeResponse;
+using optimization_guide::proto::FieldTypeResponse;
+
+// Performs sanity checks: Every field index must occur only once and they
+// must all lie in the interval [0, num_form_fields[.
+bool AreFieldTypeResponseIndicesValid(int num_form_fields,
+                                      const AutofillAiTypeResponse& response) {
+  if (response.field_responses_size() == 0) {
+    return true;
+  }
+  auto indices = base::MakeFlatSet<int>(response.field_responses(), {},
+                                        &FieldTypeResponse::field_index);
+  return indices.size() ==
+             static_cast<size_t>(response.field_responses_size()) &&
+         *indices.begin() >= 0 && *indices.rbegin() < num_form_fields;
+}
+
+}  // namespace
 
 AutofillAiModelExecutorImpl::AutofillAiModelExecutorImpl(
     AutofillAiModelCache* model_cache,
@@ -137,30 +157,21 @@ void AutofillAiModelExecutorImpl::OnModelExecuted(
     return;
   }
 
-  LogModelPredictions(std::move(logging_data));
-  const size_t response_size = response->field_responses_size();
-  if (response_size == 0) {
-    model_cache_->Update(form_signature, {}, {});
-    base::UmaHistogramEnumeration(
-        kUmaAutofillAiModelExecutionStatus,
-        AutofillAiModelExecutionStatus::kSuccessEmptyResult);
-    return;
-  }
-
-  // Perform sanity checks: Every field index must occur only once and they
-  // must all lie in the interval [0, form_data_fields().size() - 1].
-  using optimization_guide::proto::FieldTypeResponse;
-  std::vector<int> indices = base::ToVector(response->field_responses(),
-                                            &FieldTypeResponse::field_index);
-  std::ranges::sort(indices);
-  auto repeated = std::ranges::unique(indices);
-  indices.erase(repeated.begin(), repeated.end());
-  if (indices.size() != response_size || indices.front() < 0 ||
-      indices.back() >= static_cast<int>(form_data.fields().size())) {
+  if (!AreFieldTypeResponseIndicesValid(form_data.fields().size(), *response)) {
     model_cache_->Update(form_signature, {}, {});
     base::UmaHistogramEnumeration(
         kUmaAutofillAiModelExecutionStatus,
         AutofillAiModelExecutionStatus::kErrorInvalidFieldIndex);
+    return;
+  }
+
+  LogModelPredictions(std::move(logging_data));
+
+  if (response->field_responses_size() == 0) {
+    model_cache_->Update(form_signature, {}, {});
+    base::UmaHistogramEnumeration(
+        kUmaAutofillAiModelExecutionStatus,
+        AutofillAiModelExecutionStatus::kSuccessEmptyResult);
     return;
   }
 
