@@ -223,6 +223,13 @@ BASE_FEATURE(kAutofillAiNoFillingIconsExperiment,
 // If enabled, AutofillAi supports order entities.
 BASE_FEATURE(kAutofillAiOrder, base::FEATURE_ENABLED_BY_DEFAULT);
 
+// When inference through the non-PI AutofillAi online model is run (implying
+// that AutofillAiUsePrivateAi is disabled) and this flag is enabled, an
+// additional inference request through the PI stack is run to compute shadow
+// metrics between the two results.
+BASE_FEATURE(kAutofillAiPrivateAiShadowMetric,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 // If enabled, AutofillAi requires re-auth when filling/viewing sensitive
 // fields. As part of this feature sensitive fields are also obfuscated during
 // suggestion generation time.
