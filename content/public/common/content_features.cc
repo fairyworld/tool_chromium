@@ -795,7 +795,7 @@ BASE_FEATURE(kPrerender2FallbackPrefetchSpecRules,
 
 // If enabled, the feature allows the prerender host to be reused for the
 // future same-site page prerender if marked as reusable.
-BASE_FEATURE(kPrerender2ReuseHost, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kPrerender2ReuseHost, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // If enabled, the feature parameter allows all the prerender hosts for
 // DSE search results to be reused.
@@ -803,7 +803,7 @@ BASE_FEATURE_PARAM(bool,
                    kPrerender2ReuseSearchResultHost,
                    &features::kPrerender2ReuseHost,
                    "reuse_search_host",
-                   false);
+                   true);
 
 // If enabled, activation beacon is sent when a prerendered page is activated.
 // The activation beacon is a beacon that echoes back a server specified token
