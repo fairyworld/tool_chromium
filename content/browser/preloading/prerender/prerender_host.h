@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 
+#include "base/functional/callback_helpers.h"
 #include "base/memory/raw_ref.h"
 #include "base/memory/weak_ptr.h"
 #include "base/observer_list.h"
@@ -655,6 +656,8 @@ class CONTENT_EXPORT PrerenderHost {
       prerender_initial_preload_serving_metrics_;
   // True if cross-origin subframe navigations are allowed.
   bool allow_cross_origin_subframe_navigation_ = false;
+
+  base::ScopedClosureRunner process_reuse_closure_runner_;
 
   base::WeakPtrFactory<PrerenderHost> weak_factory_{this};
 };
