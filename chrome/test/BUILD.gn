@@ -846,10 +846,7 @@ static_library("test_support") {
   }
 
   if (enable_devtools_frontend) {
-    sources += [
-      "../browser/devtools/protocol/devtools_protocol_test_support.cc",
-      "../browser/devtools/protocol/devtools_protocol_test_support.h",
-    ]
+    sources += []
   }
 
   if (use_nss_certs) {
@@ -1562,11 +1559,7 @@ source_set("platform_browser_tests") {
   }
 
   if (enable_devtools_frontend) {
-    sources += [
-      "../browser/devtools/devtools_browsertest.cc",
-      "../browser/devtools/protocol/devtools_protocol_browsertest.cc",
-      "../browser/devtools/protocol/webmcp_browsertest.cc",
-    ]
+    deps += [ "//chrome/browser/devtools:platform_browser_tests" ]
     deps += [
       "//chrome/browser/actor:test_support",
       "//chrome/browser/actor:tools_test_support",
@@ -1594,15 +1587,6 @@ source_set("platform_browser_tests") {
     }
     if (enable_guest_view) {
       deps += [ "//components/guest_view/browser" ]
-    }
-    if (!is_android) {
-      sources += [
-        "../browser/devtools/devtools_remote_server_infobar_browsertest.cc",
-      ]
-    }
-    if (!is_android || enable_desktop_android_extensions) {
-      sources +=
-          [ "../browser/devtools/global_confirm_info_bar_browsertest.cc" ]
     }
   }
 
@@ -2355,6 +2339,7 @@ if (!is_android) {
       "//chrome/browser/device_api:browser_tests",
       "//chrome/browser/device_notifications:browser_test_support",
       "//chrome/browser/devtools",
+      "//chrome/browser/devtools:browser_tests",
       "//chrome/browser/devtools:test_support",
       "//chrome/browser/dictation:browser_tests",
       "//chrome/browser/digital_credentials",
@@ -3280,18 +3265,6 @@ if (!is_android) {
       "../browser/chrome_web_platform_security_metrics_browsertest.cc",
       "../browser/chrome_worker_browsertest.cc",
       "../browser/crash_recovery_browsertest.cc",
-      "../browser/devtools/device/adb/adb_client_socket_browsertest.cc",
-      "../browser/devtools/device/devtools_android_bridge_browsertest.cc",
-      "../browser/devtools/device/port_forwarding_browsertest.cc",
-      "../browser/devtools/device/usb/android_usb_browsertest.cc",
-      "../browser/devtools/devtools_navigation_throttle_browsertest.cc",
-      "../browser/devtools/devtools_policy_browsertest.cc",
-      "../browser/devtools/protocol/audits_protocol_test.cc",
-      "../browser/devtools/protocol/devtools_autofill_browsertest.cc",
-      "../browser/devtools/protocol/devtools_extensions_browsertest.cc",
-      "../browser/devtools/protocol/devtools_iwa_browsertest.cc",
-      "../browser/devtools/protocol/devtools_pwa_browsertest.cc",
-      "../browser/devtools/protocol/form_devtools_issues_browsertest.cc",
       "../browser/direct_sockets/direct_sockets_apitest.cc",
       "../browser/enterprise/browser_management/management_service_browsertest.cc",
       "../browser/enterprise/incognito/incognito_navigation_throttle_browsertest.cc",
@@ -3881,23 +3854,6 @@ if (!is_android) {
       if (enable_printing) {
         sources += [ "../browser/pdf/pdf_extension_printing_test.cc" ]
         deps += [ "//chrome/browser/printing" ]
-
-        # TODO(crbug.com/40892214): All printToPdf tests consistently fail on
-        # ChromeOS
-        if (!is_chromeos) {
-          sources += [
-            "../browser/devtools/protocol/devtools_printtopdf_browsertest.cc",
-          ]
-          deps += [
-            "//components/headless/test",
-            "//components/printing/browser",
-            "//pdf",
-          ]
-        }
-      }
-
-      if (enable_smart_card) {
-        sources += [ "../browser/devtools/protocol/smart_card_emulation_handler_browsertest.cc" ]
       }
 
       if (enable_pdf_save_to_drive) {
@@ -5786,11 +5742,6 @@ test("unit_tests") {
 
   if (!is_android) {
     sources += [
-      # The test is disabled for Android. The respective functionality is
-      # currently not being used on Android. We should enable this test when
-      # Android becomes supported.
-      "../browser/devtools/device/usb/android_rsa_unittest.cc",
-      "../browser/devtools/devtools_availability_checker_unittest.cc",
       "../browser/page_load_metrics/observers/initial_webui_page_load_metrics_observer_unittest.cc",
       "../browser/page_load_metrics/observers/non_tab_webui_page_load_metrics_observer_unittest.cc",
       "../browser/page_load_metrics/observers/top_chrome_webui_metrics_observer_unittest.cc",
@@ -5817,25 +5768,6 @@ test("unit_tests") {
 
   if (enable_webui_certificate_viewer) {
     sources += [ "../common/net/x509_certificate_model_unittest.cc" ]
-  }
-
-  if (enable_devtools_frontend) {
-    sources += [
-      "../browser/devtools/aida_client_unittest.cc",
-      "../browser/devtools/devtools_file_helper_unittest.cc",
-      "../browser/devtools/devtools_file_system_indexer_unittest.cc",
-      "../browser/devtools/devtools_file_watcher_unittest.cc",
-      "../browser/devtools/devtools_http_service_handler_unittest.cc",
-      "../browser/devtools/devtools_select_file_dialog_unittest.cc",
-      "../browser/devtools/devtools_settings_unittest.cc",
-      "../browser/devtools/devtools_ui_bindings_unittest.cc",
-    ]
-    if (!is_android) {
-      sources += [
-        "../browser/devtools/devtools_navigation_gating_rule_manager_unittest.cc",
-        "../browser/devtools/remote_debugging_server_unittest.cc",
-      ]
-    }
   }
 
   # Support v8_unwinder_unittest on Android.
@@ -5995,6 +5927,7 @@ test("unit_tests") {
     "//chrome/browser/device_reauth",
     "//chrome/browser/device_reauth:unit_tests",
     "//chrome/browser/devtools",
+    "//chrome/browser/devtools:unit_tests",
     "//chrome/browser/diagnostics:unit_tests",
     "//chrome/browser/digital_credentials:unit_tests",
     "//chrome/browser/domain_reliability",
@@ -7206,10 +7139,6 @@ test("unit_tests") {
       "../browser/autofill/ui/autofill_image_fetcher_impl_unittest.cc",
       "../browser/browser_commands_unittest.cc",
       "../browser/contextual_search/chrome_contextual_search_session_tab_validator_unittest.cc",
-      "../browser/devtools/device/android_device_manager_unittest.cc",
-      "../browser/devtools/device/devtools_device_discovery_unittest.cc",
-      "../browser/devtools/protocol/cast_handler_unittest.cc",
-      "../browser/devtools/serialize_host_descriptions_unittest.cc",
       "../browser/enterprise/reporting/extension_info_unittest.cc",
       "../browser/enterprise/reporting/extension_request/extension_request_observer_factory_unittest.cc",
       "../browser/enterprise/reporting/extension_request/extension_request_report_generator_unittest.cc",
@@ -8411,12 +8340,6 @@ test("unit_tests") {
   }
 
   if (enable_service_discovery) {
-    # TODO(crbug.com/429684535): Port this test to desktop Android.
-    if (!is_android) {
-      sources +=
-          [ "../browser/devtools/device/cast_device_provider_unittest.cc" ]
-    }
-
     deps += [
       "//chrome/browser/local_discovery",
       "//chrome/browser/local_discovery:test_support",
@@ -9713,8 +9636,6 @@ if (!is_android && !is_chromeos_device) {
       "../browser/browser_keyevents_interactive_uitest.cc",
       "../browser/chrome_render_widget_host_interactive_uitest.cc",
       "../browser/controlled_frame/controlled_frame_interactive_uitest.cc",
-      "../browser/devtools/devtools_connection_dialog_browsertest.cc",
-      "../browser/devtools/devtools_interactive_uitest.cc",
       "../browser/focus_ring_interactive_uitest.cc",
       "../browser/media/webrtc/conditional_focus_interactive_uitest.cc",
       "../browser/media/webrtc/display_media_access_handler_interactive_uitest.cc",
@@ -9856,6 +9777,7 @@ if (!is_android && !is_chromeos_device) {
       "//chrome/browser/data_sharing",
       "//chrome/browser/desktop_to_mobile_promos:utils",
       "//chrome/browser/devtools",
+      "//chrome/browser/devtools:interactive_ui_tests",
       "//chrome/browser/devtools:test_support",
       "//chrome/browser/download:test_support",
       "//chrome/browser/feedback:feedback_impl",
