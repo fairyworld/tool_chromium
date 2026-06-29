@@ -1740,6 +1740,26 @@ static_library("test_support") {
       "//chromeos/ash/components/dbus/lorgnette_manager:lorgnette_proto",
       "//components/user_manager:test_support",
     ]
+
+    if (enable_printing && use_cups) {
+      sources += [
+        "api/printing/fake_print_job_controller.cc",
+        "api/printing/fake_print_job_controller.h",
+        "api/printing/printing_test_utils.cc",
+        "api/printing/printing_test_utils.h",
+      ]
+      public_deps += [
+        "//chrome/services/printing/public/mojom",
+        "//chromeos/printing",
+        "//printing/backend:test_support",
+      ]
+      deps += [
+        "//chrome/browser/ash/printing",
+        "//chrome/browser/ash/printing:test_support",
+        "//chrome/browser/ash/printing/history:print_job_info_proto",
+        "//chrome/browser/printing",
+      ]
+    }  # enable_printing && use_cups
   }  # is_chromeos
 
   if (enable_extensions) {
