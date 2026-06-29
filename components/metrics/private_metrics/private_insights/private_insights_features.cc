@@ -16,6 +16,10 @@ const base::FeatureParam<base::TimeDelta> kPrivateInsightsUploadInterval{
 BASE_FEATURE(kPrivateInsightsPaicErrorReporting,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
+const base::FeatureParam<bool> kFcpUseAttestationTransparencyVerifier{
+    &kPrivateInsightsFeature, "fcp_use_attestation_transparency_verifier",
+    false};
+
 const base::FeatureParam<std::string> kFcpServerUri{&kPrivateInsightsFeature,
                                                     "fcp_server_uri", ""};
 

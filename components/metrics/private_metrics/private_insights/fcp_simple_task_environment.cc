@@ -5,6 +5,9 @@
 #include "components/metrics/private_metrics/private_insights/fcp_simple_task_environment.h"
 
 #include "components/metrics/private_metrics/private_insights/fcp_http_client.h"
+#include "third_party/federated_compute/chromium/fcp/client/attestation/attestation_transparency_verifier.h"
+#include "third_party/federated_compute/src/fcp/client/attestation/attestation_verifier.h"
+#include "third_party/federated_compute/src/fcp/protos/confidentialcompute/access_policy_endorsement_options.pb.h"
 
 namespace private_insights {
 
@@ -35,10 +38,13 @@ class SingleExampleIterator : public fcp::client::ExampleIterator {
 FcpSimpleTaskEnvironment::FcpSimpleTaskEnvironment(
     std::string base_dir,
     std::string cache_dir,
-    std::unique_ptr<FcpHttpRequestManager> http_request_manager)
+    std::unique_ptr<FcpHttpRequestManager> http_request_manager,
+    bool use_attestation_transparency_verifier)
     : base_dir_(std::move(base_dir)),
       cache_dir_(std::move(cache_dir)),
-      http_request_manager_(std::move(http_request_manager)) {}
+      http_request_manager_(std::move(http_request_manager)),
+      use_attestation_transparency_verifier_(
+          use_attestation_transparency_verifier) {}
 
 FcpSimpleTaskEnvironment::~FcpSimpleTaskEnvironment() = default;
 
@@ -68,11 +74,15 @@ FcpSimpleTaskEnvironment::CreateHttpClient() {
 
 std::unique_ptr<fcp::client::attestation::AttestationVerifier>
 FcpSimpleTaskEnvironment::CreateAttestationVerifier() {
-  // Use AlwaysPassingAttestationVerifier for now as we don't have the reference
-  // values configured yet. This allows FCP to proceed with data uploads.
-  // TODO(b/527790788): Add AttestationTransparencyVerifier.
-  return std::make_unique<
-      fcp::client::attestation::AlwaysPassingAttestationVerifier>();
+  if (use_attestation_transparency_verifier_) {
+    return std::make_unique<
+        fcp::client::attestation::AttestationTransparencyVerifier>(
+        fcp::confidentialcompute::AccessPolicyEndorsementOptions::
+            default_instance());
+  } else {
+    return std::make_unique<
+        fcp::client::attestation::AlwaysPassingAttestationVerifier>();
+  }
 }
 
 }  // namespace private_insights

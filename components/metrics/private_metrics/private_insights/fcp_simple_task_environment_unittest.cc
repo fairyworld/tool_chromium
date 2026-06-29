@@ -27,7 +27,7 @@ TEST(FcpSimpleTaskEnvironmentTest, CreateExampleIterator) {
 
   scoped_refptr<FcpSimpleTaskEnvironment> task_env =
       base::MakeRefCounted<FcpSimpleTaskEnvironment>("base_dir", "cache_dir",
-                                                     nullptr);
+                                                     nullptr, false);
   task_env->result() = query_result;
 
   google::internal::federated::plan::ExampleSelector selector;
@@ -59,7 +59,7 @@ TEST(FcpSimpleTaskEnvironmentTest, CreateExampleIterator) {
 TEST(FcpSimpleTaskEnvironmentTest, CreateAttestationVerifier) {
   scoped_refptr<FcpSimpleTaskEnvironment> task_env =
       base::MakeRefCounted<FcpSimpleTaskEnvironment>("base_dir", "cache_dir",
-                                                     nullptr);
+                                                     nullptr, false);
 
   auto verifier = task_env->CreateAttestationVerifier();
   ASSERT_NE(verifier, nullptr);
@@ -83,7 +83,7 @@ TEST(FcpSimpleTaskEnvironmentTest, CreateAttestationVerifier) {
 TEST(FcpSimpleTaskEnvironmentTest, CreateHttpClient) {
   scoped_refptr<FcpSimpleTaskEnvironment> task_env =
       base::MakeRefCounted<FcpSimpleTaskEnvironment>("base_dir", "cache_dir",
-                                                     nullptr);
+                                                     nullptr, false);
   auto http_client = task_env->CreateHttpClient();
   EXPECT_NE(http_client, nullptr);
 }

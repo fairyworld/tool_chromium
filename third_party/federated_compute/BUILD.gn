@@ -186,6 +186,7 @@ proto_library("client_proto") {
 
 source_set("fl_runner") {
   public = [
+    "chromium/fcp/client/attestation/attestation_transparency_verifier.h",
     "src/fcp/client/attestation/attestation_verifier.h",
     "src/fcp/client/event_publisher.h",
     "src/fcp/client/files.h",
@@ -199,9 +200,13 @@ source_set("fl_runner") {
     "src/fcp/client/stats.h",
     "src/fcp/client/tensorflow/tensorflow_runner.h",
     "src/fcp/client/tensorflow/tensorflow_runner_factory.h",
+    "src/fcp/confidentialcompute/payload_transparency/payload_transparency.h",
+    "src/fcp/confidentialcompute/payload_transparency/rekor.h",
+    "src/fcp/confidentialcompute/payload_transparency/signatures.h",
   ]
 
   sources = [
+    "chromium/fcp/client/attestation/attestation_transparency_verifier.cc",
     "chromium/fcp/client/cache/file_backed_resource_cache.h",
     "chromium/fcp/client/secagg_runner.cc",
     "src/fcp/client/attestation/attestation_verifier.cc",
@@ -255,6 +260,9 @@ source_set("fl_runner") {
     "src/fcp/client/simple_task_environment.cc",
     "src/fcp/client/tensorflow/tensorflow_runner_factory.cc",
     "src/fcp/client/willow/willow_payload_encryptor.h",
+    "src/fcp/confidentialcompute/payload_transparency/payload_transparency.cc",
+    "src/fcp/confidentialcompute/payload_transparency/rekor.cc",
+    "src/fcp/confidentialcompute/payload_transparency/signatures.cc",
     "src/fcp/confidentialcompute/time_window_utilities.cc",
     "src/fcp/confidentialcompute/time_window_utilities.h",
     "src/fcp/secagg/client/secagg_client.h",
