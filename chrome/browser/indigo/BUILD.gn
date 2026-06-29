@@ -17,6 +17,7 @@ source_set("indigo") {
     "indigo_extension_utils.h",
     "indigo_image_replacement.h",
     "indigo_image_replacement_manager.h",
+    "indigo_menu_model.h",
     "indigo_page_action_controller.h",
     "indigo_prefs.h",
     "indigo_service.h",
@@ -39,6 +40,7 @@ source_set("indigo") {
     "//components/tabs:public",
     "//content/public/browser",
     "//content/public/common",
+    "//ui/menus",
     "//url",
   ]
 }
@@ -50,6 +52,7 @@ source_set("impl") {
     "indigo_extension_utils.cc",
     "indigo_image_replacement.cc",
     "indigo_image_replacement_manager.cc",
+    "indigo_menu_model.cc",
     "indigo_page_action_controller.cc",
     "indigo_prefs.cc",
     "indigo_service.cc",
@@ -114,6 +117,7 @@ source_set("unit_tests") {
   sources = [
     "api_client_unittest.cc",
     "indigo_agent_host_unittest.cc",
+    "indigo_menu_model_unittest.cc",
     "indigo_page_action_controller_unittest.cc",
     "indigo_service_unittest.cc",
   ]
