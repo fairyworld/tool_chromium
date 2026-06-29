@@ -3104,6 +3104,13 @@ void NavigationRequest::BeginNavigationImpl() {
 
   // Connection Allowlist: check whether navigation to the url is allowed.
   if (!IsAllowedByConnectionAllowlist(/*is_redirect=*/false)) {
+    // Record that this navigation is blocked by the initiator's
+    // Connection-Allowlist before StartNavigation() notifies observers. This
+    // lets observers (e.g. //chrome's LoadingPredictor) suppress speculative
+    // network activity that would otherwise leak the destination host even
+    // though the navigation is blocked. See
+    // https://github.com/WICG/connection-allowlists.
+    is_blocked_by_connection_allowlist_ = true;
     // Create a navigation handle so that the correct error code can be set on
     // it by OnRequestFailedInternal().
     StartNavigation();
@@ -3788,6 +3795,12 @@ void NavigationRequest::OnRequestRedirected(
 
   if (!was_redirected_ &&
       !IsAllowedByConnectionAllowlist(/*is_redirect=*/true)) {
+    // As in BeginNavigationImpl(), record that this navigation is blocked by
+    // the initiator's Connection-Allowlist so observers can suppress
+    // speculative network activity for it. (Today no speculative work runs
+    // after a blocked redirect, but this keeps IsBlockedByConnectionAllowlist()
+    // truthful for any future post-redirect consumer.)
+    is_blocked_by_connection_allowlist_ = true;
     auto completion_status =
         network::URLLoaderCompletionStatus(net::ERR_UNSAFE_REDIRECT);
     error_navigation_trigger_ = ErrorNavigationTrigger::kRedirectNotAllowed;
@@ -11778,6 +11791,10 @@ bool NavigationRequest::IsPageActivation() const {
 
 bool NavigationRequest::IsNavigatingFromInitialEmptyDocument() const {
   return frame_tree_node_->is_on_initial_empty_document();
+}
+
+bool NavigationRequest::IsBlockedByConnectionAllowlist() const {
+  return is_blocked_by_connection_allowlist_;
 }
 
 std::unique_ptr<NavigationEntryImpl>
