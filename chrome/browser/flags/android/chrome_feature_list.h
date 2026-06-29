@@ -227,6 +227,7 @@ BASE_DECLARE_FEATURE(kNotificationTrampoline);
 BASE_DECLARE_FEATURE(kNotificationTrampolineNoNewTask);
 BASE_DECLARE_FEATURE(kNtpMvcRefactor);
 BASE_DECLARE_FEATURE(kOmahaMinSdkVersionAndroid);
+BASE_DECLARE_FEATURE(kOmniboxAutofocusOnIncognitoNtp);
 BASE_DECLARE_FEATURE(kOnDemandBackgroundTabContextCapture);
 BASE_DECLARE_FEATURE(kOnStartupWindowPolicy);
 BASE_DECLARE_FEATURE(kOptimizeGeolocationHeaderGeneration);

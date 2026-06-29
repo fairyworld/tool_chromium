@@ -292,7 +292,6 @@
 #include "components/permissions/android/permissions_android_feature_map.h"
 #include "components/push_messaging/push_messaging_features.h"
 #include "components/translate/content/android/translate_message.h"
-#include "components/variations/net/omnibox_autofocus_http_headers.h"
 #include "ui/android/ui_android_features.h"
 #else  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/component_updater/iwa_key_distribution_component_installer.h"
@@ -4405,23 +4404,6 @@ const FeatureEntry::FeatureVariation
         {"jump to completion no fade",
          kAnimatedProgressBarJumpToCompletionNoFade, nullptr}};
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-const FeatureEntry::Choice kOmniboxAutofocusOnIncognitoNtpChoices[] = {
-    {flags_ui::kGenericExperimentChoiceDefault, "", ""},
-    {flags_ui::kGenericExperimentChoiceDisabled, switches::kDisableFeatures,
-     "OmniboxAutofocusOnIncognitoNtp"},
-    {"Autofocus when physical keyboard attached or not first tab",
-     switches::kEnableFeatures,
-     "OmniboxAutofocusOnIncognitoNtp:not_first_tab/true/with_prediction/false/"
-     "with_hardware_keyboard/true"},
-    {"Autofocus when physical keyboard attached or prediction condition met",
-     switches::kEnableFeatures,
-     "OmniboxAutofocusOnIncognitoNtp:not_first_tab/false/with_prediction/true/"
-     "with_hardware_keyboard/true"},
-};
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 #if !BUILDFLAG(IS_ANDROID)
 const FeatureEntry::FeatureParam
     kCastStreamingExponentialVideoBitrateAlgorithmDefault[] = {
@@ -12344,18 +12326,6 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kAutofillEnableWalletBrandingName,
      flag_descriptions::kAutofillEnableWalletBrandingDescription, kOsAll,
      FEATURE_VALUE_TYPE(autofill::features::kAutofillEnableWalletBranding)},
-
-#if BUILDFLAG(IS_ANDROID)
-    {"enable-android-omnibox-autofocus-on-incognito-ntp",
-     flag_descriptions::kOmniboxAutofocusOnIncognitoNtpName,
-     flag_descriptions::kOmniboxAutofocusOnIncognitoNtpDescription, kOsAndroid,
-     MULTI_VALUE_TYPE(kOmniboxAutofocusOnIncognitoNtpChoices)},
-
-    {"enable-android-reporting-omnibox-autofocus-header",
-     flag_descriptions::kReportOmniboxAutofocusHeaderName,
-     flag_descriptions::kReportOmniboxAutofocusHeaderDescription, kOsAndroid,
-     FEATURE_VALUE_TYPE(variations::kReportOmniboxAutofocusHeader)},
-#endif
 
 #if BUILDFLAG(IS_WIN)
     {"enable-arabic-indic-digit-input",

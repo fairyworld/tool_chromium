@@ -2993,11 +2993,6 @@
     "expiry_milestone": 150
   },
   {
-    "name": "enable-android-omnibox-autofocus-on-incognito-ntp",
-    "owners": [ "jkudzia@google.com", "polonium@google.com" ],
-    "expiry_milestone": 152
-  },
-  {
     "name": "enable-android-physical-keyboard-autocorrect-underline",
     "owners": [
       "wesleygwang@google.com",
@@ -3014,11 +3009,6 @@
       "essential-inputs-team@google.com"
     ],
     "expiry_milestone": 155
-  },
-  {
-    "name": "enable-android-reporting-omnibox-autofocus-header",
-    "owners": [ "jkudzia@google.com", "polonium@google.com" ],
-    "expiry_milestone": 152
   },
   {
     "name": "enable-android-side-panel",

@@ -18,7 +18,6 @@
 #include "base/metrics/histogram_macros.h"
 #include "base/synchronization/waitable_event.h"
 #include "components/embedder_support/user_agent_utils.h"
-#include "components/variations/net/omnibox_autofocus_http_headers.h"
 #include "components/variations/net/variations_http_headers.h"
 #include "content/browser/browser_context_impl.h"
 #include "content/browser/connection_allowlist_utils.h"
@@ -1702,7 +1701,6 @@ PrefetchService::CreateIsolatedNetworkContext(
   if (base::FeatureList::IsEnabled(
           kVariationsHeaderForCrossSiteSpeculationRulesPrefetch)) {
     variations::UpdateCorsExemptHeaderForVariations(context_params.get());
-    variations::UpdateCorsExemptHeaderForOmniboxAutofocus(context_params.get());
   }
   GetContentClient()->browser()->UpdateCorsExemptHeaderForPrefetch(
       context_params.get());

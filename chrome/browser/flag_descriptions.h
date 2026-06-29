@@ -3931,11 +3931,6 @@ inline constexpr char kReportNotificationContentDetectionDataDescription[] =
     "Enables reporting a notification's contents to Google, when the user taps "
     "the `Report` button on the notification.";
 
-inline constexpr char kReportOmniboxAutofocusHeaderName[] =
-    "Option to report 'X-Omnibox-Autofocus' header";
-inline constexpr char kReportOmniboxAutofocusHeaderDescription[] =
-    "Enables reporting 'X-Omnibox-Autofocus' header to Google.";
-
 inline constexpr char kReportUnsafeSiteName[] = "Report Unsafe Site";
 inline constexpr char kReportUnsafeSiteDescription[] =
     "Enables the 'Report Unsafe Site' menu item in the app Help menu, which "
@@ -5999,12 +5994,6 @@ inline constexpr char kOnDemandBackgroundTabContextCaptureName[] =
     "On demand background tab context capture";
 inline constexpr char kOnDemandBackgroundTabContextCaptureDescription[] =
     "Enables on-demand background tab context capture.";
-
-inline constexpr char kOmniboxAutofocusOnIncognitoNtpName[] =
-    "Omnibox Autofocus on Incognito New Tab Page";
-inline constexpr char kOmniboxAutofocusOnIncognitoNtpDescription[] =
-    "Enables the Omnibox to automatically gain focus when the New "
-    "Tab Page in Incognito mode is opened, allowing immediate typing.";
 
 inline constexpr char kPersistAcrossRebootsDebugLogsName[] =
     "persist-across-reboots-debug-logs";
