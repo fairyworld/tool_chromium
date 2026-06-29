@@ -244,47 +244,17 @@ public class TabListItemAnimator extends SimpleItemAnimator {
     }
 
     private Animator buildAddAnimator(ViewHolder holder) {
-        // A simple fade in animation.
-        View view = holder.itemView;
-        view.setAlpha(0f);
-        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(view, View.ALPHA, 1f);
-
         if (mUseClipAnimations) {
-            AnimatorSet animator = new AnimatorSet();
-            ValueAnimator clipAnimator = buildClipAnimator(view, /* expanding= */ true);
-            animator.playTogether(alphaAnimator, clipAnimator);
-            animator.setDuration(getAddDuration());
-            animator.setInterpolator(Interpolators.FAST_OUT_SLOW_IN_INTERPOLATOR);
-            animator.addListener(buildAddAnimatorListener(holder, view));
-            return animator;
+            return buildAlphaClipAnimator(
+                    holder,
+                    /* expanding= */ true,
+                    getAddDuration(),
+                    () -> dispatchAddStarting(holder),
+                    () -> dispatchAddFinished(holder),
+                    /* holderMap= */ mAdds);
         } else {
-            alphaAnimator.setDuration(getAddDuration());
-            alphaAnimator.setInterpolator(Interpolators.LINEAR_INTERPOLATOR);
-            alphaAnimator.addListener(buildAddAnimatorListener(holder, view));
-            return alphaAnimator;
+            return buildGenericAddAnimator(holder);
         }
-    }
-
-    private AnimatorListenerAdapter buildAddAnimatorListener(ViewHolder holder, View view) {
-        return new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-                dispatchAddStarting(holder);
-                mIsAnimatorRunningSupplier.set(true);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                view.setAlpha(1f);
-                if (mUseClipAnimations) {
-                    view.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
-                    view.setClipToOutline(false);
-                }
-                dispatchAddFinished(holder);
-                mAdds.remove(holder);
-                dispatchFinishedWhenAllAnimationsDone();
-            }
-        };
     }
 
     @Override
@@ -474,7 +444,16 @@ public class TabListItemAnimator extends SimpleItemAnimator {
         }
 
         Animator animator = null;
-        if (!shouldUseShrinkCloseAnimation(holder)) {
+        if (mUseClipAnimations) {
+            animator =
+                    buildAlphaClipAnimator(
+                            holder,
+                            /* expanding= */ false,
+                            getRemoveDuration(),
+                            () -> dispatchRemoveStarting(holder),
+                            () -> dispatchRemoveFinished(holder),
+                            /* holderMap= */ mRemovals);
+        } else if (!shouldUseShrinkCloseAnimation(holder)) {
             animator = buildGenericRemoveAnimator(holder);
         } else {
             animator = buildTabRemoveAnimator(holder);
@@ -493,6 +472,22 @@ public class TabListItemAnimator extends SimpleItemAnimator {
         return false;
     }
 
+    private Animator buildGenericAddAnimator(ViewHolder holder) {
+        View view = holder.itemView;
+        view.setAlpha(0f);
+        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(view, View.ALPHA, 1f);
+        alphaAnimator.setDuration(getAddDuration());
+        alphaAnimator.setInterpolator(Interpolators.LINEAR_INTERPOLATOR);
+        alphaAnimator.addListener(
+                buildAnimatorListener(
+                        holder,
+                        view,
+                        () -> dispatchAddStarting(holder),
+                        () -> dispatchAddFinished(holder),
+                        /* holderMap= */ mAdds));
+        return alphaAnimator;
+    }
+
     private Animator buildGenericRemoveAnimator(ViewHolder holder) {
         // This is adapted from DefaultItemAnimator.
         View view = holder.itemView;
@@ -500,21 +495,12 @@ public class TabListItemAnimator extends SimpleItemAnimator {
         alphaAnimator.setDuration(getRemoveDuration());
         alphaAnimator.setInterpolator(getGenericRemoveInterpolator());
         alphaAnimator.addListener(
-                new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-                        dispatchRemoveStarting(holder);
-                        mIsAnimatorRunningSupplier.set(true);
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        view.setAlpha(1f);
-                        dispatchRemoveFinished(holder);
-                        mRemovals.remove(holder);
-                        dispatchFinishedWhenAllAnimationsDone();
-                    }
-                });
+                buildAnimatorListener(
+                        holder,
+                        view,
+                        () -> dispatchRemoveStarting(holder),
+                        () -> dispatchRemoveFinished(holder),
+                        /* holderMap= */ mRemovals));
         return alphaAnimator;
     }
 
@@ -573,7 +559,7 @@ public class TabListItemAnimator extends SimpleItemAnimator {
         }
     }
 
-    private ValueAnimator buildClipAnimator(View view, boolean expanding) {
+    private ValueAnimator buildOutlineClipAnimator(View view, boolean expanding) {
         int height = view.getHeight() > 0 ? view.getHeight() : view.getMeasuredHeight();
         int width = view.getWidth() > 0 ? view.getWidth() : view.getMeasuredWidth();
         final int cornerRadius =
@@ -598,6 +584,56 @@ public class TabListItemAnimator extends SimpleItemAnimator {
                     view.invalidateOutline();
                 });
         return clipAnimator;
+    }
+
+    private Animator buildAlphaClipAnimator(
+            ViewHolder holder,
+            boolean expanding,
+            long duration,
+            Runnable onStarting,
+            Runnable onFinished,
+            AnimatorHolder holderMap) {
+        View view = holder.itemView;
+        float startAlpha = expanding ? 0f : view.getAlpha();
+        float endAlpha = expanding ? 1f : 0f;
+        view.setAlpha(startAlpha);
+        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(view, View.ALPHA, endAlpha);
+        ValueAnimator clipAnimator = buildOutlineClipAnimator(view, expanding);
+
+        AnimatorSet animator = new AnimatorSet();
+        animator.playTogether(alphaAnimator, clipAnimator);
+        animator.setDuration(duration);
+        animator.setInterpolator(Interpolators.FAST_OUT_SLOW_IN_INTERPOLATOR);
+        animator.addListener(
+                buildAnimatorListener(holder, view, onStarting, onFinished, holderMap));
+        return animator;
+    }
+
+    private AnimatorListenerAdapter buildAnimatorListener(
+            ViewHolder holder,
+            View view,
+            Runnable onStarting,
+            Runnable onFinished,
+            AnimatorHolder holderMap) {
+        return new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                onStarting.run();
+                mIsAnimatorRunningSupplier.set(true);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                view.setAlpha(1f);
+                if (mUseClipAnimations) {
+                    view.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+                    view.setClipToOutline(false);
+                }
+                onFinished.run();
+                holderMap.remove(holder);
+                dispatchFinishedWhenAllAnimationsDone();
+            }
+        };
     }
 
     private Interpolator getRearrangeInterpolator() {

@@ -509,6 +509,27 @@ public class TabListItemAnimatorUnitTest {
     }
 
     @Test
+    public void animateRemove_WithClipAnimations_RunToCompletion() {
+        mItemAnimator = spy(new TabListItemAnimator(mIsAnimatorRunningSupplier, true));
+
+        var holder = buildViewHolder(TAB, /* useShrinkCloseAnimation= */ false);
+
+        assertTrue(mItemAnimator.animateRemove(holder));
+        verify(holder.itemView).setClipToOutline(true);
+        verify(holder.itemView).setOutlineProvider(any(ViewOutlineProvider.class));
+
+        assertTrue(mItemAnimator.isRunning());
+
+        runAnimationToCompletion();
+
+        verify(holder.itemView, atLeastOnce()).setAlpha(1f);
+        verify(holder.itemView).setOutlineProvider(eq(ViewOutlineProvider.BACKGROUND));
+        verify(holder.itemView).setClipToOutline(false);
+        verify(mItemAnimator).dispatchRemoveFinished(holder);
+        assertFalse(mItemAnimator.isRunning());
+    }
+
+    @Test
     public void multipleAnimationSequencing_WithClipAnimations() {
         mItemAnimator =
                 spy(
