@@ -163,6 +163,15 @@ GoogleOneOutcomeMetrics HistogramOutcomeBucket(GoogleOneOutcome outcome,
     }
   }
 
+  // If the user is not signed in and there is no valid account specified in the
+  // URL, there is no account to show settings for. Cancel the action.
+  if (!identityToUse) {
+    [self flowDidCompleteWithOutcome:GoogleOneOutcome::
+                                         kGoogleOneEntryOutcomeInvalidParameters
+                               error:nil];
+    return;
+  }
+
   GoogleOneConfiguration* configuration = [[GoogleOneConfiguration alloc] init];
   configuration.entryPoint = _entryPoint;
   configuration.identity = identityToUse;
