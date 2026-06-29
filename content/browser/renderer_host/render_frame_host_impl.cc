@@ -2610,8 +2610,7 @@ RenderFrameHostImpl::RenderFrameHostImpl(
           /*consumer_name=*/"RenderFrameHostImpl",
           /*traits=*/std::nullopt,  // TODO(crbug.com/489671163): Fill traits.
           this,
-          base::MemoryConsumerRegistration::CheckUnregister::kDisabled,
-          base::MemoryConsumerRegistration::CheckRegistryExists::kDisabled) {
+          base::MemoryConsumerRegistration::CheckUnregister::kDisabled) {
   TRACE_EVENT("navigation", "RenderFrameHostImpl::RenderFrameHostImpl",
               perfetto::Flow::FromPointer(this));
   base::trace_event::TraceSessionObserverList::AddObserver(this);

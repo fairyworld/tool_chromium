@@ -66,9 +66,7 @@ GrShaderCache::GrShaderCache(size_t max_cache_size_bytes, Client* client)
           "GrShaderCache",
           kGrShaderCacheTraits,
           this,
-          base::AsyncMemoryConsumerRegistration::CheckUnregister::kEnabled,
-          base::AsyncMemoryConsumerRegistration::CheckRegistryExists::
-              kDisabled) {
+          base::AsyncMemoryConsumerRegistration::CheckUnregister::kEnabled) {
   if (base::SingleThreadTaskRunner::HasCurrentDefault()) {
     base::trace_event::MemoryDumpManager::GetInstance()->RegisterDumpProvider(
         this, "GrShaderCache",
