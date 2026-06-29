@@ -70,8 +70,6 @@ source_set("unit_tests") {
     ":data_sharing",
     "//base",
     "//base/test:test_support",
-    "//chrome/browser",
-    "//chrome/browser/ui/browser_window",
     "//chrome/test:test_support",
     "//content/test:test_support",
     "//testing/gtest",
