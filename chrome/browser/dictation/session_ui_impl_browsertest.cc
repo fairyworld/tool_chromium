@@ -41,6 +41,7 @@ IN_PROC_BROWSER_TEST_F(DictationSessionUiImplBrowserTest,
   RunTestSequence(
     StartSession(),
     WaitForShow(DictationBubbleUi::kViewElementIdForTesting),
+    WaitForShow(DictationBubbleUi::kWaveformElementIdForTesting),
 
     // kStreamInitializing.
     CheckResult(GetSessionState(), SessionState::kStreamInitializing),

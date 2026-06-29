@@ -8920,6 +8920,7 @@ test("unit_tests") {
       "../browser/ui/views/content_setting_bubble_contents_unittest.cc",
       "../browser/ui/views/content_setting_site_row_view_unittest.cc",
       "../browser/ui/views/device_chooser_content_view_unittest.cc",
+      "../browser/ui/views/dictation/dictation_bubble_ui_unittest.cc",
       "../browser/ui/views/download/download_in_progress_dialog_view_unittest.cc",
       "../browser/ui/views/extensions/chooser_dialog_view_unittest.cc",
       "../browser/ui/views/extensions/expandable_container_view_unittest.cc",
