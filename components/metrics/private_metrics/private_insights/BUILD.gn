@@ -34,6 +34,13 @@ component("private_insights") {
   ]
 }
 
+source_set("private_insights_logger") {
+  public = [ "contextual_cue_log_event_helpers.h" ]
+  sources = [ "contextual_cue_log_event_helpers.cc" ]
+  public_deps = [ "//components/metrics/private_metrics/private_insights/events:contextual_cue_log_event_proto" ]
+  deps = [ "//base" ]
+}
+
 source_set("fcp_utils") {
   visibility = [ ":*" ]
   public = [ "fcp_utils.h" ]
@@ -97,6 +104,7 @@ source_set("fcp_files") {
 source_set("unit_tests") {
   testonly = true
   sources = [
+    "contextual_cue_log_event_helpers_unittest.cc",
     "fcp_files_unittest.cc",
     "fcp_http_client_unittest.cc",
     "fcp_simple_task_environment_unittest.cc",
@@ -109,6 +117,7 @@ source_set("unit_tests") {
     ":fcp_simple_task_environment",
     ":fcp_utils",
     ":private_insights",
+    ":private_insights_logger",
     "//base",
     "//base/test:test_support",
     "//components/metrics",
