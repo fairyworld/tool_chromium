@@ -60,6 +60,7 @@ class AtMemoryBottomSheetMediator {
         mModel =
                 new PropertyModel.Builder(AtMemoryBottomSheetProperties.ALL_KEYS)
                         .with(VISIBLE, false)
+                        .with(SHOW_SUGGESTIONS_BACKGROUND, false)
                         .with(ON_QUERY_SUBMITTED_CALLBACK, this::onQuerySubmitted)
                         .with(ON_QUERY_TEXT_CHANGED_CALLBACK, mDelegate::onQueryTextChanged)
                         .with(IS_NOTICE_VISIBLE, shouldShowNotice)
@@ -72,18 +73,12 @@ class AtMemoryBottomSheetMediator {
     }
 
     void show(List<AutofillSuggestion> suggestions) {
-        setSuggestions(suggestions);
-        mModel.set(IS_LOADING, mDelegate.isSearching());
-        mModel.set(
-                SHOW_SUGGESTIONS_BACKGROUND,
-                !suggestions.isEmpty() && !isSearchAffordance(suggestions));
+        applyScreenState(getScreenState(suggestions), suggestions);
         mModel.set(VISIBLE, true);
     }
 
     void onDismissed() {
-        mModelList.clear();
-        mModel.set(IS_LOADING, false);
-        mModel.set(SHOW_SUGGESTIONS_BACKGROUND, false);
+        applyScreenState(AtMemoryScreenState.HIDDEN, List.of());
         mModel.set(VISIBLE, false);
         mDelegate.onDismissed();
     }
@@ -93,18 +88,66 @@ class AtMemoryBottomSheetMediator {
         PersonalContextFirstRunService.noticeAcknowledged(mProfile);
     }
 
-    private void setSuggestions(List<AutofillSuggestion> suggestions) {
+    private AtMemoryScreenState getScreenState(List<AutofillSuggestion> suggestions) {
         if (isSearchAffordance(suggestions)) {
-            showSearchAffordance(suggestions.get(0));
-            return;
+            return AtMemoryScreenState.SEARCH_AFFORDANCE;
         }
-
-        mModelList.clear();
         if (suggestions.isEmpty()) {
-            showZeroState();
+            return mDelegate.isSearching()
+                    ? AtMemoryScreenState.LOADING
+                    : AtMemoryScreenState.ZERO_STATE;
+        }
+        return AtMemoryScreenState.SUGGESTIONS;
+    }
+
+    private void applyScreenState(
+            AtMemoryScreenState screenState, List<AutofillSuggestion> suggestions) {
+        mModel.set(IS_LOADING, screenState.isLoading);
+        mModel.set(SHOW_SUGGESTIONS_BACKGROUND, screenState.showSuggestionsBackground);
+
+        if (screenState.showZeroState) {
+            applyZeroState();
+        }
+        if (screenState.showSearchAffordance) {
+            applySearchAffordance(suggestions.get(0));
+        }
+        if (screenState.showAtMemorySuggestions) {
+            applySuggestions(suggestions);
+        }
+        if (screenState == AtMemoryScreenState.HIDDEN) {
+            mModelList.clear();
+        }
+    }
+
+    private void applyZeroState() {
+        if (mModelList.size() == 1 && mModelList.get(0).type == ITEM_TYPE_ZERO_STATE) {
             return;
         }
+        mModelList.clear();
+        mModelList.add(new ListItem(ITEM_TYPE_ZERO_STATE, new PropertyModel()));
+    }
 
+    private void applySearchAffordance(AutofillSuggestion affordance) {
+        if (!mModelList.isEmpty() && mModelList.get(0).type == ITEM_TYPE_SEARCH_TILE) {
+            mModelList.get(0).model.set(TILE_TITLE, affordance.getLabel());
+            if (mModelList.size() > 1) {
+                mModelList.removeRange(1, mModelList.size() - 1);
+            }
+            return;
+        }
+        mModelList.clear();
+        PropertyModel itemModel =
+                new PropertyModel.Builder(AtMemoryBottomSheetSearchTileProperties.ALL_KEYS)
+                        .with(TILE_ICON, affordance.getIconId())
+                        .with(TILE_TITLE, affordance.getLabel())
+                        .with(TILE_DETAILS, affordance.getSublabel())
+                        .with(ON_TILE_CLICKED, this::onSearchTileClicked)
+                        .build();
+        mModelList.add(new ListItem(ITEM_TYPE_SEARCH_TILE, itemModel));
+    }
+
+    private void applySuggestions(List<AutofillSuggestion> suggestions) {
+        mModelList.clear();
         for (int i = 0; i < suggestions.size(); i++) {
             AutofillSuggestion suggestion = suggestions.get(i);
             int position = i;
@@ -135,10 +178,6 @@ class AtMemoryBottomSheetMediator {
         mDelegate.onQuerySubmitted(query);
     }
 
-    private boolean isSearchTileAlreadyVisible() {
-        return !mModelList.isEmpty() && mModelList.get(0).type == ITEM_TYPE_SEARCH_TILE;
-    }
-
     private void onSearchTileClicked() {
         if (mModelList.isEmpty()) return;
 
@@ -147,32 +186,6 @@ class AtMemoryBottomSheetMediator {
 
         mHideKeyboardCallback.run();
         onQuerySubmitted(query);
-    }
-
-    private void showZeroState() {
-        // The zero-state illustration and text are static in the layout, so an empty model is used.
-        mModelList.add(new ListItem(ITEM_TYPE_ZERO_STATE, new PropertyModel()));
-    }
-
-    private void showSearchAffordance(AutofillSuggestion affordance) {
-        // Update the existing search tile in place rather than re-creating it to avoid UI
-        // flickering.
-        if (isSearchTileAlreadyVisible()) {
-            mModelList.get(0).model.set(TILE_TITLE, affordance.getLabel());
-            if (mModelList.size() > 1) {
-                mModelList.removeRange(1, mModelList.size() - 1);
-            }
-            return;
-        }
-        mModelList.clear();
-        PropertyModel itemModel =
-                new PropertyModel.Builder(AtMemoryBottomSheetSearchTileProperties.ALL_KEYS)
-                        .with(TILE_ICON, affordance.getIconId())
-                        .with(TILE_TITLE, affordance.getLabel())
-                        .with(TILE_DETAILS, affordance.getSublabel())
-                        .with(ON_TILE_CLICKED, this::onSearchTileClicked)
-                        .build();
-        mModelList.add(new ListItem(ITEM_TYPE_SEARCH_TILE, itemModel));
     }
 
     private boolean isSearchAffordance(List<AutofillSuggestion> suggestions) {

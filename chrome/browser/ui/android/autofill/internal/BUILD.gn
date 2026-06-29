@@ -29,6 +29,7 @@ android_library("java") {
     "java/src/org/chromium/chrome/browser/ui/autofill/AtMemoryBottomSheetViewBinder.java",
     "java/src/org/chromium/chrome/browser/ui/autofill/AtMemoryFlyoutView.java",
     "java/src/org/chromium/chrome/browser/ui/autofill/AtMemoryHomeView.java",
+    "java/src/org/chromium/chrome/browser/ui/autofill/AtMemoryScreenState.java",
     "java/src/org/chromium/chrome/browser/ui/autofill/AtMemorySearchBarView.java",
     "java/src/org/chromium/chrome/browser/ui/autofill/AuthenticatorOptionsAdapter.java",
     "java/src/org/chromium/chrome/browser/ui/autofill/AuthenticatorSelectionDialog.java",
