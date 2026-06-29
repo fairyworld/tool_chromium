@@ -267,9 +267,8 @@ suite('CpuPerformanceOverride', function() {
     await microtasksFinished();
 
     // Verify that the dropdown is disabled and shows the policy indicator.
-    assertTrue(dropdown.shadowRoot!.querySelector('select')!.disabled);
-    assertTrue(
-        !!dropdown.shadowRoot!.querySelector('cr-policy-pref-indicator'));
+    assertTrue(dropdown.shadowRoot.querySelector('select')!.disabled);
+    assertTrue(!!dropdown.shadowRoot.querySelector('cr-policy-pref-indicator'));
 
     // Verify the component respects the enforced preference value.
     assertEquals(4, speedPage.getPref('cpu_performance_tier_override').value);

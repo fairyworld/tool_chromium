@@ -5,7 +5,7 @@
 import {PrefsBrowserProxy, PrefService} from 'chrome://settings/settings.js';
 import type {SettingsDropdownMenuElement} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertNotReached, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {waitAfterNextRender} from 'chrome://webui-test/polymer_test_util.js';
+import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {TestPrefsBrowserProxy} from './test_prefs_browser_proxy.js';
 
@@ -23,7 +23,7 @@ suite('SettingsDropdownMenu', function() {
   let prefService: PrefService;
 
   function waitUntilDropdownUpdated(): Promise<void> {
-    return waitAfterNextRender(dropdown);
+    return microtasksFinished();
   }
 
   function simulateChangeEvent(value: string): Promise<void> {
@@ -60,7 +60,7 @@ suite('SettingsDropdownMenu', function() {
 
     dropdown = document.createElement('settings-dropdown-menu');
     document.body.appendChild(dropdown);
-    selectElement = dropdown.shadowRoot!.querySelector('select')!;
+    selectElement = dropdown.shadowRoot.querySelector('select')!;
     assertTrue(!!selectElement);
     const options = selectElement.options;
     customOption = options[options.length - 1]!;
@@ -206,7 +206,7 @@ suite('SettingsDropdownMenu', function() {
   test('delay setting options', async function() {
     dropdown.prefKey = 'test.number2';
 
-    await waitAfterNextRender(dropdown);
+    await microtasksFinished();
     await waitUntilDropdownUpdated();
     assertTrue(selectElement.disabled);
     assertEquals('SETTINGS_DROPDOWN_NOT_FOUND_ITEM', selectElement.value);
