@@ -855,10 +855,15 @@ bool CorsURLLoaderFactory::IsValidRequest(
 
   const bool allow_unsafe_headers = cors::ShouldAllowUnsafeHeaders(
       *origin_access_list_, request.request_initiator, request.url);
+  std::string forbidden_header;
   if (!process_id_.is_browser() && !allow_unsafe_headers &&
-      ContainsForbiddenSecurityHeader(request.headers)) {
-    mojo::ReportBadMessage(
-        "CorsURLLoaderFactory: Forbidden Sec- header from renderer");
+      ContainsForbiddenSecurityHeader(request.headers, &forbidden_header)) {
+    SCOPED_CRASH_KEY_STRING32("network", "forbidden_sec_header",
+                              forbidden_header);
+    if (features::kRestrictForbiddenSecurityHeadersDump.Get()) {
+      mojo::ReportBadMessage(
+          "CorsURLLoaderFactory: Forbidden Sec- header from renderer");
+    }
     return false;
   }
 
