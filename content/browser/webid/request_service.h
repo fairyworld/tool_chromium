@@ -157,11 +157,9 @@ class CONTENT_EXPORT RequestService
       RegisterIdPCallback callback,
       const GURL& idp,
       std::vector<ConfigFetcher::FetchResult> fetch_results);
-  void CompleteUserInfoRequest(
-      UserInfoRequest* request,
-      RequestUserInfoCallback callback,
-      blink::mojom::RequestUserInfoStatus status,
-      std::optional<std::vector<blink::mojom::IdentityUserInfoPtr>> user_info);
+  void CompleteUserInfoRequest(UserInfoRequest* request,
+                               RequestUserInfoCallback callback,
+                               blink::mojom::RequestUserInfoResultPtr result);
   void CompleteDisconnectRequest(DisconnectCallback callback,
                                  blink::mojom::DisconnectStatus status);
   void OnTokenRequestComplete(

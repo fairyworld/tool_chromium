@@ -389,15 +389,13 @@ void RequestService::RequestUserInfo(
 void RequestService::CompleteUserInfoRequest(
     UserInfoRequest* request,
     RequestUserInfoCallback callback,
-    blink::mojom::RequestUserInfoStatus status,
-    std::optional<std::vector<blink::mojom::IdentityUserInfoPtr>> user_info) {
+    blink::mojom::RequestUserInfoResultPtr result) {
   auto it = user_info_requests_.find(request);
   // The request may not be found if the completion is invoked from the
   // RequestService destructor. The destructor clears `user_info_requests_`,
   // which destroys the UserInfoRequests it contains. The
   // UserInfoRequest destructor invokes this callback.
-  if (it == user_info_requests_.end() &&
-      status == blink::mojom::RequestUserInfoStatus::kSuccess) {
+  if (it == user_info_requests_.end() && result->is_user_info()) {
     NOTREACHED() << "The successful user info request is nowhere to be found";
   }
   // Extract the request from the set first to prevent UAF if the callback
@@ -408,14 +406,7 @@ void RequestService::CompleteUserInfoRequest(
     user_info_requests_.erase(it);
   }
 
-  if (status == blink::mojom::RequestUserInfoStatus::kSuccess) {
-    DCHECK(user_info.has_value());
-    std::move(callback).Run(blink::mojom::RequestUserInfoResult::NewUserInfo(
-        std::move(user_info.value())));
-  } else {
-    std::move(callback).Run(
-        blink::mojom::RequestUserInfoResult::NewStatus(status));
-  }
+  std::move(callback).Run(std::move(result));
 }
 
 void RequestService::Disconnect(
