@@ -15170,6 +15170,17 @@ void RenderFrameHostImpl::GetWebAuthenticationService(
     return;
   }
 
+  // PDF renderer processes are not permitted to access password/passkey-class
+  // data for any origin (see
+  // ChildProcessSecurityPolicyImpl::IsAccessAllowedForPdfProcess). Refuse to
+  // bind blink.mojom.Authenticator for them, mirroring the gate already present
+  // for blink.mojom.PasswordManagerDriver.
+  if (GetProcess()->IsPdf()) {
+    bad_message::ReceivedBadMessage(
+        GetProcess(), bad_message::RFH_AUTHENTICATOR_PDF_PROCESS_BLOCKED);
+    return;
+  }
+
 #if !BUILDFLAG(IS_ANDROID)
   AuthenticatorImpl::Create(this, std::move(receiver));
 #else
