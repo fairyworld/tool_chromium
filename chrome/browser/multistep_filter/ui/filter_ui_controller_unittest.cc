@@ -94,6 +94,11 @@ class MockMultistepFilterService : public MultistepFilterService {
                int64_t navigation_id,
                std::string_view host),
               (override));
+  MOCK_METHOD(void, RecordSuggestionImpression, (), (override));
+  MOCK_METHOD(void,
+              RecordUserInteractionWithSuggestion,
+              (SuggestionUserDecision),
+              (override));
 };
 
 class MockWebContentsDelegate : public content::WebContentsDelegate {
@@ -573,6 +578,50 @@ TEST_F(
       test_api(*controller_).suggestion_state()->view_state,
       FilterUiController::SuggestionViewState::kCollapsedInOmniboxAfterReopen);
   EXPECT_TRUE(test_api(*controller_).suggestion_state().has_value());
+}
+
+TEST_F(FilterUiControllerTest, RecordImpressionOnMessageShown) {
+  UrlFilterSuggestion suggestion =
+      CreateDummySuggestion(GURL("https://example.com"), DefaultAttributes());
+  controller_->OnSuggestionGenerated(suggestion);
+
+  EXPECT_CALL(*mock_service_, RecordSuggestionImpression()).Times(1);
+
+  test_api(*controller_).OnPageActionAnchoredMessageShown(ActionState());
+}
+
+TEST_F(FilterUiControllerTest, DoNotRecordImpressionOnReopenFromOmnibox) {
+  UrlFilterSuggestion suggestion =
+      CreateDummySuggestion(GURL("https://example.com"), DefaultAttributes());
+  controller_->OnSuggestionGenerated(suggestion);
+
+  // 1. Initial display triggers exactly 1 impression call.
+  EXPECT_CALL(*mock_service_, RecordSuggestionImpression()).Times(1);
+  test_api(*controller_).OnPageActionAnchoredMessageShown(ActionState());
+  testing::Mock::VerifyAndClearExpectations(mock_service_.get());
+
+  // 2. Bubble hides (collapses into Omnibox).
+  test_api(*controller_).OnPageActionAnchoredMessageHidden(ActionState());
+
+  // 3. Reopening from Omnibox does NOT trigger RecordSuggestionImpression.
+  EXPECT_CALL(*mock_service_, RecordSuggestionImpression()).Times(0);
+  controller_->OnActionInvoked();
+  test_api(*controller_).OnPageActionAnchoredMessageShown(ActionState());
+  EXPECT_EQ(test_api(*controller_).suggestion_state()->view_state,
+            FilterUiController::SuggestionViewState::kReopenedFromOmnibox);
+}
+
+TEST_F(FilterUiControllerTest, RecordAcceptanceOnApplySuggestion) {
+  UrlFilterSuggestion suggestion =
+      CreateDummySuggestion(GURL("https://example.com"), DefaultAttributes());
+  controller_->OnSuggestionGenerated(suggestion);
+  test_api(*controller_).OnPageActionAnchoredMessageShown(ActionState());
+
+  EXPECT_CALL(*mock_service_, RecordUserInteractionWithSuggestion(
+                                  SuggestionUserDecision::kAccepted))
+      .Times(1);
+
+  controller_->OnActionInvoked();
 }
 
 }  // namespace

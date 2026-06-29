@@ -143,6 +143,10 @@ FilterUiController::~FilterUiController() {
       suggestion_state_->view_state == SuggestionViewState::kInactive) {
     return;
   }
+  if (service_) {
+    service_->RecordUserInteractionWithSuggestion(
+        SuggestionUserDecision::kIgnored);
+  }
   LogSuggestionUiDecision(log_router_, *suggestion_state_,
                           SuggestionUserDecision::kIgnored);
 }
@@ -177,6 +181,9 @@ void FilterUiController::ClearSuggestion(SuggestionUserDecision decision) {
     return;
   }
   if (suggestion_state_->view_state != SuggestionViewState::kInactive) {
+    if (service_) {
+      service_->RecordUserInteractionWithSuggestion(decision);
+    }
     LogSuggestionUiDecision(log_router_, *suggestion_state_, decision);
   }
   dismissal_weak_factory_.InvalidateWeakPtrs();
@@ -327,6 +334,7 @@ void FilterUiController::OnPageActionAnchoredMessageShown(
       LogSuggestionUiShown(log_router_, suggestion_state_->suggestion,
                            /*ui_shown=*/true, /*reason=*/"");
       if (service_) {
+        service_->RecordSuggestionImpression();
         // Delete similar suggestions from the service as this one is being
         // shown.
         service_->DeleteAnnotationsForTask(
