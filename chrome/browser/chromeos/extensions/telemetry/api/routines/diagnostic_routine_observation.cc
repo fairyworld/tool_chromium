@@ -12,6 +12,7 @@
 #include "chrome/browser/chromeos/extensions/telemetry/api/routines/diagnostic_routine_converters.h"
 #include "chrome/browser/chromeos/extensions/telemetry/api/routines/diagnostic_routine_info.h"
 #include "chrome/common/chromeos/extensions/api/diagnostics.h"
+#include "chromeos/ash/components/telemetry_extension/routines/routine_converters.h"
 #include "chromeos/crosapi/mojom/telemetry_diagnostic_routine_service.mojom.h"
 #include "content/public/browser/browser_context.h"
 #include "extensions/browser/event_router.h"
@@ -103,7 +104,7 @@ std::unique_ptr<extensions::Event> GetEventForFinishedRoutine(
 DiagnosticRoutineObservation::DiagnosticRoutineObservation(
     DiagnosticRoutineInfo info,
     OnRoutineFinished on_routine_finished,
-    mojo::PendingReceiver<crosapi::TelemetryDiagnosticRoutineObserver>
+    mojo::PendingReceiver<ash::cros_healthd::mojom::RoutineObserver>
         pending_receiver)
     : info_(info),
       on_routine_finished_(std::move(on_routine_finished)),
@@ -112,7 +113,10 @@ DiagnosticRoutineObservation::DiagnosticRoutineObservation(
 DiagnosticRoutineObservation::~DiagnosticRoutineObservation() = default;
 
 void DiagnosticRoutineObservation::OnRoutineStateChange(
-    crosapi::TelemetryDiagnosticRoutineStatePtr state) {
+    ash::cros_healthd::mojom::RoutineStatePtr healthd_state) {
+  // TODO(crbug.com/510951937): Remove the crosapi struct use.
+  auto state = ash::converters::ConvertRoutinePtr(std::move(healthd_state));
+
   std::unique_ptr<extensions::Event> event;
   std::unique_ptr<extensions::Event> legacy_finished_event;
   switch (state->state_union->which()) {

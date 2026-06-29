@@ -599,15 +599,3 @@ interface TelemetryDiagnosticRoutineControl {
   // `TelemetryDiagnosticRoutineStateWaiting`).
   [MinVersion=2] ReplyToInquiry@2(TelemetryDiagnosticRoutineInquiryReply reply);
 };
-
-// Implemented by clients who desire routine update notifications.
-//
-// NextMinVersion: 1, NextIndex: 1
-interface TelemetryDiagnosticRoutineObserver {
-  // Called when the routine state has changed. This is also called as soon
-  // as a routine is initialized (right after calling `CreateRoutine`).
-  // Note that if the routine fails to initialize, the
-  // TelemetryDiagnosticRoutineControl may disconnect before the first
-  // invocation of this observer method.
-  [MinVersion=1] OnRoutineStateChange@0(TelemetryDiagnosticRoutineState state);
-};
