@@ -108,7 +108,7 @@ WebuiOmniboxHandler::WebuiOmniboxHandler(
                                  std::move(pending_page),
                                  Profile::FromWebUI(web_ui),
                                  web_ui->GetWebContents(),
-                                 /*controller=*/nullptr,
+                                 /*client=*/nullptr,
                                  std::move(get_session_callback)),
       web_contents_observer_(/*handler=*/this, web_ui->GetWebContents()),
       metrics_reporter_(metrics_reporter) {
@@ -307,8 +307,13 @@ WebuiOmniboxHandler::CreateAutocompleteMatch(
 
   mojom_match.value()->has_instant_keyword =
       match.HasInstantKeyword(turl_service);
-  if (mojom_match && !match.HasInstantKeyword(turl_service) &&
-      edit_model->IsPopupControlPresentOnMatch(
+  const OmniboxEditModel* model_to_use =
+      base::FeatureList::IsEnabled(
+          omnibox::kWebUISearchboxWithoutModelController)
+          ? (controller_ ? controller_->edit_model() : nullptr)
+          : edit_model;
+  if (mojom_match && !match.HasInstantKeyword(turl_service) && model_to_use &&
+      model_to_use->IsPopupControlPresentOnMatch(
           OmniboxPopupSelection{line, OmniboxPopupSelection::KEYWORD_MODE})) {
     const auto names = SelectedKeywordView::GetKeywordLabelNames(
         match.associated_keyword, turl_service);

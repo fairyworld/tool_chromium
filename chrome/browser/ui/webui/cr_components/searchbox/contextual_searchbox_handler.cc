@@ -372,13 +372,13 @@ ContextualSearchboxHandler::ContextualSearchboxHandler(
     mojo::PendingRemote<searchbox::mojom::Page> pending_page,
     Profile* profile,
     content::WebContents* web_contents,
-    std::unique_ptr<OmniboxController> controller,
+    std::unique_ptr<OmniboxClient> client,
     GetSessionHandleCallback get_session_callback)
     : SearchboxHandler(std::move(pending_searchbox_handler),
                        std::move(pending_page),
                        profile,
                        web_contents,
-                       std::move(controller)),
+                       std::move(client)),
       get_session_callback_(std::move(get_session_callback)) {
   InitializeInputStateModel();
   tab_favicon_helper_ = std::make_unique<ContextualSearchboxTabFaviconHelper>();
@@ -1413,8 +1413,7 @@ void ContextualSearchboxHandler::OpenAutocompleteMatch(uint8_t line,
   auto* recorder = GetMetricsRecorder();
   bool record_composebox_metric =
       omnibox::IsComposebox(
-          omnibox_controller()->client()->GetPageClassification(
-              /*is_prefetch=*/false)) &&
+          client()->GetPageClassification(/*is_prefetch=*/false)) &&
       match && recorder;
 
   if (record_composebox_metric) {
@@ -1550,8 +1549,7 @@ void ContextualSearchboxHandler::SubmitQuery(const std::string& query_text,
   // for now since this is handled in `ComposeboxHandler`.
   omnibox::ChromeAimEntryPoint aim_entry_point =
       PageClassificationToAimEntryPoint(
-          omnibox_controller()->client()->GetPageClassification(
-              /*is_prefetch=*/false));
+          client()->GetPageClassification(/*is_prefetch=*/false));
 
   ContextualizeQueryAndOpenUrl(query_text, disposition, aim_entry_point,
                                /*additional_params=*/{}, is_voice_search);

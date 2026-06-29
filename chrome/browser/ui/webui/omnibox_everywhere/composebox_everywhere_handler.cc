@@ -7,7 +7,6 @@
 #include <utility>
 
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/omnibox/omnibox_controller.h"
 #include "content/public/browser/web_contents.h"
 #include "third_party/metrics_proto/omnibox_event.pb.h"
 
@@ -49,10 +48,9 @@ ComposeboxEverywhereHandler::ComposeboxEverywhereHandler(
           std::move(pending_searchbox_page),
           profile,
           web_contents,
-          std::make_unique<OmniboxController>(
-              std::make_unique<ComposeboxEverywhereClient>(profile,
-                                                           web_contents,
-                                                           this)),
+          std::make_unique<ComposeboxEverywhereClient>(profile,
+                                                       web_contents,
+                                                       this),
           std::move(get_session_callback),
           std::move(clear_session_callback)) {}
 

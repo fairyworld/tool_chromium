@@ -1932,46 +1932,8 @@ gfx::Image OmniboxEditModel::GetMatchIconIfExtension(
 
 std::u16string OmniboxEditModel::GetSuggestionGroupHeaderText(
     const std::optional<omnibox::GroupId>& suggestion_group_id) const {
-  if (suggestion_group_id.has_value()) {
-    const auto& input = autocomplete_controller()->input();
-    bool force_hide_row_header =
-        OmniboxFieldTrial::IsHideSuggestionGroupHeadersEnabledInContext(
-            input.current_page_classification());
-    auto header_text =
-        autocomplete_controller()->result().GetHeaderForSuggestionGroup(
-            suggestion_group_id.value());
-
-    bool has_toolbelt_lens_action =
-        autocomplete_controller()->contextual_search_provider() &&
-        autocomplete_controller()
-            ->contextual_search_provider()
-            ->HasToolbeltLensAction();
-    const auto* client =
-        autocomplete_controller()->autocomplete_provider_client();
-    bool has_lens_search_chip =
-        client->IsOmniboxNextLensSearchChipEnabled() &&
-        ContextualSearchProvider::LensEntrypointEligible(input, client);
-    // Show contextual search suggestion group header if the Lens action has
-    // been moved to the Omnibox toolbelt OR the "Omnibox Next" Lens search chip
-    // is currently active.
-    // TODO (crbug.com/510907230) - Clean up this logic once it's confirmed that
-    // a header is not needed for the omnibox contextual search results.
-    if (suggestion_group_id.value() == omnibox::GROUP_CONTEXTUAL_SEARCH &&
-        (has_toolbelt_lens_action || has_lens_search_chip)) {
-      if (base::FeatureList::IsEnabled(omnibox::kHideContextualGroupHeaders) ||
-          has_lens_search_chip) {
-        return u"";
-      }
-      // TODO(khalidpeer): Make direct use of `header_text` once we start
-      //     receiving a non-empty contextual search header from the server.
-      return header_text.empty()
-                 ? l10n_util::GetStringUTF16(
-                       IDS_CONTEXTUAL_SEARCH_OPEN_LENS_ACTION_LABEL)
-                 : header_text;
-    }
-    return force_hide_row_header ? u"" : header_text;
-  }
-  return u"";
+  return autocomplete_controller()->GetSuggestionGroupHeaderText(
+      suggestion_group_id);
 }
 
 void OmniboxEditModel::ResetPopupToInitialState() {
@@ -2924,19 +2886,13 @@ void OmniboxEditModel::OpenMatch(OmniboxPopupSelection selection,
   TemplateURLService* template_url_service =
       controller_->client()->GetTemplateURLService();
   if (action) {
-    OmniboxAction::ExecutionContext context(
-        *(autocomplete_controller()->autocomplete_provider_client()),
-        base::BindOnce(&OmniboxClient::OnAutocompleteAccept,
-                       controller_->client()->AsWeakPtr()),
-        match_selection_timestamp, disposition);
-    base::UmaHistogramMicrosecondsTimes(
-        "Omnibox.InputToExecuteAction",
-        base::TimeTicks::Now() - match_selection_timestamp);
-    action->Execute(context);
-    if (context.enter_starter_pack_id_ != 0 && template_url_service) {
+    int enter_starter_pack_id = controller_->client()->ExecuteAction(
+        action, disposition, match_selection_timestamp,
+        *(autocomplete_controller()->autocomplete_provider_client()));
+    if (enter_starter_pack_id != 0 && template_url_service) {
       template_url_starter_pack_data::StarterPackId starter_pack_id =
           static_cast<template_url_starter_pack_data::StarterPackId>(
-              context.enter_starter_pack_id_);
+              enter_starter_pack_id);
       if (const TemplateURL* starter_pack_turl =
               template_url_service->FindStarterPackTemplateURL(
                   starter_pack_id)) {

@@ -7,7 +7,6 @@
 #include <utility>
 
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/omnibox/omnibox_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_everywhere_service.h"
 #include "chrome/browser/ui/webui/cr_components/searchbox/searchbox_omnibox_client.h"
 #include "content/public/browser/web_ui.h"
@@ -56,19 +55,18 @@ OmniboxEverywhereHandler::OmniboxEverywhereHandler(
     content::WebUI* web_ui,
     OmniboxEverywhereService* service,
     GetSessionHandleCallback get_session_callback)
-    : ContextualSearchboxHandler(std::move(pending_page_handler),
-                                 std::move(pending_page),
-                                 Profile::FromWebUI(web_ui),
-                                 web_ui->GetWebContents(),
-                                 std::make_unique<OmniboxController>(
-                                     std::make_unique<OmniboxEverywhereClient>(
-                                         Profile::FromWebUI(web_ui),
-                                         web_ui->GetWebContents(),
-                                         service)),
-                                 std::move(get_session_callback)) {
-  static_cast<ContextualOmniboxClient*>(omnibox_controller()->client())
-      ->SetSuggestInputsCallback(base::BindRepeating(
-          &OmniboxEverywhereHandler::GetSuggestInputs, base::Unretained(this)));
+    : ContextualSearchboxHandler(
+          std::move(pending_page_handler),
+          std::move(pending_page),
+          Profile::FromWebUI(web_ui),
+          web_ui->GetWebContents(),
+          std::make_unique<OmniboxEverywhereClient>(Profile::FromWebUI(web_ui),
+                                                    web_ui->GetWebContents(),
+                                                    service),
+          std::move(get_session_callback)) {
+  static_cast<ContextualOmniboxClient*>(client())->SetSuggestInputsCallback(
+      base::BindRepeating(&OmniboxEverywhereHandler::GetSuggestInputs,
+                          base::Unretained(this)));
   autocomplete_controller_observation_.Observe(autocomplete_controller());
 }
 

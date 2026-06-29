@@ -1347,7 +1347,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksComposeboxHandlerTest,
   EXPECT_CALL(*mock_ui_, PostMessageToWebview(testing::_));
 
   AutocompleteMatch match;
-  handler_->GetOmniboxControllerForTesting()->client()->OnAutocompleteAccept(
+  handler_->GetOmniboxClientForTesting()->OnAutocompleteAccept(
       GURL("https://www.google.com/search?q=test query"), nullptr,
       WindowOpenDisposition::CURRENT_TAB, ui::PAGE_TRANSITION_TYPED,
       AutocompleteMatchType::SEARCH_SUGGEST, base::TimeTicks::Now(), false,
@@ -1386,7 +1386,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksComposeboxHandlerTest,
   EXPECT_CALL(*mock_ui_, PostMessageToWebview(testing::_));
 
   AutocompleteMatch match;
-  handler_->GetOmniboxControllerForTesting()->client()->OnAutocompleteAccept(
+  handler_->GetOmniboxClientForTesting()->OnAutocompleteAccept(
       GURL("https://www.google.com/search?q=extracted%20query"), nullptr,
       WindowOpenDisposition::CURRENT_TAB, ui::PAGE_TRANSITION_TYPED,
       AutocompleteMatchType::SEARCH_SUGGEST, base::TimeTicks::Now(), false,
@@ -1405,7 +1405,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksComposeboxHandlerTest,
   EXPECT_CALL(*mock_ui_, PostMessageToWebview(testing::_));
 
   AutocompleteMatch match;
-  handler_->GetOmniboxControllerForTesting()->client()->OnAutocompleteAccept(
+  handler_->GetOmniboxClientForTesting()->OnAutocompleteAccept(
       GURL("https://www.google.com/search?other=param"), nullptr,
       WindowOpenDisposition::CURRENT_TAB, ui::PAGE_TRANSITION_TYPED,
       AutocompleteMatchType::SEARCH_SUGGEST, base::TimeTicks::Now(), false,
@@ -3295,7 +3295,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksComposeboxHandlerTest,
                           base::Unretained(mock_ui_.get())));
 
   auto* client = static_cast<ContextualOmniboxClient*>(
-      custom_handler->GetOmniboxControllerForTesting()->client());
+      custom_handler->GetOmniboxClientForTesting());
 
   auto result = client->GetLensOverlaySuggestInputsForTesting();
 

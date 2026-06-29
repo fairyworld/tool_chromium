@@ -206,10 +206,9 @@ ContextualTasksComposeboxHandler::ContextualTasksComposeboxHandler(
           std::move(pending_searchbox_page),
           profile,
           web_contents,
-          std::make_unique<OmniboxController>(
-              std::make_unique<ContextualTasksOmniboxClient>(profile,
-                                                             web_contents,
-                                                             this)),
+          std::make_unique<ContextualTasksOmniboxClient>(profile,
+                                                         web_contents,
+                                                         this),
           std::move(get_session_callback),
           std::move(clear_session_callback)),
       take_input_model_callback_(std::move(take_input_model_callback)),
@@ -234,7 +233,7 @@ ContextualTasksComposeboxHandler::ContextualTasksComposeboxHandler(
   // Set the callback for getting suggest inputs from the session.
   // The session is owned by WebUI controller and accessed via callback.
   // It is safe to use Unretained because omnibox client is owned by `this`.
-  static_cast<ContextualTasksOmniboxClient*>(omnibox_controller()->client())
+  static_cast<ContextualTasksOmniboxClient*>(client())
       ->SetSuggestInputsCallback(base::BindRepeating(
           &ContextualTasksComposeboxHandler::GetSuggestInputs,
           base::Unretained(this)));
