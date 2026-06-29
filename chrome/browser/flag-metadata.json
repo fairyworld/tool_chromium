@@ -5385,14 +5385,7 @@
     "owners": [ "sanaakbani@google.com" ],
     "expiry_milestone": 150
   },
-  {
-    "name": "glic-detached",
-    "owners": [
-      "dewittj@chromium.org",
-      "perrier@chromium.org"
-    ],
-    "expiry_milestone": 150
-  },
+
   {
     "name": "glic-disable-actor-safety-checks",
     "owners": [

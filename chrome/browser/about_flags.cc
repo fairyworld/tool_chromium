@@ -10629,9 +10629,7 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kActorScriptToolSkipPageContentName,
      flag_descriptions::kActorScriptToolSkipPageContentDescription, kOsDesktop,
      FEATURE_VALUE_TYPE(actor::kActorScriptToolSkipPageContent)},
-    {"glic-detached", flag_descriptions::kGlicDetachedName,
-     flag_descriptions::kGlicDetachedDescription, kOsDesktop,
-     FEATURE_VALUE_TYPE(features::kGlicDetached)},
+
     {"glic-print-menu-item", flag_descriptions::kGlicPrintMenuItemName,
      flag_descriptions::kGlicPrintMenuItemDescription,
      kOsMac | kOsWin | kOsLinux,

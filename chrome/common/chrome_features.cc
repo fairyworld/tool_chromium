@@ -506,9 +506,6 @@ const base::FeatureParam<int> kGlicMinRequiredRamMb{
 const base::FeatureParam<bool> kGlicAdaptiveToolbarAutoPin{
     &kGlic, "adaptive-toolbar-auto-pin", true};
 
-// Controls whether the Glic feature is always detached.
-BASE_FEATURE(kGlicDetached, base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Controls whether the Glic feature uses multiple instances or not.
 BASE_FEATURE(kGlicMultiInstance, base::FEATURE_ENABLED_BY_DEFAULT);
 

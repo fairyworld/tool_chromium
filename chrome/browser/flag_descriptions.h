@@ -1601,9 +1601,7 @@ inline constexpr char kGlicOSIconVariantDescription[] =
 inline constexpr char kGlicClientZoomControlName[] = "Glic Client Zoom Control";
 inline constexpr char kGlicClientZoomControlDescription[] =
     "Enables the use of Chrome zoom keyboard controls in the Glic UI.";
-inline constexpr char kGlicDetachedName[] = "Glic detached-only mode";
-inline constexpr char kGlicDetachedDescription[] =
-    "Detach only mode forces the Glic UI to always be floating";
+
 inline constexpr char kGlicDefaultTabContextSettingName[] =
     "Glic Default Tab Context Setting";
 inline constexpr char kGlicDefaultTabContextSettingDescription[] =
