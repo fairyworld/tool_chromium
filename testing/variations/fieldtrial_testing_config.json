@@ -24228,6 +24228,25 @@
             ]
         }
     ],
+    "TransientKeepAlivePolicy": [
+        {
+            "platforms": [
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "TrackEmptyRendererProcessesForReuse",
+                        "TransientKeepAlivePolicy"
+                    ]
+                }
+            ]
+        }
+    ],
     "TranslateBubbleOpenSettings": [
         {
             "platforms": [

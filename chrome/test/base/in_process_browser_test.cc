@@ -83,6 +83,7 @@
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/os_crypt/async/browser/key_provider.h"
 #include "components/password_manager/core/browser/password_manager_switches.h"
+#include "components/performance_manager/public/features.h"
 #include "components/prefs/pref_service.h"
 #include "content/public/browser/browser_main_parts.h"
 #include "content/public/browser/devtools_agent_host.h"
@@ -372,6 +373,12 @@ void InProcessBrowserTest::Initialize() {
   // Allow unpacked extensions without developer mode for testing.
   disabled_features.push_back(
       extensions_features::kExtensionDisableUnsupportedDeveloper);
+
+  // Disable TransientKeepAlivePolicy in tests by default since it delays
+  // renderer process cleanup, breaking tests checking process counts or
+  // expecting immediate process exit.
+  disabled_features.push_back(
+      performance_manager::features::kTransientKeepAlivePolicy);
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
   // Disable session restore infobar the experiment as it causes test failures.
