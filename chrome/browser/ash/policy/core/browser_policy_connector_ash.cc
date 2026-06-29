@@ -225,8 +225,8 @@ void BrowserPolicyConnectorAsh::Init(
 
   device_local_account_policy_service_ =
       std::make_unique<DeviceLocalAccountPolicyService>(
-          ash::SessionManagerClient::Get(), ash::DeviceSettingsService::Get(),
-          ash::CrosSettings::Get(),
+          url_loader_factory, ash::SessionManagerClient::Get(),
+          ash::DeviceSettingsService::Get(), ash::CrosSettings::Get(),
           invalidation_listener_per_project_
               [policy::kPolicyInvalidationProjectNumber]
                   .get(),
@@ -234,7 +234,7 @@ void BrowserPolicyConnectorAsh::Init(
           /*store_first_load_task_runner=*/CreateUserVisibleTaskRunner(),
           /*extension_cache_task_runner=*/CreateBackgroundTaskRunner(),
           /*external_data_service_backend_task_runner=*/
-          CreateBackgroundTaskRunner(), url_loader_factory);
+          CreateBackgroundTaskRunner());
   device_local_account_policy_service_->Connect(device_management_service());
 
   if (device_cloud_policy_manager_) {
