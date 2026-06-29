@@ -1877,10 +1877,6 @@ if (is_android) {
     # TODO(crbug.com/504739401): Remove this dependency.
     deps += [ "//chrome/browser/keyboard_accessory/android:impl" ]
 
-    if (enable_javaless_renderers) {
-      deps += [ "//content/app:javaless_renderer" ]
-    }
-
     data_deps = [ "//testing/buildbot/filters:android_browsertests_filters" ]
 
     data = [
