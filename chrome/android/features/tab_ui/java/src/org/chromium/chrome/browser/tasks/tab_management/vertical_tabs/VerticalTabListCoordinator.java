@@ -393,7 +393,7 @@ public class VerticalTabListCoordinator {
                                 v -> verticalTabsActionDelegate.openHubPane(PaneId.TAB_GROUPS))
                         .with(
                                 VerticalTabListProperties.ON_SEARCH_CLICK_LISTENER,
-                                v -> verticalTabsActionDelegate.openHubPane(PaneId.TAB_SWITCHER))
+                                v -> verticalTabsActionDelegate.openTabSearch())
                         .with(
                                 VerticalTabListProperties.ON_NEW_TAB_CLICK_LISTENER,
                                 v -> handleNewTabButtonClick())

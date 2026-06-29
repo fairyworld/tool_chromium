@@ -207,6 +207,7 @@ import org.chromium.chrome.browser.tabwindow.WindowId;
 import org.chromium.chrome.browser.tasks.tab_management.FaviconResolver;
 import org.chromium.chrome.browser.tasks.tab_management.TabGroupFaviconCluster;
 import org.chromium.chrome.browser.tasks.tab_management.TabGroupListFaviconResolverFactory;
+import org.chromium.chrome.browser.tasks.tab_management.TabSearchOverlayCoordinator;
 import org.chromium.chrome.browser.tasks.tab_management.TabUiUtils;
 import org.chromium.chrome.browser.tasks.tab_management.UndoGroupSnackbarController;
 import org.chromium.chrome.browser.tasks.tab_management.vertical_tabs.VerticalTabListCoordinator;
@@ -393,6 +394,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
     private @Nullable GlicUiCoordinator mGlicUiCoordinator;
     private @Nullable ForcedSigninController mForcedSigninController;
     private @Nullable VerticalTabsSideUiCoordinator mVerticalTabsSideUiCoordinator;
+    private @Nullable TabSearchOverlayCoordinator mTabSearchOverlayCoordinator;
     private final VerticalTabsActionDelegate mVerticalTabsActionDelegate;
 
     // Activity tab observer that updates the current tab used by various UI components.
@@ -2249,6 +2251,20 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
         View secondaryUiContainer = mActivity.findViewById(R.id.secondary_ui_container);
         mSecondaryUiContainerMarginAdjuster = new ViewMarginAdjusterForSideUi(secondaryUiContainer);
         mSideUiCoordinator.addObserver(mSecondaryUiContainerMarginAdjuster);
+
+        if (ChromeFeatureList.sTabSearchForAL.isEnabled()) {
+            mTabSearchOverlayCoordinator =
+                    new TabSearchOverlayCoordinator(
+                            mActivity,
+                            anchorContainerParent,
+                            mWindowAndroid,
+                            mProfileSupplier,
+                            assumeNonNull(mSnackbarManagerSupplier.get()),
+                            mModalDialogManagerSupplier,
+                            mActivityLifecycleDispatcher,
+                            mTabModelSelectorSupplier,
+                            mEdgeToEdgeManager.getEdgeToEdgeSystemBarColorHelper());
+        }
     }
 
     private void maybeInitializeVerticalTabs(Profile profile) {
@@ -2369,6 +2385,11 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
         if (mPrefChangeRegistrar != null) {
             mPrefChangeRegistrar.destroy();
             mPrefChangeRegistrar = null;
+        }
+
+        if (mTabSearchOverlayCoordinator != null) {
+            mTabSearchOverlayCoordinator.destroy();
+            mTabSearchOverlayCoordinator = null;
         }
     }
 
@@ -2815,6 +2836,16 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                     result -> {
                         mTrackerInitializedOneshotSupplier.set(true);
                     });
+        }
+    }
+
+    /**
+     * Shows the tab search overlay if it has been initialized. This overlay provides a floating
+     * container anchored on the left with an embedded search UI as a side panel.
+     */
+    public void showTabSearchOverlay() {
+        if (mTabSearchOverlayCoordinator != null) {
+            mTabSearchOverlayCoordinator.show();
         }
     }
 

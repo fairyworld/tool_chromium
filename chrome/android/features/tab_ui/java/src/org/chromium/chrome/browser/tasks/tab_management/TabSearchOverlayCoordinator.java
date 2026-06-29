@@ -81,7 +81,8 @@ public class TabSearchOverlayCoordinator {
      * @param windowAndroid The window helper for managing window-level state.
      * @param profileSupplier Supplier for the current Profile.
      * @param snackbarManager Manager for showing snackbar notifications.
-     * @param modalDialogManagerSupplier Supplier for the modal dialog manager.
+     * @param modalDialogManagerSupplier Supplier for the modal dialog manager. Uses a wildcard type
+     *     to resolve NullAway type incompatibility between non-null and nullable supplier generics.
      * @param lifecycleDispatcher Dispatcher for activity lifecycle events.
      * @param tabModelSelectorSupplier Supplier for the tab model selector.
      * @param edgeToEdgeSystemBarColorHelper Helper for managing system bar colors in edge-to-edge.
@@ -92,7 +93,7 @@ public class TabSearchOverlayCoordinator {
             WindowAndroid windowAndroid,
             MonotonicObservableSupplier<Profile> profileSupplier,
             SnackbarManager snackbarManager,
-            Supplier<@Nullable ModalDialogManager> modalDialogManagerSupplier,
+            Supplier<? extends @Nullable ModalDialogManager> modalDialogManagerSupplier,
             ActivityLifecycleDispatcher lifecycleDispatcher,
             MonotonicObservableSupplier<TabModelSelector> tabModelSelectorSupplier,
             @Nullable EdgeToEdgeSystemBarColorHelper edgeToEdgeSystemBarColorHelper) {
@@ -101,7 +102,10 @@ public class TabSearchOverlayCoordinator {
         mWindowAndroid = windowAndroid;
         mProfileSupplier = profileSupplier;
         mSnackbarManager = snackbarManager;
-        mModalDialogManagerSupplier = modalDialogManagerSupplier;
+        // Wrap with a lambda to bridge generic nullability invariance between callers providing a
+        // NonNullObservableSupplier (e.g. TabbedRootUiCoordinator) and downstream coordinators
+        // expecting Supplier<@Nullable ModalDialogManager> (e.g. SearchUiCoordinator).
+        mModalDialogManagerSupplier = () -> modalDialogManagerSupplier.get();
         mLifecycleDispatcher = lifecycleDispatcher;
         mTabModelSelectorSupplier = tabModelSelectorSupplier;
         mEdgeToEdgeSystemBarColorHelper = edgeToEdgeSystemBarColorHelper;

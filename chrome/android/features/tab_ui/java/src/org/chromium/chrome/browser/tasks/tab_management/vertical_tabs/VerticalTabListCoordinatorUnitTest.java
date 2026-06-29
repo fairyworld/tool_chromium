@@ -757,7 +757,7 @@ public class VerticalTabListCoordinatorUnitTest {
         ImageButton tabSearchButton = mCoordinator.getView().findViewById(R.id.tab_search_button);
         assertNotNull(tabSearchButton);
         tabSearchButton.performClick();
-        verify(mVerticalTabsActionDelegate).openHubPane(PaneId.TAB_SWITCHER);
+        verify(mVerticalTabsActionDelegate).openTabSearch();
     }
 
     @Test
