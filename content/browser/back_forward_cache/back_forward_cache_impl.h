@@ -616,7 +616,7 @@ class CONTENT_EXPORT BackForwardCacheImpl
   // from each Entry's RenderViewHosts. Every RenderProcessHost in here is
   // observed by |this|. Every RenderProcessHost in this is referenced by a
   // RenderViewHost in the Entry and so will be valid.
-  std::multiset<RenderProcessHost*> observed_processes_;
+  std::multiset<raw_ptr<RenderProcessHost>> observed_processes_;
 
   // Whether the BackForwardCache has been enabled for pages loaded with
   // "Cache-Control: no-store" header.

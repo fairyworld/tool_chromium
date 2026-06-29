@@ -200,7 +200,7 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyManager
 #endif
 
   bool is_notifying_ = false;
-  base::flat_set<MemoryCoordinatorPolicy*> policies_;
+  base::flat_set<raw_ptr<MemoryCoordinatorPolicy>> policies_;
 
   absl::flat_hash_map<ChildProcessId, std::unique_ptr<HostState>> hosts_;
 

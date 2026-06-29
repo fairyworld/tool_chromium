@@ -141,7 +141,7 @@ void FrameTree::NodeIterator::AdvanceNode() {
 }
 
 FrameTree::NodeIterator::NodeIterator(
-    const std::vector<raw_ptr<FrameTreeNode, VectorExperimental>>&
+    const std::vector<raw_ptr<FrameTreeNode, DanglingUntriaged>>&
         starting_nodes,
     const FrameTreeNode* root_of_subtree_to_skip,
     bool should_descend_into_inner_trees,
@@ -179,7 +179,7 @@ FrameTree::NodeIterator FrameTree::NodeRange::end() {
 }
 
 FrameTree::NodeRange::NodeRange(
-    const std::vector<raw_ptr<FrameTreeNode, VectorExperimental>>&
+    const std::vector<raw_ptr<FrameTreeNode, DanglingUntriaged>>&
         starting_nodes,
     const FrameTreeNode* root_of_subtree_to_skip,
     bool should_descend_into_inner_trees,
@@ -338,7 +338,7 @@ std::vector<FrameTreeNode*> FrameTree::CollectNodesForIsLoading() {
 FrameTree::NodeRange FrameTree::SubtreeAndInnerTreeNodes(
     RenderFrameHostImpl* parent,
     bool include_delegate_nodes_for_inner_frame_trees) {
-  std::vector<raw_ptr<FrameTreeNode, VectorExperimental>> starting_nodes;
+  std::vector<raw_ptr<FrameTreeNode, DanglingUntriaged>> starting_nodes;
   starting_nodes.reserve(parent->child_count());
   for (size_t i = 0; i < parent->child_count(); ++i) {
     FrameTreeNode* child = parent->child_at(i);

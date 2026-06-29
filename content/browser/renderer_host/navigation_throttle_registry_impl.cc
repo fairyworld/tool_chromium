@@ -8,6 +8,7 @@
 
 #include "base/check_deref.h"
 #include "base/debug/dump_without_crashing.h"
+#include "base/memory/raw_ptr.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/trace_event/trace_event.h"
 #include "build/build_config.h"
@@ -260,7 +261,7 @@ void NavigationThrottleRegistryImpl::OnDeferProcessingNavigationEvent(
   deferring_throttles_.insert(deferring_throttle);
 }
 
-const std::set<NavigationThrottle*>&
+const std::set<raw_ptr<NavigationThrottle>>&
 NavigationThrottleRegistryImpl::GetDeferringThrottles() const {
   return deferring_throttles_;
 }
