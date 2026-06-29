@@ -131,6 +131,10 @@ const OGB_IFRAME_ORIGIN = 'chrome-untrusted://new-tab-page';
 const MSAL_IFRAME_ORIGIN = 'chrome-untrusted://ntp-microsoft-auth';
 const VOICE_QUERY_LENGTH_LIMIT = 120;
 const VOICE_IDLE_TIMEOUT_MS = 8000;
+const COMPOSEBOX_INERT_ALLOWLIST = [
+  '#logo',
+  '#searchboxContainer',
+];
 
 export const CUSTOMIZE_CHROME_BUTTON_ELEMENT_ID =
     'CustomizeButtonsHandler::kCustomizeChromeButtonElementId';
@@ -830,12 +834,8 @@ export class AppElement extends AppElementBase {
       this.onPromoAndModulesLoadedChange_();
     }
 
-    if (changedPrivateProperties.has('showComposebox_') &&
-        this.showComposebox_) {
-      const composeboxDialog =
-          this.shadowRoot.querySelector<HTMLDialogElement>('#composeboxDialog');
-      assert(composeboxDialog);
-      composeboxDialog.showModal();
+    if (changedPrivateProperties.has('showComposebox_')) {
+      this.onShowComposeboxChange_();
     }
 
     if (changedPrivateProperties.has('oneGoogleBarLoaded_') ||
@@ -1734,6 +1734,27 @@ export class AppElement extends AppElementBase {
     this.undoToastCallback_ = null;
     this.undoToastMessage_ = null;
     this.processPendingUndoToasts_();
+  }
+
+  private onShowComposeboxChange_() {
+    if (this.showComposebox_) {
+      const composeboxDialog =
+          this.shadowRoot.querySelector<HTMLDialogElement>('#composeboxDialog');
+      assert(composeboxDialog);
+      composeboxDialog.show();
+    }
+
+    const notSelector =
+        COMPOSEBOX_INERT_ALLOWLIST.map(s => `:not(${s})`).join('');
+    const blockedElements = this.shadowRoot.querySelectorAll<HTMLElement>(
+        `#content > ${notSelector}`);
+    blockedElements.forEach(element => {
+      if (this.showComposebox_) {
+        element.setAttribute('inert', '');
+      } else {
+        element.removeAttribute('inert');
+      }
+    });
   }
 }
 
