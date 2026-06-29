@@ -239,4 +239,38 @@ public class ShoppingPersistedTabDataDeferredStartupTest {
                 });
         ShoppingPersistedTabDataTestUtils.acquireSemaphore(semaphore);
     }
+
+    @SmallTest
+    @Test
+    public void testTabDestructionClearsQueue() {
+        final Tab tab = ShoppingPersistedTabDataTestUtils.createTabOnUiThread(0, mProfileMock);
+        Assert.assertEquals(0, ShoppingPersistedTabData.getQueueSizeForTesting());
+
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    ShoppingPersistedTabData.initialize(tab);
+                });
+        Assert.assertEquals(1, ShoppingPersistedTabData.getQueueSizeForTesting());
+
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    tab.destroy();
+                });
+        // Without the fix, this will fail because the queue size will still be 1 (leak).
+        Assert.assertEquals(0, ShoppingPersistedTabData.getQueueSizeForTesting());
+    }
+
+    @SmallTest
+    @Test
+    public void testInitializeWithDestroyedTabDoesNotQueue() {
+        final Tab tab = mock(Tab.class);
+        doReturn(true).when(tab).isDestroyed();
+        Assert.assertEquals(0, ShoppingPersistedTabData.getQueueSizeForTesting());
+
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    ShoppingPersistedTabData.initialize(tab);
+                });
+        Assert.assertEquals(0, ShoppingPersistedTabData.getQueueSizeForTesting());
+    }
 }
