@@ -74,8 +74,7 @@ class AutofillPopupControllerImplTest
     // 1. Set the trigger source inside the delegate.
     manager().external_delegate().OnQuery(
         FormData(), FormFieldData(), gfx::Rect(),
-        AutofillSuggestionTriggerSource::kAtMemory,
-        /*update_datalist=*/false);
+        AutofillSuggestionTriggerSource::kAtMemory);
 
     // 2. Setup the bridge so the mock delegate executes real initialization
     // logic.

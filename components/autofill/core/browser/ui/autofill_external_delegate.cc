@@ -369,16 +369,13 @@ void AutofillExternalDelegate::OnQuery(
     const FormData& form,
     const FormFieldData& field,
     const gfx::Rect& caret_bounds,
-    AutofillSuggestionTriggerSource trigger_source,
-    bool update_datalist) {
+    AutofillSuggestionTriggerSource trigger_source) {
   last_query_ = {.form_id = form.global_id(),
                  .field_id = field.global_id(),
                  .field_datalist_options = field.datalist_options()};
   caret_bounds_ = caret_bounds;
   trigger_source_ = trigger_source;
-  if (update_datalist) {
-    manager_->client().UpdateAutofillDataListValues(field.datalist_options());
-  }
+  manager_->client().UpdateAutofillDataListValues(field.datalist_options());
 }
 
 const AutofillField* AutofillExternalDelegate::GetQueriedField() const {
