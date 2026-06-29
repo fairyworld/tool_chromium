@@ -1664,6 +1664,7 @@ static_library("test_support") {
     "//chrome/browser/bookmarks:test_support",
     "//chrome/browser/extensions",
     "//chrome/browser/extensions:external_loader",
+    "//chrome/browser/notifications:test_support",
     "//chrome/browser/prefs",
     "//chrome/browser/preloading:test_support",
     "//chrome/browser/sync",

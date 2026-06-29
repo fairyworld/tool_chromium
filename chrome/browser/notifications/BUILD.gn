@@ -382,17 +382,25 @@ source_set("test_support") {
   sources = [
     "metrics/mock_notification_metrics_logger.cc",
     "metrics/mock_notification_metrics_logger.h",
+    "notification_display_service_tester.cc",
+    "notification_display_service_tester.h",
     "stub_notification_display_service.cc",
     "stub_notification_display_service.h",
+    "stub_notification_platform_bridge.cc",
+    "stub_notification_platform_bridge.h",
   ]
 
   public_deps = [ ":notifications" ]
 
   deps = [
+    ":system_notification_helper",
     "//base",
+    "//chrome/browser/profiles:profile",
+    "//components/keyed_service/content",
     "//components/keyed_service/core",
     "//content/public/browser",
     "//testing/gmock",
+    "//ui/message_center/public/cpp",
   ]
 
   if (is_win) {
