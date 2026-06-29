@@ -392,8 +392,8 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
           case EntityTypeName::kFlightReservation:
           case EntityTypeName::kShipment:
           case EntityTypeName::kOrder:
-            break;
           case EntityTypeName::kVehicle:
+            break;
           case EntityTypeName::kRedressNumber:
           case EntityTypeName::kKnownTravelerNumber:
             return false;
