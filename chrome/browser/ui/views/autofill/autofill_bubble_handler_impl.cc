@@ -28,6 +28,7 @@
 #include "chrome/browser/ui/views/autofill/payments/mandatory_reauth_opt_in_bubble_view.h"
 #include "chrome/browser/ui/views/autofill/payments/offer_notification_bubble_views.h"
 #include "chrome/browser/ui/views/autofill/payments/omnibox_autofill_bubble_view.h"
+#include "chrome/browser/ui/views/autofill/payments/payments_churned_users_bubble_view.h"
 #include "chrome/browser/ui/views/autofill/payments/save_card_bubble_views.h"
 #include "chrome/browser/ui/views/autofill/payments/save_card_manage_cards_bubble_views.h"
 #include "chrome/browser/ui/views/autofill/payments/save_card_offer_bubble_views.h"
@@ -355,7 +356,9 @@ AutofillBubbleBase* AutofillBubbleHandlerImpl::ShowPaymentsChurnedUsersBubble(
     content::WebContents* web_contents,
     PaymentsChurnedUsersBubbleController* controller,
     bool is_user_gesture) {
-  return nullptr;
+  return ShowBubble<PaymentsChurnedUsersBubbleView>(
+      toolbar_button_provider_, kActionShowPaymentsChurnedUsersBubble,
+      kPaymentsChurnedUsersBubbleId, is_user_gesture, web_contents, controller);
 }
 
 AutofillBubbleBase*
