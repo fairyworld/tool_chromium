@@ -234,6 +234,8 @@ class ScopedGlicCapability {
 void InvalidateAccount(Profile* profile);
 void ReauthAccount(Profile* profile);
 
+bool IsSidePanelEnabled();
+
 }  // namespace glic
 
 #endif  // CHROME_BROWSER_GLIC_TEST_SUPPORT_GLIC_TEST_UTIL_H_

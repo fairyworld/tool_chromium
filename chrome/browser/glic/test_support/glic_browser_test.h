@@ -38,6 +38,8 @@
 #include "chrome/browser/glic/test_support/test_result.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
+#include "chrome/browser/ui/side_panel/side_panel_ui.h"
+#include "chrome/browser/ui/side_panel/side_panel_ui_provider.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/test/base/platform_browser_test.h"
 #include "components/feature_engagement/test/scoped_iph_feature_list.h"
@@ -208,9 +210,14 @@ class GlicBrowserTestMixin : public T {
     activation_controller_ =
         std::make_unique<views::test::MockActivationController>();
 #endif
-#if defined(TOOLKIT_VIEWS)
-    SidePanelCoordinator::From(GetBrowser())->DisableAnimationsForTesting();
-#endif
+
+    // Disable side panel animations on supported platforms.
+    if (IsSidePanelEnabled()) {
+      SidePanelUI* side_panel_ui = SidePanelUIProvider::From(GetBrowser());
+      CHECK(side_panel_ui);
+      side_panel_ui->SetNoDelaysForTesting(true);
+      side_panel_ui->DisableAnimationsForTesting();
+    }
 
     CHECK(glic_test_environment_.SetupEmbeddedTestServers(
         T::embedded_test_server(), &T::embedded_https_test_server()));
