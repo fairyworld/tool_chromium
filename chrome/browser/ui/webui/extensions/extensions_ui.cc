@@ -145,7 +145,7 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
       {"safetyCheckExtensionsKeep", IDS_CONFIRM_DOWNLOAD},
       {"stackTrace", IDS_EXTENSIONS_ERROR_STACK_TRACE},
       {"sidebarDiscoverMore", IDS_EXTENSIONS_SIDEBAR_DISCOVER_MORE},
-      {"sidebarDocsPromo", IDS_EXTENSIONS_WHATS_NEW_SIDEBAR_PROMO},
+      {"sidebarDocsPromo", IDS_EXTENSIONS_MODERN_WEB_GUIDANCE_PROMO},
       {"keyboardShortcuts", IDS_EXTENSIONS_SIDEBAR_KEYBOARD_SHORTCUTS},
       {"incognitoInfoWarning", IDS_EXTENSIONS_INCOGNITO_WARNING},
       {"userScriptInfoWarning", IDS_EXTENSIONS_ALLOW_USER_SCRIPTS_WARNING},
@@ -457,10 +457,10 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
               g_browser_process->GetApplicationLocale())
               .spec()));
   source->AddString(
-      "extensionsWhatsNewURL",
+      "modernWebGuidanceURL",
       base::ASCIIToUTF16(google_util::AppendGoogleLocaleParam(
                              extension_urls::AppendUtmSource(
-                                 extension_urls::GetDocsWhatsNewURL(),
+                                 extension_urls::GetModernWebGuidanceURL(),
                                  extension_urls::kExtensionsSidebarUtmSource),
                              g_browser_process->GetApplicationLocale())
                              .spec()));
