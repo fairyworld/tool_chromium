@@ -281,7 +281,7 @@ final class SidePanelContainerCoordinatorImpl
     }
 
     @Override
-    public void onContainerResized(@Px int containerWidth) {}
+    public void onUiUpdateCompleted(@Px int oldWidth, @Px int newWidth) {}
 
     @Override
     public void onWillAutoClose() {
