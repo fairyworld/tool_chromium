@@ -136,6 +136,7 @@ source_set("side_panel") {
     "//chrome/browser/ui/views/toolbar",
     "//chrome/browser/ui/webui:webui_util",
     "//chrome/browser/ui/webui/side_panel/bookmarks",
+    "//chrome/browser/ui/webui/side_panel/comments",
     "//chrome/browser/ui/webui/side_panel/history",
     "//chrome/browser/ui/webui/side_panel/history_clusters",
     "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices",
