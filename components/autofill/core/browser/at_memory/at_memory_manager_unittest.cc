@@ -52,6 +52,7 @@ namespace {
 
 using ::base::Bucket;
 using ::base::BucketsAre;
+using ::base::test::RunOnceCallback;
 using ::testing::_;
 using ::testing::AllOf;
 using ::testing::ElementsAre;
@@ -60,8 +61,8 @@ using ::testing::Field;
 using ::testing::IsEmpty;
 using ::testing::Matcher;
 using ::testing::NiceMock;
-using ::testing::ResultOf;
 using ::testing::Property;
+using ::testing::ResultOf;
 using ::testing::SaveArg;
 
 class MockAutofillClient : public TestAutofillClient {
@@ -562,6 +563,60 @@ TEST_F(AtMemoryManagerTest, FiltersSpiiInInsecureContext) {
                       accessibility_annotator::MemoryDataType::kPhone,
                       ElementsAre(EqualsAtMemorySuggestion(
                           accessibility_annotator::MemoryDataType::kPhone)))));
+}
+
+// Tests that SPII entries and metadata are filtered out from the search
+// results when the device does not support OS reauth, even in a secure context.
+TEST_F(AtMemoryManagerTest, FiltersSpiiWhenDeviceReauthNotSupported) {
+  autofill_client().set_supports_device_reauth(false);
+
+  // The search results delivered by the server.
+  using MemoryDataType = accessibility_annotator::MemoryDataType;
+  using accessibility_annotator::MemorySearchResult;
+  std::vector<MemorySearchResult> entries;
+  // Non-SPII entry.
+  entries.emplace_back(MemoryDataType::kAddressFull, u"Address",
+                       u"Full Address");
+  // SPII entry.
+  entries.emplace_back(MemoryDataType::kIban, u"IBAN", u"1234");
+  // Non-SPII entry with mixed metadata.
+  MemorySearchResult mixed_entry(MemoryDataType::kDriversLicenseName, u"Name",
+                                 u"John");
+  mixed_entry.metadata_list.emplace_back(MemoryDataType::kDriversLicenseState,
+                                         u"State", u"CA");
+  mixed_entry.metadata_list.emplace_back(MemoryDataType::kDriversLicenseNumber,
+                                         u"Number", u"56789");
+  entries.push_back(std::move(mixed_entry));
+
+  accessibility_annotator::MemorySearchResults results(
+      accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
+      std::move(entries));
+
+  manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
+                         /*is_context_secure=*/true, update_callback_.Get());
+
+  EXPECT_CALL(mock_query_service(), Query(std::u16string_view(u"query"), _))
+      .WillOnce(RunOnceCallback<1>(std::move(results)));
+
+  testing::InSequence s;
+  // Executing the query immediately clears existing suggestions before
+  // returning search results.
+  EXPECT_CALL(
+      update_callback_,
+      Run(testing::IsEmpty(), AutofillSuggestionTriggerSource::kAtMemory));
+  EXPECT_CALL(
+      update_callback_,
+      Run(ElementsAre(
+              EqualsAtMemorySuggestion(
+                  accessibility_annotator::MemoryDataType::kAddressFull),
+              EqualsAtMemorySuggestion(
+                  accessibility_annotator::MemoryDataType::kDriversLicenseName,
+                  ElementsAre(EqualsAtMemorySuggestion(
+                      accessibility_annotator::MemoryDataType::
+                          kDriversLicenseState)))),
+          AutofillSuggestionTriggerSource::kAtMemory));
+
+  manager().OnSearchSubmitted(u"query");
 }
 
 // Tests that SPII entries and metadata are retained in the search results

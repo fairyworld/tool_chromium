@@ -753,9 +753,9 @@ void AtMemoryManager::OnSearchResultsReceived(
     return;
   }
 
-  // If the context is insecure, filter out any SPII entries and metadata from
-  // the results.
-  if (!is_context_secure_) {
+  // If the context is insecure or the device doesn't support OS reauth, filter
+  // out any SPII entries and metadata from the results.
+  if (!is_context_secure_ || !owner_->client().SupportsDeviceReauth()) {
     std::erase_if(result.entries,
                   [](const accessibility_annotator::MemorySearchResult& entry) {
                     return IsSpiiMemoryDataType(entry.type);

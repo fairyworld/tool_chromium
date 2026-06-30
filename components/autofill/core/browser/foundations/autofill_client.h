@@ -776,7 +776,7 @@ class AutofillClient {
 
   // Returns true if the device supports any kind of re-auth through the
   // `GetDeviceAuthenticator()`.
-  bool SupportsDeviceReauth() const;
+  virtual bool SupportsDeviceReauth() const;
 
   // Attaches the IPH for `feature` to the `field`, on
   // platforms that it. If another IPH has been shown for the tab, the IPH is
