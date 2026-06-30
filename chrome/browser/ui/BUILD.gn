@@ -5117,12 +5117,6 @@ static_library("ui") {
       # - c/b/ui/views/tabs/tab_slot_view.h
       "//chrome/browser/ui/views/tabs/vertical:impl",
 
-      # TODO(crbug.com/434882143): Remove this circular dependency when the
-      # following headers get componentized:
-      # c/b/ui/browser.h, browser_window.h
-      # c/b/ui/views/frame/browser_view.h
-      "//chrome/browser/ui/views/send_tab_to_self:impl",
-
       # TODO(crbug.com/512979192): Remove this circular dependency when the
       # following headers get componentized:
       # - c/b/ui/views/frame/browser_view.h
