@@ -7418,8 +7418,6 @@ data/echo-referrer.html
 data/empty-script.js
 data/empty-script.js.mock-http-headers
 data/empty-style.css
-data/empty-treat-as-public-address.html
-data/empty-treat-as-public-address.html.mock-http-headers
 data/empty.html
 data/empty404.html
 data/empty404.html.mock-http-headers
