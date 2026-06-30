@@ -53,9 +53,10 @@ class DISPLAY_EXPORT VSyncProviderMac {
   // Whether the task runner of VSyncProviderMac belongs to the current thread.
   bool BelongsToCurrentThread();
 
-  std::vector<int64_t> GetSupportedDisplayLinkIds();
-
-  bool IsConnectedToBrowser() { return !needs_begin_frame_callback_.is_null(); }
+  // Returns true if the provider is connected to the browser (i.e.,
+  // `needs_begin_frame_callback_` is valid) and is running on the Viz thread.
+  // Used only to gate recording the ExternalDisplayLink creation histogram.
+  bool IsConnectedToBrowserOnVizThread();
 
  private:
   friend class base::NoDestructor<VSyncProviderMac>;
@@ -66,12 +67,14 @@ class DISPLAY_EXPORT VSyncProviderMac {
   void AddSupportedDisplayLinkId(CGDirectDisplayID display_id);
   void RemoveSupportedDisplayLinkId(CGDirectDisplayID display_id);
 
-  // Protects `callback_lists_` and `needs_begin_frame_callback_` when updated
-  // on the Viz sequence and read concurrently from other threads (e.g.,
-  // CrGpuMain or CompositorGpuThread). Lock acquisition is bypassed when
-  // accessing these members directly on the Viz sequence.
-  base::Lock id_lock_;
+  // Must only be accessed on the Viz thread.
   NeedsBeginFrameCB needs_begin_frame_callback_;
+
+  // Protects `callback_lists_` when it is updated on the Viz thread and read
+  // concurrently from other threads (such as `CrGpuMain` or
+  // `CompositorGpuThread`). Lock acquisition is bypassed when accessing
+  // `callback_lists_` directly on the Viz thread.
+  base::Lock id_lock_;
   std::map<CGDirectDisplayID, std::list<VSyncCallbackMac::Callback>>
       callback_lists_;
 
