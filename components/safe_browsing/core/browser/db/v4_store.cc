@@ -236,6 +236,15 @@ class BaseFileOutputStream
   CopyingBaseFileOutputStream stream_;
 };
 
+void RecordMigrationTime(base::TimeDelta elapsed,
+                         const base::FilePath& store_path) {
+  std::string suffix = GetUmaSuffixForStore(store_path);
+  if (!suffix.empty()) {
+    base::UmaHistogramTimes(
+        "SafeBrowsing.V4Store.V5ToV4Migration.TimeTaken" + suffix, elapsed);
+  }
+}
+
 }  // namespace
 
 using ::google::protobuf::RepeatedField;
@@ -903,6 +912,12 @@ V5ToV4MigrationResult V4Store::AttemptV5ToV4Migration() {
   if (!base::PathExists(v5_store_path)) {
     return V5ToV4MigrationResult::kV5StoreNotFound;
   }
+
+  base::ElapsedTimer timer;
+  absl::Cleanup log_timer = [this, &timer] {
+    RecordMigrationTime(timer.Elapsed(), store_path_);
+  };
+
   if (!is_eligible_for_migration_) {
     bool wipe_succeeded = WipeV5Store(v5_store_path);
     return wipe_succeeded ? V5ToV4MigrationResult::kStoreIneligibleWipeSucceeded

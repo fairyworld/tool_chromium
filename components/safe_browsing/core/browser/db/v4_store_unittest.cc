@@ -469,6 +469,8 @@ TEST_F(V4StoreTest, TestMigrationNotEligible_WipeSucceeds) {
       "SafeBrowsing.V4Store.V5ToV4MigrationResult",
       V5ToV4MigrationResult::kStoreIneligibleWipeSucceeded,
       /*expected_bucket_count=*/1);
+  histograms.ExpectTotalCount(
+      "SafeBrowsing.V4Store.V5ToV4Migration.TimeTaken.V4StoreTest", 1);
 }
 
 TEST_F(V4StoreTest, TestMigrationNotEligible_WipeFails) {
@@ -592,6 +594,8 @@ TEST_F(V4StoreTest, TestMigrationSuccess) {
       "SafeBrowsing.V4Store.V5ToV4MigrationResult",
       V5ToV4MigrationResult::kV5ToV4MigrationSucceeded,
       /*expected_bucket_count=*/1);
+  histograms.ExpectTotalCount(
+      "SafeBrowsing.V4Store.V5ToV4Migration.TimeTaken.V4StoreTest", 1);
 }
 
 TEST_F(V4StoreTest, TestMigrationSuccessNoHashFile) {

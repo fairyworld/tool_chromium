@@ -11,6 +11,7 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
 #include "base/strings/string_util.h"
+#include "base/timer/elapsed_timer.h"
 #include "components/crx_file/id_util.h"
 #include "components/safe_browsing/core/browser/db/hash_prefix_container.h"
 #include "components/safe_browsing/core/browser/db/sb_protocol_manager_util.h"
@@ -46,6 +47,15 @@ void RecordApplyUpdateResult(const std::string& base_metric,
                              V5ApplyUpdateResult result,
                              const base::FilePath& file_path) {
   RecordEnumWithAndWithoutSuffix(base_metric + kApplyUpdate, result, file_path);
+}
+
+void RecordMigrationTime(base::TimeDelta elapsed,
+                         const base::FilePath& store_path) {
+  std::string suffix = GetUmaSuffixForStore(store_path);
+  if (!suffix.empty()) {
+    base::UmaHistogramTimes(
+        "SafeBrowsing.V5Store.V4ToV5Migration.TimeTaken" + suffix, elapsed);
+  }
 }
 
 }  // namespace
@@ -120,6 +130,12 @@ V4ToV5MigrationResult V5Store::AttemptV4ToV5Migration() {
   if (!base::PathExists(v4_store_path_)) {
     return V4ToV5MigrationResult::kV4StoreNotFound;
   }
+
+  base::ElapsedTimer timer;
+  absl::Cleanup log_timer = [this, &timer] {
+    RecordMigrationTime(timer.Elapsed(), store_path_);
+  };
+
   if (!is_eligible_for_migration_) {
     bool wipe_succeeded = WipeV4Store(v4_store_path_);
     return wipe_succeeded ? V4ToV5MigrationResult::kStoreIneligibleWipeSucceeded

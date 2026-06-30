@@ -4254,6 +4254,17 @@ and applied correctly. -->
   </summary>
 </histogram>
 
+<histogram name="SafeBrowsing.V4Store.V5ToV4Migration.TimeTaken{Store}"
+    units="ms" expires_after="2026-11-26">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records how long it took to perform the V5 to V4 migration for a store on
+    disk. Recorded when migration is attempted.
+  </summary>
+  <token key="Store" variants="SafeBrowsing_SBStore_Metrics"/>
+</histogram>
+
 <histogram name="SafeBrowsing.V4Store.V5ToV4Migration.V5ReadFailureReason"
     enum="SafeBrowsingV5StoreReadResult" expires_after="2027-05-05">
   <owner>thefrog@chromium.org</owner>
@@ -4349,6 +4360,17 @@ parsed correctly. -->
   <summary>
     Records whether a v5 store has valid data, when it is queried. This is
     logged once for every 256 times a store is checked.
+  </summary>
+  <token key="Store" variants="SafeBrowsing_SBStore_Metrics"/>
+</histogram>
+
+<histogram name="SafeBrowsing.V5Store.V4ToV5Migration.TimeTaken{Store}"
+    units="ms" expires_after="2026-11-26">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records how long it took to perform the V4 to V5 migration for a store on
+    disk. Recorded when migration is attempted.
   </summary>
   <token key="Store" variants="SafeBrowsing_SBStore_Metrics"/>
 </histogram>
