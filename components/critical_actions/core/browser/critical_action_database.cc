@@ -9,6 +9,7 @@
 #include "sql/error_delegate_util.h"
 #include "sql/statement.h"
 #include "sql/transaction.h"
+#include "url/gurl.h"
 
 namespace critical_actions {
 

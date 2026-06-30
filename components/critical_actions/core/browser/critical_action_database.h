@@ -12,6 +12,7 @@
 #include "base/files/file_path.h"
 #include "base/sequence_checker.h"
 #include "base/thread_annotations.h"
+#include "base/time/time.h"
 #include "components/critical_actions/core/browser/critical_action_types.h"
 #include "sql/database.h"
 #include "sql/meta_table.h"
@@ -33,22 +34,25 @@ class CriticalActionDatabase {
   // Returns true on success.
   bool Init();
 
-  // Inserts a new critical action record into the database.
-  // Returns true if insertion succeeded.
+  // Adds a new critical action record to the database.
+  // Returns true if successfully added, or false if an entry with the same ID
+  // already exists or a database error occurs.
   bool AddCriticalAction(const CriticalActionEntry& entry);
 
   // Retrieves a critical action record by its ID.
-  // Returns std::nullopt if the action ID is not found.
+  // Returns the record if found, or std::nullopt if the action ID is not found.
   std::optional<CriticalActionEntry> GetCriticalAction(
       std::string_view critical_action_id);
 
-  // Deletes a single critical action record by its ID.
-  // Returns true on success.
+  // Deletes the critical action record matching `critical_action_id`.
+  // Returns true if the query executed successfully (even if no matching record
+  // was deleted), or false on database error.
   bool DeleteCriticalAction(std::string_view critical_action_id);
 
   // Deletes all critical action records within the given time range,
   // inclusive of start_time and exclusive of end_time.
-  // Returns true on success.
+  // Returns true if the query executed successfully (even if no matching record
+  // was deleted), or false on database error.
   bool DeleteCriticalActionsInTimeRange(base::Time start_time,
                                         base::Time end_time);
 

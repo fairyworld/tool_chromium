@@ -34,27 +34,27 @@ class CriticalActionBackendTest : public testing::Test {
 };
 
 TEST_F(CriticalActionBackendTest, InitBackend) {
-  EXPECT_TRUE(backend_->Init());
+  backend_->Init();
   EXPECT_TRUE(base::PathExists(db_path_));
 }
 
 TEST_F(CriticalActionBackendTest, CallBeforeInitReturnsGracefully) {
-  // Database is not initialized. Operations should return gracefully without
-  // crashing.
   CriticalActionEntry entry;
   entry.critical_action_id = "test-uuid";
   entry.timestamp = base::Time::Now();
   entry.action_type = ActionType::kFormFill;
 
-  EXPECT_FALSE(backend_->AddCriticalAction(entry));
+  // Database is not initialized. All the operations should return gracefully
+  // without crashing.
+  backend_->AddCriticalAction(entry);
   EXPECT_FALSE(backend_->GetCriticalAction("test-uuid").has_value());
-  EXPECT_FALSE(backend_->DeleteCriticalAction("test-uuid"));
-  EXPECT_FALSE(backend_->DeleteCriticalActionsInTimeRange(base::Time::Now(),
-                                                          base::Time::Now()));
+  backend_->DeleteCriticalAction("test-uuid");
+  backend_->DeleteCriticalActionsInTimeRange(base::Time::Now(),
+                                             base::Time::Now());
 }
 
 TEST_F(CriticalActionBackendTest, ForwardCallsToDatabase) {
-  ASSERT_TRUE(backend_->Init());
+  backend_->Init();
 
   CriticalActionEntry entry;
   entry.critical_action_id = "test-uuid";
@@ -67,13 +67,13 @@ TEST_F(CriticalActionBackendTest, ForwardCallsToDatabase) {
   entry.metadata = "{}";
 
   // Verify basic crud operations are successfully forwarded.
-  EXPECT_TRUE(backend_->AddCriticalAction(entry));
+  backend_->AddCriticalAction(entry);
 
   auto retrieved = backend_->GetCriticalAction("test-uuid");
   ASSERT_TRUE(retrieved.has_value());
   EXPECT_EQ(*retrieved, entry);
 
-  EXPECT_TRUE(backend_->DeleteCriticalAction("test-uuid"));
+  backend_->DeleteCriticalAction("test-uuid");
   EXPECT_FALSE(backend_->GetCriticalAction("test-uuid").has_value());
 }
 

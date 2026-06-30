@@ -5,6 +5,7 @@
 #ifndef COMPONENTS_CRITICAL_ACTIONS_CORE_BROWSER_CRITICAL_ACTION_TYPES_H_
 #define COMPONENTS_CRITICAL_ACTIONS_CORE_BROWSER_CRITICAL_ACTION_TYPES_H_
 
+#include <cstdint>
 #include <string>
 
 #include "base/time/time.h"
@@ -22,7 +23,7 @@ enum class ActionType {
   kCredentialAccess = 4,
 };
 
-// Represents a memory row copy of a single record in CriticalActions.db.
+// Represents a memory row copy of a single record in critical_actions database.
 struct CriticalActionEntry {
   CriticalActionEntry();
   CriticalActionEntry(const CriticalActionEntry&);
