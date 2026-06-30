@@ -46,6 +46,7 @@ import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabSelectionType;
 import org.chromium.chrome.browser.tabmodel.TabModel;
+import org.chromium.chrome.browser.tabmodel.TabUngrouper;
 import org.chromium.chrome.browser.tasks.tab_management.TabGridItemLongPressOrchestrator;
 import org.chromium.chrome.browser.tasks.tab_management.TabListModel;
 import org.chromium.chrome.browser.tasks.tab_management.TabProperties;
@@ -71,6 +72,7 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
 
     @Mock private Supplier<TabModel> mCurrentTabModelSupplier;
     @Mock private TabModel mTabModel;
+    @Mock private TabUngrouper mTabUngrouper;
     @Mock private RecyclerView mRecyclerView;
 
     private TabListModel mModel;
@@ -86,6 +88,7 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
         Context context = ApplicationProvider.getApplicationContext();
 
         when(mCurrentTabModelSupplier.get()).thenReturn(mTabModel);
+        when(mTabModel.getTabUngrouper()).thenReturn(mTabUngrouper);
         when(mRecyclerView.getContext()).thenReturn(context);
 
         // Set up the mocked property model for the dragged view holder.
@@ -253,6 +256,7 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
         Token groupId = new Token(1L, 2L);
         mPropertyModel.set(TabProperties.TAB_GROUP_ID, groupId);
         mTargetPropertyModel.set(TabProperties.TAB_ID, 2);
+        mTargetPropertyModel.set(TabProperties.TAB_GROUP_ID, groupId);
 
         Tab tab1 = mock(Tab.class);
         Tab tab2 = mock(Tab.class);
@@ -283,6 +287,7 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
         Token groupId = new Token(1L, 2L);
         mPropertyModel.set(TabProperties.TAB_GROUP_ID, groupId);
         mTargetPropertyModel.set(TabProperties.TAB_ID, 2);
+        mTargetPropertyModel.set(TabProperties.TAB_GROUP_ID, groupId);
 
         Tab tab1 = mock(Tab.class);
         Tab tab2 = mock(Tab.class);
@@ -1011,5 +1016,135 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
         // It HAS crossed the center of target (y=-150).
         RecyclerView.ViewHolder winner4 = mCallback.chooseDropTarget(mViewHolder, targets, 0, -160);
         assertEquals(mTargetViewHolder, winner4);
+    }
+
+    @Test
+    public void testHasDragEscapedBounds_GroupHeader() {
+        when(mViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB_GROUP);
+        assertFalse(mCallback.hasDragEscapedBounds(mRecyclerView, mViewHolder, 0, 0, 0, 0));
+    }
+
+    @Test
+    public void testHasDragEscapedBounds_StandaloneTab() {
+        when(mViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB);
+        mPropertyModel.set(TabProperties.TAB_GROUP_ID, null);
+        assertFalse(mCallback.hasDragEscapedBounds(mRecyclerView, mViewHolder, 0, 0, 0, 0));
+    }
+
+    @Test
+    public void testHasDragEscapedBounds_SolitaryChild() {
+        when(mViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB);
+        Token groupId = new Token(1L, 2L);
+        mPropertyModel.set(TabProperties.TAB_GROUP_ID, groupId);
+        mPropertyModel.set(TabProperties.TAB_ID, 1);
+
+        Tab tab1 = mock(Tab.class);
+        when(tab1.getTabGroupId()).thenReturn(groupId);
+        when(mTabModel.getTabById(1)).thenReturn(tab1);
+        when(mTabModel.getRelatedTabList(1)).thenReturn(Arrays.asList(tab1));
+
+        assertFalse(mCallback.hasDragEscapedBounds(mRecyclerView, mViewHolder, 0, 0, 0, 0));
+    }
+
+    @Test
+    public void testHasDragEscapedBounds_FirstChild_DragUp_ThresholdMet() {
+        when(mViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB);
+        Token groupId = new Token(1L, 2L);
+        mPropertyModel.set(TabProperties.TAB_GROUP_ID, groupId);
+        mPropertyModel.set(TabProperties.TAB_ID, 1);
+
+        Tab tab1 = mock(Tab.class);
+        Tab tab2 = mock(Tab.class);
+        when(tab1.getId()).thenReturn(1);
+        when(tab2.getId()).thenReturn(2);
+        when(tab1.getTabGroupId()).thenReturn(groupId);
+        when(tab2.getTabGroupId()).thenReturn(groupId);
+        when(mTabModel.getTabById(1)).thenReturn(tab1);
+        when(mTabModel.getRelatedTabList(1)).thenReturn(Arrays.asList(tab1, tab2));
+
+        when(mViewHolder.itemView.getHeight()).thenReturn(100);
+        when(mViewHolder.itemView.getTop()).thenReturn(200);
+
+        // Threshold is top - height/2 = 200 - 50 = 150
+        // y < 150 -> return true
+        assertTrue(mCallback.hasDragEscapedBounds(mRecyclerView, mViewHolder, 0, 140, 0, -10));
+        verify(mTabUngrouper).ungroupTabs(List.of(tab1), false, false);
+    }
+
+    @Test
+    public void testHasDragEscapedBounds_FirstChild_DragUp_ThresholdNotMet() {
+        when(mViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB);
+        Token groupId = new Token(1L, 2L);
+        mPropertyModel.set(TabProperties.TAB_GROUP_ID, groupId);
+        mPropertyModel.set(TabProperties.TAB_ID, 1);
+
+        Tab tab1 = mock(Tab.class);
+        Tab tab2 = mock(Tab.class);
+        when(tab1.getId()).thenReturn(1);
+        when(tab2.getId()).thenReturn(2);
+        when(tab1.getTabGroupId()).thenReturn(groupId);
+        when(tab2.getTabGroupId()).thenReturn(groupId);
+        when(mTabModel.getTabById(1)).thenReturn(tab1);
+        when(mTabModel.getRelatedTabList(1)).thenReturn(Arrays.asList(tab1, tab2));
+
+        when(mViewHolder.itemView.getHeight()).thenReturn(100);
+        when(mViewHolder.itemView.getTop()).thenReturn(200);
+
+        // Threshold is 150, y = 160 is not < 150
+        assertFalse(mCallback.hasDragEscapedBounds(mRecyclerView, mViewHolder, 0, 160, 0, -10));
+    }
+
+    @Test
+    public void testHasDragEscapedBounds_LastChild_DragDown_ThresholdMet() {
+        when(mViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB);
+        Token groupId = new Token(1L, 2L);
+        mPropertyModel.set(TabProperties.TAB_GROUP_ID, groupId);
+        mPropertyModel.set(TabProperties.TAB_ID, 2);
+
+        Tab tab1 = mock(Tab.class);
+        Tab tab2 = mock(Tab.class);
+        when(tab1.getId()).thenReturn(1);
+        when(tab2.getId()).thenReturn(2);
+        when(tab1.getTabGroupId()).thenReturn(groupId);
+        when(tab2.getTabGroupId()).thenReturn(groupId);
+        when(mTabModel.getTabById(2)).thenReturn(tab2);
+        when(mTabModel.getRelatedTabList(2)).thenReturn(Arrays.asList(tab1, tab2)); // tab2 is last
+
+        when(mViewHolder.itemView.getHeight()).thenReturn(100);
+        when(mViewHolder.itemView.getTop()).thenReturn(200);
+
+        // Threshold is top + height/4 = 200 + 25 = 225
+        // y > 225 -> return true
+        assertTrue(mCallback.hasDragEscapedBounds(mRecyclerView, mViewHolder, 0, 230, 0, 10));
+        verify(mTabUngrouper).ungroupTabs(List.of(tab2), true, false);
+    }
+
+    @Test
+    public void testHasDragEscapedBounds_MiddleChild_DragUpOrDown() {
+        when(mViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB);
+        Token groupId = new Token(1L, 2L);
+        mPropertyModel.set(TabProperties.TAB_GROUP_ID, groupId);
+        mPropertyModel.set(TabProperties.TAB_ID, 2);
+
+        Tab tab1 = mock(Tab.class);
+        Tab tab2 = mock(Tab.class);
+        Tab tab3 = mock(Tab.class);
+        when(tab1.getId()).thenReturn(1);
+        when(tab2.getId()).thenReturn(2);
+        when(tab3.getId()).thenReturn(3);
+        when(tab1.getTabGroupId()).thenReturn(groupId);
+        when(tab2.getTabGroupId()).thenReturn(groupId);
+        when(tab3.getTabGroupId()).thenReturn(groupId);
+        when(mTabModel.getTabById(2)).thenReturn(tab2);
+        when(mTabModel.getRelatedTabList(2))
+                .thenReturn(Arrays.asList(tab1, tab2, tab3)); // tab2 is middle
+
+        when(mViewHolder.itemView.getHeight()).thenReturn(100);
+        when(mViewHolder.itemView.getTop()).thenReturn(200);
+
+        // Middle child should never escape bounds
+        assertFalse(mCallback.hasDragEscapedBounds(mRecyclerView, mViewHolder, 0, 0, 0, -50)); // up
+        assertFalse(
+                mCallback.hasDragEscapedBounds(mRecyclerView, mViewHolder, 0, 1000, 0, 50)); // down
     }
 }
