@@ -41,7 +41,6 @@ class FadeTransitionHandler {
         if (delegate == null) return;
         mTabStripTransitionThreshold =
                 ViewUtils.dpToPx(displayMetrics, delegate.getFadeTransitionThresholdDp());
-        requestTransition(/* forceFadeInStrip= */ false);
     }
 
     void onTabStripSizeChanged(
