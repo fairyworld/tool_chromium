@@ -173,10 +173,12 @@ WebNNContextImpl::~WebNNContextImpl() {
       << "Graph builders must be cleared in OnDisconnect().";
 
   for (auto impl : tensor_impls_) {
-    // Delete non-interop tensor instances from the tracker as they can't
-    // unregister themselves since they're ref-counted and might outlive the
-    // context.
-    if (!impl->has_shared_image()) {
+    // Non-interop tensors require manual tracking cleanup since the memory
+    // is owned by the context and unlike interop, cannot be released by shared
+    // image.
+    if (impl->has_shared_image()) {
+      impl->DestroyAccessAndRepresentationAndWait();
+    } else {
       memory_type_tracker_.TrackMemFree(impl->PackedByteLength());
     }
   }
@@ -665,7 +667,9 @@ void WebNNContextImpl::RemoveWebNNTensorImpl(
     const blink::WebNNTensorToken& handle) {
   const auto it = tensor_impls_.find(handle);
   CHECK(it != tensor_impls_.end());
-  if (!it->get()->has_shared_image()) {
+  if (it->get()->has_shared_image()) {
+    it->get()->DestroyAccessAndRepresentationAndWait();
+  } else {
     memory_type_tracker_.TrackMemFree(it->get()->PackedByteLength());
   }
   // Upon calling erase, the handle will no longer refer to a valid
