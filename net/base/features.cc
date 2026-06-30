@@ -900,4 +900,6 @@ BASE_FEATURE_PARAM(int,
                    &kCacheCertVerification,
                    1800);
 
+BASE_FEATURE(kTlsGreaseSigalgs, base::FEATURE_ENABLED_BY_DEFAULT);
+
 }  // namespace net::features

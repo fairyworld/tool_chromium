@@ -933,6 +933,13 @@ NET_EXPORT BASE_DECLARE_FEATURE(kCacheCertVerification);
 // already be expired.
 NET_EXPORT BASE_DECLARE_FEATURE_PARAM(int, kCacheCertVerificationTtlSecs);
 
+// If enabled, configures SSLClientSocketImpl to enable GREASE for
+// signature_algorithms. This is a killswitch for behavior that is enabled by
+// default.
+// TODO(crbug.com/526597789): Clean up this killswitch after successfully
+// deployed.
+NET_EXPORT BASE_DECLARE_FEATURE(kTlsGreaseSigalgs);
+
 }  // namespace net::features
 
 #endif  // NET_BASE_FEATURES_H_
