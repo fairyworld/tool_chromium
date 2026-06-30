@@ -1158,7 +1158,10 @@ public abstract class ChromeFeatureList {
     public static final CachedFlag sSearchInCCTIfEnabledByEmbedder =
             newCachedFlag(SEARCH_IN_CCT_IF_ENABLED_BY_EMBEDDER, true);
     public static final CachedFlag sSendTabToSelfExtraEntryPoints =
-            newCachedFlag(SEND_TAB_TO_SELF_EXTRA_ENTRY_POINTS, /* defaultValue= */ false);
+            newCachedFlag(
+                    SEND_TAB_TO_SELF_EXTRA_ENTRY_POINTS,
+                    /* defaultValue= */ false,
+                    /* defaultValueInTests= */ true);
     public static final CachedFlag sSessionRestoreAfterCrash =
             newCachedFlag(
                     SESSION_RESTORE_AFTER_CRASH,

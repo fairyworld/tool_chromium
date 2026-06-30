@@ -136,6 +136,9 @@ public class SendTabToSelfCoordinatorTest {
         SigninFeatures.ENABLE_SEAMLESS_SIGNIN,
         SigninFeatures.ENABLE_ACTIVITYLESS_SIGNIN_ALL_ENTRY_POINT
     })
+    // This test asserts the old bottom sheet UI and must run with the enhanced
+    // bottom sheet feature disabled.
+    @DisableFeatures({ChromeFeatureList.SEND_TAB_TO_SELF_ENHANCED_BOTTOMSHEET})
     public void testShowDeviceListIfSignedIn_activitylessSignin() {
         // Sign in and wait for the device list to be downloaded.
         mSyncTestRule.setUpAccountAndSignInForTesting();
@@ -162,9 +165,12 @@ public class SendTabToSelfCoordinatorTest {
     @LargeTest
     // TODO(crbug.com/40825119): Flaky on Nexus 5x (bullhead).
     @DisableIf.Build(hardware_is = "bullhead")
+    // This test asserts the old bottom sheet UI and must run with the enhanced
+    // bottom sheet feature disabled.
     @DisableFeatures({
         SigninFeatures.ENABLE_SEAMLESS_SIGNIN,
-        SigninFeatures.ENABLE_ACTIVITYLESS_SIGNIN_ALL_ENTRY_POINT
+        SigninFeatures.ENABLE_ACTIVITYLESS_SIGNIN_ALL_ENTRY_POINT,
+        ChromeFeatureList.SEND_TAB_TO_SELF_ENHANCED_BOTTOMSHEET
     })
     // TODO(crbug.com/448227402): Remove this test once the migration to the activity-less sign-in
     // flow is complete.
@@ -192,6 +198,9 @@ public class SendTabToSelfCoordinatorTest {
         SigninFeatures.ENABLE_SEAMLESS_SIGNIN,
         SigninFeatures.ENABLE_ACTIVITYLESS_SIGNIN_ALL_ENTRY_POINT
     })
+    // This test asserts the old bottom sheet UI and must run with the enhanced
+    // bottom sheet feature disabled.
+    @DisableFeatures({ChromeFeatureList.SEND_TAB_TO_SELF_ENHANCED_BOTTOMSHEET})
     public void testShowSigninPromoIfSignedOut_activitylessSignin() {
         // An account must be added to the device so the promo is offered.
         mSyncTestRule.addTestAccount();

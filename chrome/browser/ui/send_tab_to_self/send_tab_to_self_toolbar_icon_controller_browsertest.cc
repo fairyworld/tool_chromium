@@ -43,6 +43,7 @@ class SendTabToSelfToolbarIconControllerTest : public InProcessBrowserTest {
  public:
   void SetUpOnMainThread() override {
     InProcessBrowserTest::SetUpOnMainThread();
+    browser_view()->Activate();
     ui_test_utils::WaitForBrowserSetLastActive(browser());
   }
 
@@ -68,7 +69,22 @@ class SendTabToSelfToolbarIconControllerTest : public InProcessBrowserTest {
   web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
 };
 
-IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerTest,
+// Test suite for tests that expect the receiving bubble UI to be shown.
+// These tests must run with SendTabToSelfAutoOpen disabled, as that feature
+// automatically opens received tabs in the foreground instead of showing the
+// bubble.
+class SendTabToSelfToolbarIconControllerDisabledAutoOpenTest
+    : public SendTabToSelfToolbarIconControllerTest {
+ public:
+  SendTabToSelfToolbarIconControllerDisabledAutoOpenTest() {
+    feature_list_.InitAndDisableFeature(kSendTabToSelfAutoOpen);
+  }
+
+ private:
+  base::test::ScopedFeatureList feature_list_;
+};
+
+IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
                        DisplayNewEntry) {
   ASSERT_TRUE(browser()->IsActive());
 
@@ -88,7 +104,7 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerTest,
 // This test cannot work on Wayland because the platform does not allow clients
 // to position top level windows, activate them, and set focus.
 #if !(BUILDFLAG(SUPPORTS_OZONE_WAYLAND) || BUILDFLAG(IS_CHROMEOS))
-IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerTest,
+IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
                        StorePendingNewEntryFromIncognitoBrowser) {
   ASSERT_TRUE(browser()->IsActive());
 
@@ -108,7 +124,7 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerTest,
   EXPECT_TRUE(bubble_controller()->IsBubbleShowing());
 }
 
-IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerTest,
+IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
                        StorePendingNewEntryFromWebApp) {
   ASSERT_TRUE(browser()->IsActive());
   auto web_app_info = web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(
@@ -134,7 +150,7 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerTest,
 }
 #endif
 
-IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerTest,
+IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
                        ReplaceExistingEntry) {
   controller()->set_ignore_active_for_testing(true);
   SendTabToSelfEntry existing_entry(
@@ -161,12 +177,6 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerTest,
 class SendTabToSelfToolbarIconControllerAutoOpenTest
     : public SendTabToSelfToolbarIconControllerTest {
  public:
-  void SetUpOnMainThread() override {
-    SendTabToSelfToolbarIconControllerTest::SetUpOnMainThread();
-    browser_view()->Activate();
-    WaitUntilBrowserBecomeActiveOrLastActive(browser());
-  }
-
   void SetUpBrowserContextKeyedServices(
       content::BrowserContext* context) override {
     SendTabToSelfSyncServiceFactory::GetInstance()->SetTestingFactoryAndUse(

@@ -15064,6 +15064,36 @@
             ]
         }
     ],
+    "InstantHandoffPhase1": [
+        {
+            "platforms": [
+                "android",
+                "chromeos",
+                "ios",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "SendTabToSelfAutoOpen",
+                        "SendTabToSelfEnhancedBottomsheet",
+                        "SendTabToSelfEnhancedDesktopUI",
+                        "SendTabToSelfExtraEntryPoints",
+                        "SendTabToSelfImprovedLastActiveLabels",
+                        "SendTabToSelfPostSendToast",
+                        "SendTabToSelfPropagateFormFields",
+                        "SendTabToSelfPropagateScrollPosition",
+                        "SyncSessionsUsePreferredDisplayName",
+                        "SyncSimplifyDeviceNaming",
+                        "SyncUseServerDeterminedDeviceName"
+                    ]
+                }
+            ]
+        }
+    ],
     "IosAppStoreAgeSignal": [
         {
             "platforms": [
