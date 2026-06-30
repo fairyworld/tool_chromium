@@ -210,7 +210,7 @@ class AssistantAIMUIStateProvider
 
   if (_viewController) {
     _viewController = nil;
-    [self dismissAssistantContainerAnimated:NO];
+    [self dismissAssistantContainerAnimated:NO completion:nil];
   }
   [_activityReporter reportInactive];
 }
@@ -235,7 +235,7 @@ class AssistantAIMUIStateProvider
     }
   } else {
     _isHiding = YES;
-    [self dismissAssistantContainerAnimated:YES];
+    [self dismissAssistantContainerAnimated:YES completion:nil];
     [_activityReporter reportInactive];
   }
 }
@@ -264,8 +264,11 @@ class AssistantAIMUIStateProvider
   // Initially the assistant is only hidden, the actual closing happens after
   // the snackbar dismisses and the undo window elapses.
   _isHiding = YES;
-  [self dismissAssistantContainerAnimated:YES];
-  [self showUndoSnackbar];
+  __weak __typeof(self) weakSelf = self;
+  [self dismissAssistantContainerAnimated:YES
+                               completion:^{
+                                 [weakSelf showUndoSnackbar];
+                               }];
 }
 
 - (void)assistantAIMViewController:(AssistantAIMViewController*)viewController
@@ -311,16 +314,22 @@ class AssistantAIMUIStateProvider
 }
 
 // Dismisses the assistant container safely.
-- (void)dismissAssistantContainerAnimated:(BOOL)animated {
-  if (self.browser) {
-    CommandDispatcher* dispatcher = self.browser->GetCommandDispatcher();
-    if ([dispatcher
-            dispatchingForProtocol:@protocol(AssistantContainerCommands)]) {
-      id<AssistantContainerCommands> containerHandler =
-          HandlerForProtocol(dispatcher, AssistantContainerCommands);
-      [containerHandler dismissAssistantContainerAnimated:animated
-                                               completion:nil];
+- (void)dismissAssistantContainerAnimated:(BOOL)animated
+                               completion:(ProceduralBlock)completion {
+  if (!self.browser) {
+    if (completion) {
+      completion();
     }
+    return;
+  }
+
+  CommandDispatcher* dispatcher = self.browser->GetCommandDispatcher();
+  if ([dispatcher
+          dispatchingForProtocol:@protocol(AssistantContainerCommands)]) {
+    id<AssistantContainerCommands> containerHandler =
+        HandlerForProtocol(dispatcher, AssistantContainerCommands);
+    [containerHandler dismissAssistantContainerAnimated:animated
+                                             completion:completion];
   }
 }
 
@@ -431,7 +440,7 @@ class AssistantAIMUIStateProvider
 - (void)assistantContainerDidRequestDismissal:
     (AssistantContainerViewController*)container {
   [_mediator endSession];
-  [self dismissAssistantContainerAnimated:YES];
+  [self dismissAssistantContainerAnimated:YES completion:nil];
 }
 
 #pragma mark - AssistantAIMMediatorDelegate
