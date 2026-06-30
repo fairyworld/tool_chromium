@@ -226,6 +226,15 @@ bool PrefetchManager::IsAvailableForPrefetch(
   return GetResourceTypeForPrefetch(destination).has_value();
 }
 
+// TODO(crbug.com/447954811, crbug.com/524282506): Enforce the connection
+// allowlist for prefetch requests.
+//
+// If `kPrefetchManagerUseNetworkContextPrefetch` feature is enabled,
+// `PrefetchManager` uses `NetworkContext::Prefetch`.
+// Else, it uses a URL loader factory for the browser process.
+//
+// Neither of them checks the connection allowlist of the prefetch initiator
+// `RenderFrameHost`.
 void PrefetchManager::PrefetchUrl(
     std::unique_ptr<PrefetchJob> job,
     scoped_refptr<network::SharedURLLoaderFactory> factory) {

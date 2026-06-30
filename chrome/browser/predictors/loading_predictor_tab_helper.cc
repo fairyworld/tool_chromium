@@ -34,6 +34,7 @@
 #include "content/public/browser/render_frame_host.h"
 #include "net/base/network_anonymization_key.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
+#include "services/network/public/cpp/constants.h"
 #include "services/network/public/mojom/fetch_api.mojom.h"
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/common/loader/lcp_critical_path_predictor_util.h"
@@ -424,9 +425,12 @@ void LoadingPredictorTabHelper::PrepareForPageLoad(
   if (!predictor_ || predictor_->WasShutdown()) {
     return;
   }
+  // TODO(crbug.com/447954811, crbug.com/524282506): Pass the
+  // `network_restrictions_id` from the request initiator RenderFrameHost.
   page_data->has_local_preconnect_predictions_for_current_navigation_ =
       predictor_->PrepareForPageLoad(initiator_origin, main_frame_url,
-                                     HintOrigin::NAVIGATION);
+                                     HintOrigin::NAVIGATION,
+                                     network::GetTODONetworkRestrictionsId());
 
   if ((page_data->has_local_preconnect_predictions_for_current_navigation_ &&
        !features::ShouldAlwaysRetrieveOptimizationGuidePredictions()) ||
@@ -695,8 +699,11 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
   // use the predictions to pre* subresources.
   if (!page_data->document_page_data_holder_ &&
       features::ShouldUseOptimizationGuidePredictions()) {
+    // TODO(crbug.com/447954811, crbug.com/524282506): Pass the
+    // `network_restrictions_id` from the request initiator RenderFrameHost.
     predictor_->PrepareForPageLoad(initiator_origin, main_frame_url,
                                    HintOrigin::OPTIMIZATION_GUIDE,
+                                   network::GetTODONetworkRestrictionsId(),
                                    /*preconnectable=*/false, prediction);
   }
 }

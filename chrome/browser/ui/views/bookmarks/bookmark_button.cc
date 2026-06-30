@@ -29,6 +29,7 @@
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/preloading_data.h"
 #include "content/public/browser/web_contents.h"
+#include "services/network/public/cpp/constants.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/views/accessibility/view_accessibility.h"
@@ -312,7 +313,8 @@ void BookmarkButton::StartPreconnecting(GURL url) {
   if (loading_predictor) {
     loading_predictor->PrepareForPageLoad(
         /*initiator_origin=*/std::nullopt, url,
-        predictors::HintOrigin::BOOKMARK_BAR, true);
+        predictors::HintOrigin::BOOKMARK_BAR,
+        network::GetNoOpNetworkRestrictionsId(), true);
   }
 }
 
