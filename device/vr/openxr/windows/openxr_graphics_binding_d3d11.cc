@@ -216,7 +216,7 @@ void OpenXrGraphicsBindingD3D11::CreateSharedImages(
     gfx::GpuMemoryBufferHandle gpu_memory_buffer_handle{
         gfx::DXGIHandle(base::win::ScopedHandle(shared_handle))};
 
-    // TODO(crbug.com/40918787): This size is the size of the texture
+    // TODO(crbug.com/529457611): This size is the size of the texture
     // from the OpenXr runtime, which is fine but does not work properly if the
     // page requests any kind of framebuffer scaling, because then the image
     // size that the page uses would be different than this size, which can
@@ -387,7 +387,7 @@ void OpenXrGraphicsBindingD3D11::ResizeSharedBuffer(
     OpenXrCompositionLayer&,
     OpenXrSwapchainInfo& swap_chain_info,
     gpu::SharedImageInterface* sii) {
-  // TODO(crbug.com/40918787): Current texture size needs to be updated.
+  // TODO(crbug.com/529457611): Current texture size needs to be updated.
 }
 
 bool OpenXrGraphicsBindingD3D11::SupportsLayers() const {
