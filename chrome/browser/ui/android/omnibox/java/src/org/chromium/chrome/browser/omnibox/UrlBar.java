@@ -116,6 +116,8 @@ public class UrlBar extends AutocompleteEditText {
     private @Nullable Callback<Integer> mUrlDirectionListener;
     private @Nullable Callback<Boolean> mUrlTextWrappingChangeListener;
     private @Nullable Runnable mManageSearchEnginesCallback;
+    private boolean mShowAiMode;
+    private @Nullable Callback<Boolean> mShowAiModeCallback;
 
     private final Rect mClipBounds = new Rect();
 
@@ -350,6 +352,7 @@ public class UrlBar extends AutocompleteEditText {
         mTextContextMenuDelegate = null;
         mTextChangeListener = null;
         mManageSearchEnginesCallback = null;
+        mShowAiModeCallback = null;
     }
 
     /**
@@ -373,6 +376,16 @@ public class UrlBar extends AutocompleteEditText {
     /** Set the callback to trigger "Manage search engines" settings shortcut. */
     public void setManageSearchEnginesCallback(@Nullable Runnable callback) {
         mManageSearchEnginesCallback = callback;
+    }
+
+    /** Set the state of "Always Show AI Mode" option. */
+    public void setShowAiMode(boolean showAiMode) {
+        mShowAiMode = showAiMode;
+    }
+
+    /** Set the callback when "Always Show AI Mode" is toggled. */
+    public void setShowAiModeCallback(@Nullable Callback<Boolean> callback) {
+        mShowAiModeCallback = callback;
     }
 
     @Override
@@ -887,6 +900,28 @@ public class UrlBar extends AutocompleteEditText {
     @Override
     protected void onCreateContextMenu(ContextMenu menu) {
         super.onCreateContextMenu(menu);
+        if (mShowAiModeCallback != null) {
+            if (menu.findItem(R.id.url_bar_always_show_ai_mode) == null) {
+                MenuItem alwaysShowItem =
+                        menu.add(
+                                Menu.NONE,
+                                R.id.url_bar_always_show_ai_mode,
+                                Menu.CATEGORY_SECONDARY,
+                                getContext().getString(R.string.always_show_ai_mode));
+                alwaysShowItem.setCheckable(true);
+                alwaysShowItem.setChecked(mShowAiMode);
+                alwaysShowItem.setOnMenuItemClickListener(
+                        clickedItem -> {
+                            boolean newCheckedState = !clickedItem.isChecked();
+                            clickedItem.setChecked(newCheckedState);
+                            if (mShowAiModeCallback != null) {
+                                mShowAiModeCallback.onResult(newCheckedState);
+                            }
+                            return true;
+                        });
+            }
+        }
+
         if (mManageSearchEnginesCallback == null
                 || !OmniboxFeatures.sOmniboxSiteSearch.isEnabled()) {
             return;

@@ -101,6 +101,7 @@ import org.chromium.chrome.browser.omnibox.suggestions.OmniboxSuggestionsContain
 import org.chromium.chrome.browser.omnibox.suggestions.OmniboxSuggestionsDropdown;
 import org.chromium.chrome.browser.omnibox.suggestions.SiteSearchActivationSource;
 import org.chromium.chrome.browser.omnibox.voice.VoiceRecognitionHandler;
+import org.chromium.chrome.browser.preferences.Pref;
 import org.chromium.chrome.browser.prefetch.settings.PreloadPagesSettingsBridge;
 import org.chromium.chrome.browser.prefetch.settings.PreloadPagesSettingsBridgeJni;
 import org.chromium.chrome.browser.prefetch.settings.PreloadPagesState;
@@ -132,9 +133,13 @@ import org.chromium.components.omnibox.OmniboxFeatureList;
 import org.chromium.components.omnibox.OmniboxFocusReason;
 import org.chromium.components.omnibox.OmniboxSuggestionType;
 import org.chromium.components.omnibox.TextSelection;
+import org.chromium.components.prefs.PrefChangeRegistrar;
+import org.chromium.components.prefs.PrefChangeRegistrarJni;
+import org.chromium.components.prefs.PrefService;
 import org.chromium.components.search_engines.TemplateUrlService;
 import org.chromium.components.security_state.ConnectionSecurityLevel;
 import org.chromium.components.signin.identitymanager.IdentityManager;
+import org.chromium.components.user_prefs.UserPrefs;
 import org.chromium.components.webapps.AddToHomescreenCoordinator;
 import org.chromium.components.webapps.AppBannerManager;
 import org.chromium.components.webapps.AppBannerManagerJni;
@@ -216,6 +221,8 @@ public class LocationBarMediatorTest {
     @Mock private IdentityServicesProvider mIdentityServicesProvider;
     @Mock private IdentityManager mIdentityManager;
     @Mock private Profile mProfile;
+    @Mock private PrefService mPrefService;
+    @Mock private PrefChangeRegistrar.Natives mPrefChangeRegistrarJni;
     @Mock private PreloadPagesSettingsBridge.Natives mPreloadPagesSettingsJni;
     @Mock private LocationBarMediator.OmniboxUma mOmniboxUma;
     @Mock private OmniboxSuggestionsDropdownEmbedderImpl mEmbedderImpl;
@@ -280,6 +287,13 @@ public class LocationBarMediatorTest {
                 new ContextThemeWrapper(
                         ApplicationProvider.getApplicationContext(),
                         R.style.Theme_BrowserUI_DayNight);
+
+        UserPrefs.setPrefServiceForTesting(mPrefService);
+        lenient().doReturn(mProfile).when(mProfile).getOriginalProfile();
+        lenient().doReturn(true).when(mPrefService).getBoolean(Pref.SHOW_AI_MODE_OMNIBOX_BUTTON);
+
+        PrefChangeRegistrarJni.setInstanceForTesting(mPrefChangeRegistrarJni);
+        lenient().doReturn(1L).when(mPrefChangeRegistrarJni).init(any(), any());
 
         AutocompleteController.setInstanceForTesting(mAutocompleteController);
         ComposeboxQueryControllerBridge.setInstanceForTesting(mComposeboxBridge);
@@ -3386,5 +3400,24 @@ public class LocationBarMediatorTest {
                 new TextSelection(5, 5),
                 LocationBarMediator.translateDisplaySelectionToEditing(
                         new TextSelection(5, 5), "youtube.com", "www.youtube.com"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testAlwaysShowAiModePrefTogglesAndSyncs() throws Exception {
+        mFuseboxLayoutModeSupplier.set(FuseboxLayoutMode.SUGGESTIONS_POPOVER);
+        mMediator.onFinishNativeInitialization();
+        mProfileSupplier.set(mProfile);
+
+        verify(mUrlCoordinator).setShowAiMode(true);
+        ArgumentCaptor<Callback<Boolean>> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
+        verify(mUrlCoordinator).setShowAiModeCallback(callbackCaptor.capture());
+        assertNotNull(callbackCaptor.getValue());
+
+        // Toggle the pref via callback (set to false) and verify it writes to PrefService
+        // and updates the coordinator directly
+        callbackCaptor.getValue().onResult(false);
+        verify(mPrefService).setBoolean(Pref.SHOW_AI_MODE_OMNIBOX_BUTTON, false);
+        verify(mUrlCoordinator).setShowAiMode(false);
     }
 }

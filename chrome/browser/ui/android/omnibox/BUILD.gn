@@ -233,6 +233,7 @@ android_library("java") {
     "//chrome/browser/lens:java",
     "//chrome/browser/locale:java",
     "//chrome/browser/preferences:java",
+    "//chrome/browser/preferences:pref_service_java",
     "//chrome/browser/prefetch/android:java",
     "//chrome/browser/preloading/android:java",
     "//chrome/browser/privacy:java",

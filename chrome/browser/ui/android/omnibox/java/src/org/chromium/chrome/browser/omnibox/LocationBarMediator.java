@@ -92,6 +92,7 @@ import org.chromium.chrome.browser.omnibox.suggestions.OmniboxSuggestionsContain
 import org.chromium.chrome.browser.omnibox.suggestions.OmniboxSuggestionsDropdownScrollListener;
 import org.chromium.chrome.browser.omnibox.suggestions.SiteSearchActivationSource;
 import org.chromium.chrome.browser.omnibox.voice.VoiceRecognitionHandler;
+import org.chromium.chrome.browser.preferences.Pref;
 import org.chromium.chrome.browser.prefetch.settings.PreloadPagesSettingsBridge;
 import org.chromium.chrome.browser.prefetch.settings.PreloadPagesState;
 import org.chromium.chrome.browser.profiles.Profile;
@@ -128,6 +129,7 @@ import org.chromium.components.omnibox.ToolModeUtils;
 import org.chromium.components.search_engines.TemplateUrlService;
 import org.chromium.components.search_engines.TemplateUrlService.TemplateUrlServiceObserver;
 import org.chromium.components.security_state.ConnectionSecurityLevel;
+import org.chromium.components.user_prefs.UserPrefs;
 import org.chromium.components.webapps.AddToHomescreenCoordinator;
 import org.chromium.components.webapps.AppBannerManager;
 import org.chromium.content_public.browser.LoadUrlParams;
@@ -1812,6 +1814,34 @@ class LocationBarMediator
         mSearchEngineService = SearchEngineService.getForProfile(profile);
         mSearchEngineServiceSupplier.set(mSearchEngineService);
         mLocationBarLayout.setSearchEngineService(mSearchEngineService);
+
+        updateAlwaysShowAiModeCallback();
+    }
+
+    private void updateAlwaysShowAiModeCallback() {
+        Profile profile = mProfileSupplier.get();
+        if (profile == null) return;
+
+        boolean isSuggestionsPopover =
+                mFuseboxCoordinator.getFuseboxLayoutModeSupplier().get()
+                        == FuseboxLayoutMode.SUGGESTIONS_POPOVER;
+        boolean isInAiMode =
+                mCurrentInput != null
+                        && mCurrentInput.getRequestType() == AutocompleteRequestType.AI_MODE;
+
+        if (isSuggestionsPopover && !isInAiMode) {
+            boolean currentPrefValue =
+                    UserPrefs.get(profile).getBoolean(Pref.SHOW_AI_MODE_OMNIBOX_BUTTON);
+            mUrlCoordinator.setShowAiMode(currentPrefValue);
+            mUrlCoordinator.setShowAiModeCallback(
+                    (newValue) -> {
+                        UserPrefs.get(profile)
+                                .setBoolean(Pref.SHOW_AI_MODE_OMNIBOX_BUTTON, newValue);
+                        mUrlCoordinator.setShowAiMode(newValue);
+                    });
+        } else {
+            mUrlCoordinator.setShowAiModeCallback(null);
+        }
     }
 
     /**
@@ -2300,6 +2330,7 @@ class LocationBarMediator
         mLocationBarLayout.setIsInStandby(
                 mCurrentInput != null
                         && mCurrentInput.getAutocompleteState() == AutocompleteState.STANDBY);
+        updateAlwaysShowAiModeCallback();
     }
 
     private boolean isLensOnOmniboxEnabled() {

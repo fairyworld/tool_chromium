@@ -18,4 +18,5 @@ found in the LICENSE file.
     <item type="id" name="coordinator"/>
     <item type="id" name="url_bar"/>
     <item type="id" name="url_bar_manage_search_engines"/>
+    <item type="id" name="url_bar_always_show_ai_mode"/>
 </resources>
