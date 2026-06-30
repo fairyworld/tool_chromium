@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.chromium.base.ThreadUtils;
 import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.CriteriaHelper;
+import org.chromium.base.test.util.DisableIf;
 import org.chromium.base.test.util.Feature;
 import org.chromium.base.test.util.Restriction;
 import org.chromium.base.test.util.UrlUtils;
@@ -161,6 +162,8 @@ public class ThumbnailMediaParserTest {
     @Test
     @LargeTest
     @Feature({"MediaParser"})
+    // TODO(crbug.com/528212805): Re-enable after flakiness is fixed.
+    @DisableIf.Device(DeviceFormFactor.DESKTOP)
     public void testParseVideoThumbnailH265() {
         String filePath = UrlUtils.getIsolatedTestRoot() + "/media/test/data/bear-hevc-frag.mp4";
         MediaParserResult result = parseMediaFile(filePath, "video/mp4");
