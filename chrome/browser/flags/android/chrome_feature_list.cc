@@ -160,7 +160,6 @@ const base::Feature* const kFeaturesExposedToJava[] = {
     &commerce::kShoppingList,
     &commerce::kShoppingPDPMetrics,
     &content_capture::features::kContentCaptureSendMetadataForDataShare,
-    &content_settings::features::kUserBypassUI,
     &content_settings::kDarkenWebsitesCheckboxInThemesSetting,
     &contextual_tasks::kContextualTasks,
     &contextual_tasks::kContextualTasksJavaFusebox,

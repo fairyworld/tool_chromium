@@ -11687,6 +11687,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="CookieControls.Bubble.SendFeedback">
+  <obsolete>Obsolete as of 06/2026</obsolete>
   <owner>boujane@google.com</owner>
   <owner>sauski@google.com</owner>
   <description>
@@ -53698,12 +53699,14 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="TrackingProtection.UserBypass.Animated">
+  <obsolete>Obsolete as of 06/2026.</obsolete>
   <owner>alvingo@google.com</owner>
   <owner>koilos@google.com</owner>
   <description>User bypass icon was animated.</description>
 </action>
 
 <action name="TrackingProtection.UserBypass.Animated.Opened">
+  <obsolete>Obsolete as of 06/2026.</obsolete>
   <owner>alvingo@google.com</owner>
   <owner>koilos@google.com</owner>
   <description>User bypass icon was animated and clicked on.</description>

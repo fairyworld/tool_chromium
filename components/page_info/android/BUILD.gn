@@ -17,7 +17,6 @@ static_library("android") {
     "page_info_client.h",
     "page_info_controller_android.cc",
     "page_info_controller_android.h",
-    "page_info_features.cc",
   ]
   deps = [
     "//base",
@@ -80,7 +79,6 @@ android_library("java") {
     "java/src/org/chromium/components/page_info/PageInfoCookiesController.java",
     "java/src/org/chromium/components/page_info/PageInfoCookiesSettings.java",
     "java/src/org/chromium/components/page_info/PageInfoDialog.java",
-    "java/src/org/chromium/components/page_info/PageInfoFeatures.java",
     "java/src/org/chromium/components/page_info/PageInfoHighlight.java",
     "java/src/org/chromium/components/page_info/PageInfoLocationPermissionController.java",
     "java/src/org/chromium/components/page_info/PageInfoMainController.java",
@@ -145,7 +143,6 @@ generate_jni("jni_headers") {
     "java/src/org/chromium/components/page_info/ConnectionInfoView.java",
     "java/src/org/chromium/components/page_info/PageInfoConnectionSecurityController.java",
     "java/src/org/chromium/components/page_info/PageInfoController.java",
-    "java/src/org/chromium/components/page_info/PageInfoFeatures.java",
   ]
 }
 
