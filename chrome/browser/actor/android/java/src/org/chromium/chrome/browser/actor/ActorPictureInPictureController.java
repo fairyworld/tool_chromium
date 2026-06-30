@@ -27,6 +27,7 @@ import androidx.lifecycle.Lifecycle;
 
 import org.chromium.base.Callback;
 import org.chromium.base.Log;
+import org.chromium.base.ThreadUtils;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.actor.ui.ActorPictureInPictureOverlayCoordinator;
@@ -342,7 +343,7 @@ public class ActorPictureInPictureController
 
     /** Expose to Activity to guarantee UI reset during framework exits. */
     public void onFrameworkExitedPictureInPicture() {
-        exitPictureInPicture();
+        ThreadUtils.runOnUiThreadBlocking(this::exitPictureInPicture);
     }
 
     private void enterPictureInPicture() {
