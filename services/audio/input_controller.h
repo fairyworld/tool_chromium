@@ -119,6 +119,9 @@ class InputController final {
 
     // Failed to open aec reference stream due to device in use by another app.
     REFERENCE_STREAM_OPEN_DEVICE_IN_USE_ERROR,  // = 10
+
+    // Open failed due to the device being removed.
+    STREAM_OPEN_DEVICE_REMOVED_ERROR,  // = 11
   };
 
 #if defined(AUDIO_POWER_MONITORING)

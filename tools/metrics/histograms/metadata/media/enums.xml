@@ -2202,6 +2202,7 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="System permissions error"/>
   <int value="4" label="Device in use error"/>
   <int value="5" label="Previous stream error"/>
+  <int value="6" label="Device removed error"/>
 </enum>
 
 <enum name="RemotingCompatibility">

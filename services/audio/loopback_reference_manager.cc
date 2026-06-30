@@ -58,13 +58,15 @@ ReferenceOpenOutcome MapStreamOpenOutcomeToReferenceOpenOutcome(
       return ReferenceOpenOutcome::STREAM_OPEN_SYSTEM_PERMISSIONS_ERROR;
     case OpenOutcome::kFailedInUse:
       return ReferenceOpenOutcome::STREAM_OPEN_DEVICE_IN_USE_ERROR;
+    case OpenOutcome::kFailedDeviceRemoved:
+      return ReferenceOpenOutcome::STREAM_OPEN_DEVICE_REMOVED_ERROR;
     default:
       return ReferenceOpenOutcome::STREAM_OPEN_ERROR;
   }
 }
 
 ReferenceOpenOutcome ReportOpenResult(ReferenceOpenOutcome outcome) {
-  base::UmaHistogramEnumeration("Media.Audio.LoopbackReference.OpenResult",
+  base::UmaHistogramEnumeration("Media.Audio.LoopbackReference.OpenResult2",
                                 outcome);
   return outcome;
 }

@@ -678,6 +678,8 @@ InputController::ErrorCode MapOpenOutcomeToErrorCode(OpenOutcome outcome) {
       return InputController::STREAM_OPEN_SYSTEM_PERMISSIONS_ERROR;
     case OpenOutcome::kFailedInUse:
       return InputController::STREAM_OPEN_DEVICE_IN_USE_ERROR;
+    case OpenOutcome::kFailedDeviceRemoved:
+      return InputController::STREAM_OPEN_DEVICE_REMOVED_ERROR;
     default:
       return InputController::STREAM_OPEN_ERROR;
   }

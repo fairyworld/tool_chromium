@@ -21675,6 +21675,7 @@ from previous Chrome versions.
   <int value="53"
       label="Failed due to Shutdown: Web Contents No Delegate (AbortError)"/>
   <int value="54" label="Failed due to Shutdown: Other (AbortError)"/>
+  <int value="55" label="Device removed"/>
 </enum>
 
 <enum name="MediaStreamType">
