@@ -2084,6 +2084,16 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
             .Build());
   }
 
+  // Fake Page Action for Chrome internals page debugging.
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {},
+              bwi))
+          .SetActionId(kActionFakePageActionForDebug)
+          .Build());
+
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(

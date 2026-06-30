@@ -73,6 +73,7 @@ bool IsPageActionMigrated(PageActionIconType page_action) {
     case PageActionIconType::kFileSystemAccess:
     case PageActionIconType::kAutofillPayment:
     case PageActionIconType::kPaymentsChurnedUsers:
+    case PageActionIconType::kFakePageActionForDebug:
       return true;
     default:
       break;

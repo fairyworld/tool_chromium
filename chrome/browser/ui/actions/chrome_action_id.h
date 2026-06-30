@@ -102,6 +102,7 @@
   E(kActionGroupUngroupedTabs, IDC_GROUP_UNGROUPED_TABS) \
   E(kActionCreateNewTabGroupTopLevel, IDC_CREATE_NEW_TAB_GROUP_TOP_LEVEL) \
   E(kActionAddNewTabRecentGroup, IDC_ADD_NEW_TAB_RECENT_GROUP) \
+  E(kActionFakePageActionForDebug, IDC_FAKE_PAGE_ACTION_FOR_DEBUG) \
   /* Page-manipulation commands that target a specified tab, which may not */ \
   /* be the active one. */ \
   E(kActionMuteTargetSite, IDC_MUTE_TARGET_SITE) \
