@@ -533,8 +533,16 @@ IN_PROC_BROWSER_TEST_F(WebUIBrowserTest, DevToolsWindowDoesNotCrash) {
                                DevToolsOpenedByAction::kUnknown);
 }
 
+// TODO(crbug.com/525865317): Re-enable this test on macOS.
+#if BUILDFLAG(IS_MAC)
+#define MAYBE_ActiveTabHasNonZeroSizeOnWindowCreation \
+  DISABLED_ActiveTabHasNonZeroSizeOnWindowCreation
+#else
+#define MAYBE_ActiveTabHasNonZeroSizeOnWindowCreation \
+  ActiveTabHasNonZeroSizeOnWindowCreation
+#endif
 IN_PROC_BROWSER_TEST_F(WebUIBrowserTest,
-                       ActiveTabHasNonZeroSizeOnWindowCreation) {
+                       MAYBE_ActiveTabHasNonZeroSizeOnWindowCreation) {
   // Create a new browser window with a tab.
   Browser* new_browser = Browser::Create(Browser::CreateParams(
       Browser::Type::TYPE_NORMAL, browser()->profile(), true));
