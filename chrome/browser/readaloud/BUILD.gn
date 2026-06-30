@@ -5,6 +5,7 @@
 if (is_android) {
   source_set("readaloud") {
     sources = [
+      "read_aloud_constants.h",
       "read_aloud_service.h",
       "read_aloud_service_factory.h",
     ]
@@ -14,6 +15,7 @@ if (is_android) {
       "//components/dom_distiller/core",
       "//components/keyed_service/core",
       "//content/public/browser",
+      "//media",
     ]
   }
 
