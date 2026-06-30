@@ -100,6 +100,7 @@ import org.chromium.chrome.browser.compositor.layouts.components.CompositorButto
 import org.chromium.chrome.browser.compositor.layouts.components.CompositorButton.ButtonType;
 import org.chromium.chrome.browser.compositor.layouts.components.CompositorButton.TooltipHandler;
 import org.chromium.chrome.browser.compositor.layouts.components.TintedCompositorButton;
+import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutHelper.LeadingButtonDelegate;
 import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutView.StripLayoutViewOnClickHandler;
 import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutView.StripLayoutViewOnKeyboardFocusHandler;
 import org.chromium.chrome.browser.compositor.overlays.strip.TabStripIphController.IphType;
@@ -240,6 +241,7 @@ public class StripLayoutHelperTest {
     @Mock private TabBookmarker mTabBookmarker;
     @Mock private ActivityResultTracker mActivityResultTracker;
     @Mock private SendTabToSelfAndroidBridge.Natives mSendTabToSelfAndroidBridgeNatives;
+    @Mock private LeadingButtonDelegate mLeadingButtonDelegate;
 
     @Captor private ArgumentCaptor<DataSharingService.Observer> mSharingObserverCaptor;
     @Captor private ArgumentCaptor<TabModelActionListener> mTabModelActionListenerCaptor;
@@ -4834,6 +4836,7 @@ public class StripLayoutHelperTest {
                                 return null;
                             }
                         },
+                        mLeadingButtonDelegate,
                         mManagerHost,
                         mUpdateHost,
                         mRenderHost,
@@ -7459,6 +7462,17 @@ public class StripLayoutHelperTest {
         assertFalse(
                 "Tab should not be underlined",
                 mStripLayoutHelper.getStripLayoutTabsForTesting()[0].isUnderlinedForTesting());
+    }
+
+    @Test
+    public void testHandleTabSearchClick_InvokesDelegate() {
+        initializeTest(0);
+        mStripLayoutHelper.onClick(
+                TIMESTAMP,
+                mStripLayoutHelper.getTabSearchButton(),
+                MotionEventUtils.MOTION_EVENT_BUTTON_NONE,
+                0);
+        verify(mLeadingButtonDelegate).onTabSearchClicked();
     }
 
     private void closeTabAt(int index) {

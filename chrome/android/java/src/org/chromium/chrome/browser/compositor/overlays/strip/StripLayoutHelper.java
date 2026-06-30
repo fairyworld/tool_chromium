@@ -496,9 +496,15 @@ public class StripLayoutHelper
         @Nullable CompositorButton getGlicButton();
     }
 
+    public interface LeadingButtonDelegate {
+        /** Called when the tab search button is clicked. */
+        void onTabSearchClicked();
+    }
+
     // External influences
     private final SceneOverlay mSceneOverlay;
     private final TrailingButtonDelegate mTrailingButtonDelegate;
+    private final LeadingButtonDelegate mLeadingButtonDelegate;
     private final LayoutUpdateHost mUpdateHost;
     private final LayoutRenderHost mRenderHost;
     private final LayoutManagerHost mManagerHost;
@@ -726,6 +732,7 @@ public class StripLayoutHelper
      * @param sceneOverlay The {@link SceneOverlay} to use.
      * @param trailingButtonDelegate A delegate to communicate with the trailing buttons
      *     coordinator.
+     * @param leadingButtonDelegate A delegate to communicate with the leading buttons.
      * @param managerHost The parent {@link LayoutManagerHost}.
      * @param updateHost The parent {@link LayoutUpdateHost}.
      * @param renderHost The {@link LayoutRenderHost}.
@@ -756,6 +763,7 @@ public class StripLayoutHelper
             Context context,
             SceneOverlay sceneOverlay,
             TrailingButtonDelegate trailingButtonDelegate,
+            LeadingButtonDelegate leadingButtonDelegate,
             LayoutManagerHost managerHost,
             LayoutUpdateHost updateHost,
             LayoutRenderHost renderHost,
@@ -810,6 +818,7 @@ public class StripLayoutHelper
 
         mSceneOverlay = sceneOverlay;
         mTrailingButtonDelegate = trailingButtonDelegate;
+        mLeadingButtonDelegate = leadingButtonDelegate;
         mManagerHost = managerHost;
         mUpdateHost = updateHost;
         mRenderHost = renderHost;
@@ -3256,7 +3265,7 @@ public class StripLayoutHelper
     }
 
     private void handleTabSearchClick() {
-        // TODO(crbug.com/527609826): Implemented when the overlay floating container is added.
+        mLeadingButtonDelegate.onTabSearchClicked();
     }
 
     @Override

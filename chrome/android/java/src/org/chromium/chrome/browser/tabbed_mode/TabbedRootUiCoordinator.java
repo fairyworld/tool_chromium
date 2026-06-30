@@ -79,6 +79,7 @@ import org.chromium.chrome.browser.collaboration.CollaborationServiceFactory;
 import org.chromium.chrome.browser.collaboration.messaging.MessagingBackendServiceFactory;
 import org.chromium.chrome.browser.compositor.CompositorViewHolder;
 import org.chromium.chrome.browser.compositor.layouts.LayoutManagerImpl;
+import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutHelper.LeadingButtonDelegate;
 import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutHelperManager;
 import org.chromium.chrome.browser.contextmenu.ChromeContextMenuPopulator;
 import org.chromium.chrome.browser.contextmenu.ChromeContextMenuPopulatorFactory;
@@ -1323,6 +1324,15 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                 mBrowserControlsManager,
                 mIsVerticalTabsActiveSupplier,
                 mIsGlicPinnedSupplier);
+    }
+
+    /** Returns the {@link LeadingButtonDelegate} for the tab strip's leading button. */
+    public LeadingButtonDelegate getLeadingButtonDelegate() {
+        return () -> {
+            if (mTabSearchOverlayCoordinator != null) {
+                mTabSearchOverlayCoordinator.show();
+            }
+        };
     }
 
     @Override

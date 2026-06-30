@@ -1154,6 +1154,8 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
                     new ChromeDragAndDropBrowserDelegate(() -> this));
 
             assert getToolbarManager() != null;
+            TabbedRootUiCoordinator tabbedRootUiCoordinator =
+                    (TabbedRootUiCoordinator) mRootUiCoordinator;
 
             ActionConfirmationManager actionConfirmationManager =
                     new ActionConfirmationManager(
@@ -1163,8 +1165,7 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
 
             GlicButtonDelegate glicClickHandler =
                     (preventClose, invocationSource) ->
-                            ((TabbedRootUiCoordinator) mRootUiCoordinator)
-                                    .toggleGlic(preventClose, invocationSource);
+                            tabbedRootUiCoordinator.toggleGlic(preventClose, invocationSource);
 
             mLayoutManager =
                     new LayoutManagerChromeTablet(
@@ -1195,8 +1196,8 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
                             getSnackbarManager(),
                             getActivityResultTracker(),
                             glicClickHandler,
-                            ((TabbedRootUiCoordinator) mRootUiCoordinator)
-                                    .getSideUiStateProviderSupplier(),
+                            tabbedRootUiCoordinator.getLeadingButtonDelegate(),
+                            tabbedRootUiCoordinator.getSideUiStateProviderSupplier(),
                             mRootUiCoordinator.getTabObscuringHandler());
             mLayoutStateProviderSupplier.set(mLayoutManager);
         }
