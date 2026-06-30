@@ -440,10 +440,6 @@
     "dependencies": ["permission:documentScan"],
     "contexts": ["privileged_extension"]
   },
-  "dom": {
-    "channel": "stable",
-    "contexts": ["privileged_extension", "content_script"]
-  },
   "downloads": {
     "dependencies": ["permission:downloads"],
     "contexts": ["privileged_extension"]
