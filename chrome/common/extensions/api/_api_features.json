@@ -675,10 +675,6 @@
     "dependencies": ["permission:identity"],
     "contexts": ["privileged_extension"]
   },
-  "idltest": {
-    "dependencies": ["permission:idltest"],
-    "contexts": ["privileged_extension"]
-  },
   "indigoPrivate": {
     "dependencies": ["permission:indigoPrivate"],
     "contexts": [

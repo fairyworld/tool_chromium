@@ -2680,7 +2680,6 @@ source_set("browser_tests") {
       "api/file_system/file_system_apitest.cc",
       "api/hid/hid_apitest.cc",
       "api/identity/gaia_remote_consent_flow_browsertest.cc",
-      "api/idltest/idltest_apitest.cc",
       "api/image_writer_private/extractor_browsertest.cc",
       "api/image_writer_private/image_writer_private_apitest.cc",
       "api/image_writer_private/test_utils.cc",
