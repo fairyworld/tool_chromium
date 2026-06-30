@@ -295,7 +295,7 @@ class V4StoreTest : public PlatformTest {
   base::FilePath store_path_;
   base::FilePath v5_store_path_;
   base::test::TaskEnvironment task_environment_;
-  V4StorePtr updated_store_{nullptr, V4StoreDeleter(nullptr)};
+  V4StorePtr updated_store_{nullptr, SBStoreDeleter(nullptr)};
   base::test::ScopedFeatureList feature_list_;
 };
 

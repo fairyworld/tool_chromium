@@ -219,4 +219,11 @@ std::string SBStore::ExtensionV4IdToV5Hash(std::string_view v4_id) {
   return v5_hash;
 }
 
+SBStoreDeleter::SBStoreDeleter(
+    scoped_refptr<base::SequencedTaskRunner> task_runner)
+    : task_runner_(std::move(task_runner)) {}
+SBStoreDeleter::~SBStoreDeleter() = default;
+SBStoreDeleter::SBStoreDeleter(SBStoreDeleter&&) = default;
+SBStoreDeleter& SBStoreDeleter::operator=(SBStoreDeleter&&) = default;
+
 }  // namespace safe_browsing

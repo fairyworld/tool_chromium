@@ -67,7 +67,7 @@ class FakeV4StoreFactory : public V4StoreFactory {
       bool is_extensions_blocklist) override {
     return V4StorePtr(
         new FakeV4Store(task_runner, store_path, hash_prefix_should_match_),
-        V4StoreDeleter(task_runner));
+        SBStoreDeleter(task_runner));
   }
 
  private:

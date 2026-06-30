@@ -264,7 +264,7 @@ V4StorePtr V4StoreFactory::CreateV4Store(
   V4StorePtr new_store(
       new V4Store(task_runner, store_path, v5_prefix_size,
                   is_eligible_for_migration, is_extensions_blocklist),
-      V4StoreDeleter(task_runner));
+      SBStoreDeleter(task_runner));
   new_store->Initialize();
   return new_store;
 }
@@ -462,7 +462,7 @@ void V4Store::ApplyUpdate(
   V4StorePtr new_store(new V4Store(task_runner_, store_path_, v5_prefix_size_,
                                    is_eligible_for_migration_,
                                    is_extensions_blocklist_, file_size_),
-                       V4StoreDeleter(task_runner_));
+                       SBStoreDeleter(task_runner_));
   ApplyUpdateResult apply_update_result;
   std::optional<std::string> metric;
   ApplyUpdateType apply_update_type;
@@ -1384,11 +1384,8 @@ void V4Store::CollectStoreInfo(
   hash_prefix_map_->GetPrefixInfo(store_info->mutable_prefix_sets());
 }
 
-V4StoreDeleter::V4StoreDeleter(
-    scoped_refptr<base::SequencedTaskRunner> task_runner)
-    : task_runner_(std::move(task_runner)) {}
-V4StoreDeleter::~V4StoreDeleter() = default;
-V4StoreDeleter::V4StoreDeleter(V4StoreDeleter&&) = default;
-V4StoreDeleter& V4StoreDeleter::operator=(V4StoreDeleter&&) = default;
+const std::string& V4Store::GetStoreState() const {
+  return state_;
+}
 
 }  // namespace safe_browsing

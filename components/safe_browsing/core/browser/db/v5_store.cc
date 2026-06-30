@@ -10,6 +10,7 @@
 #include "base/files/file_util.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
+#include "base/notreached.h"
 #include "base/strings/string_util.h"
 #include "base/timer/elapsed_timer.h"
 #include "components/crx_file/id_util.h"
@@ -394,6 +395,37 @@ V5Store::ConvertExtensionsBlocklistFromV4ToV5(
   }
 
   return ConvertExtensionBlocklistV4ToV5Result::kSuccess;
+}
+
+int64_t V5Store::RecordAndReturnFileSize(const std::string& base_metric) {
+  // TODO(crbug.com/362791941): implement
+  NOTREACHED();
+}
+
+void V5Store::Reset() {
+  // TODO(crbug.com/362791941): implement
+  NOTREACHED();
+}
+
+bool V5Store::VerifyChecksum() {
+  // TODO(crbug.com/362791941): implement
+  NOTREACHED();
+}
+
+void V5Store::CollectStoreInfo(
+    DatabaseManagerInfo::DatabaseInfo::StoreInfo* store_info,
+    const std::string& base_metric) {
+  // TODO(crbug.com/362791941): implement
+  NOTREACHED();
+}
+
+HashPrefixStr V5Store::GetMatchingHashPrefix(const FullHashStr& full_hash) {
+  // TODO(crbug.com/362791941): implement
+  NOTREACHED();
+}
+
+const std::string& V5Store::GetStoreState() const {
+  return version_;
 }
 
 }  // namespace safe_browsing

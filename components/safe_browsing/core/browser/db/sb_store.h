@@ -10,8 +10,11 @@
 
 #include "base/files/file.h"
 #include "base/files/file_path.h"
+#include "base/location.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/task/sequenced_task_runner.h"
+#include "components/safe_browsing/core/browser/db/sb_protocol_manager_util.h"
+#include "components/safe_browsing/core/common/proto/webui.pb.h"
 #include "third_party/protobuf/src/google/protobuf/io/zero_copy_stream.h"
 #include "third_party/protobuf/src/google/protobuf/io/zero_copy_stream_impl_lite.h"
 class V5StoreFileFormat;
@@ -19,6 +22,10 @@ class V5StoreFileFormat;
 namespace safe_browsing {
 
 class V4StoreFileFormat;
+class SBStore;
+
+struct SBStoreDeleter;
+using SBStorePtr = std::unique_ptr<SBStore, SBStoreDeleter>;
 
 // Enumerate different failure events while parsing the file read from disk for
 // histogramming purposes.  DO NOT CHANGE THE ORDERING OF THESE VALUES.
@@ -190,6 +197,33 @@ class SBStore {
 
   int64_t file_size() const { return file_size_; }
 
+  // Records (in kilobytes) and returns the size of the file on disk for this
+  // store using |base_metric| as prefix and the filename as suffix.
+  virtual int64_t RecordAndReturnFileSize(const std::string& base_metric) = 0;
+
+  // Reset internal state.
+  virtual void Reset() = 0;
+
+  // Scheduled after reading the store file from disk on startup. When run, it
+  // ensures that the checksum of the hash prefixes in lexicographical sorted
+  // order matches the expected value in |expected_checksum_|. Returns true if
+  // it matches; false otherwise. Checksum verification can take a long time,
+  // so it is performed outside of the hotpath of loading SafeBrowsing database,
+  // which blocks resource loads.
+  virtual bool VerifyChecksum() = 0;
+
+  // Populates the DatabaseInfo message.
+  virtual void CollectStoreInfo(
+      DatabaseManagerInfo::DatabaseInfo::StoreInfo* store_info,
+      const std::string& base_metric) = 0;
+
+  // If a hash prefix in this store matches `full_hash`, returns that hash
+  // prefix; otherwise returns an empty hash prefix.
+  virtual HashPrefixStr GetMatchingHashPrefix(const FullHashStr& full_hash) = 0;
+
+  // Returns the state of the store (i.e. state for V4, version for V5).
+  virtual const std::string& GetStoreState() const = 0;
+
  protected:
   // Converts a 32-character V4 extension ID string into its raw 16-byte V5
   // binary hash representation.
@@ -239,6 +273,26 @@ class SBStore {
   // A counter used to manage how frequently the value of `has_valid_data_`
   // below is recorded.
   uint8_t record_has_valid_data_counter_ = 0;
+};
+
+struct SBStoreDeleter {
+  explicit SBStoreDeleter(scoped_refptr<base::SequencedTaskRunner> task_runner);
+  ~SBStoreDeleter();
+
+  SBStoreDeleter(SBStoreDeleter&&);
+  SBStoreDeleter& operator=(SBStoreDeleter&&);
+
+  void operator()(const SBStore* ptr) {
+    if (ptr) {
+      if (task_runner_->RunsTasksInCurrentSequence()) {
+        delete ptr;
+      } else {
+        task_runner_->DeleteSoon(FROM_HERE, ptr);
+      }
+    }
+  }
+
+  scoped_refptr<base::SequencedTaskRunner> task_runner_;
 };
 
 }  // namespace safe_browsing

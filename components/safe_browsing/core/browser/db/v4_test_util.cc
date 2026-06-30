@@ -108,7 +108,7 @@ V4StorePtr TestV4StoreFactory::CreateV4Store(
   V4StorePtr new_store(
       new TestV4Store(task_runner, store_path, v5_prefix_size,
                       is_eligible_for_migration, is_extensions_blocklist),
-      V4StoreDeleter(task_runner));
+      SBStoreDeleter(task_runner));
   new_store->Initialize();
   return new_store;
 }

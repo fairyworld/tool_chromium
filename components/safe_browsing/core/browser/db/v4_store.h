@@ -27,8 +27,7 @@ namespace safe_browsing {
 
 class V4Store;
 
-struct V4StoreDeleter;
-using V4StorePtr = std::unique_ptr<V4Store, V4StoreDeleter>;
+using V4StorePtr = std::unique_ptr<V4Store, SBStoreDeleter>;
 
 using UpdatedStoreReadyCallback =
     base::OnceCallback<void(V4StorePtr new_store)>;
@@ -183,9 +182,7 @@ class V4Store : public SBStore {
           int64_t old_file_size = 0);
   ~V4Store() override;
 
-  // If a hash prefix in this store matches |full_hash|, returns that hash
-  // prefix; otherwise returns an empty hash prefix.
-  virtual HashPrefixStr GetMatchingHashPrefix(const FullHashStr& full_hash);
+  HashPrefixStr GetMatchingHashPrefix(const FullHashStr& full_hash) override;
 
   const std::string& state() const { return state_; }
 
@@ -193,9 +190,7 @@ class V4Store : public SBStore {
                    const scoped_refptr<base::SequencedTaskRunner>& runner,
                    UpdatedStoreReadyCallback callback);
 
-  // Records (in kilobytes) and returns the size of the file on disk for this
-  // store using |base_metric| as prefix and the filename as suffix.
-  int64_t RecordAndReturnFileSize(const std::string& base_metric);
+  int64_t RecordAndReturnFileSize(const std::string& base_metric) override;
 
   std::string DebugString() const;
 
@@ -203,21 +198,15 @@ class V4Store : public SBStore {
   // of the hash prefixes.
   void Initialize();
 
-  // Reset internal state.
-  void Reset();
+  void Reset() override;
 
-  // Scheduled after reading the store file from disk on startup. When run, it
-  // ensures that the checksum of the hash prefixes in lexicographical sorted
-  // order matches the expected value in |expected_checksum_|. Returns true if
-  // it matches; false otherwise. Checksum verification can take a long time,
-  // so it is performed outside of the hotpath of loading SafeBrowsing database,
-  // which blocks resource loads.
-  bool VerifyChecksum();
+  bool VerifyChecksum() override;
 
-  // Populates the DatabaseInfo message.
   void CollectStoreInfo(
       DatabaseManagerInfo::DatabaseInfo::StoreInfo* store_info,
-      const std::string& base_metric);
+      const std::string& base_metric) override;
+
+  const std::string& GetStoreState() const override;
 
  protected:
   std::string GetMetricPrefix() const override;
@@ -555,26 +544,6 @@ class V4Store : public SBStore {
 };
 
 std::ostream& operator<<(std::ostream& os, const V4Store& store);
-
-struct V4StoreDeleter {
-  explicit V4StoreDeleter(scoped_refptr<base::SequencedTaskRunner> task_runner);
-  ~V4StoreDeleter();
-
-  V4StoreDeleter(V4StoreDeleter&&);
-  V4StoreDeleter& operator=(V4StoreDeleter&&);
-
-  void operator()(const V4Store* ptr) {
-    if (ptr) {
-      if (task_runner_->RunsTasksInCurrentSequence()) {
-        delete ptr;
-      } else {
-        task_runner_->DeleteSoon(FROM_HERE, ptr);
-      }
-    }
-  }
-
-  scoped_refptr<base::SequencedTaskRunner> task_runner_;
-};
 
 }  // namespace safe_browsing
 

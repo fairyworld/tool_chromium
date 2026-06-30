@@ -14,6 +14,7 @@
 #include "components/safe_browsing/core/browser/db/hash_prefix_list.h"
 #include "components/safe_browsing/core/browser/db/sb_store.h"
 #include "components/safe_browsing/core/browser/db/sb_store_file_format.h"
+#include "components/safe_browsing/core/common/proto/webui.pb.h"
 
 namespace safe_browsing {
 
@@ -129,6 +130,20 @@ class V5Store : public SBStore {
   // Reads the store file from disk and populates the in-memory representation
   // of the hash prefixes.
   void Initialize();
+
+  int64_t RecordAndReturnFileSize(const std::string& base_metric) override;
+
+  void Reset() override;
+
+  bool VerifyChecksum() override;
+
+  void CollectStoreInfo(
+      DatabaseManagerInfo::DatabaseInfo::StoreInfo* store_info,
+      const std::string& base_metric) override;
+
+  const std::string& GetStoreState() const override;
+
+  HashPrefixStr GetMatchingHashPrefix(const FullHashStr& full_hash) override;
 
  protected:
   std::string GetMetricPrefix() const override;
