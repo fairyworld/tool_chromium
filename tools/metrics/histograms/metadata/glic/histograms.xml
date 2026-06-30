@@ -1268,7 +1268,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.Session.CreateTabCount" units="count"
-    expires_after="2026-10-27">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>perrier@google.com</owner>
   <summary>
@@ -1278,7 +1278,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.Session.Duration" units="ms"
-    expires_after="2026-10-27">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>carlosk@chromium.org</owner>
   <summary>
@@ -1293,7 +1293,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.Session.EndReason"
-    enum="GlicMultiInstanceSessionEndReason" expires_after="2026-10-27">
+    enum="GlicMultiInstanceSessionEndReason" expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>carlosk@chromium.org</owner>
   <summary>
@@ -1315,7 +1315,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.Session.InputModesUsed"
-    enum="GlicInputModesUsed" expires_after="2026-10-27">
+    enum="GlicInputModesUsed" expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>perrier@chromium.org</owner>
   <summary>
@@ -1346,7 +1346,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.Session.ToggleCount" units="count"
-    expires_after="2026-10-27">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>perrier@google.com</owner>
   <summary>
@@ -1356,7 +1356,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.Session.TotalActiveDuration" units="ms"
-    expires_after="2026-10-27">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>perrier@google.com</owner>
   <summary>
@@ -1367,7 +1367,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.Session.TotalHiddenDuration" units="ms"
-    expires_after="2026-10-27">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>perrier@google.com</owner>
   <summary>
@@ -1378,7 +1378,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.Session.TotalInactiveDuration" units="ms"
-    expires_after="2026-10-27">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>perrier@google.com</owner>
   <summary>
@@ -1389,7 +1389,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.Session.TotalVisibleDuration" units="ms"
-    expires_after="2026-10-27">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>perrier@google.com</owner>
   <summary>
@@ -1410,7 +1410,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.Session.UninterruptedActiveDuration" units="ms"
-    expires_after="2026-10-27">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>perrier@google.com</owner>
   <summary>
@@ -1421,7 +1421,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.Session.UninterruptedVisibleDuration" units="ms"
-    expires_after="2026-10-27">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>perrier@google.com</owner>
   <summary>
@@ -1432,7 +1432,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.Instance.SessionCount" units="count"
-    expires_after="2026-10-27">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>carlosk@chromium.org</owner>
   <summary>
@@ -2172,7 +2172,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.PanelWebUiState.Error" enum="PanelWebUiStateErrorReason"
-    expires_after="2026-10-28">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>perrier@google.com</owner>
   <summary>
@@ -2189,7 +2189,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Glic.PanelWebUiState.FinishState3" enum="WebUiState"
-    expires_after="2026-10-28">
+    expires_after="2026-12-27">
   <owner>birnie@google.com</owner>
   <owner>perrier@google.com</owner>
   <summary>

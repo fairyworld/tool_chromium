@@ -639,7 +639,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Sharing.SharingHubAndroid.CustomAction"
-    enum="ShareCustomAction" expires_after="2026-10-25">
+    enum="ShareCustomAction" expires_after="2026-12-27">
   <owner>wenyufu@chromium.org</owner>
   <owner>src/chrome/browser/share/OWNERS</owner>
   <summary>

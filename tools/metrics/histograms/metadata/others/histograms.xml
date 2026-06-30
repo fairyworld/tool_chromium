@@ -2783,7 +2783,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="ClientHints.CriticalCHRestart" enum="CriticalCHRestart"
-    expires_after="2026-10-25">
+    expires_after="2026-12-27">
   <owner>victortan@chromium.org</owner>
   <owner>miketaylr@chromium.org</owner>
   <owner>katabolism-finch@google.com</owner>
@@ -6040,7 +6040,7 @@ chromium-metrics-reviews@google.com.
 
 <histogram
     name="PushMessaging.PushSubscriptionChangeForNotificationPermissionChangeFired"
-    units="count" expires_after="2026-10-25">
+    units="count" expires_after="2026-12-27">
   <owner>peter@chromium.org</owner>
   <owner>antoniosartori@chromium.org</owner>
   <summary>

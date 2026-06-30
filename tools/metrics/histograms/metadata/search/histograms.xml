@@ -286,7 +286,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Search.AuxiliarySearch.Schedule.Favicon.FetchTime" units="ms"
-    expires_after="2026-10-25">
+    expires_after="2026-12-27">
   <owner>hanxi@chromium.org</owner>
   <owner>gangwu@chromium.org</owner>
   <owner>clank-start@google.com</owner>
@@ -1147,7 +1147,7 @@ https://chromium.googlesource.com/chromium/src/tools/+/HEAD/metrics/histograms/R
 </histogram>
 
 <histogram name="Search.Integrity.CustomPopulatedDefault" enum="Boolean"
-    expires_after="2026-10-20">
+    expires_after="2026-12-27">
   <owner>musalmaan@chromium.org</owner>
   <owner>iclelland@chromium.org</owner>
   <owner>chrome-desktop-ui-waterloo@google.com</owner>
@@ -1195,7 +1195,7 @@ https://chromium.googlesource.com/chromium/src/tools/+/HEAD/metrics/histograms/R
 </histogram>
 
 <histogram name="Search.Integrity.Enterprise.Referral.ParameterFound"
-    enum="SearchReferralParam" expires_after="2026-10-20">
+    enum="SearchReferralParam" expires_after="2026-12-27">
   <owner>musalmaan@chromium.org</owner>
   <owner>iclelland@chromium.org</owner>
   <owner>chrome-desktop-ui-waterloo@google.com</owner>

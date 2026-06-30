@@ -37,7 +37,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="PDF.Caret.FirstVisible" enum="Boolean"
-    expires_after="2026-10-27">
+    expires_after="2026-12-27">
   <owner>andyphan@chromium.org</owner>
   <owner>thestig@chromium.org</owner>
   <summary>

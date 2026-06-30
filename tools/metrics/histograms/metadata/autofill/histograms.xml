@@ -1357,7 +1357,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 
 <histogram
     name="Autofill.AddressSuggestionOnTypingAcceptance.FieldClassication"
-    enum="BooleanFieldClassificationType" expires_after="2026-10-25">
+    enum="BooleanFieldClassificationType" expires_after="2026-12-27">
   <owner>brunobraga@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -1369,7 +1369,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 
 <histogram
     name="Autofill.AddressSuggestionOnTypingAcceptance.NumberOfCharactersTyped"
-    units="units" expires_after="2026-10-26">
+    units="units" expires_after="2026-12-27">
   <owner>brunobraga@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -1923,7 +1923,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Ai.ReauthToFill" enum="DeviceReauth.ReauthResult"
-    expires_after="2026-10-25">
+    expires_after="2026-12-27">
   <owner>brunobraga@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -2847,7 +2847,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.HideDueToTabHide" enum="AutofillBubbleType"
-    expires_after="2026-10-22">
+    expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -2858,7 +2858,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.Queue.AddedDueToActiveBubble"
-    enum="AutofillBubbleType" expires_after="2026-10-25">
+    enum="AutofillBubbleType" expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -2870,7 +2870,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.Queue.AddedDueToHover"
-    enum="AutofillBubbleType" expires_after="2026-10-25">
+    enum="AutofillBubbleType" expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -2881,7 +2881,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.Queue.Discarded" enum="AutofillBubbleType"
-    expires_after="2026-10-22">
+    expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -2904,7 +2904,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.Queue.ShownFromQueue"
-    enum="AutofillBubbleType" expires_after="2026-10-25">
+    enum="AutofillBubbleType" expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -2915,7 +2915,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.Queue.ShownFromQueueOnTabVisible"
-    enum="AutofillBubbleType" expires_after="2026-10-25">
+    enum="AutofillBubbleType" expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -2926,7 +2926,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.Queue.TimedOut" enum="AutofillBubbleType"
-    expires_after="2026-10-25">
+    expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -2972,7 +2972,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.RequestShow" enum="AutofillBubbleType"
-    expires_after="2026-10-25">
+    expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -2983,7 +2983,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.RequestShow.ForceShow"
-    enum="AutofillBubbleType" expires_after="2026-10-25">
+    enum="AutofillBubbleType" expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -2994,7 +2994,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.Show.NoActiveBubble" enum="AutofillBubbleType"
-    expires_after="2026-10-22">
+    expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -3005,7 +3005,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.Show.Preemption" enum="AutofillBubbleType"
-    expires_after="2026-10-22">
+    expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -3016,7 +3016,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.Bubble.WasPreempted" enum="AutofillBubbleType"
-    expires_after="2026-10-22">
+    expires_after="2026-12-27">
   <owner>vidhanj@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -3874,7 +3874,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.EditedAutofilledFieldAtSubmission.AddressOnTyping"
-    enum="AutofilledFieldUserEditingStatus" expires_after="2026-10-25">
+    enum="AutofilledFieldUserEditingStatus" expires_after="2026-12-27">
   <owner>brunobraga@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -3910,7 +3910,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 
 <histogram
     name="Autofill.EditedDistanceAutofilledFieldAtSubmission.AddressOnTyping"
-    units="units" expires_after="2026-10-25">
+    units="units" expires_after="2026-12-27">
   <owner>brunobraga@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -3922,7 +3922,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 
 <histogram
     name="Autofill.EditedPercentageAutofilledFieldAtSubmission.AddressOnTyping"
-    units="%" expires_after="2026-10-25">
+    units="%" expires_after="2026-12-27">
   <owner>brunobraga@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -5381,7 +5381,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.LabelInference.InferredLabelSource.AtSubmission2"
-    enum="InferredLabelSource" expires_after="2026-10-25">
+    enum="InferredLabelSource" expires_after="2026-12-27">
   <owner>fleimgruber@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -6652,7 +6652,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 </histogram>
 
 <histogram name="Autofill.ProfileImport.NameEmailSupersetProfileDecision"
-    enum="AutofillProfileImportDecision" expires_after="2026-10-25">
+    enum="AutofillProfileImportDecision" expires_after="2026-12-27">
   <owner>sygiet@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -10077,7 +10077,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 <!-- TODO(crbug.com/491115361): Rename YourSavedInfoSettingsPage to AddressesSettingsPage -->
 
 <histogram name="Autofill.YourSavedInfoSettingsPage.CategoryLinkClick"
-    enum="YourSavedInfoDataCategory" expires_after="2026-10-28">
+    enum="YourSavedInfoDataCategory" expires_after="2026-12-27">
   <owner>mikhe@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -10090,7 +10090,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 <!-- TODO(crbug.com/491115361): Rename YourSavedInfoSettingsPage to AddressesSettingsPage -->
 
 <histogram name="Autofill.YourSavedInfoSettingsPage.DataChipClick"
-    enum="YourSavedInfoDataChip" expires_after="2026-10-28">
+    enum="YourSavedInfoDataChip" expires_after="2026-12-27">
   <owner>ireneuszszulc@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -10102,7 +10102,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 <!-- TODO(crbug.com/491115361): Rename YourSavedInfoSettingsPage to AddressesSettingsPage -->
 
 <histogram name="Autofill.YourSavedInfoSettingsPage.RelatedServiceLinkClick"
-    enum="YourSavedInfoRelatedService" expires_after="2026-10-28">
+    enum="YourSavedInfoRelatedService" expires_after="2026-12-27">
   <owner>ireneuszszulc@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
@@ -10115,7 +10115,7 @@ Called by update_autofill_enums.py. This is a manual comment.-->
 <!-- TODO(crbug.com/491115361): Merge this metric with the existing Autofill.AddressesSettingsPage.VisitReferrer -->
 
 <histogram name="Autofill.YourSavedInfoSettingsPage.VisitReferrer"
-    enum="AutofillSettingsReferrer" expires_after="2026-10-28">
+    enum="AutofillSettingsReferrer" expires_after="2026-12-27">
   <owner>mikhe@google.com</owner>
   <owner>chrome-autofill-alerts@google.com</owner>
   <summary>
