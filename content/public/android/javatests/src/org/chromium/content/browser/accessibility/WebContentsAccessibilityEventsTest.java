@@ -1539,6 +1539,7 @@ public class WebContentsAccessibilityEventsTest {
     // on the node info, which requires tiramisu or higher.
     @MinAndroidSdkLevel(Build.VERSION_CODES.TIRAMISU)
     @EnableFeatures(ContentFeatures.ACCESSIBILITY_REQUEST_SCOPED_CONTENT_CHANGED_EVENTS)
+    @DisabledTest(message = "https://crbug.com/529790434")
     public void test_scopedContentChanged_enabled() {
         performTest(
                 "scoped-content-changed.html",
