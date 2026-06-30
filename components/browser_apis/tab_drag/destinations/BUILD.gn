@@ -2,46 +2,35 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-source_set("sessions") {
+source_set("destinations") {
   sources = [
-    "tab_drag_event_router.h",
-    "tab_drag_session.h",
-    "tab_drag_session_injector.h",
-    "tab_drag_session_listener.h",
-    "tab_drag_session_manager.h",
-    "tab_drag_window_registry.h",
+    "drop_target.h",
+    "drop_target_id.h",
+    "drop_target_registry.h",
+    "drop_target_registry_impl.h",
   ]
 
   public_deps = [
     "//components/browser_apis/tab_drag:mojom",
     "//components/browser_apis/tab_drag/adapters",
-    "//components/browser_apis/tab_drag/destinations",
-    "//components/browser_apis/tab_strip:mojom",
-    "//components/browser_apis/tab_strip/types",
     "//mojo/public/cpp/bindings",
     "//ui/gfx/geometry",
   ]
 
-  deps = [
-    "//base",
-    "//mojo/public/mojom/base",
-  ]
+  deps = [ "//base" ]
 }
 
 source_set("impl") {
   sources = [
-    "tab_drag_event_router.cc",
-    "tab_drag_session.cc",
-    "tab_drag_session_manager.cc",
-    "tab_drag_window_registry.cc",
+    "drop_target.cc",
+    "drop_target_registry_impl.cc",
   ]
 
   deps = [
-    ":sessions",
+    ":destinations",
     "//base",
     "//components/browser_apis/tab_drag:mojom",
     "//components/browser_apis/tab_drag/adapters",
-    "//components/browser_apis/tab_drag/destinations:impl",
     "//mojo/public/cpp/bindings",
     "//ui/gfx",
     "//ui/gfx/geometry",
@@ -51,20 +40,16 @@ source_set("impl") {
 source_set("unit_tests") {
   testonly = true
 
-  sources = [
-    "tab_drag_event_router_unittest.cc",
-    "tab_drag_session_unittest.cc",
-  ]
+  sources = [ "drop_target_registry_impl_unittest.cc" ]
 
   deps = [
+    ":destinations",
     ":impl",
-    ":sessions",
     "//base",
     "//base/test:test_support",
     "//components/browser_apis/tab_drag/adapters",
+    "//components/browser_apis/tab_drag/sessions",
     "//components/browser_apis/tab_drag/testing",
-    "//components/browser_apis/tab_strip/types",
-    "//mojo/public/cpp/bindings",
     "//testing/gmock",
     "//testing/gtest",
     "//ui/gfx",

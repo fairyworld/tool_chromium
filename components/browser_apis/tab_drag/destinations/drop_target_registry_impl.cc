@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/browser_apis/tab_drag/sessions/drop_target_registry_impl.h"
+#include "components/browser_apis/tab_drag/destinations/drop_target_registry_impl.h"
 
 #include <memory>
 #include <utility>
 
 #include "base/check.h"
 #include "components/browser_apis/tab_drag/adapters/tab_drag_window_adapter.h"
-#include "components/browser_apis/tab_drag/sessions/drop_target.h"
+#include "components/browser_apis/tab_drag/destinations/drop_target.h"
 #include "mojo/public/cpp/bindings/self_owned_associated_receiver.h"
 
 namespace tabs_api {

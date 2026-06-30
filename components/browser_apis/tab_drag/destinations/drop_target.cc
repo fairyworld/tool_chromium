@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/browser_apis/tab_drag/sessions/drop_target.h"
+#include "components/browser_apis/tab_drag/destinations/drop_target.h"
 
 #include <utility>
 

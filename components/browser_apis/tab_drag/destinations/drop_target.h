@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_BROWSER_APIS_TAB_DRAG_SESSIONS_DROP_TARGET_H_
-#define COMPONENTS_BROWSER_APIS_TAB_DRAG_SESSIONS_DROP_TARGET_H_
+#ifndef COMPONENTS_BROWSER_APIS_TAB_DRAG_DESTINATIONS_DROP_TARGET_H_
+#define COMPONENTS_BROWSER_APIS_TAB_DRAG_DESTINATIONS_DROP_TARGET_H_
 
 #include <optional>
 #include <vector>
 
 #include "base/memory/raw_ptr.h"
 #include "components/browser_apis/tab_drag/adapters/tab_drag_window_adapter.h"
-#include "components/browser_apis/tab_drag/sessions/drop_target_id.h"
+#include "components/browser_apis/tab_drag/destinations/drop_target_id.h"
 #include "components/browser_apis/tab_drag/tab_drag_api.mojom.h"
 #include "mojo/public/cpp/bindings/associated_remote.h"
 #include "mojo/public/cpp/bindings/pending_associated_remote.h"
@@ -65,4 +65,4 @@ class DropTarget {
 
 }  // namespace tabs_api
 
-#endif  // COMPONENTS_BROWSER_APIS_TAB_DRAG_SESSIONS_DROP_TARGET_H_
+#endif  // COMPONENTS_BROWSER_APIS_TAB_DRAG_DESTINATIONS_DROP_TARGET_H_
