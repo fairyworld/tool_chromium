@@ -319,10 +319,15 @@ inline LayoutStateAssistantPassKey PassKey() {
 }
 
 - (void)animateAlongsideTransitionPresented:(BOOL)presented {
+  BOOL isSheet =
+      self.presentationContext == AssistantPresentationContext::kSheet;
+  BOOL isSheetPresented = presented && isSheet;
   CGFloat targetRadius =
-      presented ? (_bottomCornerRadius + _bottomMargin) : 0.0;
+      isSheetPresented ? (_bottomCornerRadius + _bottomMargin) : 0.0;
   [self.layoutState setAssistantContainerCutoutRadius:targetRadius
                                               passKey:PassKey()];
+  [self.layoutState setAppBarLockedInFullscreen:isSheetPresented
+                                        passKey:PassKey()];
 }
 
 #pragma mark - Properties
@@ -350,6 +355,7 @@ inline LayoutStateAssistantPassKey PassKey() {
 
   if (_presentationContext != AssistantPresentationContext::kSheet) {
     [self.layoutState setAssistantContainerCutoutRadius:0.0 passKey:PassKey()];
+    [self.layoutState setAppBarLockedInFullscreen:NO passKey:PassKey()];
   }
 
   if ([self.delegate respondsToSelector:@selector(assistantContainer:
