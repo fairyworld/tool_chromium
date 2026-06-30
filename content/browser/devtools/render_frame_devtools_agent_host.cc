@@ -782,8 +782,12 @@ std::string RenderFrameDevToolsAgentHost::GetParentId() {
   if (IsChildFrame()) {
     FrameTreeNode* frame_tree_node =
         GetFrameTreeNodeAncestor(frame_tree_node_->parent()->frame_tree_node());
-    return RenderFrameDevToolsAgentHost::GetOrCreateFor(frame_tree_node)
-        ->GetId();
+    // During teardown/disconnect of the parent frame, the parent's agent host
+    // may have been unmapped. Avoid recreating it here to prevent registering
+    // a duplicate agent host ID (which would cause a crash).
+    DevToolsAgentHostImpl* parent =
+        RenderFrameDevToolsAgentHost::GetFor(frame_tree_node);
+    return parent ? parent->GetId() : std::string();
   }
 
   WebContentsImpl* contents = static_cast<WebContentsImpl*>(web_contents());
