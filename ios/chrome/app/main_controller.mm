@@ -334,6 +334,14 @@ enum class ProfileChoice {
 
 // Returns the available ProfileChoices.
 base::span<const ProfileChoice> GetProfileChoices() {
+  if (!AreSeparateProfilesForManagedAccountsEnabled()) {
+    // Note: Separate profiles for managed accounts are launched; this code path
+    // is only relevant for some EG tests covering the migration.
+    static constexpr auto kSingleProfileChoices = std::to_array<ProfileChoice>({
+        ProfileChoice::kPersonalProfile,
+    });
+    return kSingleProfileChoices;
+  }
   static constexpr auto kProfileChoices = std::to_array<ProfileChoice>({
       ProfileChoice::kProfileFromTask,
       ProfileChoice::kProfileForScene,
@@ -1261,7 +1269,6 @@ std::string GetProfileNameForChoice(ProfileChoice choice,
   // down, so there is no point in running them).
   [_appState.deferredRunner cancelAllBlocks];
 
-
 #if BUILDFLAG(ENABLE_RLZ)
   if (_rlzTrackerInitialized) {
     _rlzTrackerInitialized = NO;
@@ -1580,10 +1587,11 @@ std::string GetProfileNameForChoice(ProfileChoice choice,
 - (void)expireFirstUserActionRecorder {
   // Clear out any scheduled calls to this method. For example, the app may have
   // been backgrounded before the `kFirstUserActionTimeout` expired.
-  [NSObject cancelPreviousPerformRequestsWithTarget:self
-                                           selector:@selector
-                                           (expireFirstUserActionRecorder)
-                                             object:nil];
+  [NSObject
+      cancelPreviousPerformRequestsWithTarget:self
+                                     selector:@selector(
+                                                  expireFirstUserActionRecorder)
+                                       object:nil];
 
   if (_firstUserActionRecorder) {
     _firstUserActionRecorder->Expire();
