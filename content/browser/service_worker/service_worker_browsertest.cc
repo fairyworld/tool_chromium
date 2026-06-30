@@ -8026,7 +8026,7 @@ class InterceptorURLLoader : public network::mojom::URLLoader {
     client_->OnReceiveResponse(std::move(response), std::move(consumer),
                                std::nullopt);
     network::URLLoaderCompletionStatus status(net::OK);
-    status.decoded_body_length = body.size();
+    status.decoded_body_length = base::ByteSize(body.size());
     client_->OnComplete(status);
   }
 

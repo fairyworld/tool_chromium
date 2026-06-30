@@ -12,6 +12,7 @@
 #include <string>
 #include <utility>
 
+#include "base/byte_size.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
 #include "base/memory/scoped_refptr.h"
@@ -739,7 +740,7 @@ TEST_F(ConfigParserTest, ParseConfig) {
       net::HttpUtil::AssembleRawHeaders(headers));
   head->mime_type = "text/xml";
   network::URLLoaderCompletionStatus status;
-  status.decoded_body_length = xml_config.size();
+  status.decoded_body_length = base::ByteSize(xml_config.size());
   test_url_loader_factory().AddResponse(url, std::move(head), xml_config,
                                         status);
 

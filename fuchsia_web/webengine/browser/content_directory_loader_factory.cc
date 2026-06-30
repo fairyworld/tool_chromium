@@ -13,6 +13,7 @@
 #include <string_view>
 #include <utility>
 
+#include "base/byte_size.h"
 #include "base/command_line.h"
 #include "base/compiler_specific.h"
 #include "base/files/memory_mapped_file.h"
@@ -284,7 +285,7 @@ class ContentDirectoryURLLoader final : public network::mojom::URLLoader {
     }
 
     network::URLLoaderCompletionStatus status(net::OK);
-    const size_t content_length = mmap_->bytes().size();
+    const auto content_length = base::ByteSize(mmap_->bytes().size());
     status.encoded_data_length = content_length;
     status.encoded_body_length = content_length;
     status.decoded_body_length = content_length;

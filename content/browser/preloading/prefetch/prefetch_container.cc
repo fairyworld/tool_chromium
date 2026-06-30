@@ -4,6 +4,7 @@
 
 #include "content/browser/preloading/prefetch/prefetch_container.h"
 
+#include "base/byte_size.h"
 #include "base/check_is_test.h"
 #include "base/debug/crash_logging.h"
 #include "base/debug/dump_without_crashing.h"
@@ -1458,7 +1459,7 @@ void PrefetchContainer::OnPrefetchCompleteInternal() {
     prefetch_container_metrics_.time_prefetch_completed_successfully =
         base::TimeTicks::Now();
     RecordPrefetchProxyPrefetchMainframeBodyLength(
-        GetCompletionStatus()->decoded_body_length);
+        GetCompletionStatus()->decoded_body_length.InBytes());
   }
 
   if (auto* renderer_initiator_info = request().GetRendererInitiatorInfo()) {

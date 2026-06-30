@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include "base/byte_size.h"
 #include "base/strings/strcat.h"
 #include "base/test/bind.h"
 #include "base/test/metrics/histogram_tester.h"
@@ -686,7 +687,7 @@ TEST_P(PrefetchContainerTest, PrefetchProxyPrefetchedResourceUkm) {
       CreateSpeculationRulesPrefetchContainer(GURL("https://test.com"));
 
   network::URLLoaderCompletionStatus completion_status;
-  completion_status.encoded_data_length = 100;
+  completion_status.encoded_data_length = base::ByteSize(100u);
   completion_status.completion_time =
       base::TimeTicks() + base::Milliseconds(200);
 

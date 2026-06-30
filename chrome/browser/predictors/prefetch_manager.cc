@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "base/byte_size.h"
 #include "base/command_line.h"
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
@@ -368,18 +369,19 @@ void PrefetchManager::OnPrefetchFinished(
 
   // TODO(ricea): Remove these histograms in October 2024 and make a note of the
   // results in https://crbug.com/335524391.
-  if (status.error_code == net::OK && status.decoded_body_length > 0) {
+  if (status.error_code == net::OK &&
+      status.decoded_body_length.InBytes() > 0) {
     if (status.decoded_body_length > status.encoded_body_length) {
       // Assume it was compressed.
       base::UmaHistogramCounts10000(
           "Navigation.Prefetch.CompressedBodySize",
-          static_cast<int>(status.encoded_body_length / 1024));
+          static_cast<int>(status.encoded_body_length.InBytes() / 1024));
     } else {
       // The cast to int will overflow if we prefetch a resource over a terabyte
       // in size, but I'm hoping that will never happen.
       base::UmaHistogramCounts10000(
           "Navigation.Prefetch.UncompressedBodySize",
-          static_cast<int>(status.encoded_body_length / 1024));
+          static_cast<int>(status.encoded_body_length.InBytes() / 1024));
     }
   }
 

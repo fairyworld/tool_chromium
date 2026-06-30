@@ -7,6 +7,7 @@
 #include <optional>
 #include <string_view>
 
+#include "base/byte_size.h"
 #include "base/functional/callback_helpers.h"
 #include "base/logging.h"
 #include "base/memory/weak_ptr.h"
@@ -1145,7 +1146,8 @@ class PrefetchServiceTestBase : public PrefetchingMetricsTestBase {
     }
 
     network::URLLoaderCompletionStatus completion_status(net_error);
-    completion_status.decoded_body_length = expected_total_body_size;
+    completion_status.decoded_body_length =
+        base::ByteSize(expected_total_body_size);
     request->client->OnComplete(completion_status);
     task_environment()->RunUntilIdle();
 

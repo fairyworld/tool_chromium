@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "base/base64.h"
+#include "base/byte_size.h"
 #include "base/feature_list.h"
 #include "base/files/file_path.h"
 #include "base/functional/bind.h"
@@ -306,7 +307,7 @@ void AddOKResponseWithIM(
   if (!im.empty())
     head->headers->SetHeader("IM", im);
   network::URLLoaderCompletionStatus status;
-  status.decoded_body_length = body.size();
+  status.decoded_body_length = base::ByteSize(body.size());
   test_url_loader_factory->AddResponse(interception_url, std::move(head), body,
                                        status);
 }
@@ -650,7 +651,7 @@ TEST_F(VariationsServiceTest, CountryHeader) {
   head->headers->SetHeader("X-Country", "test");
   head->headers->SetHeader("X-Geo-Level-1", "test-geo-level");
   network::URLLoaderCompletionStatus status;
-  status.decoded_body_length = serialized_seed.size();
+  status.decoded_body_length = base::ByteSize(serialized_seed.size());
   service.test_url_loader_factory()->AddResponse(
       service.interception_url(), std::move(head), serialized_seed, status);
 
@@ -679,7 +680,7 @@ TEST_F(VariationsServiceTest, CountryHeaderNotTrustedOverHTTP) {
   head->headers->SetHeader("X-Country", "test");
   head->headers->SetHeader("X-Geo-Level-1", "test-geo-level");
   network::URLLoaderCompletionStatus status;
-  status.decoded_body_length = serialized_seed.size();
+  status.decoded_body_length = base::ByteSize(serialized_seed.size());
   service.test_url_loader_factory()->AddResponse(
       service.interception_url(), std::move(head), serialized_seed, status);
 
@@ -885,7 +886,7 @@ TEST_F(VariationsServiceTest, SafeMode_SuccessfulFetchClearsFailureStreaks) {
       net::HttpUtil::AssembleRawHeaders(headers));
   head->headers->SetHeader("X-Seed-Signature", kBase64SeedSignature);
   network::URLLoaderCompletionStatus status;
-  status.decoded_body_length = response.size();
+  status.decoded_body_length = base::ByteSize(response.size());
   service.test_url_loader_factory()->AddResponse(
       service.interception_url(), std::move(head), response, status);
 
@@ -1018,7 +1019,7 @@ TEST_F(VariationsServiceTest, NullResponseReceivedWithHTTPOk) {
   http_response_headers->SetHeader("X-Seed-Signature", kBase64SeedSignature);
   // Set ERR_FAILED status code despite the 200 response code.
   network::URLLoaderCompletionStatus status(net::ERR_FAILED);
-  status.decoded_body_length = response.size();
+  status.decoded_body_length = base::ByteSize(response.size());
   service.test_url_loader_factory()->AddResponse(
       service.interception_url(), std::move(head), response, status,
       network::TestURLLoaderFactory::Redirects(),

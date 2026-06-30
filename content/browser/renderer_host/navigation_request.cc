@@ -6212,20 +6212,9 @@ void NavigationRequest::MaybeAddResourceTimingEntryForCancelledNavigation() {
 void NavigationRequest::AddResourceTimingEntryForFailedSubframeNavigation(
     const network::URLLoaderCompletionStatus& status) {
   auto resource_lengths = blink::mojom::SubframeResourceLengths::New();
-  // TODO(crbug.com/448661443): Remove signedness checks once
-  // URLLoaderCompletionStatus uses ByteSize.
-  if (status.encoded_data_length >= 0) {
-    resource_lengths->encoded_data_length =
-        base::ByteSize(base::as_unsigned(status.encoded_data_length));
-  }
-  if (status.encoded_body_length >= 0) {
-    resource_lengths->encoded_body_length =
-        base::ByteSize(base::as_unsigned(status.encoded_body_length));
-  }
-  if (status.decoded_body_length >= 0) {
-    resource_lengths->decoded_body_length =
-        base::ByteSize(base::as_unsigned(status.decoded_body_length));
-  }
+  resource_lengths->encoded_data_length = status.encoded_data_length;
+  resource_lengths->encoded_body_length = status.encoded_body_length;
+  resource_lengths->decoded_body_length = status.decoded_body_length;
   AddResourceTimingEntryForFailedSubframeNavigation(
       status.completion_time, std::move(resource_lengths));
 }
