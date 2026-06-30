@@ -18003,6 +18003,7 @@ from previous Chrome versions.
   <int value="1129109601" label="EnableAIWriterAPI:disabled"/>
   <int value="1129542111" label="CastAllowAllIPs:disabled"/>
   <int value="1129888794" label="ash-touch-hud"/>
+  <int value="1130229973" label="Aim3pEntrypoint:disabled"/>
   <int value="1131627624" label="DefaultStyleSheetsEarlyInit:enabled"/>
   <int value="1131677207" label="OmniboxShowPopupOnMouseReleased:enabled"/>
   <int value="1132343836" label="AndroidBookmarkBarFastFollow:enabled"/>
@@ -20359,6 +20360,7 @@ from previous Chrome versions.
   <int value="1872185826" label="LocationHardReload:enabled"/>
   <int value="1872394121"
       label="ContextualTasksBackButtonExpandsSidePanel:disabled"/>
+  <int value="1872516063" label="Aim3pEntrypoint:enabled"/>
   <int value="1872768755" label="BackgroundResourceFetch:disabled"/>
   <int value="1872897574"
       label="AutofillEnableRankingFormulaCreditCards:disabled"/>

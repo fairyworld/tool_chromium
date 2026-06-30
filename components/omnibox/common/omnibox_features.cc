@@ -206,6 +206,8 @@ BASE_FEATURE(kAndroidDesktopAimGate, DISABLED);
 
 // Enables the AIM entrypoint for third party search engines.
 BASE_FEATURE(kAim3pEntrypoint, DISABLED);
+const base::FeatureParam<bool> kAim3pEntrypointDebug{
+    &kAim3pEntrypoint, "Aim3pEntrypointDebug", false};
 
 // When enabled, AI mode will remove verbatim suggestions from the suggestions
 // list.

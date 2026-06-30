@@ -96,6 +96,11 @@
     "expiry_milestone": 155
   },
   {
+    "name": "aim-3p-entrypoint",
+    "owners": [ "manukh@chromium.org", "chrome-desktop-search@google.com" ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "aim-cobrowse",
     "owners": [ "ameurhosni@google.com", "bling-search@google.com" ],
     "expiry_milestone": 152
