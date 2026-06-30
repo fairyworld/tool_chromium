@@ -37,6 +37,10 @@ export function getHtml(this: MemoryBanksElement) {
               this.selectedIds.size === 0}" @click="${this.onDownloadClick_}">
                     Download selected
                   </cr-button>
+                  <cr-button ?disabled="${
+              this.selectedIds.size === 0}" @click="${this.onDeleteClick_}">
+                    Delete selected
+                  </cr-button>
                 </div>
               </div>
             `}

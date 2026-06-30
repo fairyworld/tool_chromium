@@ -45,7 +45,7 @@ export class MemoryBanksElement extends CrLitElement {
 
   private async fetchEntries() {
     const {entries} =
-        await BrowserProxyImpl.getInstance().handler.getAllEntries();
+        await BrowserProxyImpl.getInstance().handler.getAllMemoryBankEntries();
     this.entries = entries;
   }
 
@@ -124,6 +124,14 @@ export class MemoryBanksElement extends CrLitElement {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
+
+  protected async onDeleteClick_() {
+    const ids = Array.from(this.selectedIds);
+    await BrowserProxyImpl.getInstance().handler.deleteMemoryBankEntries(ids);
+    this.selectedIds = new Set();
+    await this.fetchEntries();
+  }
+
 
   private getSelectedEntriesAsText_(): string {
     const selectedEntries =
