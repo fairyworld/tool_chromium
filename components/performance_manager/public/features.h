@@ -257,6 +257,11 @@ BASE_DECLARE_FEATURE(kUseLoadingStateToDetectBackgroundTitleOrFaviconUpdate);
 
 BASE_DECLARE_FEATURE(kGlicActuationPriorityVoter);
 
+// When enabled, ignores kMediaQueryChange favicon updates (e.g.
+// prefers-color-scheme toggles) when determining whether a background tab
+// updated its favicon.
+BASE_DECLARE_FEATURE(kIgnoreMediaQueryFaviconUpdates);
+
 }  // namespace performance_manager::features
 
 #endif  // COMPONENTS_PERFORMANCE_MANAGER_PUBLIC_FEATURES_H_
