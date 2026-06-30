@@ -36,6 +36,7 @@
 #include "components/autofill/core/common/mojom/autofill_types.mojom-shared.h"
 #include "components/autofill/core/common/test_utils/autofill_form_test_utils.h"
 #include "components/autofill/core/common/unique_ids.h"
+#include "media/base/sequence.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/platform/web_string.h"
@@ -67,6 +68,7 @@ using ::blink::WebString;
 using ::testing::_;
 using ::testing::Each;
 using ::testing::ElementsAre;
+using ::testing::ElementsAreArray;
 using ::testing::Field;
 using ::testing::Optional;
 using ::testing::Pair;
@@ -74,6 +76,111 @@ using ::testing::Property;
 
 namespace autofill::form_util {
 namespace {
+
+const std::array kJohnSmithIdFieldsMatchers = {
+    test::FormFieldDescriptionEq({.label = u"First name:",
+                                  .name = u"firstname",
+                                  .name_attribute = u"",
+                                  .id_attribute = u"firstname",
+                                  .value = u"John"}),
+    test::FormFieldDescriptionEq({.label = u"Last name:",
+                                  .name = u"lastname",
+                                  .name_attribute = u"",
+                                  .id_attribute = u"lastname",
+                                  .value = u"Smith"}),
+    test::FormFieldDescriptionEq({.label = u"Email:",
+                                  .name = u"email",
+                                  .name_attribute = u"",
+                                  .id_attribute = u"email",
+                                  .value = u"john@example.com"})};
+
+const std::array kJohnSmithNameFieldsMatchers = {
+    test::FormFieldDescriptionEq({.label = u"First name:",
+                                  .name = u"firstname",
+                                  .name_attribute = u"firstname",
+                                  .value = u"John"}),
+    test::FormFieldDescriptionEq({.label = u"Last name:",
+                                  .name = u"lastname",
+                                  .name_attribute = u"lastname",
+                                  .value = u"Smith"}),
+    test::FormFieldDescriptionEq({.label = u"Email:",
+                                  .name = u"email",
+                                  .name_attribute = u"email",
+                                  .value = u"john@example.com"})};
+
+const std::array kJohnSmithValueFieldsMatchers = {
+    test::FormFieldDescriptionEq({.label = u"John",
+                                  .name = u"firstname",
+                                  .name_attribute = u"",
+                                  .id_attribute = u"firstname",
+                                  .value = u"John"}),
+    test::FormFieldDescriptionEq({.label = u"Smith",
+                                  .name = u"lastname",
+                                  .name_attribute = u"",
+                                  .id_attribute = u"lastname",
+                                  .value = u"Smith"}),
+    test::FormFieldDescriptionEq({.label = u"john@example.com",
+                                  .name = u"email",
+                                  .name_attribute = u"",
+                                  .id_attribute = u"email",
+                                  .value = u"john@example.com"})};
+
+const std::array kFirstLastEmailIdFieldsMatchers = {
+    test::FormFieldDescriptionEq(
+        {.name = u"firstname", .name_attribute = u"", .id_attribute = u"firstname"}),
+    test::FormFieldDescriptionEq(
+        {.name = u"lastname", .name_attribute = u"", .id_attribute = u"lastname"}),
+    test::FormFieldDescriptionEq(
+        {.name = u"email", .name_attribute = u"", .id_attribute = u"email"})};
+
+const std::array kStarredFirstLastEmailFieldsMatchers = {
+    test::FormFieldDescriptionEq({.label = u"*First Name",
+                                  .name = u"firstname",
+                                  .name_attribute = u"",
+                                  .id_attribute = u"firstname",
+                                  .value = u"John"}),
+    test::FormFieldDescriptionEq({.label = u"*Last Name",
+                                  .name = u"lastname",
+                                  .name_attribute = u"",
+                                  .id_attribute = u"lastname",
+                                  .value = u"Smith"}),
+    test::FormFieldDescriptionEq({.label = u"*Email",
+                                  .name = u"email",
+                                  .name_attribute = u"",
+                                  .id_attribute = u"email",
+                                  .value = u"john@example.com"})};
+
+const std::array kCreditCardAutofilledFieldsMatchers = {
+    test::FormFieldDescriptionEq({.label = u"Credit Card Number",
+                                  .name = u"cc",
+                                  .name_attribute = u"",
+                                  .id_attribute = u"cc",
+                                  .value = u"1111-2222-3333-4444",
+                                  .placeholder = u"Credit Card Number",
+                                  .is_autofilled_according_to_renderer = true}),
+    test::FormFieldDescriptionEq({.label = u"Expiration Date",
+                                  .name = u"expiration_date",
+                                  .name_attribute = u"",
+                                  .id_attribute = u"expiration_date",
+                                  .value = u"03/2030",
+                                  .placeholder = u"Expiration Date",
+                                  .is_autofilled_according_to_renderer = true}),
+    test::FormFieldDescriptionEq(
+        {.label = u"Full Name",
+         .name = u"name",
+         .name_attribute = u"",
+         .id_attribute = u"name",
+         .value = u"John Smith",
+         .placeholder = u"Full Name",
+         .is_autofilled_according_to_renderer = false})};
+
+const std::array kAriaLabelAndDescriptionFieldsMatchers = {
+    test::FormFieldDescriptionEq(
+        {.aria_label = u"inline aria label", .aria_description = u""}),
+    test::FormFieldDescriptionEq(
+        {.aria_label = u"aria label", .aria_description = u""}),
+    test::FormFieldDescriptionEq(
+        {.aria_label = u"", .aria_description = u"aria description"})};
 
 struct AutofillFieldCase {
   FormControlType form_control_type;
@@ -365,103 +472,6 @@ class FormAutofillTest : public test::AutofillRendererTest {
         kUpdateFormCacheCallTimerStateDummy);
   }
 
-  void ExpectLabels(const char* html,
-                    const std::vector<std::u16string>& id_attributes,
-                    const std::vector<std::u16string>& name_attributes,
-                    const std::vector<std::u16string>& labels,
-                    const std::vector<std::u16string>& names,
-                    const std::vector<std::u16string>& values) {
-    ASSERT_EQ(labels.size(), id_attributes.size());
-    ASSERT_EQ(labels.size(), name_attributes.size());
-    ASSERT_EQ(labels.size(), names.size());
-    ASSERT_EQ(labels.size(), values.size());
-
-    std::vector<test::CommonFieldDescription> fields;
-    for (size_t i = 0; i < labels.size(); ++i) {
-      fields.push_back({.label = labels[i],
-                        .name = names[i],
-                        .name_attribute = name_attributes[i],
-                        .id_attribute = id_attributes[i],
-                        .value = values[i],
-                        .max_length = FormFieldData::kDefaultMaxLength,
-                        .form_control_type = FormControlType::kInputText});
-    }
-    ExpectLabelsAndTypes(html, fields);
-  }
-
-  void ExpectLabelsAndTypes(
-      const char* html,
-      const std::vector<test::CommonFieldDescription>& fields) {
-    LoadHTML(html);
-
-    std::vector<FormData> forms = UpdateFormCache().updated_forms;
-    ASSERT_EQ(1U, forms.size());
-
-    const FormData& form = forms[0];
-    EXPECT_EQ(u"TestForm", form.name());
-    EXPECT_EQ(GURL("http://cnn.com"), form.action());
-    ASSERT_EQ(fields.size(), form.fields().size());
-
-    for (size_t i = 0; i < fields.size(); ++i) {
-      SCOPED_TRACE(base::StringPrintf("i: %" PRIuS, i));
-      EXPECT_THAT(form.fields()[i], test::FormFieldDescriptionEq(fields[i]));
-    }
-  }
-
-  // Use this validator when the test HTML uses the id attribute instead of
-  // the name attribute to identify the input fields. Otherwise, this is the
-  // same text structure as ExpectJohnSmithLabelsAndNameAttributes().
-  void ExpectJohnSmithLabelsAndIdAttributes(const char* html) {
-    std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-        values;
-
-    id_attributes.push_back(u"firstname");
-    name_attributes.emplace_back();
-    labels.push_back(u"First name:");
-    names.push_back(id_attributes.back());
-    values.push_back(u"John");
-
-    id_attributes.push_back(u"lastname");
-    name_attributes.emplace_back();
-    labels.push_back(u"Last name:");
-    names.push_back(id_attributes.back());
-    values.push_back(u"Smith");
-
-    id_attributes.push_back(u"email");
-    name_attributes.emplace_back();
-    labels.push_back(u"Email:");
-    names.push_back(id_attributes.back());
-    values.push_back(u"john@example.com");
-
-    ExpectLabels(html, id_attributes, name_attributes, labels, names, values);
-  }
-
-  // Use this validator when the test HTML uses the name attribute instead of
-  // the id attribute to identify the input fields. Otherwise, this is the same
-  // text structure as ExpectJohnSmithLabelsAndIdAttributes().
-  void ExpectJohnSmithLabelsAndNameAttributes(const char* html) {
-    std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-        values;
-    id_attributes.emplace_back();
-    name_attributes.push_back(u"firstname");
-    labels.push_back(u"First name:");
-    names.push_back(name_attributes.back());
-    values.push_back(u"John");
-
-    id_attributes.emplace_back();
-    name_attributes.push_back(u"lastname");
-    labels.push_back(u"Last name:");
-    names.push_back(name_attributes.back());
-    values.push_back(u"Smith");
-
-    id_attributes.emplace_back();
-    name_attributes.push_back(u"email");
-    labels.push_back(u"Email:");
-    names.push_back(name_attributes.back());
-    values.push_back(u"john@example.com");
-    ExpectLabels(html, id_attributes, name_attributes, labels, names, values);
-  }
-
   typedef WebString (*GetValueFunction)(WebFormControlElement element);
 
   // Test FormFill* functions.
@@ -657,27 +667,14 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form.action());
     }
 
-    EXPECT_THAT(
-        form.fields(),
-        testing::ElementsAre(
-            test::FormFieldDescriptionEq({.label = u"John",
-                                          .name = u"firstname",
-                                          .id_attribute = u"firstname",
-                                          .value = u"John"}),
-            test::FormFieldDescriptionEq({.label = u"Smith",
-                                          .name = u"lastname",
-                                          .id_attribute = u"lastname",
-                                          .value = u"Smith"}),
-            test::FormFieldDescriptionEq({.label = u"john@example.com",
-                                          .name = u"email",
-                                          .id_attribute = u"email",
-                                          .value = u"john@example.com",
-                                          .autocomplete_attribute = "off"}),
-            test::FormFieldDescriptionEq({.label = u"1.800.555.1234",
-                                          .name = u"phone",
-                                          .id_attribute = u"phone",
-                                          .value = u"1.800.555.1234",
-                                          .autocomplete_attribute = ""})));
+    EXPECT_THAT(form.fields(),
+                ElementsAreArray(media::sequence::Concat(
+                    kJohnSmithValueFieldsMatchers,
+                    media::sequence::Singlet(test::FormFieldDescriptionEq(
+                        {.label = u"1.800.555.1234",
+                         .name = u"phone",
+                         .id_attribute = u"phone",
+                         .value = u"1.800.555.1234"})))));
   }
 
   void TestFindFormForTextAreaElement(const char* html, bool unowned) {
@@ -698,29 +695,15 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form.action());
     }
 
-    EXPECT_THAT(
-        form.fields(),
-        testing::ElementsAre(
-            test::FormFieldDescriptionEq({.label = u"John",
-                                          .name = u"firstname",
-                                          .id_attribute = u"firstname",
-                                          .value = u"John"}),
-            test::FormFieldDescriptionEq({.label = u"Smith",
-                                          .name = u"lastname",
-                                          .id_attribute = u"lastname",
-                                          .value = u"Smith"}),
-            test::FormFieldDescriptionEq({.label = u"john@example.com",
-                                          .name = u"email",
-                                          .id_attribute = u"email",
-                                          .value = u"john@example.com",
-                                          .autocomplete_attribute = "off"}),
-            test::FormFieldDescriptionEq(
-                {.label = u"",
-                 .name = u"street-address",
-                 .id_attribute = u"street-address",
-                 .value = u"123 Fantasy Ln.\nApt. 42",
-                 .autocomplete_attribute = "",
-                 .form_control_type = FormControlType::kTextArea})));
+    EXPECT_THAT(form.fields(),
+                ElementsAreArray(media::sequence::Concat(
+                    kJohnSmithValueFieldsMatchers,
+                    media::sequence::Singlet(test::FormFieldDescriptionEq(
+                        {.label = u"",
+                         .name = u"street-address",
+                         .id_attribute = u"street-address",
+                         .value = u"123 Fantasy Ln.\nApt. 42",
+                         .form_control_type = FormControlType::kTextArea})))));
   }
 
   void TestFillFormMaxLength(const char* html, bool unowned) {
@@ -814,13 +797,7 @@ class FormAutofillTest : public test::AutofillRendererTest {
     }
 
     EXPECT_THAT(form.fields(),
-                testing::ElementsAre(
-                    test::FormFieldDescriptionEq(
-                        {.name = u"firstname", .id_attribute = u"firstname"}),
-                    test::FormFieldDescriptionEq(
-                        {.name = u"lastname", .id_attribute = u"lastname"}),
-                    test::FormFieldDescriptionEq(
-                        {.name = u"email", .id_attribute = u"email"})));
+                ElementsAreArray(kFirstLastEmailIdFieldsMatchers));
 
     // Fill the form.
     test_api(form).field(0).set_value(u"Brother");
@@ -868,13 +845,7 @@ class FormAutofillTest : public test::AutofillRendererTest {
     }
 
     EXPECT_THAT(form.fields(),
-                testing::ElementsAre(
-                    test::FormFieldDescriptionEq(
-                        {.name = u"firstname", .id_attribute = u"firstname"}),
-                    test::FormFieldDescriptionEq(
-                        {.name = u"lastname", .id_attribute = u"lastname"}),
-                    test::FormFieldDescriptionEq(
-                        {.name = u"email", .id_attribute = u"email"})));
+                ElementsAreArray(kFirstLastEmailIdFieldsMatchers));
 
     // Fill the form.
     test_api(form).field(0).set_value(u"Wyatt");
@@ -2059,13 +2030,18 @@ TEST_F(FormAutofillTest, WebFormElementToFormData_IdAttributes) {
 }
 
 TEST_F(FormAutofillTest, ExtractForms) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm action='http://cnn.com'>
            First name: <input id=firstname value=John>
            Last name: <input id=lastname value=Smith>
            Email: <input id=email value='john@example.com'>
            <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+  const FormData& form = forms[0];
+  EXPECT_EQ(u"TestForm", form.name());
+  EXPECT_EQ(GURL("http://cnn.com"), form.action());
+  EXPECT_THAT(form.fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, ExtractMultipleForms) {
@@ -2090,21 +2066,7 @@ TEST_F(FormAutofillTest, ExtractMultipleForms) {
   EXPECT_EQ(u"TestForm", form.name());
   EXPECT_EQ(GURL("http://cnn.com"), form.action());
 
-  EXPECT_THAT(
-      form.fields(),
-      testing::ElementsAre(
-          test::FormFieldDescriptionEq({.label = u"John",
-                                        .name = u"firstname",
-                                        .id_attribute = u"firstname",
-                                        .value = u"John"}),
-          test::FormFieldDescriptionEq({.label = u"Smith",
-                                        .name = u"lastname",
-                                        .id_attribute = u"lastname",
-                                        .value = u"Smith"}),
-          test::FormFieldDescriptionEq({.label = u"john@example.com",
-                                        .name = u"email",
-                                        .id_attribute = u"email",
-                                        .value = u"john@example.com"})));
+  EXPECT_THAT(form.fields(), ElementsAreArray(kJohnSmithValueFieldsMatchers));
 
   // Second form.
   const FormData& form2 = forms[1];
@@ -2155,24 +2117,15 @@ TEST_F(FormAutofillTest, OnlyExtractNewForms) {
   forms = UpdateFormCache().updated_forms;
   ASSERT_EQ(1U, forms.size());
 
-  EXPECT_THAT(forms[0].fields(),
-              testing::ElementsAre(
-                  test::FormFieldDescriptionEq({.label = u"John",
-                                                .name = u"firstname",
-                                                .id_attribute = u"firstname",
-                                                .value = u"John"}),
-                  test::FormFieldDescriptionEq({.label = u"Smith",
-                                                .name = u"lastname",
-                                                .id_attribute = u"lastname",
-                                                .value = u"Smith"}),
-                  test::FormFieldDescriptionEq({.label = u"john@example.com",
-                                                .name = u"email",
-                                                .id_attribute = u"email",
-                                                .value = u"john@example.com"}),
-                  test::FormFieldDescriptionEq({.label = u"",
-                                                .name = u"telephone",
-                                                .id_attribute = u"telephone",
-                                                .value = u"12345"})));
+  EXPECT_THAT(
+      forms[0].fields(),
+      ElementsAreArray(media::sequence::Concat(
+          kJohnSmithValueFieldsMatchers,
+          std::array{test::FormFieldDescriptionEq({.label = u"",
+                                                   .name = u"telephone",
+                                                   .name_attribute = u"",
+                                                   .id_attribute = u"telephone",
+                                                   .value = u"12345"})})));
 
   forms.clear();
 
@@ -2340,8 +2293,7 @@ TEST_F(FormAutofillTest, PreviewFormForUnownedNonEnglishForm) {
 
 
 TEST_F(FormAutofillTest, Labels) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
            <label for=firstname> First name: </label>
              <input id=firstname value=John>
            <label for=lastname> Last name: </label>
@@ -2350,13 +2302,18 @@ TEST_F(FormAutofillTest, Labels) {
              <input id=email value='john@example.com'>
            <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 // <label for=fieldId> elements are correctly assigned to their inputs. Multiple
 // labels are separated with a space.
-// TODO(crbug.com/40229922): Simplify the test using `ExpectLabels()`. This
-// requires some refactoring of the fixture, as only owned forms are supported
-// at the moment.
+// TODO(crbug.com/40229922): Simplify the test using `FormFieldDescriptionEq`.
+// This requires some refactoring of the fixture, as only owned forms are
+// supported at the moment.
 TEST_F(FormAutofillTest, LabelForAttribute) {
   LoadHTML(R"(<label for=fieldId>foo</label>
               <label for=fieldId>bar</label>
@@ -2380,21 +2337,25 @@ TEST_F(FormAutofillTest, LabelForAttribute) {
 // The label is assigned to the input without the for-attribute, by declaring it
 // it inside the label.
 TEST_F(FormAutofillTest, LabelTextBehindInput) {
-  ExpectLabels(R"(
-    <form name=TestForm action=http://cnn.com>
+  LoadHTML(R"(
+    <form name=TestForm>
       <label>
         <input>
         label
       </label>
     </form>
-  )",
-               /*id_attributes=*/{u""}, /*name_attributes=*/{u""},
-               /*labels=*/{u"label"}, /*names=*/{u""}, /*values=*/{u""});
+  )");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(
+      forms[0].fields(),
+      testing::ElementsAre(test::FormFieldDescriptionEq({.label = u"label"})));
 }
 
 TEST_F(FormAutofillTest, LabelsWithSpans) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
            <label for=firstname><span>First name: </span></label>
              <input id=firstname value=John>
            <label for=lastname><span>Last name: </span></label>
@@ -2403,6 +2364,11 @@ TEST_F(FormAutofillTest, LabelsWithSpans) {
              <input id=email value='john@example.com'>
            <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 // This test is different from FormAutofillTest.Labels in that the label
@@ -2412,29 +2378,8 @@ TEST_F(FormAutofillTest, LabelsWithSpans) {
 // however, current label parsing code will extract the text from the previous
 // label element and apply it to the following input field.
 TEST_F(FormAutofillTest, InvalidLabels) {
-  std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-      values;
-
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"firstname");
-  labels.push_back(u"First name:");
-  names.push_back(name_attributes.back());
-  values.push_back(u"John");
-
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"lastname");
-  labels.push_back(u"Last name:");
-  names.push_back(name_attributes.back());
-  values.push_back(u"Smith");
-
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"email");
-  labels.push_back(u"Email:");
-  names.push_back(name_attributes.back());
-  values.push_back(u"john@example.com");
-
-  ExpectLabels(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(
+      R"(<form name=TestForm>
            <label for=firstname> First name: </label>
              <input name=firstname value=John>
            <label for=lastname> Last name: </label>
@@ -2442,15 +2387,19 @@ TEST_F(FormAutofillTest, InvalidLabels) {
            <label for=email> Email: </label>
              <input name=email value='john@example.com'>
            <input type=submit name='reply-send' value=Send>
-         </form>)",
-      id_attributes, name_attributes, labels, names, values);
+         </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(),
+              ElementsAreArray(kJohnSmithNameFieldsMatchers));
 }
 
 // This test has three form control elements, only one of which has a label
 // element associated with it.
 TEST_F(FormAutofillTest, OneLabelElement) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
            First name:
              <input id=firstname value=John>
            <label for=lastname>Last name: </label>
@@ -2459,11 +2408,15 @@ TEST_F(FormAutofillTest, OneLabelElement) {
              <input id=email value='john@example.com'>
            <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromText) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
            First name:
              <input id=firstname value=John>
            Last name:
@@ -2472,11 +2425,15 @@ TEST_F(FormAutofillTest, LabelsInferredFromText) {
              <input id=email value='john@example.com'>
            <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromParagraph) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
            <p>First name:</p><input id=firstname value=John>
            <p>Last name:</p>
              <input id=lastname value=Smith>
@@ -2484,11 +2441,15 @@ TEST_F(FormAutofillTest, LabelsInferredFromParagraph) {
              <input id=email value='john@example.com'>
            <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromBold) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
            <b>First name:</b><input id=firstname value=John>
            <b>Last name:</b>
              <input id=lastname value=Smith>
@@ -2496,11 +2457,15 @@ TEST_F(FormAutofillTest, LabelsInferredFromBold) {
              <input id=email value='john@example.com'>
            <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredPriorToImgOrBr) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
            First name:<img><input id=firstname value=John>
            Last name:<img>
              <input id=lastname value=Smith>
@@ -2508,11 +2473,15 @@ TEST_F(FormAutofillTest, LabelsInferredPriorToImgOrBr) {
              <input id=email value='john@example.com'>
            <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromTableCell) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
            <table>
              <tr>
                <td>First name:</td>
@@ -2532,11 +2501,15 @@ TEST_F(FormAutofillTest, LabelsInferredFromTableCell) {
              </tr>
            </table>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromTableCellTH) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <table>
            <tr>
              <th>First name:</th>
@@ -2556,32 +2529,15 @@ TEST_F(FormAutofillTest, LabelsInferredFromTableCellTH) {
            </tr>
          </table>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromTableCellNested) {
-  std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-      values;
-
-  id_attributes.push_back(u"firstname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"First name: Bogus");
-  names.push_back(id_attributes.back());
-  values.push_back(u"John");
-
-  id_attributes.push_back(u"lastname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"Last name:");
-  names.push_back(id_attributes.back());
-  values.push_back(u"Smith");
-
-  id_attributes.push_back(u"email");
-  name_attributes.push_back(u"");
-  labels.push_back(u"Email:");
-  names.push_back(id_attributes.back());
-  values.push_back(u"john@example.com");
-
-  ExpectLabels(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <table>
            <tr>
              <td>
@@ -2629,60 +2585,50 @@ TEST_F(FormAutofillTest, LabelsInferredFromTableCellNested) {
              </td>
            </tr>
          </table>
-         </form>)",
-      id_attributes, name_attributes, labels, names, values);
+         </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(
+      forms[0].fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.label = u"First name: Bogus",
+                                        .name = u"firstname",
+                                        .name_attribute = u"",
+                                        .id_attribute = u"firstname",
+                                        .value = u"John"}),
+          test::FormFieldDescriptionEq({.label = u"Last name:",
+                                        .name = u"lastname",
+                                        .name_attribute = u"",
+                                        .id_attribute = u"lastname",
+                                        .value = u"Smith"}),
+          test::FormFieldDescriptionEq({.label = u"Email:",
+                                        .name = u"email",
+                                        .name_attribute = u"",
+                                        .id_attribute = u"email",
+                                        .value = u"john@example.com"})));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromTableEmptyTDs) {
-  std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-      values;
-
-  id_attributes.push_back(u"firstname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"* First Name");
-  names.push_back(id_attributes.back());
-  values.push_back(u"John");
-
-  id_attributes.push_back(u"lastname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"* Last Name");
-  names.push_back(id_attributes.back());
-  values.push_back(u"Smith");
-
-  id_attributes.push_back(u"email");
-  name_attributes.push_back(u"");
-  labels.push_back(u"* Email");
-  names.push_back(id_attributes.back());
-  values.push_back(u"john@example.com");
-
-  ExpectLabels(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <table>
-           <tr>
-             <td>
-               <span>*</span>
-               <b>First Name</b>
-             </td>
+                       <tr>
+             <td><span>*</span><b>First Name</b></td>
              <td></td>
              <td>
                <input id=firstname value=John>
              </td>
            </tr>
            <tr>
-             <td>
-               <span>*</span>
-               <b>Last Name</b>
-             </td>
+             <td><span>*</span><b>Last Name</b></td>
              <td></td>
              <td>
                <input id=lastname value=Smith>
              </td>
            </tr>
            <tr>
-             <td>
-               <span>*</span>
-               <b>Email</b>
-             </td>
+             <td><span>*</span><b>Email</b></td>
              <td></td>
              <td>
                <input id=email value='john@example.com'>
@@ -2695,37 +2641,20 @@ TEST_F(FormAutofillTest, LabelsInferredFromTableEmptyTDs) {
              </td>
            </tr>
          </table>
-         </form>)",
-      id_attributes, name_attributes, labels, names, values);
+         </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(),
+              testing::ElementsAreArray(kStarredFirstLastEmailFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromPreviousTD) {
-  std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-      values;
-
-  id_attributes.push_back(u"firstname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"* First Name");
-  names.push_back(id_attributes.back());
-  values.push_back(u"John");
-
-  id_attributes.push_back(u"lastname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"* Last Name");
-  names.push_back(id_attributes.back());
-  values.push_back(u"Smith");
-
-  id_attributes.push_back(u"email");
-  name_attributes.push_back(u"");
-  labels.push_back(u"* Email");
-  names.push_back(id_attributes.back());
-  values.push_back(u"john@example.com");
-
-  ExpectLabels(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <table>
            <tr>
-             <td>* First Name</td>
+             <td>*First Name</td>
              <td>
                Bogus
                <input type=hidden>
@@ -2733,13 +2662,13 @@ TEST_F(FormAutofillTest, LabelsInferredFromPreviousTD) {
              </td>
            </tr>
            <tr>
-             <td>* Last Name</td>
+             <td>*Last Name</td>
              <td>
                <input id=lastname value=Smith>
              </td>
            </tr>
            <tr>
-             <td>* Email</td>
+             <td>*Email</td>
              <td>
                <input id=email value='john@example.com'>
              </td>
@@ -2751,49 +2680,20 @@ TEST_F(FormAutofillTest, LabelsInferredFromPreviousTD) {
              </td>
            </tr>
          </table>
-         </form>)",
-      id_attributes, name_attributes, labels, names, values);
+         </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(),
+              testing::ElementsAreArray(kStarredFirstLastEmailFieldsMatchers));
 }
 
 // <script>, <noscript> and <option> tags are excluded when the labels are
 // inferred.
 // Also <!-- comment --> is excluded.
 TEST_F(FormAutofillTest, LabelsInferredFromTableWithSpecialElements) {
-  std::vector<test::CommonFieldDescription> fields = {
-      {.label = u"* First Name",
-       .name = u"firstname",
-       .name_attribute = u"",
-       .id_attribute = u"firstname",
-       .value = u"John",
-       .form_control_type = FormControlType::kInputText},
-      {.label = u"* Middle Name",
-       .name = u"middlename",
-       .name_attribute = u"",
-       .id_attribute = u"middlename",
-       .value = u"Joe",
-       .form_control_type = FormControlType::kInputText},
-      {.label = u"* Last Name",
-       .name = u"lastname",
-       .name_attribute = u"",
-       .id_attribute = u"lastname",
-       .value = u"Smith",
-       .form_control_type = FormControlType::kInputText},
-      {.label = u"* Country",
-       .name = u"country",
-       .name_attribute = u"",
-       .id_attribute = u"country",
-       .value = u"US",
-       .max_length = 0,
-       .form_control_type = FormControlType::kSelectOne},
-      {.label = u"* Email",
-       .name = u"email",
-       .name_attribute = u"",
-       .id_attribute = u"email",
-       .value = u"john@example.com",
-       .form_control_type = FormControlType::kInputText}};
-
-  ExpectLabelsAndTypes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <table>
            <tr>
              <td>
@@ -2857,13 +2757,53 @@ TEST_F(FormAutofillTest, LabelsInferredFromTableWithSpecialElements) {
              </td>
            </tr>
          </table>
-         </form>)",
-      fields);
+         </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(),
+              testing::ElementsAre(
+                  test::FormFieldDescriptionEq(
+                      {.label = u"* First Name",
+                       .name = u"firstname",
+                       .name_attribute = u"",
+                       .id_attribute = u"firstname",
+                       .value = u"John",
+                       .form_control_type = FormControlType::kInputText}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"* Middle Name",
+                       .name = u"middlename",
+                       .name_attribute = u"",
+                       .id_attribute = u"middlename",
+                       .value = u"Joe",
+                       .form_control_type = FormControlType::kInputText}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"* Last Name",
+                       .name = u"lastname",
+                       .name_attribute = u"",
+                       .id_attribute = u"lastname",
+                       .value = u"Smith",
+                       .form_control_type = FormControlType::kInputText}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"* Country",
+                       .name = u"country",
+                       .name_attribute = u"",
+                       .id_attribute = u"country",
+                       .value = u"US",
+                       .max_length = 0,
+                       .form_control_type = FormControlType::kSelectOne}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"* Email",
+                       .name = u"email",
+                       .name_attribute = u"",
+                       .id_attribute = u"email",
+                       .value = u"john@example.com",
+                       .form_control_type = FormControlType::kInputText})));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromTableLabels) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <table>
            <tr>
              <td>
@@ -2886,11 +2826,15 @@ TEST_F(FormAutofillTest, LabelsInferredFromTableLabels) {
          </table>
          <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromTableTDInterveningElements) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <table>
            <tr>
              <td>
@@ -2916,34 +2860,17 @@ TEST_F(FormAutofillTest, LabelsInferredFromTableTDInterveningElements) {
          </table>
          <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 // Verify that we correctly infer labels when the label text spans multiple
 // adjacent HTML elements, not separated by whitespace.
 TEST_F(FormAutofillTest, LabelsInferredFromTableAdjacentElements) {
-  std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-      values;
-
-  id_attributes.push_back(u"firstname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"*First Name");
-  names.push_back(id_attributes.back());
-  values.push_back(u"John");
-
-  id_attributes.push_back(u"lastname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"*Last Name");
-  names.push_back(id_attributes.back());
-  values.push_back(u"Smith");
-
-  id_attributes.push_back(u"email");
-  name_attributes.push_back(u"");
-  labels.push_back(u"*Email");
-  names.push_back(id_attributes.back());
-  values.push_back(u"john@example.com");
-
-  ExpectLabels(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <table>
            <tr>
              <td>
@@ -2975,73 +2902,19 @@ TEST_F(FormAutofillTest, LabelsInferredFromTableAdjacentElements) {
              </td>
            </tr>
          </table>
-         </form>)",
-      id_attributes, name_attributes, labels, names, values);
+         </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(),
+              testing::ElementsAreArray(kStarredFirstLastEmailFieldsMatchers));
 }
 
 // Verify that we correctly infer labels when the label text resides in the
 // previous row.
 TEST_F(FormAutofillTest, LabelsInferredFromTableRow) {
-  std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-      values;
-
-  id_attributes.push_back(u"firstname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"*First Name");
-  names.push_back(id_attributes.back());
-  values.push_back(u"John");
-
-  id_attributes.push_back(u"lastname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"*Last Name");
-  names.push_back(id_attributes.back());
-  values.push_back(u"Smith");
-
-  id_attributes.push_back(u"email");
-  name_attributes.push_back(u"");
-  labels.push_back(u"*Email");
-  names.push_back(id_attributes.back());
-  values.push_back(u"john@example.com");
-
-  id_attributes.push_back(u"name2");
-  name_attributes.push_back(u"");
-  labels.push_back(u"NAME");
-  names.push_back(id_attributes.back());
-  values.push_back(u"John Smith");
-
-  id_attributes.push_back(u"email2");
-  name_attributes.push_back(u"");
-  labels.push_back(u"EMAIL");
-  names.push_back(id_attributes.back());
-  values.push_back(u"john@example2.com");
-
-  id_attributes.push_back(u"phone1");
-  name_attributes.push_back(u"");
-  labels.push_back(u"Phone");
-  names.push_back(id_attributes.back());
-  values.push_back(u"123");
-
-  id_attributes.push_back(u"phone2");
-  name_attributes.push_back(u"");
-  labels.push_back(u"Phone");
-  names.push_back(id_attributes.back());
-  values.push_back(u"456");
-
-  id_attributes.push_back(u"phone3");
-  name_attributes.push_back(u"");
-  labels.push_back(u"Phone");
-  names.push_back(id_attributes.back());
-  values.push_back(u"7890");
-
-  // Note that ccnumber uses the name attribute instead of the id attribute.
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"ccnumber");
-  labels.push_back(u"Credit Card Number");
-  names.push_back(name_attributes.back());
-  values.push_back(u"4444555544445555");
-
-  ExpectLabels(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <table>
            <tr>
              <td>*First Name</td>
@@ -3100,35 +2973,50 @@ TEST_F(FormAutofillTest, LabelsInferredFromTableRow) {
                <input type=submit name='reply-send' value=Send>
              </td>
            </tr>
-         </table>)",
-      id_attributes, name_attributes, labels, names, values);
+         </table>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(
+      forms[0].fields(),
+      testing::ElementsAreArray(media::sequence::Concat(
+          kStarredFirstLastEmailFieldsMatchers,
+          std::array{
+              test::FormFieldDescriptionEq({.label = u"NAME",
+                                            .name = u"name2",
+                                            .name_attribute = u"",
+                                            .id_attribute = u"name2",
+                                            .value = u"John Smith"}),
+              test::FormFieldDescriptionEq({.label = u"EMAIL",
+                                            .name = u"email2",
+                                            .name_attribute = u"",
+                                            .id_attribute = u"email2",
+                                            .value = u"john@example2.com"}),
+              test::FormFieldDescriptionEq({.label = u"Phone",
+                                            .name = u"phone1",
+                                            .name_attribute = u"",
+                                            .id_attribute = u"phone1",
+                                            .value = u"123"}),
+              test::FormFieldDescriptionEq({.label = u"Phone",
+                                            .name = u"phone2",
+                                            .name_attribute = u"",
+                                            .id_attribute = u"phone2",
+                                            .value = u"456"}),
+              test::FormFieldDescriptionEq({.label = u"Phone",
+                                            .name = u"phone3",
+                                            .name_attribute = u"",
+                                            .id_attribute = u"phone3",
+                                            .value = u"7890"}),
+              test::FormFieldDescriptionEq({.label = u"Credit Card Number",
+                                            .name = u"ccnumber",
+                                            .name_attribute = u"ccnumber",
+                                            .value = u"4444555544445555"})})));
 }
 
 // Verify that we correctly infer labels when enclosed within a list item.
 TEST_F(FormAutofillTest, LabelsInferredFromListItem) {
-  std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-      values;
-
-  id_attributes.push_back(u"areacode");
-  name_attributes.push_back(u"");
-  labels.push_back(u"* Home Phone");
-  names.push_back(id_attributes.back());
-  values.push_back(u"415");
-
-  id_attributes.push_back(u"prefix");
-  name_attributes.push_back(u"");
-  labels.push_back(u"* Home Phone");
-  names.push_back(id_attributes.back());
-  values.push_back(u"555");
-
-  id_attributes.push_back(u"suffix");
-  name_attributes.push_back(u"");
-  labels.push_back(u"* Home Phone");
-  names.push_back(id_attributes.back());
-  values.push_back(u"1212");
-
-  ExpectLabels(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm action='http://cnn.com'>
          <div>
            <li>
              <span>Bogus</span>
@@ -3143,34 +3031,32 @@ TEST_F(FormAutofillTest, LabelsInferredFromListItem) {
              <input type=submit name='reply-send' value=Send>
            </li>
          </div>
-         </form>)",
-      id_attributes, name_attributes, labels, names, values);
+         </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(),
+              testing::ElementsAre(
+                  test::FormFieldDescriptionEq({.label = u"* Home Phone",
+                                                .name = u"areacode",
+                                                .name_attribute = u"",
+                                                .id_attribute = u"areacode",
+                                                .value = u"415"}),
+                  test::FormFieldDescriptionEq({.label = u"* Home Phone",
+                                                .name = u"prefix",
+                                                .name_attribute = u"",
+                                                .id_attribute = u"prefix",
+                                                .value = u"555"}),
+                  test::FormFieldDescriptionEq({.label = u"* Home Phone",
+                                                .name = u"suffix",
+                                                .name_attribute = u"",
+                                                .id_attribute = u"suffix",
+                                                .value = u"1212"})));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromDefinitionList) {
-  std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-      values;
-
-  id_attributes.push_back(u"firstname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"* First name: Bogus");
-  names.push_back(id_attributes.back());
-  values.push_back(u"John");
-
-  id_attributes.push_back(u"lastname");
-  name_attributes.push_back(u"");
-  labels.push_back(u"Last name:");
-  names.push_back(id_attributes.back());
-  values.push_back(u"Smith");
-
-  id_attributes.push_back(u"email");
-  name_attributes.push_back(u"");
-  labels.push_back(u"Email:");
-  names.push_back(id_attributes.back());
-  values.push_back(u"john@example.com");
-
-  ExpectLabels(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <dl>
            <dt>
              <span>
@@ -3213,34 +3099,33 @@ TEST_F(FormAutofillTest, LabelsInferredFromDefinitionList) {
              <input type=submit name='reply-send' value=Send>
            </dd>
          </dl>
-         </form>)",
-      id_attributes, name_attributes, labels, names, values);
+         </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(
+      forms[0].fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.label = u"* First name: Bogus",
+                                        .name = u"firstname",
+                                        .name_attribute = u"",
+                                        .id_attribute = u"firstname",
+                                        .value = u"John"}),
+          test::FormFieldDescriptionEq({.label = u"Last name:",
+                                        .name = u"lastname",
+                                        .name_attribute = u"",
+                                        .id_attribute = u"lastname",
+                                        .value = u"Smith"}),
+          test::FormFieldDescriptionEq({.label = u"Email:",
+                                        .name = u"email",
+                                        .name_attribute = u"",
+                                        .id_attribute = u"email",
+                                        .value = u"john@example.com"})));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredWithSameName) {
-  std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-      values;
-
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"Address");
-  labels.push_back(u"Address Line 1:");
-  names.push_back(name_attributes.back());
-  values.emplace_back();
-
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"Address");
-  labels.push_back(u"Address Line 2:");
-  names.push_back(name_attributes.back());
-  values.emplace_back();
-
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"Address");
-  labels.push_back(u"Address Line 3:");
-  names.push_back(name_attributes.back());
-  values.emplace_back();
-
-  ExpectLabels(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
            Address Line 1:
              <input name=Address>
            Address Line 2:
@@ -3248,46 +3133,27 @@ TEST_F(FormAutofillTest, LabelsInferredWithSameName) {
            Address Line 3:
              <input name=Address>
            <input type=submit name='reply-send' value=Send>
-         </form>)",
-      id_attributes, name_attributes, labels, names, values);
+         </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(
+      forms[0].fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.label = u"Address Line 1:",
+                                        .name = u"Address",
+                                        .name_attribute = u"Address"}),
+          test::FormFieldDescriptionEq({.label = u"Address Line 2:",
+                                        .name = u"Address",
+                                        .name_attribute = u"Address"}),
+          test::FormFieldDescriptionEq({.label = u"Address Line 3:",
+                                        .name = u"Address",
+                                        .name_attribute = u"Address"})));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredWithImageTags) {
-  std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-      values;
-
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"dayphone1");
-  labels.push_back(u"Phone:");
-  names.push_back(name_attributes.back());
-  values.emplace_back();
-
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"dayphone2");
-  labels.push_back(u"");
-  names.push_back(name_attributes.back());
-  values.emplace_back();
-
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"dayphone3");
-  labels.push_back(u"");
-  names.push_back(name_attributes.back());
-  values.emplace_back();
-
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"dayphone4");
-  labels.push_back(u"ext.:");
-  names.push_back(name_attributes.back());
-  values.emplace_back();
-
-  id_attributes.push_back(u"");
-  name_attributes.push_back(u"dummy");
-  labels.emplace_back();
-  names.push_back(name_attributes.back());
-  values.emplace_back();
-
-  ExpectLabels(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm action='http://cnn.com'>
            Phone:
            <input name=dayphone1>
            <img>
@@ -3302,13 +3168,32 @@ TEST_F(FormAutofillTest, LabelsInferredWithImageTags) {
            <input name=dayphone4>
            <input name=dummy>
            <input type=submit name='reply-send' value=Send>
-         </form>)",
-      id_attributes, name_attributes, labels, names, values);
+         </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(
+      forms[0].fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.label = u"Phone:",
+                                        .name = u"dayphone1",
+                                        .name_attribute = u"dayphone1"}),
+          test::FormFieldDescriptionEq({.label = u"",
+                                        .name = u"dayphone2",
+                                        .name_attribute = u"dayphone2"}),
+          test::FormFieldDescriptionEq({.label = u"",
+                                        .name = u"dayphone3",
+                                        .name_attribute = u"dayphone3"}),
+          test::FormFieldDescriptionEq({.label = u"ext.:",
+                                        .name = u"dayphone4",
+                                        .name_attribute = u"dayphone4"}),
+          test::FormFieldDescriptionEq(
+              {.label = u"", .name = u"dummy", .name_attribute = u"dummy"})));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromDivTable) {
-  ExpectJohnSmithLabelsAndNameAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <div>First name:<br>
            <span>
              <input name=firstname value=John>
@@ -3326,11 +3211,16 @@ TEST_F(FormAutofillTest, LabelsInferredFromDivTable) {
          </div>
          <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(),
+              ElementsAreArray(kJohnSmithNameFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromDivSiblingTable) {
-  ExpectJohnSmithLabelsAndNameAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <div>First name:</div>
          <div>
            <span>
@@ -3351,11 +3241,16 @@ TEST_F(FormAutofillTest, LabelsInferredFromDivSiblingTable) {
          </div>
          <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(),
+              ElementsAreArray(kJohnSmithNameFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromLabelInDivTable) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
          <label>First name:</label>
          <label for=lastname>Last name:</label>
          <div>
@@ -3372,11 +3267,15 @@ TEST_F(FormAutofillTest, LabelsInferredFromLabelInDivTable) {
          </div>
          <input type=submit name='reply-send' value=Send>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(forms[0].fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, LabelsInferredFromDefinitionListRatherThanDivTable) {
-  ExpectJohnSmithLabelsAndIdAttributes(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm action='http://cnn.com'>
          <div>This is not a label.<br>
          <dl>
            <dt>
@@ -3416,6 +3315,12 @@ TEST_F(FormAutofillTest, LabelsInferredFromDefinitionListRatherThanDivTable) {
          </dl>
          </div>
          </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+  const FormData& form = forms[0];
+  EXPECT_EQ(u"TestForm", form.name());
+  EXPECT_EQ(GURL("http://cnn.com"), form.action());
+  EXPECT_THAT(form.fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, FillFormMaxLength) {
@@ -3836,28 +3741,7 @@ TEST_F(FormAutofillTest, FillFormModifyInitiatingValue) {
   EXPECT_EQ(GURL("http://abc.com"), form2.action());
 
   EXPECT_THAT(form2.fields(),
-              testing::ElementsAre(
-                  test::FormFieldDescriptionEq(
-                      {.label = u"Credit Card Number",
-                       .name = u"cc",
-                       .id_attribute = u"cc",
-                       .value = u"1111-2222-3333-4444",
-                       .placeholder = u"Credit Card Number",
-                       .is_autofilled_according_to_renderer = true}),
-                  test::FormFieldDescriptionEq(
-                      {.label = u"Expiration Date",
-                       .name = u"expiration_date",
-                       .id_attribute = u"expiration_date",
-                       .value = u"03/2030",
-                       .placeholder = u"Expiration Date",
-                       .is_autofilled_according_to_renderer = true}),
-                  test::FormFieldDescriptionEq(
-                      {.label = u"Full Name",
-                       .name = u"name",
-                       .id_attribute = u"name",
-                       .value = u"John Smith",
-                       .placeholder = u"Full Name",
-                       .is_autofilled_according_to_renderer = false})));
+              ElementsAreArray(kCreditCardAutofilledFieldsMatchers));
 
   // Verify that the cursor position has been updated.
   EXPECT_EQ(19u, input_element.SelectionStart());
@@ -3929,28 +3813,7 @@ TEST_F(FormAutofillTest, FillFormJSModifiesUserInputValue) {
   EXPECT_EQ(GURL("http://abc.com"), form2.action());
 
   EXPECT_THAT(form2.fields(),
-              testing::ElementsAre(
-                  test::FormFieldDescriptionEq(
-                      {.label = u"Credit Card Number",
-                       .name = u"cc",
-                       .id_attribute = u"cc",
-                       .value = u"1111-2222-3333-4444",
-                       .placeholder = u"Credit Card Number",
-                       .is_autofilled_according_to_renderer = true}),
-                  test::FormFieldDescriptionEq(
-                      {.label = u"Expiration Date",
-                       .name = u"expiration_date",
-                       .id_attribute = u"expiration_date",
-                       .value = u"03/2030",
-                       .placeholder = u"Expiration Date",
-                       .is_autofilled_according_to_renderer = true}),
-                  test::FormFieldDescriptionEq(
-                      {.label = u"Full Name",
-                       .name = u"name",
-                       .id_attribute = u"name",
-                       .value = u"John Smith",
-                       .placeholder = u"Full Name",
-                       .is_autofilled_according_to_renderer = false})));
+              ElementsAreArray(kCreditCardAutofilledFieldsMatchers));
 
   // Verify that the cursor position has been updated.
   EXPECT_EQ(19u, input_element.SelectionStart());
@@ -4132,29 +3995,7 @@ TEST_F(FormAutofillTest,
 
 // If we have multiple labels per id, the labels concatenated into label string.
 TEST_F(FormAutofillTest, MultipleLabelsPerElement) {
-  std::vector<std::u16string> id_attributes, name_attributes, labels, names,
-      values;
-
-  id_attributes.push_back(u"firstname");
-  name_attributes.emplace_back();
-  labels.push_back(u"First Name:");
-  names.push_back(id_attributes.back());
-  values.push_back(u"John");
-
-  id_attributes.push_back(u"lastname");
-  name_attributes.emplace_back();
-  labels.push_back(u"Last Name:");
-  names.push_back(id_attributes.back());
-  values.push_back(u"Smith");
-
-  id_attributes.push_back(u"email");
-  name_attributes.emplace_back();
-  labels.push_back(u"Email: xxx@yyy.com");
-  names.push_back(id_attributes.back());
-  values.push_back(u"john@example.com");
-
-  ExpectLabels(
-      R"(<form name=TestForm action='http://cnn.com'>
+  LoadHTML(R"(<form name=TestForm>
            <label for=firstname> First Name: </label>
            <label for=firstname></label>
              <input id=firstname value=John>
@@ -4165,8 +4006,29 @@ TEST_F(FormAutofillTest, MultipleLabelsPerElement) {
            <label for=email> xxx@yyy.com </label>
              <input id=email value='john@example.com'>
            <input type=submit name='reply-send' value=Send>
-         </form>)",
-      id_attributes, name_attributes, labels, names, values);
+         </form>)");
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  EXPECT_EQ(u"TestForm", forms[0].name());
+  EXPECT_THAT(
+      forms[0].fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.label = u"First Name:",
+                                        .name = u"firstname",
+                                        .name_attribute = u"",
+                                        .id_attribute = u"firstname",
+                                        .value = u"John"}),
+          test::FormFieldDescriptionEq({.label = u"Last Name:",
+                                        .name = u"lastname",
+                                        .name_attribute = u"",
+                                        .id_attribute = u"lastname",
+                                        .value = u"Smith"}),
+          test::FormFieldDescriptionEq({.label = u"Email: xxx@yyy.com",
+                                        .name = u"email",
+                                        .name_attribute = u"",
+                                        .id_attribute = u"email",
+                                        .value = u"john@example.com"})));
 }
 
 TEST_F(FormAutofillTest, ClickElement) {
@@ -4255,21 +4117,7 @@ TEST_F(FormAutofillTest, UnownedFormElementsToFormDataWithoutForm) {
   EXPECT_TRUE(form->name().empty());
   EXPECT_FALSE(form->action().is_valid());
 
-  EXPECT_THAT(
-      form->fields(),
-      ElementsAre(
-          test::FormFieldDescriptionEq({.label = u"First name:",
-                                        .name = u"firstname",
-                                        .id_attribute = u"firstname",
-                                        .value = u"John"}),
-          test::FormFieldDescriptionEq({.label = u"Last name:",
-                                        .name = u"lastname",
-                                        .id_attribute = u"lastname",
-                                        .value = u"Smith"}),
-          test::FormFieldDescriptionEq({.label = u"Email:",
-                                        .name = u"email",
-                                        .id_attribute = u"email",
-                                        .value = u"john@example.com"})));
+  EXPECT_THAT(form->fields(), ElementsAreArray(kJohnSmithIdFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, UnownedFormElementsToFormDataWithForm) {
@@ -4377,15 +4225,8 @@ TEST_F(FormAutofillTest, AriaLabelAndDescription) {
   ASSERT_TRUE(control_element);
   FormData form = FindForm(control_element);
 
-  EXPECT_THAT(
-      form.fields(),
-      testing::ElementsAre(
-          test::FormFieldDescriptionEq(
-              {.aria_label = u"inline aria label", .aria_description = u""}),
-          test::FormFieldDescriptionEq(
-              {.aria_label = u"aria label", .aria_description = u""}),
-          test::FormFieldDescriptionEq(
-              {.aria_label = u"", .aria_description = u"aria description"})));
+  EXPECT_THAT(form.fields(),
+              ElementsAreArray(kAriaLabelAndDescriptionFieldsMatchers));
 }
 
 TEST_F(FormAutofillTest, AriaLabelAndDescription2) {
@@ -4410,15 +4251,8 @@ TEST_F(FormAutofillTest, AriaLabelAndDescription2) {
   ASSERT_TRUE(control_element);
   FormData form = FindForm(control_element);
 
-  EXPECT_THAT(
-      form.fields(),
-      testing::ElementsAre(
-          test::FormFieldDescriptionEq(
-              {.aria_label = u"inline aria label", .aria_description = u""}),
-          test::FormFieldDescriptionEq(
-              {.aria_label = u"aria label", .aria_description = u""}),
-          test::FormFieldDescriptionEq(
-              {.aria_label = u"", .aria_description = u"aria description"})));
+  EXPECT_THAT(form.fields(),
+              ElementsAreArray(kAriaLabelAndDescriptionFieldsMatchers));
 }
 
 }  // namespace
