@@ -2152,6 +2152,40 @@ Keep consistent with active providers. Doesn't need to include every provider in
   <token key="OmniboxPageContext" variants="OmniboxPageContext"/>
 </histogram>
 
+<histogram name="Omnibox.GeolocationHeaderService.GetLocationOutcome.{Trigger}"
+    enum="GeolocationHeaderGetLocationOutcome" expires_after="2027-06-29">
+  <owner>andypaicu@chromium.org</owner>
+  <owner>chrome-permissions-team@google.com</owner>
+  <summary>
+    Recorded every time the geolocation header is attempted to be built by the
+    GeolocationHeaderService. This happens automatically when an omnibox
+    navigation goes to the DSE origin (if it has permission) [Automatic], or
+    during autocomplete match generation when attempting to build the inline
+    location suggestion [InlineSuggestion]. It records the outcome of the
+    attempt to build the geolocation header: either success or the failure
+    reason.
+  </summary>
+  <token key="Trigger">
+    <variant name="Automatic" summary="Automatic header addition"/>
+    <variant name="InlineSuggestion"
+        summary="Header built for inline suggestion"/>
+  </token>
+</histogram>
+
+<histogram name="Omnibox.GeolocationHeaderService.PrimeLocationOutcome"
+    enum="GeolocationHeaderPrimeLocationOutcome" expires_after="2027-06-29">
+  <owner>andypaicu@chromium.org</owner>
+  <owner>chrome-permissions-team@google.com</owner>
+  <summary>
+    Recorded every time the geolocation header service tries to retrieve the
+    user's geoposition in preparation for it be used to construct the XGeo HTTP
+    header. Logs the outcome of the priming attempt: either an early exit due to
+    checks (like no default search provider, permission denied, already in
+    progress, etc) or a successful request start (specifying if it requested a
+    cached position only or a next position update).
+  </summary>
+</histogram>
+
 <histogram name="Omnibox.GroupId.ToggledOff" enum="GroupId"
     expires_after="2025-11-02">
   <owner>mahmadi@google.com</owner>
