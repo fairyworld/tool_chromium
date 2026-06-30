@@ -232,9 +232,11 @@ void SetFormData(FormData& form_data_proto,
   form_data_proto.set_form_name(
       base::UTF16ToUTF8(form.form_data.name_attribute()));
   form_data_proto.set_url(form.url.spec());
+  form_data_proto.clear_button_text();
   for (const auto& button : form.form_data.button_titles()) {
     form_data_proto.add_button_text(base::UTF16ToUTF8(button.first));
   }
+  form_data_proto.clear_field_data();
   for (const auto& field : form.form_data.fields()) {
     FieldData field_data;
     field_data.set_signature(

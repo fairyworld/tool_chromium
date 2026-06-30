@@ -992,6 +992,35 @@ TEST_F(ModelQualityLogsUploaderTest, SetChangePasswordFormData) {
   VerifyPasswordFormLoggedCorrectlyInProto(password_form, form_data);
 }
 
+TEST_F(ModelQualityLogsUploaderTest,
+       SetChangePasswordFormDataMultipleTimesDoesNotDuplicateFields) {
+  ModelQualityLogsUploader logs_uploader(web_contents(),
+                                         GURL(kChangePasswordURL));
+  password_manager::PasswordForm password_form;
+  password_form.url = GURL(kChangePasswordURL);
+  password_form.form_data.set_id_attribute(u"change_form_id");
+
+  autofill::FormFieldData password_field;
+  password_field.set_id_attribute(u"password_id");
+  password_field.set_name_attribute(u"password_name");
+  password_field.set_form_control_type(
+      autofill::FormControlType::kInputPassword);
+  password_field.set_renderer_id(autofill::FieldRendererId(1));
+
+  password_form.form_data.set_fields({password_field});
+
+  logs_uploader.SetChangePasswordFormData(password_form);
+  logs_uploader.SetChangePasswordFormData(password_form);
+
+  const optimization_guide::proto::PasswordChangeQuality_FormData& form_data =
+      logs_uploader.GetFinalLog()
+          .password_change_submission()
+          .quality()
+          .change_password_form_data();
+
+  EXPECT_EQ(1, form_data.field_data_size());
+}
+
 TEST_F(ModelQualityLogsUploaderTest, DurationRecordedForLoginCheck) {
   ModelQualityLogsUploader logs_uploader(web_contents(),
                                          GURL(kChangePasswordURL));
