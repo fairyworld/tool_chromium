@@ -2,9 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/autofill/core/browser/permissions/enterprise_policy/autofill_enterprise_policy_service.h"
+#include "components/autofill/core/browser/permissions/autofill_policy_service.h"
 
-#include <algorithm>
 #include <string>
 #include <utility>
 
@@ -20,32 +19,63 @@
 
 namespace autofill {
 
-
-AutofillEnterprisePolicyService::AutofillEnterprisePolicyService(
-    PrefService* prefs)
+AutofillPolicyService::AutofillPolicyService(PrefService* prefs)
     : prefs_(CHECK_DEREF(prefs)) {
   if (base::FeatureList::IsEnabled(
           features::kAutofillEnableAutofillSettingsEnterprisePolicy)) {
     autofill_types_blocked_change_registrar_.Init(&prefs_.get());
     autofill_types_blocked_change_registrar_.Add(
         prefs::kAutofillTypesBlocked,
-        base::BindRepeating(
-            &AutofillEnterprisePolicyService::OnAutofillPolicyChanged,
-            base::Unretained(this)));
+        base::BindRepeating(&AutofillPolicyService::OnAutofillPolicyChanged,
+                            base::Unretained(this)));
     OnAutofillPolicyChanged();
   }
 }
 
-AutofillEnterprisePolicyService::~AutofillEnterprisePolicyService() = default;
+AutofillPolicyService::~AutofillPolicyService() = default;
 
-bool AutofillEnterprisePolicyService::IsAutofillTypeBlockedByPolicy(
+bool AutofillPolicyService::IsAutofillTypeBlockedByPolicy(
     const GURL& url,
     AutofillClient::AutofillPolicyDataCategory category) const {
+  // Global / Legacy Policy Layer: Check if the category is disabled globally
+  // (either by the user's settings toggles, or by legacy enterprise policies
+  // like AutofillAddressEnabled / AutofillCreditCardEnabled). If so, it is
+  // blocked for all URLs immediately.
+  switch (category) {
+    case AutofillClient::AutofillPolicyDataCategory::kContactInfo:
+      if (!prefs::IsAutofillProfileEnabled(&*prefs_)) {
+        return true;
+      }
+      break;
+    case AutofillClient::AutofillPolicyDataCategory::kPayments:
+      if (!prefs::IsAutofillPaymentMethodsEnabled(&*prefs_)) {
+        return true;
+      }
+      break;
+    case AutofillClient::AutofillPolicyDataCategory::kIdentityDocs:
+      if (!prefs_->GetBoolean(prefs::kAutofillAiIdentityEntitiesEnabled)) {
+        return true;
+      }
+      break;
+    case AutofillClient::AutofillPolicyDataCategory::kTravel:
+      if (!prefs_->GetBoolean(prefs::kAutofillAiTravelEntitiesEnabled)) {
+        return true;
+      }
+      break;
+    case AutofillClient::AutofillPolicyDataCategory::kShopping:
+      if (!prefs_->GetBoolean(prefs::kAutofillAiShoppingEntitiesEnabled)) {
+        return true;
+      }
+      break;
+  }
+
   if (!base::FeatureList::IsEnabled(
           features::kAutofillEnableAutofillSettingsEnterprisePolicy)) {
     return false;
   }
 
+  // Enterprise Policy Layer: Check if there is an active GPO domain blocking
+  // rule that matches the navigation URL for the requested data category.
   return std::ranges::any_of(
       blocked_patterns_cache_, [&](const BlockedPatternEntry& entry) {
         return entry.pattern.Matches(url) &&
@@ -54,7 +84,7 @@ bool AutofillEnterprisePolicyService::IsAutofillTypeBlockedByPolicy(
       });
 }
 
-void AutofillEnterprisePolicyService::OnAutofillPolicyChanged() {
+void AutofillPolicyService::OnAutofillPolicyChanged() {
   blocked_patterns_cache_.clear();
   const base::ListValue& blocked_list =
       prefs_->GetList(prefs::kAutofillTypesBlocked);

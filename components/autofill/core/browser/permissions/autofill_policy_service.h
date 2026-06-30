@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_AUTOFILL_CORE_BROWSER_PERMISSIONS_ENTERPRISE_POLICY_AUTOFILL_ENTERPRISE_POLICY_SERVICE_H_
-#define COMPONENTS_AUTOFILL_CORE_BROWSER_PERMISSIONS_ENTERPRISE_POLICY_AUTOFILL_ENTERPRISE_POLICY_SERVICE_H_
+#ifndef COMPONENTS_AUTOFILL_CORE_BROWSER_PERMISSIONS_AUTOFILL_POLICY_SERVICE_H_
+#define COMPONENTS_AUTOFILL_CORE_BROWSER_PERMISSIONS_AUTOFILL_POLICY_SERVICE_H_
 
 #include <vector>
 
@@ -18,18 +18,17 @@ class PrefService;
 
 namespace autofill {
 
-// Evaluates the `autofill.types_blocked` enterprise policy.
-class AutofillEnterprisePolicyService : public KeyedService {
+// Evaluates whether Autofill is allowed for a given data category and URL,
+// combining both user settings and enterprise policies.
+class AutofillPolicyService : public KeyedService {
  public:
-  explicit AutofillEnterprisePolicyService(PrefService* prefs);
-  AutofillEnterprisePolicyService(const AutofillEnterprisePolicyService&) =
-      delete;
-  AutofillEnterprisePolicyService& operator=(
-      const AutofillEnterprisePolicyService&) = delete;
-  ~AutofillEnterprisePolicyService() override;
+  explicit AutofillPolicyService(PrefService* prefs);
+  AutofillPolicyService(const AutofillPolicyService&) = delete;
+  AutofillPolicyService& operator=(const AutofillPolicyService&) = delete;
+  ~AutofillPolicyService() override;
 
-  // Returns true if the specified Autofill data category is blocked by the
-  // Enterprise policy for the given `url`.
+  // Returns true if the specified Autofill data category is blocked by either
+  // user settings or enterprise policy for the given `url`.
   [[nodiscard]] bool IsAutofillTypeBlockedByPolicy(
       const GURL& url,
       AutofillClient::AutofillPolicyDataCategory category) const;
@@ -49,4 +48,4 @@ class AutofillEnterprisePolicyService : public KeyedService {
 
 }  // namespace autofill
 
-#endif  // COMPONENTS_AUTOFILL_CORE_BROWSER_PERMISSIONS_ENTERPRISE_POLICY_AUTOFILL_ENTERPRISE_POLICY_SERVICE_H_
+#endif  // COMPONENTS_AUTOFILL_CORE_BROWSER_PERMISSIONS_AUTOFILL_POLICY_SERVICE_H_

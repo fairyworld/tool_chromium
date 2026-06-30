@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/autofill/core/browser/permissions/enterprise_policy/autofill_enterprise_policy_service.h"
+#include "components/autofill/core/browser/permissions/autofill_policy_service.h"
 
 #include <utility>
 
@@ -18,31 +18,42 @@
 namespace autofill {
 namespace {
 
-class AutofillEnterprisePolicyServiceTest : public testing::Test {
+class AutofillPolicyServiceTest : public testing::Test {
  public:
-  AutofillEnterprisePolicyServiceTest() {
+  AutofillPolicyServiceTest() {
     scoped_feature_list_.InitAndEnableFeature(
         features::kAutofillEnableAutofillSettingsEnterprisePolicy);
     prefs_.registry()->RegisterListPref(prefs::kAutofillTypesBlocked);
-    service_ = std::make_unique<AutofillEnterprisePolicyService>(&prefs_);
+    prefs_.registry()->RegisterBooleanPref(prefs::kAutofillProfileEnabled,
+                                           true);
+    prefs_.registry()->RegisterBooleanPref(prefs::kAutofillCreditCardEnabled,
+                                           true);
+    prefs_.registry()->RegisterBooleanPref(
+        prefs::kAutofillAiIdentityEntitiesEnabled, true);
+    prefs_.registry()->RegisterBooleanPref(
+        prefs::kAutofillAiTravelEntitiesEnabled, true);
+    prefs_.registry()->RegisterBooleanPref(
+        prefs::kAutofillAiShoppingEntitiesEnabled, true);
+    service_ = std::make_unique<AutofillPolicyService>(&prefs_);
   }
 
   void SetPolicy(base::ListValue blocked_list) {
     prefs_.SetList(prefs::kAutofillTypesBlocked, std::move(blocked_list));
   }
 
-  AutofillEnterprisePolicyService* service() { return service_.get(); }
+  AutofillPolicyService* service() { return service_.get(); }
+
+ protected:
+  TestingPrefServiceSimple prefs_;
 
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
-  TestingPrefServiceSimple prefs_;
-  std::unique_ptr<AutofillEnterprisePolicyService> service_;
+  std::unique_ptr<AutofillPolicyService> service_;
 };
 
 // Tests that when no enterprise policy rules are configured in preference, all
 // Autofill data categories are permitted across all navigation URLs.
-TEST_F(AutofillEnterprisePolicyServiceTest,
-       EmptyPolicyAllowsAllAutofillCategories) {
+TEST_F(AutofillPolicyServiceTest, EmptyPolicyAllowsAllAutofillCategories) {
   const GURL url("https://www.example.com");
   EXPECT_FALSE(service()->IsAutofillTypeBlockedByPolicy(
       url, AutofillClient::AutofillPolicyDataCategory::kContactInfo));
@@ -58,7 +69,7 @@ TEST_F(AutofillEnterprisePolicyServiceTest,
 
 // Tests that categories explicitly configured in the policy rule are blocked
 // on matching subdomains, while unlisted categories remain allowed.
-TEST_F(AutofillEnterprisePolicyServiceTest,
+TEST_F(AutofillPolicyServiceTest,
        ConfiguredCategoryOnMatchingDomainBlocksAutofill) {
   base::ListValue blocked_list;
   base::DictValue entry;
@@ -86,8 +97,7 @@ TEST_F(AutofillEnterprisePolicyServiceTest,
 
 // Tests that domain block rules strictly scope to matching URL patterns
 // and do not affect unrelated navigation URLs.
-TEST_F(AutofillEnterprisePolicyServiceTest,
-       ActiveRuleOnUnrelatedDomainAllowsAutofill) {
+TEST_F(AutofillPolicyServiceTest, ActiveRuleOnUnrelatedDomainAllowsAutofill) {
   base::ListValue blocked_list;
   base::DictValue entry;
   entry.Set("url_pattern", "https://[*.]example.com");
@@ -102,9 +112,51 @@ TEST_F(AutofillEnterprisePolicyServiceTest,
       AutofillClient::AutofillPolicyDataCategory::kContactInfo));
 }
 
+// Tests that when the enterprise policy feature flag is disabled, all
+// Autofill data categories remain allowed regardless of configured rules.
+TEST_F(AutofillPolicyServiceTest, FeatureFlagDisabledAllowsAllAutofill) {
+  base::test::ScopedFeatureList disabled_features;
+  disabled_features.InitAndDisableFeature(
+      features::kAutofillEnableAutofillSettingsEnterprisePolicy);
+
+  base::ListValue blocked_list;
+  base::DictValue entry;
+  entry.Set("url_pattern", "https://[*.]example.com");
+  base::ListValue blocked_types;
+  blocked_types.Append("contact_info");
+  entry.Set("blocked_types", std::move(blocked_types));
+  blocked_list.Append(std::move(entry));
+  SetPolicy(std::move(blocked_list));
+
+  EXPECT_FALSE(service()->IsAutofillTypeBlockedByPolicy(
+      GURL("https://www.example.com"),
+      AutofillClient::AutofillPolicyDataCategory::kContactInfo));
+}
+
+// Tests that when a user preference is disabled, IsAutofillTypeBlockedByPolicy
+// returns true (blocked) regardless of whether there is an enterprise policy.
+TEST_F(AutofillPolicyServiceTest, UserSettingDisabledBlocksAutofill) {
+  const GURL url("https://www.example.com");
+
+  // 1. Initially enabled.
+  EXPECT_FALSE(service()->IsAutofillTypeBlockedByPolicy(
+      url, AutofillClient::AutofillPolicyDataCategory::kTravel));
+
+  // 2. Disable user setting.
+  prefs_.SetBoolean(prefs::kAutofillAiTravelEntitiesEnabled, false);
+
+  // 3. Getter should now return true (blocked).
+  EXPECT_TRUE(service()->IsAutofillTypeBlockedByPolicy(
+      url, AutofillClient::AutofillPolicyDataCategory::kTravel));
+
+  // Other categories should still be allowed if enabled.
+  EXPECT_FALSE(service()->IsAutofillTypeBlockedByPolicy(
+      url, AutofillClient::AutofillPolicyDataCategory::kContactInfo));
+}
+
 // Tests that live preference changes pushed by Group Policy dynamically
 // update the in-memory blocking cache without restarting the service.
-TEST_F(AutofillEnterprisePolicyServiceTest,
+TEST_F(AutofillPolicyServiceTest,
        LivePreferenceChangeUpdatesBlockingCacheDynamically) {
   const GURL url("https://www.example.com");
 
@@ -137,7 +189,7 @@ TEST_F(AutofillEnterprisePolicyServiceTest,
 
 // Tests that a rule specifying a global wildcard URL pattern ('*') blocks its
 // configured categories across all navigation URLs.
-TEST_F(AutofillEnterprisePolicyServiceTest,
+TEST_F(AutofillPolicyServiceTest,
        GlobalWildcardPatternBlocksAutofillAcrossAllDomains) {
   base::ListValue blocked_list;
   base::DictValue entry;
@@ -161,7 +213,7 @@ TEST_F(AutofillEnterprisePolicyServiceTest,
 
 // Tests that when both global wildcard rules and domain-specific rules target
 // the same navigation URL, their blocked categories merge into a union.
-TEST_F(AutofillEnterprisePolicyServiceTest,
+TEST_F(AutofillPolicyServiceTest,
        MultipleRulesTargetingSameDomainMergeBlockedCategoriesUnion) {
   base::ListValue blocked_list;
 
@@ -202,7 +254,7 @@ TEST_F(AutofillEnterprisePolicyServiceTest,
 
 // Tests that policy rules with malformed URL patterns are filtered out
 // silently without invalidating valid co-existing rules.
-TEST_F(AutofillEnterprisePolicyServiceTest,
+TEST_F(AutofillPolicyServiceTest,
        MalformedUrlPatternRuleIsIgnoredWithoutAffectingValidRules) {
   base::ListValue blocked_list;
 
@@ -230,7 +282,7 @@ TEST_F(AutofillEnterprisePolicyServiceTest,
       AutofillClient::AutofillPolicyDataCategory::kTravel));
 }
 
-TEST_F(AutofillEnterprisePolicyServiceTest, ShoppingCategoryBlocksAutofill) {
+TEST_F(AutofillPolicyServiceTest, ShoppingCategoryBlocksAutofill) {
   base::ListValue blocked_list;
   base::DictValue entry;
   entry.Set("url_pattern", "https://[*.]example.com");
