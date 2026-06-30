@@ -819,6 +819,36 @@ public class TabBottomSheetManagerTest {
         blockUntilSheetFullyRestored();
     }
 
+    @Test
+    @SmallTest
+    public void testTryToShowBottomSheet_ReuseExistingSheetAndExpand() {
+        NativeInterfaceDelegate mockDelegate = mock(NativeInterfaceDelegate.class);
+
+        // 1. Show the bottom sheet starting in peek mode.
+        showBottomSheetAndBlockUntilReady(
+                mockDelegate, /* animate= */ false, /* startsExpanded= */ false);
+        assertTrue(mManager.isSheetShowing());
+        assertTrue(mManager.isInPeekMode());
+
+        // 2. Call tryToShowBottomSheet again with the same delegate to expand the sheet.
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    mManager.tryToShowBottomSheet(
+                            mockDelegate,
+                            mCoBrowseViews,
+                            /* animate= */ false,
+                            /* startsExpanded= */ true);
+                });
+
+        // 3. Verify the sheet is still showing, but is no longer in peek mode (i.e. it expanded).
+        CriteriaHelper.pollUiThread(() -> mManager.isSheetShowing());
+        CriteriaHelper.pollUiThread(() -> !mManager.isInPeekMode());
+
+        // 4. Crucially, verify that the delegate's onBottomSheetClosed() was NEVER called,
+        // confirming we reused the sheet instead of tearing it down.
+        verify(mockDelegate, times(0)).onBottomSheetClosed();
+    }
+
     private static class TestManualFillingComponent extends EmptyManualFillingComponent {
         private final NonNullObservableSupplier<Boolean> mAccessoryRequestedSupplier;
 

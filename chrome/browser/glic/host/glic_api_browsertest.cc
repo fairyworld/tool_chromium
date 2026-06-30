@@ -2703,24 +2703,6 @@ IN_PROC_BROWSER_TEST_P(MAYBE_GlicApiTestWithOneTabMoreDebounceDelay,
   ContinueJsTest();
 }
 
-IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab, testGetPinCandidatesSingleTab) {
-  // In multi-instance mode, the tab is automatically pinned. Unpin it now.
-  GetGlicInstanceImpl()->GetSharingManagerInternal().UnpinAllTabs();
-  ExecuteJsTest();
-}
-
-IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab,
-                       testGetPinCandidatesWithPanelClosed) {
-  ExecuteJsTest();
-  RunTestSequence(AddInstrumentedTab(
-      kSecondTab,
-      embedded_test_server()->GetURL("/glic/browser_tests/test.html")));
-  ContinueJsTest();
-  // Opens the panel again.
-  RunTestSequence(ToggleGlicWindow(GlicWindowMode::kDetached));
-  ContinueJsTest();
-}
-
 IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab,
                        testSwitchConversationToExistingInstance) {
   // Open glic. It will register a conversation.

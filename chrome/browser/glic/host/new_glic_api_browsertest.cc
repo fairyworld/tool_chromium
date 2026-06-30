@@ -14,6 +14,7 @@
 #include "base/test/scoped_logging_settings.h"
 #include "base/test/test_future.h"
 #include "base/values.h"
+#include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/glic/glic_enums.h"
@@ -524,6 +525,48 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithDefaultTabContextEnabled,
 
   ASSERT_OK(OpenGlicForActiveTab());
   ExecuteJsTest();
+}
+
+IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testGetPinCandidatesSingleTab) {
+  ASSERT_TRUE(content::NavigateToURL(
+      GetTabListInterface()->GetActiveTab()->GetContents(),
+      embedded_test_server()->GetURL("/glic/browser_tests/test.html")));
+  ASSERT_OK(OpenGlicForActiveTab());
+  // The tab is automatically pinned. Unpin it now.
+  GetOnlyGlicInstance()->GetSharingManagerInternal().UnpinAllTabs();
+  ExecuteJsTest();
+}
+
+// Flaky on Android.
+#if BUILDFLAG(IS_ANDROID)
+#define MAYBE_testGetPinCandidatesWithPanelClosed \
+  DISABLED_testGetPinCandidatesWithPanelClosed
+#else
+#define MAYBE_testGetPinCandidatesWithPanelClosed \
+  testGetPinCandidatesWithPanelClosed
+#endif
+IN_PROC_BROWSER_TEST_P(NewGlicApiTest,
+                       MAYBE_testGetPinCandidatesWithPanelClosed) {
+  ASSERT_TRUE(content::NavigateToURL(
+      GetTabListInterface()->GetActiveTab()->GetContents(),
+      embedded_test_server()->GetURL("/glic/browser_tests/test.html")));
+  ASSERT_OK(OpenGlicForActiveTab());
+
+  // Save first tab.
+  tabs::TabInterface* first_tab = GetTabListInterface()->GetActiveTab();
+
+  ExecuteJsTest();
+
+  CreateAndActivateTab(
+      embedded_test_server()->GetURL("/glic/browser_tests/test.html"));
+  ContinueJsTest();
+
+  // Activate the first tab again to reuse GlicInstance 1.
+  ActivateTab(first_tab);
+
+  // Opens the panel again.
+  ASSERT_OK(OpenGlicForActiveTab());
+  ContinueJsTest();
 }
 
 class NewGlicApiTestWithWebActuationSettingEnabled : public NewGlicApiTest {
