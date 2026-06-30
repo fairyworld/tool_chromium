@@ -22,6 +22,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PointF;
@@ -128,7 +129,6 @@ import org.chromium.chrome.browser.ui.vertical_tabs.VerticalTabUtils;
 import org.chromium.chrome.browser.user_education.UserEducationHelper;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 import org.chromium.components.browser_ui.styles.ChromeColors;
-import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.components.collaboration.CollaborationService;
 import org.chromium.components.data_sharing.DataSharingService;
 import org.chromium.components.data_sharing.GroupData;
@@ -142,7 +142,6 @@ import org.chromium.ui.accessibility.AccessibilityState;
 import org.chromium.ui.base.ActivityResultTracker;
 import org.chromium.ui.base.LocalizationUtils;
 import org.chromium.ui.base.WindowAndroid;
-import org.chromium.ui.util.ColorUtils;
 import org.chromium.ui.util.MotionEventUtils;
 import org.chromium.ui.util.StyleUtils;
 import org.chromium.ui.widget.RectProvider;
@@ -831,33 +830,15 @@ public class StripLayoutHelper
                         R.drawable.bg_circle_tab_strip_button,
                         BUTTON_CLICK_SLOP_DP);
 
-        @ColorRes int iconTintRes = R.color.default_icon_color_tint_list;
-        @ColorRes int bgHoverTintRes = R.color.tab_strip_button_bg_hover_tint;
-        @ColorRes int bgPressedTintRes = R.color.tab_strip_button_bg_pressed_tint;
-
-        @ColorInt int bgTint = TabUiThemeProvider.getDefaultNtbContainerColor(context);
-        @ColorInt
-        int bgPeripheralPressedTint =
-                context.getColor(R.color.tab_strip_button_bg_peripheral_pressed_tint);
-
-        if (incognito) {
-            iconTintRes = R.color.modern_white;
-            bgTint = context.getColor(R.color.tab_strip_bg_incognito_default_tint);
-            bgHoverTintRes = R.color.tab_strip_button_bg_incognito_hover_tint;
-            bgPressedTintRes = R.color.tab_strip_bg_incognito_pressed_tint;
-            bgPeripheralPressedTint =
-                    context.getColor(R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint);
-        } else if (ColorUtils.inNightMode(context)) {
-            bgTint = SemanticColorUtils.getColorSurfaceContainerLow(context);
-            bgPeripheralPressedTint = SemanticColorUtils.getColorSurfaceContainerHighest(context);
-        }
-
+        @ColorRes
+        int iconTintRes = incognito ? R.color.modern_white : R.color.default_icon_color_tint_list;
+        @ColorRes
+        int bgTintRes =
+                incognito
+                        ? R.color.tab_strip_ntb_bg_incognito_tint_list
+                        : R.color.tab_strip_ntb_bg_tint_list;
         mNewTabButton.setTint(context.getColor(iconTintRes));
-        mNewTabButton.setBackgroundTint(
-                bgTint,
-                context.getColor(bgHoverTintRes),
-                context.getColor(bgPressedTintRes),
-                bgPeripheralPressedTint);
+        mNewTabButton.setBackgroundTint(context.getColorStateList(bgTintRes));
 
         // y-offset  = lowered tab container + (tab container size - bg size)/2 -
         // Tab title y-offset = 2 + (38 - 32)/2 - 2 = 3dp
@@ -962,11 +943,9 @@ public class StripLayoutHelper
                         ? context.getColor(R.color.white_alpha_20)
                         : TabUiThemeProvider.getFaviconBackgroundColor(
                                 context, /* isIncognito= */ false);
-        button.setBackgroundTint(bgTint, bgTint, bgTint, bgTint);
+        button.setBackgroundTint(ColorStateList.valueOf(bgTint));
 
-        @ColorInt
-        int iconColor = ChromeColors.getPrimaryIconTint(context, incognito).getDefaultColor();
-        button.setTint(iconColor);
+        button.setTint(ChromeColors.getPrimaryIconTint(context, incognito).getDefaultColor());
         button.setDrawY(BUTTON_BACKGROUND_Y_OFFSET_DP);
         button.setAccessibilityDescription(
                 res.getString(R.string.accessibility_search_loupe_tooltip_text));

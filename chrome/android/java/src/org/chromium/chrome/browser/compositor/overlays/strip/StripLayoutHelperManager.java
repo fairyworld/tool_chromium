@@ -1880,26 +1880,18 @@ public class StripLayoutHelperManager
         if (mModelSelectorButton == null) return;
         mModelSelectorButton.setIncognito(mIsIncognito);
 
-        @ColorRes int iconTintRes = R.color.default_icon_color_tint_list;
-        @ColorRes int bgTintRes = R.color.model_selector_button_bg_color;
-        @ColorRes int bgHoverTintRes = R.color.tab_strip_button_bg_hover_tint;
         @ColorRes
-        int bgPeripheralPressedTintRes = R.color.tab_strip_button_bg_peripheral_pressed_tint;
-
-        if (mIsIncognito) {
-            iconTintRes = R.color.default_icon_color_secondary_light;
-            bgTintRes = R.color.default_bg_color_dark_elev_1_baseline;
-            bgHoverTintRes = R.color.tab_strip_button_bg_incognito_hover_tint;
-            bgPeripheralPressedTintRes =
-                    R.color.tab_strip_button_bg_incognito_peripheral_pressed_tint;
-        }
-
+        int iconTintRes =
+                mIsIncognito
+                        ? R.color.default_icon_color_secondary_light
+                        : R.color.default_icon_color_tint_list;
+        @ColorRes
+        int bgTintRes =
+                mIsIncognito
+                        ? R.color.tab_strip_msb_bg_incognito_tint_list
+                        : R.color.tab_strip_msb_bg_tint_list;
         mModelSelectorButton.setTint(mContext.getColor(iconTintRes));
-        mModelSelectorButton.setBackgroundTint(
-                mContext.getColor(bgTintRes),
-                mContext.getColor(bgHoverTintRes),
-                mContext.getColor(bgTintRes),
-                mContext.getColor(bgPeripheralPressedTintRes));
+        mModelSelectorButton.setBackgroundTint(mContext.getColorStateList(bgTintRes));
 
         mModelSelectorButton.setAccessibilityDescription(
                 mIsIncognito
