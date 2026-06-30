@@ -4825,14 +4825,14 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Net.NetworkTransaction.StreamAddressFamily2"
-    enum="AddressFamily" expires_after="2026-07-12">
+    enum="AddressFamily" expires_after="2027-06-30">
   <owner>bashi@chromium.org</owner>
   <owner>src/net/OWNERS</owner>
   <summary>Deprecated. Replaced by StreamAddressFamily3.</summary>
 </histogram>
 
 <histogram name="Net.NetworkTransaction.StreamAddressFamily3"
-    enum="AddressFamily" expires_after="2026-07-12">
+    enum="AddressFamily" expires_after="2027-06-30">
   <owner>bashi@chromium.org</owner>
   <owner>src/net/OWNERS</owner>
   <summary>
