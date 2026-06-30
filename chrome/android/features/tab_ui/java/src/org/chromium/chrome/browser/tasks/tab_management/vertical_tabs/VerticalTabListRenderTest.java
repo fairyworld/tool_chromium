@@ -173,9 +173,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTab);
                     model.set(TabProperties.TITLE, "Standard Tab");
@@ -200,9 +198,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTab);
                     model.set(TabProperties.TITLE, "Active Tab");
@@ -227,9 +223,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTab);
                     model.set(TabProperties.TITLE, "Loading Tab");
@@ -255,9 +249,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTab);
                     model.set(TabProperties.TITLE, "AI Tab");
@@ -285,9 +277,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTab);
                     model.set(TabProperties.TITLE, "AI Tab");
@@ -315,9 +305,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTab);
                     model.set(TabProperties.TITLE, "Active AI Tab");
@@ -345,9 +333,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTab);
                     model.set(TabProperties.TITLE, "Active AI Tab");
@@ -375,9 +361,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTab);
                     model.set(TabProperties.TITLE, "Media Tab");
@@ -403,9 +387,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTab);
                     model.set(TabProperties.TITLE, "Hovered Tab");
@@ -443,9 +425,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_pinned_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindPinnedTab);
                     model.set(TabProperties.TITLE, "Pinned Tab");
@@ -466,9 +446,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_pinned_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindPinnedTab);
                     model.set(TabProperties.TITLE, "Pinned Tab");
@@ -489,9 +467,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_pinned_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindPinnedTab);
                     model.set(TabProperties.TITLE, "Loading Pinned Tab");
@@ -513,9 +489,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_pinned_item);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindPinnedTab);
                     model.set(TabProperties.TITLE, "Hovered Pinned Tab");
@@ -549,9 +523,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_group_header);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTabGroupHeader);
                     model.set(TabProperties.TITLE, "Collapsed Group");
@@ -572,9 +544,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_group_header);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTabGroupHeader);
                     model.set(TabProperties.TITLE, "Expanded Group");
@@ -595,9 +565,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_group_header);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTabGroupHeader);
                     model.set(TabProperties.TITLE, "Hovered Group (Collapsed)");
@@ -631,9 +599,7 @@ public class VerticalTabListRenderTest {
                 () -> {
                     view[0] = inflateAndAttachView(R.layout.vertical_tab_group_header);
                     PropertyModel model =
-                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
-                                    .with(TabProperties.IS_INCOGNITO, false)
-                                    .build();
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB).build();
                     PropertyModelChangeProcessor.create(
                             model, view[0], TabVerticalViewBinder::bindTabGroupHeader);
                     model.set(TabProperties.TITLE, "Hovered Group (Expanded)");
@@ -726,7 +692,6 @@ public class VerticalTabListRenderTest {
                     TabModelSelector tabModelSelector = mock(TabModelSelector.class);
                     TabModel tabModel = mock(TabModel.class);
                     when(tabModelSelector.getCurrentModel()).thenReturn(tabModel);
-                    when(tabModel.isIncognitoBranded()).thenReturn(false);
 
                     var supplier = ObservableSuppliers.<TabModel>createMonotonic();
                     supplier.set(tabModel);
