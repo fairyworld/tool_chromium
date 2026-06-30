@@ -55,6 +55,9 @@ inline constexpr char kClientRenderedHostCursorCapability[] =
 // Host supports remoting of microphone audio.
 inline constexpr char kMicrophoneRemotingCapability[] = "microphoneRemoting";
 
+// Host supports remoting of terminal control.
+inline constexpr char kTerminalModeCapability[] = "terminalMode_alpha";
+
 }  // namespace remoting::protocol
 
 #endif  // REMOTING_PROTOCOL_CAPABILITY_NAMES_H_

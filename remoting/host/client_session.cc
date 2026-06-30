@@ -520,6 +520,11 @@ void ClientSession::SetVideoLayout(const protocol::VideoLayout& video_layout) {
   screen_controls_->SetVideoLayout(video_layout);
 }
 
+void ClientSession::ControlTerminal(
+    const protocol::TerminalControl& terminal_control) {
+  NOTIMPLEMENTED(); // Will be implemented in a later CL.
+}
+
 void ClientSession::OnConnectionAuthenticating() {
   event_handler_->OnSessionAuthenticating(this);
 }
@@ -1093,6 +1098,9 @@ void ClientSession::OnDesktopEnvironmentCreated(
 
   host_capabilities_.append(" ");
   host_capabilities_.append(protocol::kClientRenderedHostCursorCapability);
+
+  host_capabilities_.append(" ");
+  host_capabilities_.append(protocol::kTerminalModeCapability);
 
   // Create the object that controls the screen resolution.
   screen_controls_ = desktop_environment_->CreateScreenControls();
