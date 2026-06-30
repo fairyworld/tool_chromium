@@ -11,6 +11,7 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/mock_callback.h"
 #include "base/test/task_environment.h"
+#include "base/test/test_future.h"
 #include "components/autofill/core/browser/autofill_field.h"
 #include "components/autofill/core/browser/form_structure.h"
 #include "components/autofill/core/browser/foundations/autofill_driver.h"
@@ -267,12 +268,59 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldNotFillIncomingSensitiveField) {
       "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome", 0);
 }
 
-// Tests that local fields of a sensitive type (e.g. "password") are not filled,
-// even if the sent field matches.
-TEST_F(ReceivedTabFormsFillerTest, ShouldNotFillLocalSensitiveField) {
+// Tests that fallback signature matching is skipped if the control types
+// of the sender and receiver fields differ.
+TEST_F(ReceivedTabFormsFillerTest,
+       ShouldNotMatchSignatureFallbackWithDifferentControlTypes) {
   const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com"));
 
-  // The sent field is "text"/USERNAME (not sensitive).
+  // Create a sender form (control type "text").
+  const FormData form_sender = autofill::test::GetFormData(
+      {.fields = {{.renderer_id = autofill::FieldRendererId(1),
+                   .name_attribute = u"name_123",
+                   .form_control_type = autofill::FormControlType::kInputText,
+                   .origin = kOrigin}},
+       .url = "https://example.com"});
+  PageContext::FormFieldInfo form_field_info;
+  form_field_info.fields.push_back(MakeFormField(u"id1", u"name_123", "text",
+                                                 u"shared_value",
+                                                 GetSignature(form_sender, 0)));
+
+  // Create a receiver form with same signature but different control type
+  // ("password").
+  const FormData form_receiver = autofill::test::GetFormData(
+      {.fields = {{.renderer_id = autofill::FieldRendererId(2),
+                   .label = u"label1",
+                   .name_attribute = u"name_124",
+                   .id_attribute = u"id2",
+                   .form_control_type =
+                       autofill::FormControlType::kInputPassword,
+                   .origin = kOrigin}},
+       .url = "https://example.com"});
+
+  EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
+
+  base::HistogramTester histogram_tester;
+  base::test::TestFuture<void> future;
+  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
+                                future.GetCallback());
+
+  autofill_manager().OnFormsSeen({form_receiver}, {});
+
+  EXPECT_TRUE(future.Wait());
+
+  histogram_tester.ExpectUniqueSample(
+      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
+      FormFieldMatchOutcome::kNoMatch, 1);
+}
+
+// Tests that fallback semantic matching is skipped if the control types
+// of the sender and receiver fields differ.
+TEST_F(ReceivedTabFormsFillerTest,
+       ShouldNotMatchSemanticFallbackWithDifferentControlTypes) {
+  const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com"));
+
+  // Sender field is "text" with USERNAME type.
   PageContext::FormFieldInfo form_field_info;
   PageContext::FormField pending_field =
       MakeFormField(u"id1", u"name1", "text", u"shared_value");
@@ -280,9 +328,7 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldNotFillLocalSensitiveField) {
       sync_pb::FormField_AutofillFieldType_USERNAME};
   form_field_info.fields.push_back(pending_field);
 
-  // The receiver field is "password" (sensitive). It has a different name and
-  // ID than the sent field, so the matching algorithm will fall back to a
-  // semantic match (by autofill type).
+  // Receiver field is "password" with USERNAME type.
   const FormData form_receiver = autofill::test::GetFormData(
       {.fields = {{.renderer_id = autofill::FieldRendererId(2),
                    .name_attribute = u"name_diff",
@@ -294,8 +340,9 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldNotFillLocalSensitiveField) {
 
   ActivateAutofillDriver(autofill_driver());
 
-  // The *autofill* type of the local field is USERNAME, so it'll match the
-  // pending field by semantic type.
+  // The *autofill* type of the local field is USERNAME. Even though it matches
+  // the pending field's type, they should not match because the control types
+  // differ.
   auto form_structure =
       std::make_unique<autofill::FormStructure>(form_receiver);
   form_structure->field(0)->SetTypeTo(
@@ -306,58 +353,15 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldNotFillLocalSensitiveField) {
   EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
 
   base::HistogramTester histogram_tester;
-  base::RunLoop run_loop;
+  base::test::TestFuture<void> future;
   ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                run_loop.QuitClosure());
+                                future.GetCallback());
 
-  run_loop.Run();
+  EXPECT_TRUE(future.Wait());
 
-  // Since the field type was "password" (sensitive), it should not have been
-  // filled.
-  histogram_tester.ExpectTotalCount(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome", 0);
-}
-
-// Tests that if the sender sent a sensitive field value, it does not get
-// filled. (The sender should not have sent such a value in the first place;
-// this test covers the receiving side in case of a bug on the sender side.)
-TEST_F(ReceivedTabFormsFillerTest,
-       ShouldNotFillIncomingSensitiveFieldToLocalNonSensitiveField) {
-  const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com"));
-
-  // The sent field is of type "password" (sensitive).
-  PageContext::FormFieldInfo form_field_info;
-  PageContext::FormField pending_field =
-      MakeFormField(u"id1", u"name1", "password", u"shared_value");
-  pending_field.autofill_types = {
-      sync_pb::FormField_AutofillFieldType_EMAIL_ADDRESS};
-  form_field_info.fields.push_back(pending_field);
-
-  // Local field is "text" (non-sensitive).
-  const FormData form_receiver = autofill::test::GetFormData(
-      {.fields = {{.role = autofill::FieldType::EMAIL_ADDRESS,
-                   .renderer_id = autofill::FieldRendererId(2),
-                   .name_attribute = u"name_diff",
-                   .id_attribute = u"id_diff",
-                   .form_control_type = autofill::FormControlType::kInputText,
-                   .origin = kOrigin}},
-       .url = "https://example.com"});
-
-  ActivateAutofillDriver(autofill_driver());
-
-  EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
-
-  base::HistogramTester histogram_tester;
-  base::RunLoop run_loop;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                run_loop.QuitClosure());
-
-  autofill_manager().OnFormsSeen({form_receiver}, {});
-
-  run_loop.Run();
-
-  histogram_tester.ExpectTotalCount(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome", 0);
+  histogram_tester.ExpectUniqueSample(
+      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
+      FormFieldMatchOutcome::kNoMatch, 1);
 }
 
 // Tests that fallback signature matching works when names/IDs are dynamic
