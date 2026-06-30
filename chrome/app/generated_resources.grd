@@ -8859,6 +8859,9 @@ Keep your key file in a safe place. You will need it to create new versions of y
         <ph name="BREAK">&lt;br&gt;</ph>
         You can manage settings from the card menu or see more options in Customize Chrome.
       </message>
+      <message name="IDS_NTP_MODULES_DRIVE_SEE_MORE" desc="A label for the see more button in the Drive module.">
+        See more
+      </message>
       <message name="IDS_NTP_MODULES_MICROSOFT_FILES_NAME" desc="Name of the Microsoft files module in sentence case shown in various UIs.">
         SharePoint and OneDrive files
       </message>
