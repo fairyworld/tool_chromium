@@ -94,12 +94,6 @@ using ::testing::Property;
 using ::testing::SaveArg;
 using ::testing::SizeIs;
 
-constexpr CallTimerState kCallTimerStateDummy = {
-    .call_site = CallTimerState::CallSite::kUpdateFormCache,
-    .last_autofill_agent_reset = {},
-    .last_dom_content_loaded = {},
-};
-
 class MockAutofillAgent : public AutofillAgent {
  public:
   using AutofillAgent::AutofillAgent;
@@ -881,10 +875,7 @@ TEST_F(AutofillAgentTest, SelectFieldOptionsChangedAfterFillUsesFieldId) {
   std::vector<WebFormElement> forms = GetDocument().GetTopLevelForms();
   ASSERT_EQ(forms.size(), 1u);
 
-  std::optional<FormData> form = form_util::ExtractFormData(
-      forms[0].GetDocument(), forms[0],
-      *base::MakeRefCounted<FieldDataManager>(), kCallTimerStateDummy,
-      /*button_titles_cache=*/nullptr);
+  std::optional<FormData> form = ExtractFormData(forms.front());
   ASSERT_TRUE(form);
   ASSERT_EQ(form->fields().size(), 1u);
 
@@ -934,23 +925,20 @@ TEST_F(AutofillAgentTest, PreviewThenClear) {
 
   std::vector<blink::WebFormElement> forms = GetDocument().GetTopLevelForms();
   ASSERT_EQ(1U, forms.size());
-  FormData form = *form_util::ExtractFormData(
-      forms[0].GetDocument(), forms[0],
-      *base::MakeRefCounted<FieldDataManager>(), kCallTimerStateDummy,
-      /*button_titles_cache=*/nullptr);
-  ASSERT_EQ(form.fields().size(), 1u);
+  std::optional<FormData> form = ExtractFormData(forms.front());
+  ASSERT_TRUE(form);
+  ASSERT_EQ(form->fields().size(), 1u);
   blink::WebFormControlElement field =
       GetWebElementById("text_id").DynamicTo<blink::WebFormControlElement>();
   ASSERT_TRUE(field);
 
-  std::u16string prior_value = form.fields()[0].value();
-  test_api(form).field(0).set_value(form.fields()[0].value() + u"AUTOFILLED");
-  test_api(form).field(0).set_is_autofilled_according_to_renderer(true);
+  test_api(*form).field(0).set_value(form->fields()[0].value() + u"AUTOFILLED");
+  test_api(*form).field(0).set_is_autofilled_according_to_renderer(true);
 
   ASSERT_EQ(field.GetAutofillState(), blink::WebAutofillState::kNotFilled);
   autofill_agent().ApplyFieldsAction(
       mojom::FormActionType::kFill, mojom::ActionPersistence::kPreview,
-      GetFillData(form.fields()), FillId::Create(),
+      GetFillData(form->fields()), FillId::Create(),
       /*supports_refill=*/false);
   EXPECT_EQ(field.GetAutofillState(), blink::WebAutofillState::kPreviewed);
   autofill_agent().ClearPreviewedForm();
@@ -1078,19 +1066,17 @@ TEST_P(AutofillAgentSelectFillingTest, FillingSelectElements) {
   std::vector<WebFormElement> forms = GetDocument().GetTopLevelForms();
   ASSERT_EQ(forms.size(), 1u);
 
-  FormData form = *form_util::ExtractFormData(
-      forms[0].GetDocument(), forms[0],
-      *base::MakeRefCounted<FieldDataManager>(), kCallTimerStateDummy,
-      /*button_titles_cache=*/nullptr);
+  std::optional<FormData> form = ExtractFormData(forms.front());
+  ASSERT_TRUE(form);
 
   // Set the filling data.
-  test_api(form).field(0).set_value(param.fill_value);
-  test_api(form).field(0).set_selected_option_text(param.fill_text);
-  test_api(form).field(0).set_is_autofilled_according_to_renderer(true);
+  test_api(*form).field(0).set_value(param.fill_value);
+  test_api(*form).field(0).set_selected_option_text(param.fill_text);
+  test_api(*form).field(0).set_is_autofilled_according_to_renderer(true);
 
   autofill_agent().ApplyFieldsAction(
       mojom::FormActionType::kFill, mojom::ActionPersistence::kFill,
-      GetFillData(form.fields()), FillId::Create(),
+      GetFillData(form->fields()), FillId::Create(),
       /*supports_refill=*/false);
 
   // Verification Logic
