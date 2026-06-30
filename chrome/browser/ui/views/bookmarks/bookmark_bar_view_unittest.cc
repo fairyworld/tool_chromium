@@ -182,7 +182,8 @@ class BookmarkBarViewBaseTest : public ChromeViewsTestBase {
     return bookmark_bar_view;
   }
 
-  base::test::ScopedFeatureList feature_list_;
+  base::test::ScopedFeatureList feature_list_{
+      switches::kSyncEnableBookmarksInTransportMode};
   std::unique_ptr<TestingProfile> profile_;
   std::unique_ptr<Browser> browser_;
   std::unique_ptr<BookmarkBarViewTestHelper> test_helper_;
@@ -213,8 +214,6 @@ class BookmarkBarViewTest : public BookmarkBarViewBaseTest {
   }
 
  private:
-  base::test::ScopedFeatureList features_{
-      switches::kSyncEnableBookmarksInTransportMode};
   std::unique_ptr<BookmarkBarView> bookmark_bar_view_;
 };
 
