@@ -361,6 +361,78 @@ IN_PROC_BROWSER_TEST_F(PaymentHandlerWebFlowViewMandatoryUiEnabledTest,
   ASSERT_TRUE(WaitForObservedEvent());
 }
 
+IN_PROC_BROWSER_TEST_F(PaymentHandlerWebFlowViewMandatoryUiEnabledTest,
+                       DialogClosedOnErrorAfterUserInteraction) {
+  NavigateTo("/payment_handler.html");
+  std::string method_name;
+  InstallPaymentApp("a.com",
+                    "/payment_handler_sw_error_after_user_interaction.js",
+                    &method_name);
+
+  // Trigger PaymentRequest.
+  ResetEventWaiterForSequence({DialogEvent::PROCESSING_SPINNER_SHOWN,
+                               DialogEvent::PROCESSING_SPINNER_HIDDEN,
+                               DialogEvent::DIALOG_OPENED,
+                               DialogEvent::PROCESSING_SPINNER_SHOWN,
+                               DialogEvent::PROCESSING_SPINNER_HIDDEN,
+                               DialogEvent::PAYMENT_HANDLER_WINDOW_OPENED,
+                               DialogEvent::PAYMENT_HANDLER_TITLE_SET});
+  ASSERT_EQ(
+      "success",
+      content::EvalJs(
+          GetActiveWebContents(),
+          content::JsReplace("launchWithoutWaitForResponse($1)", method_name)));
+  ASSERT_TRUE(WaitForObservedEvent());
+
+  // Get the payment handler web contents.
+  views::View* top_view = dialog_view()->view_stack_for_testing()->top();
+  auto* sheet_controller =
+      dialog_view()->controller_map_for_testing()->at(top_view).get();
+  auto* web_flow_controller =
+      static_cast<PaymentHandlerWebFlowViewController*>(sheet_controller);
+  content::WebContents* payment_handler_contents =
+      web_flow_controller->web_contents();
+
+  // Expect the dialog to close.
+  ResetEventWaiter(DialogEvent::DIALOG_CLOSED);
+
+  // Reject the promise with a user interaction.
+  content::SimulateEndOfPaintHoldingOnPrimaryMainFrame(
+      payment_handler_contents);
+  content::SimulateMouseClickOrTapElementWithId(payment_handler_contents,
+                                                "reject-button");
+
+  ASSERT_TRUE(WaitForObservedEvent());
+}
+
+IN_PROC_BROWSER_TEST_F(PaymentHandlerWebFlowViewMandatoryUiEnabledTest,
+                       ErrorMessageShownOnErrorWithoutUserInteraction) {
+  NavigateTo("/payment_handler.html");
+  std::string method_name;
+  InstallPaymentApp("a.com",
+                    "/payment_handler_sw_error_without_user_interaction.js",
+                    &method_name);
+
+  // Trigger PaymentRequest. We expect the error message sheet to be shown
+  // because the app rejects the payment immediately before any user interaction
+  // occurs.
+  ResetEventWaiterForSequence({DialogEvent::PROCESSING_SPINNER_SHOWN,
+                               DialogEvent::PROCESSING_SPINNER_HIDDEN,
+                               DialogEvent::DIALOG_OPENED,
+                               DialogEvent::PROCESSING_SPINNER_SHOWN,
+                               DialogEvent::PROCESSING_SPINNER_HIDDEN,
+                               DialogEvent::PAYMENT_HANDLER_WINDOW_OPENED,
+                               DialogEvent::PAYMENT_HANDLER_TITLE_SET,
+                               DialogEvent::PROCESSING_SPINNER_HIDDEN,
+                               DialogEvent::ERROR_MESSAGE_SHOWN});
+  ASSERT_EQ(
+      "success",
+      content::EvalJs(
+          GetActiveWebContents(),
+          content::JsReplace("launchWithoutWaitForResponse($1)", method_name)));
+  ASSERT_TRUE(WaitForObservedEvent());
+}
+
 class PaymentHandlerWebFlowViewMandatoryUiDisabledTest
     : public PaymentRequestBrowserTestBase {
  public:
@@ -393,6 +465,51 @@ IN_PROC_BROWSER_TEST_F(PaymentHandlerWebFlowViewMandatoryUiDisabledTest,
             content::EvalJs(
                 GetActiveWebContents(),
                 content::JsReplace("launchAndComplete($1)", method_name)));
+  ASSERT_TRUE(WaitForObservedEvent());
+}
+
+IN_PROC_BROWSER_TEST_F(PaymentHandlerWebFlowViewMandatoryUiDisabledTest,
+                       ErrorMessageShownOnErrorAfterUserInteraction) {
+  NavigateTo("/payment_handler.html");
+  std::string method_name;
+  InstallPaymentApp("a.com",
+                    "/payment_handler_sw_error_after_user_interaction.js",
+                    &method_name);
+
+  // Trigger PaymentRequest.
+  ResetEventWaiterForSequence({DialogEvent::PROCESSING_SPINNER_SHOWN,
+                               DialogEvent::PROCESSING_SPINNER_HIDDEN,
+                               DialogEvent::DIALOG_OPENED,
+                               DialogEvent::PROCESSING_SPINNER_SHOWN,
+                               DialogEvent::PROCESSING_SPINNER_HIDDEN,
+                               DialogEvent::PAYMENT_HANDLER_WINDOW_OPENED,
+                               DialogEvent::PAYMENT_HANDLER_TITLE_SET});
+  ASSERT_EQ(
+      "success",
+      content::EvalJs(
+          GetActiveWebContents(),
+          content::JsReplace("launchWithoutWaitForResponse($1)", method_name)));
+  ASSERT_TRUE(WaitForObservedEvent());
+
+  // Get the payment handler web contents.
+  views::View* top_view = dialog_view()->view_stack_for_testing()->top();
+  auto* sheet_controller =
+      dialog_view()->controller_map_for_testing()->at(top_view).get();
+  auto* web_flow_controller =
+      static_cast<PaymentHandlerWebFlowViewController*>(sheet_controller);
+  content::WebContents* payment_handler_contents =
+      web_flow_controller->web_contents();
+
+  // Expect error message screen is shown.
+  ResetEventWaiterForSequence({DialogEvent::PROCESSING_SPINNER_HIDDEN,
+                               DialogEvent::ERROR_MESSAGE_SHOWN});
+
+  // Reject the promise with a user interaction.
+  content::SimulateEndOfPaintHoldingOnPrimaryMainFrame(
+      payment_handler_contents);
+  content::SimulateMouseClickOrTapElementWithId(payment_handler_contents,
+                                                "reject-button");
+
   ASSERT_TRUE(WaitForObservedEvent());
 }
 

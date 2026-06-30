@@ -288,7 +288,9 @@ PaymentHandlerWebFlowViewController::~PaymentHandlerWebFlowViewController() {
       manager->SetDelegate(nullptr);
     }
   }
-  state()->OnPaymentAppWindowClosed();
+  if (state()) {
+    state()->OnPaymentAppWindowClosed();
+  }
 }
 
 std::u16string PaymentHandlerWebFlowViewController::GetSheetTitle() {
