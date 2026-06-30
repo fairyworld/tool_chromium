@@ -76,6 +76,8 @@ class COMPONENT_EXPORT(WEBNN_SERVICE) DispatchContextImplOrt final
   base::WeakPtr<WebNNContextImpl> AsWeakPtr() override;
 
   // mojom::WebNNContext:
+  void CreateGraphBuilder(
+      mojo::PendingReceiver<mojom::WebNNGraphBuilder> receiver) override;
   void RequestCompilerContext(mojo::PendingReceiver<mojom::WebNNCompilerContext>
                                   compiler_context_receiver) override;
 

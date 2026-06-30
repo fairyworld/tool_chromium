@@ -298,6 +298,11 @@ class COMPONENT_EXPORT(WEBNN_SERVICE) WebNNContextImpl
 
   void CreateWeightsFile(base::OnceCallback<void(base::File)> callback);
 
+  // Reports a bad message from the renderer and disconnects this context.
+  // After this call, the context will be scheduled for removal. Callers
+  // must return immediately after calling this method.
+  void ReportBadMessageAndDisconnect(std::string_view message);
+
   // True when this context is owned by a WebNNContextProviderImpl (GPU
   // process). This flag is thread-safe to read since it is set at construction
   // and never modified.
@@ -346,11 +351,6 @@ class COMPONENT_EXPORT(WEBNN_SERVICE) WebNNContextImpl
   void InitializeContext(ContextBackendUma backend_uma);
 
   void OnDisconnect() override;
-
-  // Reports a bad message from the renderer and disconnects this context.
-  // After this call, the context will be scheduled for removal. Callers
-  // must return immediately after calling this method.
-  void ReportBadMessageAndDisconnect(std::string_view message);
 
   // Callback for BuildGraph. Takes ownership of the graph and
   // extracts the token/devices for the builder.
