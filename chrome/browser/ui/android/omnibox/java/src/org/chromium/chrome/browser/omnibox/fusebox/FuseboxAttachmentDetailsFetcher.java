@@ -8,7 +8,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -21,14 +23,17 @@ import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.Callback;
 import org.chromium.base.FileUtils;
+import org.chromium.base.Log;
 import org.chromium.base.task.AsyncTask;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.device.DeviceConditions;
 import org.chromium.chrome.browser.omnibox.fusebox.FuseboxMetrics.FuseboxAttachmentButtonType;
 import org.chromium.chrome.browser.omnibox.fusebox.FuseboxMetrics.FuseboxAttachmentSizeLimitCheck;
+import org.chromium.components.omnibox.OmniboxFeatures;
 import org.chromium.ui.base.MimeTypeUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -42,7 +47,10 @@ import java.io.InputStream;
 @NullMarked
 class FuseboxAttachmentDetailsFetcher extends AsyncTask<Boolean> {
 
+    private static final String TAG = "FaDetailsFetcher";
+
     private static final int THUMBNAIL_BITMAP_EDGE_SIZE = 256;
+    private static final int MAX_IMAGE_EDGE_SIZE = 1600;
 
     @VisibleForTesting
     static final long MAX_ATTACHMENT_SIZE_BYTES = 100 * 1000 * 1000L; /* 100 MB */
@@ -114,7 +122,7 @@ class FuseboxAttachmentDetailsFetcher extends AsyncTask<Boolean> {
 
         recordAttachmentSizeLimitCheck(isMetered, /* isTooLarge= */ false);
 
-        mData = fetchData();
+        mData = fetchData(mMimeType);
         if (mData == null) return false;
 
         mThumbnail = fetchThumbnail(mData, mMimeType);
@@ -201,17 +209,80 @@ class FuseboxAttachmentDetailsFetcher extends AsyncTask<Boolean> {
         return cursor.getLong(sizeIndex);
     }
 
-    private byte @Nullable [] fetchData() {
-        byte[] data;
+    private byte @Nullable [] fetchData(String mimeType) {
+        byte[] data = null;
 
-        try (InputStream inputStream = mContentResolver.openInputStream(mUri)) {
-            if (inputStream == null) return null;
-            data = FileUtils.readStream(inputStream);
-        } catch (IOException e) {
-            return null;
+        @Nullable CompressFormat outputFormat = getCompressionFormat(mimeType);
+
+        if (outputFormat != null && OmniboxFeatures.sOmniboxAimImageDownscaling.isEnabled()) {
+            data = loadDownscaledImage(outputFormat);
+        }
+
+        if (data == null) {
+            try (InputStream inputStream = mContentResolver.openInputStream(mUri)) {
+                if (inputStream == null) return null;
+                data = FileUtils.readStream(inputStream);
+            } catch (IOException e) {
+                return null;
+            }
         }
 
         return data;
+    }
+
+    private byte @Nullable [] loadDownscaledImage(CompressFormat outputFormat) {
+        Bitmap bitmap;
+        try {
+            bitmap =
+                    ImageDecoder.decodeBitmap(
+                            ImageDecoder.createSource(mContentResolver, mUri),
+                            FuseboxAttachmentDetailsFetcher::setDecoderForDownscaling);
+        } catch (IOException | IllegalArgumentException e) {
+            Log.w(TAG, "Failed to decode image from URI", e);
+            return null;
+        }
+
+        try {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(outputFormat, /* quality= */ 100, stream);
+            return stream.toByteArray();
+        } finally {
+            bitmap.recycle();
+        }
+    }
+
+    private static void setDecoderForDownscaling(
+            ImageDecoder decoder, ImageDecoder.ImageInfo info, ImageDecoder.Source source) {
+        decoder.setAllocator(ImageDecoder.ALLOCATOR_SOFTWARE);
+
+        Size size = info.getSize();
+        int width = size.getWidth();
+        int height = size.getHeight();
+
+        if (width <= MAX_IMAGE_EDGE_SIZE && height <= MAX_IMAGE_EDGE_SIZE) {
+            return;
+        }
+
+        double ratio = (double) MAX_IMAGE_EDGE_SIZE / Math.max(width, height);
+        int targetWidth = (int) Math.round(width * ratio);
+        int targetHeight = (int) Math.round(height * ratio);
+
+        // This is highly likely for very asymmetrical images e.g., (20000 x 1). Just load the image
+        // without downscaling.
+        if (targetWidth <= 0 || targetHeight <= 0) {
+            return;
+        }
+
+        decoder.setTargetSize(targetWidth, targetHeight);
+    }
+
+    private static @Nullable CompressFormat getCompressionFormat(String mimeType) {
+        return switch (mimeType) {
+            case MimeTypeUtils.IMAGE_JPEG_MIME_TYPE, MimeTypeUtils.IMAGE_JPG_MIME_TYPE ->
+                    CompressFormat.JPEG;
+            case MimeTypeUtils.IMAGE_PNG_MIME_TYPE -> CompressFormat.PNG;
+            default -> null;
+        };
     }
 
     private @Nullable Drawable fetchThumbnail(byte[] data, String mimeType) {

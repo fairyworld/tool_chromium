@@ -326,6 +326,10 @@ BASE_FEATURE(kOmniboxAsyncViewInflation, DISABLED);
 // Enable asynchronous Fusebox view inflation.
 BASE_FEATURE(kOmniboxFuseboxAsyncInflation, DISABLED);
 
+// When enabled, AIM image attachments will be downscaled on load before
+// reaching the C++ side.
+BASE_FEATURE(kOmniboxAimImageDownscaling, DISABLED);
+
 // Use FusedLocationProvider on Android to fetch device location.
 BASE_FEATURE(kUseFusedLocationProvider, ENABLED);
 
@@ -516,7 +520,8 @@ static int64_t JNI_OmniboxFeatureMap_GetNativeMap(JNIEnv* env) {
       &kResetSuggestionsScroll,
       &kOmniboxItemDecoration,
       &kExactMatchFavicons,
-      &kStarterPackExpansion};
+      &kStarterPackExpansion,
+      &kOmniboxAimImageDownscaling};
   static base::NoDestructor<base::android::FeatureMap> kFeatureMap(
       kFeaturesExposedToJava);
   return reinterpret_cast<int64_t>(kFeatureMap.get());

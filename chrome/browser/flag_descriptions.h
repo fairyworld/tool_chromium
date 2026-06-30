@@ -3348,6 +3348,12 @@ inline constexpr char kOmniboxFuseboxAsyncInflationDescription[] =
     "When enabled, Fusebox RecyclerView will be inflated on a background thread"
     " instead of the UI thread.";
 
+inline constexpr char kOmniboxAimImageDownscalingName[] =
+    "Omnibox AIM Image Downscaling";
+inline constexpr char kOmniboxAimImageDownscalingDescription[] =
+    "When enabled, AIM image attachments will be downscaled on load before"
+    " reaching the C++ side.";
+
 inline constexpr char kOmniboxForceAllowedToBeDefaultName[] =
     "Omnibox Force Allowed To Be Default";
 inline constexpr char kOmniboxForceAllowedToBeDefaultDescription[] =

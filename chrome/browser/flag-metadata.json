@@ -7122,6 +7122,11 @@
     "expiry_milestone": 160
   },
   {
+    "name": "omnibox-aim-image-downscaling",
+    "owners": ["jkoblinsky@google.com", "chrome-mobile-search@google.com"],
+    "expiry_milestone": 160
+  },
+  {
     "name": "omnibox-aim-suppress-verbatim-match",
     "owners": [
       "charlesyc@google.com",

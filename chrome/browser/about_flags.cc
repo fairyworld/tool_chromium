@@ -6678,6 +6678,11 @@ const FeatureEntry kFeatureEntries[] = {
                                     kOmniboxMultimodalInputVariants,
                                     "OmniboxMultiModalInput")},
 
+    {"omnibox-aim-image-downscaling",
+     flag_descriptions::kOmniboxAimImageDownscalingName,
+     flag_descriptions::kOmniboxAimImageDownscalingDescription, kOsAndroid,
+     FEATURE_VALUE_TYPE(omnibox::kOmniboxAimImageDownscaling)},
+
     {"android-desktop-aim-gate", flag_descriptions::kAndroidDesktopAimGateName,
      flag_descriptions::kAndroidDesktopAimGateDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(omnibox::kAndroidDesktopAimGate)},
