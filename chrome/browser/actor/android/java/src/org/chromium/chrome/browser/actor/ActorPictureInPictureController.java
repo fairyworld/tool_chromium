@@ -241,6 +241,7 @@ public class ActorPictureInPictureController
                     mExitPipRunnable = null;
                     if (mInActorPiP && !shouldEnterPip()) {
                         Log.i(TAG, "Exiting PiP after 1 min delay.");
+                        ActorMetrics.getInstance().setIsInPip(false);
                         mInActorPiP = false;
                         hideOverlay();
                         mActivity.moveTaskToBack(true);
@@ -351,6 +352,9 @@ public class ActorPictureInPictureController
             mHandler.removeCallbacks(mTabSelectRunnable);
             mTabSelectRunnable = null;
         }
+
+        ActorMetrics.getInstance().setIsInPip(true);
+
         mInActorPiP = true;
         mPipStartTime = SystemClock.elapsedRealtime();
         mReceivedNewIntent = false;
@@ -363,6 +367,8 @@ public class ActorPictureInPictureController
 
     private void exitPictureInPicture() {
         if (!mInActorPiP) return;
+
+        ActorMetrics.getInstance().setIsInPip(false);
 
         mInActorPiP = false;
         ActorMetrics.recordPipStatus(ActorMetrics.ActorPipStatus.EXITED);
@@ -442,6 +448,10 @@ public class ActorPictureInPictureController
 
     /** Called when the Activity is destroyed. */
     public void destroy() {
+        if (mInActorPiP) {
+            ActorMetrics.getInstance().setIsInPip(false);
+            mInActorPiP = false;
+        }
         cancelPendingExit();
         if (mTabSelectRunnable != null) {
             mHandler.removeCallbacks(mTabSelectRunnable);

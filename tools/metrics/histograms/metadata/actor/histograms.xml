@@ -982,6 +982,22 @@ chromium-metrics-reviews@google.com.
   <token key="ToolRequest" variants="ToolRequest"/>
 </histogram>
 
+<histogram name="Actor.Tools.ExecutionDuration.{ActorMode}.{ActorTaskState}"
+    units="ms" expires_after="2027-03-31">
+  <owner>bbetini@google.com</owner>
+  <owner>ritkagup@google.com</owner>
+  <summary>
+    Recorded when a task is completed (Finished, Failed, or Cancelled). This
+    captures the cumulative duration the task spent in the {ActorTaskState}
+    state while Chrome was in {ActorMode} mode.
+  </summary>
+  <token key="ActorTaskState" variants="ActorTaskState"/>
+  <token key="ActorMode">
+    <variant name="Foreground" summary="standard Foreground"/>
+    <variant name="Pip" summary="Picture-in-Picture"/>
+  </token>
+</histogram>
+
 <histogram name="Actor.Tools.ExecutionDuration.{ToolRequest}" units="ms"
     expires_after="2026-11-29">
   <owner>dtapuska@google.com</owner>

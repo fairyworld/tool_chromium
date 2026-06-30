@@ -156,6 +156,7 @@ android_resources("java_resources") {
 robolectric_library("junit") {
   sources = [
     "java/src/org/chromium/chrome/browser/actor/ActorForegroundServiceManagerTest.java",
+    "java/src/org/chromium/chrome/browser/actor/ActorMetricsTest.java",
     "java/src/org/chromium/chrome/browser/actor/ActorNotificationFactoryTest.java",
     "java/src/org/chromium/chrome/browser/actor/ActorNotificationServiceTest.java",
     "java/src/org/chromium/chrome/browser/actor/ActorPictureInPictureControllerTest.java",
