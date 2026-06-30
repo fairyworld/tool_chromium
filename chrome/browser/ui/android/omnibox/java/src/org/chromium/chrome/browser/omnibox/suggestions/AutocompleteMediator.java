@@ -1397,13 +1397,13 @@ class AutocompleteMediator
     }
 
     private void onFuseboxStateChanged(@FuseboxState int fuseboxState) {
-        boolean fuseboxOnTablet = mEmbedder.isTablet() && fuseboxState != FuseboxState.DISABLED;
-        boolean separatedFuseboxOnTablet =
-                fuseboxOnTablet && getFuseboxLayoutMode() == FuseboxLayoutMode.TOOLBAR;
-        mListPropertyModel.set(
-                SuggestionListProperties.ROUND_TOP_CORNERS, !separatedFuseboxOnTablet);
-        mListPropertyModel.set(
-                SuggestionListProperties.DRAW_OVER_ANCHOR, !separatedFuseboxOnTablet);
+        boolean suggestionsSeparated =
+                mEmbedder.isTablet()
+                        && (fuseboxState == FuseboxState.DISABLED
+                                || getFuseboxLayoutMode() == FuseboxLayoutMode.SUGGESTIONS_POPOVER);
+
+        mListPropertyModel.set(SuggestionListProperties.ROUND_TOP_CORNERS, suggestionsSeparated);
+        mListPropertyModel.set(SuggestionListProperties.DRAW_OVER_ANCHOR, suggestionsSeparated);
         mRoundSidesSupplier.set(calculateRoundSides());
     }
 
