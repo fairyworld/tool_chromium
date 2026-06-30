@@ -544,9 +544,7 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
 
         if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
             if (!hasTabPropertiesModel(viewHolder)) return;
-            if (isCurrentlyActive) {
-                setBeingDragged(viewHolder, /* isBeingDragged= */ true);
-            }
+            setDraggingY(viewHolder, isCurrentlyActive ? dY : null);
 
             if (viewHolder.getItemViewType() != TabProperties.UiType.TAB_GROUP
                     && !isSolitaryChild(viewHolder)) return;
@@ -618,7 +616,7 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
         if (mTabGridItemLongPressOrchestrator != null) {
             mTabGridItemLongPressOrchestrator.cancel();
         }
-        setBeingDragged(viewHolder, /* isBeingDragged= */ false);
+        setDraggingY(viewHolder, null);
         // When the drag completely finishes, clean up all manual visual overrides on children.
         if (viewHolder.getItemViewType() == TabProperties.UiType.TAB_GROUP
                 || isSolitaryChild(viewHolder)) {
@@ -792,10 +790,12 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
         }
     }
 
-    private void setBeingDragged(RecyclerView.ViewHolder viewHolder, boolean isBeingDragged) {
-        int pos = viewHolder.getBindingAdapterPosition();
-        if (pos >= 0 && pos < mModel.size()) {
-            mModel.get(pos).model.set(TabProperties.IS_BEING_DRAGGED, isBeingDragged);
+    private void setDraggingY(RecyclerView.ViewHolder viewHolder, @Nullable Float draggingY) {
+        if (viewHolder instanceof ViewHolder simpleViewHolder) {
+            PropertyModel model = simpleViewHolder.model;
+            if (model != null) {
+                model.set(TabProperties.DRAGGING_Y, draggingY);
+            }
         }
     }
 

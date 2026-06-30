@@ -231,10 +231,6 @@ public class VerticalTabListCoordinator {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         recyclerView.setupCustomItemAnimator(/* useClipAnimations= */ true);
-        mSpineDecoration =
-                new VerticalTabGroupSpineDecoration(
-                        activity, recyclerView::postInvalidate, mModelList, tabModelSelector);
-        recyclerView.addItemDecoration(mSpineDecoration);
         recyclerView.setVisibility(View.VISIBLE);
 
         // Create the gesture detector to catch long-presses on VT empty space.
@@ -363,6 +359,11 @@ public class VerticalTabListCoordinator {
         recyclerView.addOnItemTouchListener(
                 VerticalTabListItemTouchHelperCallback.createAfterOnItemTouchListener(
                         touchHelperCallback));
+
+        mSpineDecoration =
+                new VerticalTabGroupSpineDecoration(
+                        activity, recyclerView::postInvalidate, mModelList, tabModelSelector);
+        recyclerView.addItemDecoration(mSpineDecoration);
 
         // TODO(crbug.com/509226293):
         // Attach ItemTouchHelper for vertical row dragging & reordering.
