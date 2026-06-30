@@ -129,6 +129,14 @@ public class TabStripTransitionCoordinator implements ComponentCallbacks, AppHea
         default int getFadeTransitionThresholdDp() {
             return 0;
         }
+
+        /**
+         * Sets the callback to re-evaluate the fade transition threshold when an affecting update
+         * occurs, for example, tab strip button margins changing.
+         *
+         * @param callback Callback to handle a fade transition threshold update.
+         */
+        default void setFadeTransitionThresholdChangedCallback(@Nullable Runnable callback) {}
     }
 
     private final CallbackController mCallbackController = new CallbackController();
@@ -226,7 +234,10 @@ public class TabStripTransitionCoordinator implements ComponentCallbacks, AppHea
         controlContainerView().addOnLayoutChangeListener(mOnLayoutChangedListener);
 
         mTabStripTransitionDelegateSupplier.runSyncOrOnAvailable(
-                (unused) -> updateTabStripTransitionThreshold());
+                (delegate) -> {
+                    updateTabStripTransitionThreshold();
+                    delegate.setFadeTransitionThresholdChangedCallback(this::updateTabStripTransitionThreshold);
+                });
 
         AppHeaderState appHeaderState = null;
         if (mDesktopWindowStateManager != null) {
@@ -305,6 +316,10 @@ public class TabStripTransitionCoordinator implements ComponentCallbacks, AppHea
         if (mDesktopWindowStateManager != null) {
             mDesktopWindowStateManager.removeObserver(this);
         }
+        mTabStripTransitionDelegateSupplier.runSyncOrOnAvailable(
+                (delegate) -> {
+                    delegate.setFadeTransitionThresholdChangedCallback(null);
+                });
         mCallbackController.destroy();
         mHeightTransitionHandler.destroy();
     }

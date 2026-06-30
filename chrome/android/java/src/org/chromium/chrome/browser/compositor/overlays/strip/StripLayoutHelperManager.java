@@ -248,6 +248,7 @@ public class StripLayoutHelperManager
     private final WindowAndroid mWindowAndroid;
     private TabStripEventHandler mTabStripEventHandler;
     private final TabSwitcherLayoutObserver mTabSwitcherLayoutObserver;
+    private @Nullable Runnable mFadeTransitionThresholdChangedCallback;
     private final View mControlContainer;
     private final ViewStub mTabHoverCardViewStub;
     private float mLastVisibleViewportOffsetY;
@@ -1191,6 +1192,11 @@ public class StripLayoutHelperManager
         return Math.round(thresholdDp);
     }
 
+    @Override
+    public void setFadeTransitionThresholdChangedCallback(@Nullable Runnable callback) {
+        mFadeTransitionThresholdChangedCallback = callback;
+    }
+
     private boolean duringTabStripHeightTransition() {
         return mIsHeightTransitioning;
     }
@@ -1858,6 +1864,10 @@ public class StripLayoutHelperManager
                 trailingButtonsTouchTargetSize, msbTouchTargetSize);
         mIncognitoHelper.updateEndMarginForStripButtons(
                 trailingButtonsTouchTargetSize, msbTouchTargetSize);
+
+        if (mFadeTransitionThresholdChangedCallback != null) {
+            mFadeTransitionThresholdChangedCallback.run();
+        }
     }
 
     private boolean shouldMsbBeVisible() {

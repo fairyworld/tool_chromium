@@ -1035,7 +1035,8 @@ public abstract class ChromeFeatureList {
                     GESTURE_USER_EDUCATION_BACK_SWIPE,
                     /* defaultValue= */ false,
                     /* defaultValueInTests= */ true);
-    public static final CachedFlag sGlic = newCachedFlag(GLIC, false);
+    public static final CachedFlag sGlic =
+            newCachedFlag(GLIC, false, /* defaultValueInTests= */ true);
     public static final CachedFlag sGmscoreBindServiceOptimization =
             newCachedFlag(
                     GMSCORE_BIND_SERVICE_OPTIMIZATION, false, /* defaultValueInTests= */ true);

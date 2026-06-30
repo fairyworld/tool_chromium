@@ -11873,6 +11873,29 @@
             ]
         }
     ],
+    "GlicAndroid": [
+        {
+            "platforms": [
+                "android"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "params": {
+                        "dont_show_fusebox": "true",
+                        "glic-min-required-ram-mb": "3600"
+                    },
+                    "enable_features": [
+                        "ContextualCueing",
+                        "Glic",
+                        "GlicActor",
+                        "GlicRollout",
+                        "TabBottomSheet"
+                    ]
+                }
+            ]
+        }
+    ],
     "GlicAutoLogin": [
         {
             "platforms": [
