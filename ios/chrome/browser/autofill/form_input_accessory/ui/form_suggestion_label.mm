@@ -44,6 +44,9 @@ constexpr CGFloat kSpacing = 4;
 // The corner radius of the label.
 constexpr CGFloat kCornerRadius = 8;
 
+// Initial max width used until the view is added to the view hierarchy.
+constexpr CGFloat kInitialMaxWidth = 375;
+
 // The size adjustment for the subtitle font from the default font size.
 constexpr CGFloat kSubtitleFontPointSizeAdjustment = -1;
 // The size adjustment for the title font from the default font size.
@@ -589,6 +592,13 @@ void ConfigureFetchingAmbientDataSuggestion(UIStackView* stackView,
   }
 }
 
+- (void)didMoveToWindow {
+  [super didMoveToWindow];
+  if (_widthConstraint) {
+    _widthConstraint.constant = [self maximumWidth];
+  }
+}
+
 #pragma mark - UIResponder
 
 - (void)touchesBegan:(NSSet<UITouch*>*)touches withEvent:(UIEvent*)event {
@@ -725,9 +735,9 @@ void ConfigureFetchingAmbientDataSuggestion(UIStackView* stackView,
 // Returns CGFLOAT_MAX if there's no maximum width.
 - (CGFloat)maximumWidth {
   CGFloat maxWidth = CGFLOAT_MAX;
-  // Using the screen width because the `window` member is nil at the moment of
-  // setting up the label's width anchor.
-  CGSize windowSize = [[UIScreen mainScreen] bounds].size;
+  CGSize windowSize = self.window
+                          ? self.window.bounds.size
+                          : CGSizeMake(kInitialMaxWidth, kInitialMaxWidth);
   CGFloat portraitScreenWidth = MIN(windowSize.width, windowSize.height);
   switch (_suggestion.type) {
     case SuggestionType::kCreditCardEntry:
