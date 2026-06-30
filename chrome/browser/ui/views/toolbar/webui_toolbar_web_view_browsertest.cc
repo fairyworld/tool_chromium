@@ -5262,6 +5262,102 @@ IN_PROC_BROWSER_TEST_F(WebUIPinnedToolbarActionsBrowserTest,
   }));
 }
 
+IN_PROC_BROWSER_TEST_F(WebUIPinnedToolbarActionsBrowserTest,
+                       PostOrQueueActionAfterAnimation_SingleButton) {
+  auto* pinned_actions = GetPinnedToolbarActions();
+  actions::ActionId action_id = kActionSidePanelShowBookmarks;
+
+  ASSERT_FALSE(pinned_actions->IsActionPinned(action_id));
+
+  bool callback_called = false;
+  base::RunLoop run_loop;
+
+  model_->UpdatePinnedState(action_id, true);
+
+  pinned_actions->PostOrQueueActionAfterAnimation(
+      base::BindLambdaForTesting([&]() {
+        callback_called = true;
+        views::BubbleAnchor anchor = pinned_actions->GetBubbleAnchor(action_id);
+        EXPECT_FALSE(anchor.IsNull());
+        run_loop.Quit();
+      }));
+
+  EXPECT_FALSE(callback_called);
+  run_loop.Run();
+  EXPECT_TRUE(callback_called);
+
+  // Cleanup.
+  model_->UpdatePinnedState(action_id, false);
+}
+
+IN_PROC_BROWSER_TEST_F(WebUIPinnedToolbarActionsBrowserTest,
+                       PostOrQueueActionAfterAnimation_MultipleButtons) {
+  auto* pinned_actions = GetPinnedToolbarActions();
+  actions::ActionId action_id_1 = kActionSidePanelShowBookmarks;
+  actions::ActionId action_id_2 = kActionSidePanelShowReadingList;
+
+  ASSERT_FALSE(pinned_actions->IsActionPinned(action_id_1));
+  ASSERT_FALSE(pinned_actions->IsActionPinned(action_id_2));
+
+  bool callback_called = false;
+  base::RunLoop run_loop;
+
+  model_->UpdatePinnedState(action_id_1, true);
+  model_->UpdatePinnedState(action_id_2, true);
+
+  pinned_actions->PostOrQueueActionAfterAnimation(
+      base::BindLambdaForTesting([&]() {
+        callback_called = true;
+        EXPECT_FALSE(pinned_actions->GetBubbleAnchor(action_id_1).IsNull());
+        EXPECT_FALSE(pinned_actions->GetBubbleAnchor(action_id_2).IsNull());
+        run_loop.Quit();
+      }));
+
+  EXPECT_FALSE(callback_called);
+  run_loop.Run();
+  EXPECT_TRUE(callback_called);
+
+  // Cleanup.
+  model_->UpdatePinnedState(action_id_1, false);
+  model_->UpdatePinnedState(action_id_2, false);
+}
+
+IN_PROC_BROWSER_TEST_F(WebUIPinnedToolbarActionsBrowserTest,
+                       PostOrQueueActionAfterAnimation_ImmediateEmpty) {
+  auto* pinned_actions = GetPinnedToolbarActions();
+
+  // Ensure nothing is pinned.
+  for (const auto& [action_id, mojom_action] : kActionMappings) {
+    if (pinned_actions->IsActionPinned(action_id)) {
+      model_->UpdatePinnedState(action_id, false);
+    }
+  }
+
+  bool callback_called = false;
+  pinned_actions->PostOrQueueActionAfterAnimation(
+      base::BindLambdaForTesting([&]() { callback_called = true; }));
+
+  EXPECT_TRUE(callback_called);
+}
+
+IN_PROC_BROWSER_TEST_F(WebUIPinnedToolbarActionsBrowserTest,
+                       PostOrQueueActionAfterAnimation_ImmediateWithPinned) {
+  auto* pinned_actions = GetPinnedToolbarActions();
+  actions::ActionId action_id = kActionSidePanelShowBookmarks;
+  toolbar_ui_api::mojom::PinnedToolbarAction mojom_action =
+      toolbar_ui_api::mojom::PinnedToolbarAction::kSidePanelShowBookmarks;
+
+  PinAction(action_id, mojom_action);
+
+  bool callback_called = false;
+  pinned_actions->PostOrQueueActionAfterAnimation(
+      base::BindLambdaForTesting([&]() { callback_called = true; }));
+
+  EXPECT_TRUE(callback_called);
+
+  UnpinAction(action_id, mojom_action);
+}
+
 struct DragTestParam {
   const char* test_name;
   const char* selector;
