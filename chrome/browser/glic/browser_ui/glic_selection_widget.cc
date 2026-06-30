@@ -32,6 +32,7 @@
 #include "ui/compositor/layer.h"
 #include "ui/compositor/scoped_layer_animation_settings.h"
 #include "ui/display/screen.h"
+#include "ui/gfx/animation/animation.h"
 #include "ui/gfx/image/image_skia_operations.h"
 #include "ui/gfx/paint_vector_icon.h"
 #include "ui/gfx/text_elider.h"
@@ -70,6 +71,7 @@ constexpr int kCornerRadius = 12;
 // on the sides where they meet.
 constexpr int kCornerRadiusInner = 4;
 constexpr int kMenuVerticalMargin = 4;
+constexpr base::TimeDelta kFadeInDuration = base::Milliseconds(250);
 
 // Custom MenuModel for the selection widget's three-dot menu, providing custom
 // typography styling for the menu items.
@@ -210,6 +212,8 @@ class GlicSelectionContentsView : public views::View,
                             bool initial_pinned_state)
       : widget_delegate_(widget_delegate) {
     SetNotifyEnterExitOnChild(true);
+    SetPaintToLayer();
+    layer()->SetFillsBoundsOpaquely(false);
 
     auto border1 = std::make_unique<views::BubbleBorder>(
         views::BubbleBorder::NONE, views::BubbleBorder::STANDARD_SHADOW);
@@ -659,6 +663,16 @@ void GlicSelectionWidgetDelegate::ShowWidget() {
       this, base::BindOnce(&GlicSelectionWidgetDelegate::OnWidgetClose,
                            weak_ptr_factory_.GetWeakPtr()));
   widget_->ShowInactive();
+
+  ui::Layer* anim_layer =
+      GetContentsView() ? GetContentsView()->layer() : nullptr;
+  if (anim_layer && gfx::Animation::ShouldRenderRichAnimation()) {
+    anim_layer->SetOpacity(0.0f);
+    ui::ScopedLayerAnimationSettings settings(anim_layer->GetAnimator());
+    settings.SetTweenType(gfx::Tween::Type::EASE_IN_OUT);
+    settings.SetTransitionDuration(kFadeInDuration);
+    anim_layer->SetOpacity(1.0f);
+  }
 }
 
 void GlicSelectionWidgetDelegate::CloseWidget() {
