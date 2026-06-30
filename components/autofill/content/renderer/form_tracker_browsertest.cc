@@ -5,9 +5,13 @@
 #include "components/autofill/content/renderer/form_tracker.h"
 
 #include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "base/containers/to_vector.h"
 #include "base/feature_list.h"
+#include "base/run_loop.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
@@ -130,40 +134,16 @@ class FormTrackerTest : public test::AutofillRendererTest,
     });
   }
 
-  void SimulateFillForm(std::string_view fname_id = "fname",
-                        std::string_view lname_id = "lname") {
-    blink::WebFormControlElement fname_element =
-        GetFormControlElementById(fname_id);
-    ASSERT_TRUE(fname_element);
-    SimulateElementClickAndWait(std::string(fname_id));
-
-    blink::WebFormElement form_element =
-        fname_element.GetOwningFormForAutofill();
-    FormData form;
-    if (!form_element.IsNull()) {
-      form = *form_util::ExtractFormData(
-          form_element.GetDocument(), form_element,
-          *base::MakeRefCounted<FieldDataManager>(), kCallTimerStateDummy,
-          /*button_titles_cache=*/nullptr);
+  bool SimulateFillForm() {
+    if (std::optional<FormData> data = form_util::ExtractFormData(
+            GetDocument(),
+            GetWebElementById("myForm").To<blink::WebFormElement>(),
+            autofill_agent().field_data_manager(), kCallTimerStateDummy,
+            /*button_titles_cache=*/nullptr)) {
+      return AutofillRendererTest::SimulateFillForm(
+          *data, "fname", {{u"fname", u"John"}, {u"lname", u"Smith"}});
     }
-
-    for (FormFieldData& field : test_api(form).fields()) {
-      if (field.renderer_id() == form_util::GetFieldRendererId(fname_element)) {
-        field.set_value(u"John");
-        field.set_is_autofilled_according_to_renderer(true);
-      } else if (lname_id != "" &&
-                 field.renderer_id() ==
-                     form_util::GetFieldRendererId(
-                         GetFormControlElementById(lname_id))) {
-        field.set_value(u"Smith");
-        field.set_is_autofilled_according_to_renderer(true);
-      }
-    }
-
-    autofill_agent().ApplyFieldsAction(
-        mojom::FormActionType::kFill, mojom::ActionPersistence::kFill,
-        GetFillData(form.fields()), FillId::Create(),
-        /*supports_refill=*/false);
+    return false;
   }
 
  protected:
@@ -732,7 +712,7 @@ TEST_P(FormTrackerTest, DomMutationAfterAutofill) {
           <input name='lname' id='lname'/>
         </form>
       </html>)");
-  SimulateFillForm();
+  EXPECT_TRUE(SimulateFillForm());
 
   base::RunLoop run_loop;
   EXPECT_CALL(
@@ -939,7 +919,7 @@ TEST_P(FormTrackerTest, AjaxSucceeded_FilledFormIsInvisible) {
           <input name='lname' id='lname'/>
         </form>
       </html>)");
-  SimulateFillForm();
+  EXPECT_TRUE(SimulateFillForm());
   SimulateUserInputChangeForElementById("fname", "Rick");
 
   ExecuteJavaScriptForTests(
@@ -969,7 +949,7 @@ TEST_P(FormTrackerTest, AjaxSucceeded_FilledFormStillVisible) {
           <input name='lname' id='lname' value='Deckard'/>
         </form>
       </html>)");
-  SimulateFillForm();
+  EXPECT_TRUE(SimulateFillForm());
 
   EXPECT_CALL(autofill_driver(), FormSubmitted).Times(0);
   base::RunLoop run_loop;

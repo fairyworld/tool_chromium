@@ -4,31 +4,23 @@
 
 #include <memory>
 #include <optional>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
-#include "base/containers/flat_map.h"
-#include "base/containers/map_util.h"
 #include "base/functional/bind.h"
-#include "base/memory/scoped_refptr.h"
 #include "base/run_loop.h"
 #include "base/test/gmock_callback_support.h"
 #include "chrome/test/base/chrome_render_view_test.h"
-#include "components/autofill/content/common/mojom/autofill_driver.mojom.h"
 #include "components/autofill/content/renderer/autofill_agent.h"
 #include "components/autofill/content/renderer/autofill_renderer_test.h"
 #include "components/autofill/content/renderer/focus_test_utils.h"
 #include "components/autofill/content/renderer/form_autofill_util.h"
-#include "components/autofill/content/renderer/timing.h"
 #include "components/autofill/core/common/autofill_test_utils.h"
-#include "components/autofill/core/common/field_data_manager.h"
 #include "components/autofill/core/common/form_data.h"
-#include "components/autofill/core/common/form_field_data.h"
-#include "components/autofill/core/common/mojom/autofill_types.mojom.h"
 #include "components/autofill/core/common/test_utils/autofill_form_test_utils.h"
-#include "components/autofill/core/common/unique_ids.h"
 #include "content/public/renderer/render_frame.h"
-#include "mojo/public/cpp/bindings/pending_associated_receiver.h"
 #include "mojo/public/cpp/bindings/scoped_interface_endpoint_handle.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -36,8 +28,6 @@
 #include "third_party/blink/public/platform/web_string.h"
 #include "third_party/blink/public/web/web_document.h"
 #include "third_party/blink/public/web/web_element.h"
-#include "third_party/blink/public/web/web_form_control_element.h"
-#include "third_party/blink/public/web/web_form_element.h"
 #include "third_party/blink/public/web/web_input_element.h"
 #include "third_party/blink/public/web/web_local_frame.h"
 
@@ -52,8 +42,10 @@ using ::blink::WebFormControlElement;
 using ::blink::WebInputElement;
 using ::blink::WebString;
 using ::testing::_;
+using ::testing::AssertionFailure;
+using ::testing::AssertionResult;
+using ::testing::AssertionSuccess;
 using ::testing::ElementsAre;
-using ::testing::NiceMock;
 using ::testing::Property;
 
 constexpr CallTimerState kCallTimerStateDummy = {
@@ -62,7 +54,7 @@ constexpr CallTimerState kCallTimerStateDummy = {
     .last_dom_content_loaded = {},
 };
 
-class FormAutocompleteTest : public ChromeRenderViewTest {
+class FormAutocompleteTest : public test::AutofillRendererTest {
  public:
   FormAutocompleteTest() = default;
   FormAutocompleteTest(const FormAutocompleteTest&) = delete;
@@ -71,83 +63,32 @@ class FormAutocompleteTest : public ChromeRenderViewTest {
 
  protected:
   void SetUp() override {
-    ChromeRenderViewTest::SetUp();
-
-    // We only use the fake driver for main frame
-    // because our test cases only involve the main frame.
-    blink::AssociatedInterfaceProvider* remote_interfaces =
-        GetMainRenderFrame()->GetRemoteAssociatedInterfaces();
-    remote_interfaces->OverrideBinderForTesting(
-        mojom::AutofillDriver::Name_,
-        base::BindRepeating(&FormAutocompleteTest::BindAutofillDriver,
-                            base::Unretained(this)));
+    AutofillRendererTest::SetUp();
 
     focus_test_utils_ = std::make_unique<test::FocusTestUtils>(
         base::BindRepeating(&FormAutocompleteTest::ExecuteJavaScriptForTests,
                             base::Unretained(this)));
   }
 
-  void BindAutofillDriver(mojo::ScopedInterfaceEndpointHandle handle) {
-    autofill_driver_.BindPendingReceiver(std::move(handle));
-  }
-
-  void SimulateElementClick(const WebElement element) {
-    SimulatePointClick(element.BoundsInWidget().CenterPoint());
-  }
-
-  // Simulates receiving a message from the browser to fill a form.
-  // Blocks until the form is autofilled.
-  void SimulateFillForm(std::string_view form_id = "myForm",
-                        const base::flat_map<std::u16string, std::u16string>&
-                            fill_values_by_id = {{u"fname", u"John"},
-                                                 {u"lname", u"Smith"}}) {
-    std::optional<FormData> form = form_util::ExtractFormData(
-        GetMainFrame()->GetDocument(),
-        GetMainFrame()
-            ->GetDocument()
-            .GetElementById(WebString::FromUtf8(form_id))
-            .To<blink::WebFormElement>(),
-        *base::MakeRefCounted<FieldDataManager>(), kCallTimerStateDummy,
-        /*button_titles_cache=*/nullptr);
-
-    ASSERT_TRUE(form);
-    SimulateFillForm(*form, fill_values_by_id);
-  }
-
-  void SimulateFillForm(const FormData& form_data,
-                        const base::flat_map<std::u16string, std::u16string>&
-                            fill_values_by_id = {{u"fname", u"John"},
-                                                 {u"lname", u"Smith"}}) {
-    WebDocument document = GetMainFrame()->GetDocument();
-    WebFormControlElement fname_element =
-        document.GetElementById(WebString("fname")).To<WebFormControlElement>();
-
-    ASSERT_TRUE(fname_element);
-    // This call is necessary to setup the autofill agent appropriate for the
-    // user selection; simulates the menu actually popping up.
-    SimulateElementClick(fname_element);
-
-    std::vector<FormFieldData::FillData> fields_for_filling;
-    for (const FormFieldData& field : form_data.fields()) {
-      if (const std::u16string* fill_value =
-              base::FindOrNull(fill_values_by_id, field.id_attribute())) {
-        FormFieldData::FillData fill_data(field);
-        fill_data.value = *fill_value;
-        fill_data.is_autofilled = true;
-        fields_for_filling.push_back(std::move(fill_data));
-      }
+  // See `AutofillRendererTest::SimulateFillForm`. Extracts `FormData` from main
+  // frame if none is provided.
+  AssertionResult SimulateFillForm(
+      std::optional<FormData> form_data = std::nullopt) {
+    if (!form_data) {
+      form_data = form_util::ExtractFormData(
+          GetMainFrame()->GetDocument(),
+          GetMainFrame()
+              ->GetDocument()
+              .GetElementById(WebString::FromUtf8("myForm"))
+              .To<blink::WebFormElement>(),
+          *base::MakeRefCounted<FieldDataManager>(), kCallTimerStateDummy,
+          /*button_titles_cache=*/nullptr);
     }
-
-    base::RunLoop run_loop;
-    EXPECT_CALL(
-        autofill_driver_,
-        DidAutofillForm(Property(&FormData::global_id, form_data.global_id())))
-        .WillOnce(RunOnceClosure(run_loop.QuitClosure()));
-    autofill_agent_->ApplyFieldsAction(mojom::FormActionType::kFill,
-                                       mojom::ActionPersistence::kFill,
-                                       fields_for_filling, FillId::Create(),
-                                       /*supports_refill=*/false);
-    std::move(run_loop).Run();
+    if (!form_data) {
+      return AssertionFailure();
+    }
+    return AutofillRendererTest::SimulateFillForm(
+        *form_data, "fname", {{u"fname", u"John"}, {u"lname", u"Smith"}});
   }
 
   std::string GetFocusLog() {
@@ -155,7 +96,6 @@ class FormAutocompleteTest : public ChromeRenderViewTest {
   }
 
   test::AutofillBrowserTestEnvironment autofill_test_environment_;
-  NiceMock<test::MockAutofillDriver> autofill_driver_;
   std::unique_ptr<test::FocusTestUtils> focus_test_utils_;
 };
 
@@ -175,7 +115,7 @@ TEST_F(FormAutocompleteTest, VerifyFocusAndBlurEventsAfterAutofill) {
   focus_test_utils_->FocusElement("fname");
 
   // Simulate filling the form using Autofill.
-  SimulateFillForm();
+  ASSERT_TRUE(SimulateFillForm());
 
   // Expected Result in order:
   // * Change fname
@@ -202,7 +142,7 @@ TEST_F(FormAutocompleteTest,
   focus_test_utils_->FocusElement("fname");
 
   // Simulate filling the form using Autofill.
-  SimulateFillForm();
+  ASSERT_TRUE(SimulateFillForm());
 
   // Expected Result in order:
   // * Change fname
@@ -229,7 +169,7 @@ TEST_F(FormAutocompleteTest,
   focus_test_utils_->FocusElement("fname");
 
   // Simulate filling the form using Autofill.
-  SimulateFillForm();
+  ASSERT_TRUE(SimulateFillForm());
 
   // Expected Result in order:
   // * Change fname
@@ -267,7 +207,7 @@ TEST_F(FormAutocompleteTest, VerifyFocusAndBlurEventAfterElementAdded) {
   ExecuteJavaScriptForTests(
       "document.getElementById('fname').insertAdjacentHTML('beforebegin', "
       "'<label>Zip code:</label><input id=\"zip_code\"/>');");
-  SimulateFillForm(data);
+  ASSERT_TRUE(SimulateFillForm(form));
 
   // Expected Result in order:
   // * Change fname
@@ -304,7 +244,7 @@ TEST_F(FormAutocompleteTest, VerifyFocusAndBlurEventAfterElementRemoved) {
 
   ASSERT_TRUE(form);
   ExecuteJavaScriptForTests("document.getElementById('lname').remove()");
-  SimulateFillForm(*form);
+  ASSERT_TRUE(SimulateFillForm(form));
 
   // Expected Result in order:
   // * Change fname
@@ -350,12 +290,13 @@ TEST_F(FormAutocompleteTest, AcceptDataListSuggestion) {
   };
 
   for (const auto& c : cases) {
+    ASSERT_TRUE(SimulateElementClick(c.id));
+
     WebElement element = document.GetElementById(WebString::FromUtf8(c.id));
     ASSERT_TRUE(element);
     WebInputElement input_element = element.To<WebInputElement>();
-    SimulateElementClick(input_element);
 
-    autofill_agent_->AcceptDataListSuggestion(
+    autofill_agent().AcceptDataListSuggestion(
         form_util::GetFieldRendererId(input_element), kSuggestion);
     EXPECT_EQ(c.expected, input_element.Value().Utf8()) << "Case id: " << c.id;
   }
@@ -375,7 +316,7 @@ TEST_F(FormAutocompleteTest, SelectControlChanged) {
       "color.selectedIndex = 1;";
 
   base::RunLoop run_loop;
-  EXPECT_CALL(autofill_driver_,
+  EXPECT_CALL(autofill_driver(),
               SelectControlSelectionChanged(
                   Property(&FormData::fields,
                            ElementsAre(test::FormFieldDescriptionEq(
@@ -385,8 +326,7 @@ TEST_F(FormAutocompleteTest, SelectControlChanged) {
   // The click simulation is necessary to give the frame transient user
   // activation, otherwise the select value-change event will be ignored by the
   // agent.
-  SimulateElementClick(
-      GetMainFrame()->GetDocument().GetElementById(blink::WebString("color")));
+  ASSERT_TRUE(SimulateElementClick("color"));
   ExecuteJavaScriptForTests(change_value.c_str());
   std::move(run_loop).Run();
 }

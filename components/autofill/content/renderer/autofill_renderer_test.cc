@@ -5,23 +5,45 @@
 #include "components/autofill/content/renderer/autofill_renderer_test.h"
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
+#include "base/containers/map_util.h"
+#include "base/memory/scoped_refptr.h"
+#include "base/run_loop.h"
 #include "base/strings/strcat.h"
+#include "base/test/gmock_callback_support.h"
 #include "components/autofill/content/common/mojom/autofill_driver.mojom.h"
+#include "components/autofill/content/renderer/form_autofill_util.h"
 #include "components/autofill/content/renderer/password_generation_agent.h"
 #include "components/autofill/content/renderer/test_password_autofill_agent.h"
+#include "components/autofill/content/renderer/timing.h"
+#include "components/autofill/core/common/field_data_manager.h"
+#include "components/autofill/core/common/form_field_data.h"
+#include "components/autofill/core/common/mojom/autofill_types.mojom.h"
+#include "components/autofill/core/common/unique_ids.h"
 #include "content/public/renderer/render_frame.h"
 #include "content/public/test/render_view_test.h"
-#include "mojo/public/cpp/bindings/associated_receiver_set.h"
-#include "mojo/public/cpp/bindings/self_owned_associated_receiver.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
+#include "third_party/blink/public/common/associated_interfaces/associated_interface_registry.h"
+#include "third_party/blink/public/web/web_document.h"
+#include "third_party/blink/public/web/web_form_element.h"
+#include "third_party/blink/public/web/web_input_element.h"
+#include "third_party/blink/public/web/web_local_frame.h"
 
 namespace autofill::test {
+
+using base::test::RunClosure;
+using testing::AssertionFailure;
+using testing::AssertionResult;
+using testing::Assign;
+using testing::DoAll;
+using testing::Property;
 
 MockAutofillDriver::MockAutofillDriver() = default;
 
@@ -68,6 +90,49 @@ std::unique_ptr<AutofillAgent> AutofillRendererTest::CreateAutofillAgent(
   return std::make_unique<AutofillAgent>(
       render_frame, std::move(password_autofill_agent),
       std::move(password_generation_agent), associated_interfaces);
+}
+
+AssertionResult AutofillRendererTest::SimulateFillForm(
+    const FormData& form_data,
+    std::string_view initiate_click_element_id,
+    const base::flat_map<std::u16string, std::u16string>& fill_values_by_id) {
+  blink::WebFormControlElement element =
+      GetWebElementById(initiate_click_element_id)
+          .To<blink::WebFormControlElement>();
+
+  if (!element) {
+    return AssertionFailure();
+  }
+  // This click simulation is necessary to set up the autofill agent
+  // appropriately for the user selection; it simulates the menu actually
+  // popping up.
+  SimulatePointClick(element.BoundsInWidget().CenterPoint());
+
+  std::vector<FormFieldData::FillData> fields_for_filling;
+  fields_for_filling.reserve(form_data.fields().size());
+  for (const FormFieldData& field : form_data.fields()) {
+    if (const std::u16string* fill_value =
+            base::FindOrNull(fill_values_by_id, field.id_attribute())) {
+      FormFieldData::FillData fill_data(field);
+      fill_data.value = *fill_value;
+      fill_data.is_autofilled = true;
+      fields_for_filling.push_back(std::move(fill_data));
+    }
+  }
+
+  bool success = false;
+  base::RunLoop run_loop;
+  ON_CALL(autofill_driver(), DidAutofillForm(Property(&FormData::global_id,
+                                                      form_data.global_id())))
+      .WillByDefault(
+          DoAll(RunClosure(run_loop.QuitClosure()), Assign(&success, true)));
+
+  autofill_agent().ApplyFieldsAction(mojom::FormActionType::kFill,
+                                     mojom::ActionPersistence::kFill,
+                                     fields_for_filling, FillId::Create(),
+                                     /*supports_refill=*/false);
+  std::move(run_loop).Run();
+  return AssertionResult(success);
 }
 
 bool AutofillRendererTest::SimulateElementClickAndWait(
