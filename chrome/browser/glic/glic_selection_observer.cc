@@ -327,6 +327,10 @@ void GlicSelectionObserver::PrimaryPageChanged(content::Page& page) {
   }
 }
 
+void GlicSelectionObserver::PrimaryMainFrameWasResized(bool width_changed) {
+  DismissUI(/*keep_nudge=*/true);
+}
+
 void GlicSelectionObserver::OnWebContentsLostFocus(
     content::RenderWidgetHost* render_widget_host) {
   if (web_contents()->IsBeingDestroyed()) {

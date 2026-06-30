@@ -89,6 +89,7 @@ class GlicSelectionObserver
   void RenderFrameDeleted(content::RenderFrameHost* render_frame_host) override;
   void OnVisibilityChanged(content::Visibility visibility) override;
   void PrimaryPageChanged(content::Page& page) override;
+  void PrimaryMainFrameWasResized(bool width_changed) override;
   void OnWebContentsLostFocus(
       content::RenderWidgetHost* render_widget_host) override;
 

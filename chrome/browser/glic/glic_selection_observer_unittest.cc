@@ -60,6 +60,8 @@ class TestGlicSelectionObserver : public GlicSelectionObserver {
   explicit TestGlicSelectionObserver(content::WebContents* web_contents)
       : GlicSelectionObserver(web_contents) {}
 
+  using GlicSelectionObserver::PrimaryMainFrameWasResized;
+
   void UpdateSelectionState(const std::u16string& text,
                             bool is_pending_selection) override {
     last_processed_text_ = text;
@@ -653,6 +655,15 @@ TEST_F(GlicSelectionObserverTest, InputEventsDismissUI) {
   EXPECT_TRUE(observer->dismiss_ui_kept_nudge());
   testing::Mock::VerifyAndClearExpectations(&mock_tab);
   observer->Reset();
+}
+
+TEST_F(GlicSelectionObserverTest, PrimaryMainFrameResizedDismissesUI) {
+  auto* observer = GetObserver();
+  ASSERT_TRUE(observer);
+
+  observer->PrimaryMainFrameWasResized(/*width_changed=*/true);
+  EXPECT_TRUE(observer->dismiss_ui_called());
+  EXPECT_TRUE(observer->dismiss_ui_kept_nudge());
 }
 
 TEST_F(GlicSelectionObserverTest, OnLinkGeneratedSuccess) {
