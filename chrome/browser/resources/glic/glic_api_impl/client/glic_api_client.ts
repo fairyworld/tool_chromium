@@ -572,7 +572,6 @@ export class GlicBrowserHostImpl extends glicBrowserHostAnnotationMixin
 
     if (!state.enableZeroStateSuggestions) {
       this.getZeroStateSuggestionsForFocusedTab = undefined;
-      // MOJO_RUNTIME_FEATURE_GATED GetZeroStateSuggestionsAndSubscribe
       this.getZeroStateSuggestions = undefined;
     }
 

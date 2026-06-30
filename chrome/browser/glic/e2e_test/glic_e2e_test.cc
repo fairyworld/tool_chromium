@@ -91,12 +91,9 @@ const char kIgnoreCertificateErrorsSPKIListValue[] =
 GlicE2ETest::GlicE2ETest(
     const std::vector<base::test::FeatureRef>& additional_enabled_features,
     const std::vector<base::test::FeatureRef>& additional_disabled_features) {
-  // TODO(crbug.com/440578183): ZeroStateSuggestionsV2 is enabled here
-  // due to the associated bug and should be removed here once fixed.
   std::vector<base::test::FeatureRef> enabled = {
       features::kGlic, features::kGlicKeyboardShortcutNewBadge,
-      features::kGlicRollout, kContextualCueing,
-      mojom::features::kZeroStateSuggestionsV2};
+      features::kGlicRollout, kContextualCueing};
   enabled.insert(enabled.end(), additional_enabled_features.begin(),
                  additional_enabled_features.end());
 

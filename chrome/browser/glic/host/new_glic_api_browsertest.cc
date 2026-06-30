@@ -636,8 +636,7 @@ class NewGlicApiTestWithContextualCueing : public NewGlicApiTest {
               {features::kGlicMinLoadingTimeMs.name, "40"},
           }},
          {kGlicZeroStateSuggestions, {}},
-         {kContextualCueing, {}},
-         {mojom::features::kZeroStateSuggestionsV2, {}}},
+         {kContextualCueing, {}}},
         /*disabled_features=*/
         {});
   }

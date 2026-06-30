@@ -1509,7 +1509,6 @@ interface WebClientHandler {
   // currently shared content. Suggestions will continue to emit via
   // NotifyZeroStateSuggestionsChanged until this is called with the same
   // options but with is_live == false.
-  [RuntimeFeature=glic.mojom.features.kZeroStateSuggestionsV2]
   GetZeroStateSuggestionsAndSubscribe(
       bool is_live, ZeroStateSuggestionsOptions options)
       => (ZeroStateSuggestionsV2? zero_state_suggestions);
