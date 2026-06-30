@@ -390,6 +390,11 @@ class PDFiumEngine : public DocumentLoader::Client,
   // otherwise, it may return false if pages are not yet available.
   virtual bool HasMeaningfulText() const;
 
+  // Returns true if the PDF contains JavaScript actions. This method should be
+  // called after the document is loaded; otherwise, it returns false if the
+  // document is not yet available.
+  virtual bool HasJavaScript() const;
+
   // Returns a copy of the structure tree which describes the logical
   // organization of the PDF, if present.
   std::unique_ptr<AccessibilityStructureElement> GetStructureTree() const;

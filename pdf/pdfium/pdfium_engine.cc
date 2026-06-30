@@ -84,6 +84,7 @@
 #include "third_party/pdfium/public/fpdf_edit.h"
 #include "third_party/pdfium/public/fpdf_ext.h"
 #include "third_party/pdfium/public/fpdf_fwlevent.h"
+#include "third_party/pdfium/public/fpdf_javascript.h"
 #include "third_party/pdfium/public/fpdf_ppo.h"
 #include "third_party/pdfium/public/fpdf_searchex.h"
 #include "third_party/pdfium/public/fpdfview.h"
@@ -5115,6 +5116,14 @@ bool PDFiumEngine::HasMeaningfulText() const {
   }
 
   return false;
+}
+
+bool PDFiumEngine::HasJavaScript() const {
+  if (!document_loaded_) {
+    return false;
+  }
+
+  return FPDFDoc_GetJavaScriptActionCount(doc()) > 0;
 }
 
 void PDFiumEngine::UpdateLinkUnderCursor(const std::string& target_url) {

@@ -679,6 +679,33 @@ TEST_P(PDFiumEngineTest, HasMeaningfulTextNotLoaded) {
   EXPECT_FALSE(engine.HasMeaningfulText());
 }
 
+TEST_P(PDFiumEngineTest, HasNoJavaScript) {
+  NiceMock<MockTestClient> client(GetParam());
+  std::unique_ptr<PDFiumEngine> engine =
+      InitializeEngine(&client, FILE_PATH_LITERAL("blank.pdf"));
+  ASSERT_TRUE(engine);
+  EXPECT_FALSE(engine->HasJavaScript());
+}
+
+TEST_P(PDFiumEngineTest, HasJavaScript) {
+  NiceMock<MockTestClient> client(GetParam());
+  std::unique_ptr<PDFiumEngine> engine =
+      InitializeEngine(&client, FILE_PATH_LITERAL("js_actions.pdf"));
+  ASSERT_TRUE(engine);
+  EXPECT_TRUE(engine->HasJavaScript());
+}
+
+TEST_P(PDFiumEngineTest, HasJavaScriptNotLoaded) {
+  NiceMock<MockTestClient> client(GetParam());
+  InitializeEngineResult initialize_result =
+      InitializeEngineWithoutLoading(&client, FILE_PATH_LITERAL("blank.pdf"));
+  ASSERT_TRUE(initialize_result.engine);
+  PDFiumEngine& engine = *initialize_result.engine;
+
+  ASSERT_EQ(0, engine.GetNumberOfPages());
+  EXPECT_FALSE(engine.HasJavaScript());
+}
+
 TEST_P(PDFiumEngineTest, GetLinearizedDocumentMetadata) {
   TestClient client(/*use_skia_renderer=*/GetParam());
   std::unique_ptr<PDFiumEngine> engine =
