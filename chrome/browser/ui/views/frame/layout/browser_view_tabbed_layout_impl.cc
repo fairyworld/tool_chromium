@@ -1413,7 +1413,11 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
 
     if (features::IsGlassFrameEnabled()) {
       if (!is_fullscreen(layout_data_->window_state)) {
-        frame_color.opacity = static_cast<float>(animation.expand_on_hover);
+        // Use a curve that goes very close to 1 very quickly, but still has a
+        // visible fade. This isn't perfect, but hopefully with glass
+        // expand-on-hover it will improve.
+        frame_color.opacity =
+            std::powf(static_cast<float>(animation.expand_on_hover), 0.2f);
       }
       vertical_tabs_background->SetPrimaryColor(frame_color);
     }
