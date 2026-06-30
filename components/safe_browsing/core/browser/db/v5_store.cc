@@ -207,9 +207,12 @@ V4ToV5MigrationResult V5Store::MigrateFromV4(
     return V4ToV5MigrationResult::kMultipleHashFilesFailure;
   }
 
-  std::optional<std::string> v5_checksum;
-  if (v4_file_format.list_update_response().has_checksum()) {
-    v5_checksum = v4_file_format.list_update_response().checksum().sha256();
+  std::string* v5_checksum = nullptr;
+  if (v4_file_format.list_update_response().has_checksum() &&
+      v4_file_format.list_update_response().checksum().has_sha256()) {
+    v5_checksum = v4_file_format.mutable_list_update_response()
+                      ->mutable_checksum()
+                      ->mutable_sha256();
   }
 
   base::FilePath v4_hash_file_path;
@@ -248,17 +251,14 @@ V4ToV5MigrationResult V5Store::MigrateFromV4(
     if (is_extensions_blocklist_) {
       // For the extensions blocklist, migrate the length-32 extension IDs to
       // 16-byte hashes into the v5 hash file, and delete the v4 hash file.
-      std::string converted_checksum;
       ConvertExtensionBlocklistV4ToV5Result result =
-          ConvertExtensionsBlocklistFromV4ToV5(v4_hash_file_path,
-                                               v5_hash_file_path,
-                                               &converted_checksum, &file_size);
+          ConvertExtensionsBlocklistFromV4ToV5(
+              v4_hash_file_path, v5_hash_file_path, v5_checksum, &file_size);
       base::UmaHistogramEnumeration(
           "SafeBrowsing.V5Store.ConvertExtensionBlocklistV4ToV5Result", result);
       if (result != ConvertExtensionBlocklistV4ToV5Result::kSuccess) {
         return V4ToV5MigrationResult::kExtensionBlocklistMigrationFailed;
       }
-      v5_checksum = std::move(converted_checksum);
       base::DeleteFile(v4_hash_file_path);
     } else {
       // For other blocklists, just rename the v4 hash file to v5.
@@ -278,7 +278,7 @@ V4ToV5MigrationResult V5Store::MigrateFromV4(
     list_details->set_version(
         v4_file_format.list_update_response().new_client_state());
   }
-  if (v5_checksum.has_value()) {
+  if (v5_checksum) {
     list_details->mutable_checksum()->set_sha256(std::move(*v5_checksum));
   }
 
@@ -339,6 +339,20 @@ V5Store::ConvertExtensionsBlocklistFromV4ToV5(
   if (!base::ReadFileToString(v4_hash_file_path, &v4_data)) {
     return ConvertExtensionBlocklistV4ToV5Result::kReadV4Failed;
   }
+
+  // Verify V4 checksum if provided and not empty. For the purposes of the disk
+  // migration, we don't fail when the checksum is missing, because
+  // `V4Store::VerifyChecksum` allows it. `V5Store::VerifyChecksum` may end up
+  // being different.
+  if (checksum_sha256 && !checksum_sha256->empty()) {
+    std::array<uint8_t, crypto::hash::kSha256Size> calculated_checksum;
+    crypto::hash::Hash(crypto::hash::HashKind::kSha256,
+                       base::as_byte_span(v4_data), calculated_checksum);
+    if (checksum_sha256->size() != crypto::hash::kSha256Size ||
+        base::as_byte_span(*checksum_sha256) != calculated_checksum) {
+      return ConvertExtensionBlocklistV4ToV5Result::kV4ChecksumMismatch;
+    }
+  }
   if (v4_data.size() % 32 != 0) {
     return ConvertExtensionBlocklistV4ToV5Result::kInvalidFileSize;
   }
@@ -356,10 +370,12 @@ V5Store::ConvertExtensionsBlocklistFromV4ToV5(
   }
   *file_size = v5_hash_data.size();
 
-  std::array<uint8_t, crypto::hash::kSha256Size> checksum;
-  crypto::hash::Hash(crypto::hash::HashKind::kSha256,
-                     base::as_byte_span(v5_hash_data), checksum);
-  checksum_sha256->assign(checksum.begin(), checksum.end());
+  if (checksum_sha256 && !checksum_sha256->empty()) {
+    std::array<uint8_t, crypto::hash::kSha256Size> v5_checksum;
+    crypto::hash::Hash(crypto::hash::HashKind::kSha256,
+                       base::as_byte_span(v5_hash_data), v5_checksum);
+    checksum_sha256->assign(v5_checksum.begin(), v5_checksum.end());
+  }
 
   return ConvertExtensionBlocklistV4ToV5Result::kSuccess;
 }

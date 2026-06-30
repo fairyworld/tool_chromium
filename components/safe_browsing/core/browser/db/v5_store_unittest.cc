@@ -136,7 +136,7 @@ class V5StoreTest : public PlatformTest {
         {"32_foo", v4_hash_file_size}};
     WriteV4FileFormatProtoToFile(
         v4_store_path_, /*magic=*/0x600D71FE, /*file_version=*/9,
-        /*client_state=*/"v4_version", /*checksum_sha256=*/"v4_checksum",
+        /*client_state=*/"v4_version", /*checksum_sha256=*/std::nullopt,
         v4_hash_files, /*prefix_size=*/32);
 
     if (!setup_failure_condition.is_null()) {
@@ -166,6 +166,98 @@ class V5StoreTest : public PlatformTest {
     if (!teardown_cleanup.is_null()) {
       std::move(teardown_cleanup).Run();
     }
+  }
+
+  void RunExtensionMigrationChecksumTest(
+      std::optional<std::string> override_checksum,
+      bool expect_success) {
+    base::HistogramTester histogram_tester;
+    std::vector<std::pair<std::string, uint64_t>> v4_hash_files = {
+        {"32_foo", 64}};
+
+    std::string v4_data =
+        "aapbdbdomjkkjkaonfhkkikfgjllcleb"
+        "aapbdbdomjkkjkaonfhkkikfgjllclec";
+    base::WriteFile(v4_store_path_.AddExtensionASCII("32_foo"), v4_data);
+
+    std::optional<std::string> checksum_to_write;
+    if (override_checksum.has_value()) {
+      checksum_to_write = override_checksum.value();
+    } else {
+      std::array<uint8_t, crypto::hash::kSha256Size> v4_checksum;
+      crypto::hash::Hash(crypto::hash::HashKind::kSha256,
+                         base::as_byte_span(v4_data), v4_checksum);
+      checksum_to_write = std::string(
+          reinterpret_cast<char*>(v4_checksum.data()), v4_checksum.size());
+    }
+
+    WriteV4FileFormatProtoToFile(v4_store_path_, 0x600D71FE, 9, "v4_version",
+                                 checksum_to_write, v4_hash_files, 32);
+
+    V5Store store(task_runner(), store_path_, /*prefix_size=*/16,
+                  v4_store_path_,
+                  /*is_eligible_for_v4_to_v5_disk_migration=*/true,
+                  /*is_extensions_blocklist=*/true);
+
+    V5StoreReadResult expected_read_result =
+        expect_success ? V5StoreReadResult::kReadSuccess
+                       : V5StoreReadResult::kV4ToV5MigrationFailure;
+    EXPECT_EQ(expected_read_result, ReadFromDisk(store));
+
+    if (expect_success) {
+      // Verify V5 files created.
+      EXPECT_TRUE(base::PathExists(store_path_));
+      EXPECT_TRUE(base::PathExists(store_path_.AddExtensionASCII("foo")));
+      EXPECT_FALSE(base::PathExists(store_path_.AddExtensionASCII("32_foo")));
+
+      // Verify V4 files deleted.
+      EXPECT_FALSE(base::PathExists(v4_store_path_));
+      EXPECT_FALSE(
+          base::PathExists(v4_store_path_.AddExtensionASCII("32_foo")));
+
+      // Verify data.
+      EXPECT_EQ("v4_version", store.version());
+      std::string expected_v5_data;
+      expected_v5_data.append(
+          ExtensionV4IdToV5Hash("aapbdbdomjkkjkaonfhkkikfgjllcleb"));
+      expected_v5_data.append(
+          ExtensionV4IdToV5Hash("aapbdbdomjkkjkaonfhkkikfgjllclec"));
+      EXPECT_EQ(GetHashPrefixList(store).view().at(16), expected_v5_data);
+
+      // Verify checksum.
+      if (override_checksum != "") {
+        std::array<uint8_t, crypto::hash::kSha256Size> v5_checksum;
+        crypto::hash::Hash(crypto::hash::HashKind::kSha256,
+                           base::as_byte_span(expected_v5_data), v5_checksum);
+        EXPECT_EQ(std::string(reinterpret_cast<char*>(v5_checksum.data()),
+                              v5_checksum.size()),
+                  GetExpectedChecksum(store));
+      } else {
+        EXPECT_TRUE(GetExpectedChecksum(store).empty());
+      }
+    } else {
+      // Verify files are wiped on failure.
+      EXPECT_FALSE(base::PathExists(v4_store_path_));
+      EXPECT_FALSE(
+          base::PathExists(v4_store_path_.AddExtensionASCII("32_foo")));
+      EXPECT_FALSE(base::PathExists(store_path_));
+    }
+
+    V4ToV5MigrationResult expected_migration_result =
+        expect_success
+            ? V4ToV5MigrationResult::kV4ToV5MigrationSucceeded
+            : V4ToV5MigrationResult::kExtensionBlocklistMigrationFailed;
+    ConvertExtensionBlocklistV4ToV5Result expected_conversion_result =
+        expect_success
+            ? ConvertExtensionBlocklistV4ToV5Result::kSuccess
+            : ConvertExtensionBlocklistV4ToV5Result::kV4ChecksumMismatch;
+
+    histogram_tester.ExpectUniqueSample(
+        "SafeBrowsing.V5Store.V4ToV5MigrationResult", expected_migration_result,
+        1);
+    histogram_tester.ExpectUniqueSample(
+        "SafeBrowsing.V5Store.ConvertExtensionBlocklistV4ToV5Result",
+        expected_conversion_result, 1);
   }
 
   base::ScopedTempDir temp_dir_;
@@ -986,7 +1078,7 @@ TEST_F(V5StoreTest, TestExtensionMigrationSuccess) {
   std::vector<std::pair<std::string, uint64_t>> v4_hash_files = {
       {"32_foo", 64}};
   WriteV4FileFormatProtoToFile(v4_store_path_, 0x600D71FE, 9, "v4_version",
-                               "v4_checksum", v4_hash_files, 32);
+                               std::nullopt, v4_hash_files, 32);
 
   // 2 valid extension IDs (32 chars 'a'-'p').
   std::string v4_data =
@@ -1020,13 +1112,8 @@ TEST_F(V5StoreTest, TestExtensionMigrationSuccess) {
       ExtensionV4IdToV5Hash("aapbdbdomjkkjkaonfhkkikfgjllclec"));
   EXPECT_EQ(GetHashPrefixList(store).view().at(16), expected_v5_data);
 
-  // Verify checksum is recomputed and correct.
-  std::array<uint8_t, crypto::hash::kSha256Size> expected_checksum;
-  crypto::hash::Hash(crypto::hash::HashKind::kSha256,
-                     base::as_byte_span(expected_v5_data), expected_checksum);
-  EXPECT_EQ(std::string(reinterpret_cast<char*>(expected_checksum.data()),
-                        expected_checksum.size()),
-            GetExpectedChecksum(store));
+  // Verify checksum is not written because the source had no checksum.
+  EXPECT_TRUE(GetExpectedChecksum(store).empty());
 
   // Verify UMA.
   histogram_tester.ExpectUniqueSample(
@@ -1135,6 +1222,25 @@ TEST_F(V5StoreTest, TestExtensionMigrationNoHashFiles) {
   histogram_tester.ExpectUniqueSample(
       "SafeBrowsing.V5Store.V4ToV5MigrationResult",
       V4ToV5MigrationResult::kV4ToV5MigrationSucceeded, 1);
+}
+
+TEST_F(V5StoreTest, TestExtensionMigrationFailureChecksumMismatch) {
+  std::string dummy_checksum(32, 'x');
+  RunExtensionMigrationChecksumTest(
+      /*override_checksum=*/dummy_checksum,
+      /*expect_success=*/false);
+}
+
+TEST_F(V5StoreTest, TestExtensionMigrationSuccessWithChecksum) {
+  RunExtensionMigrationChecksumTest(
+      /*override_checksum=*/std::nullopt,
+      /*expect_success=*/true);
+}
+
+TEST_F(V5StoreTest, TestExtensionMigrationSuccessWithEmptyChecksum) {
+  RunExtensionMigrationChecksumTest(
+      /*override_checksum=*/"",
+      /*expect_success=*/true);
 }
 
 }  // namespace safe_browsing

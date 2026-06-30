@@ -152,7 +152,10 @@ enum class ConvertExtensionBlocklistV5ToV4Result {
   // Failed to write the converted v4 hash file.
   kWriteV4Failed = 3,
 
-  kMaxValue = kWriteV4Failed
+  // The V5 store's checksum did not match the V5 data on disk.
+  kV5ChecksumMismatch = 4,
+
+  kMaxValue = kV5ChecksumMismatch
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:ConvertExtensionBlocklistV5ToV4Result)
 
@@ -475,12 +478,18 @@ class V4Store : public SBStore {
   V5ToV4MigrationResult MigrateFromV5(const base::FilePath& v5_store_path);
 
   // Converts the extensions blocklist from v5 hash file format to v4 ID file
-  // format. |v5_hash_file_path| is the path to the source v5 hash file
-  // containing 16-byte hashes. |v4_hash_file_path| is the path where the
-  // converted 32-byte hex IDs should be written. |checksum_sha256| will be
-  // populated with the SHA256 checksum of the converted data. |file_size| will
-  // be populated with the size of the converted file in bytes. Returns the
-  // granular result of the conversion attempt.
+  // format.
+  // |v5_hash_file_path| is the path to the source v5 hash file
+  // containing 16-byte hashes.
+  // |v4_hash_file_path| is the path where the
+  // converted 32-byte hex IDs should be written.
+  // |checksum_sha256| is an in-out parameter. On input, it contains the
+  // expected V5 checksum (if any) used to verify the V5 data before conversion.
+  // On successful conversion, it is overwritten in-place with the newly
+  // calculated V4 checksum of the converted data. Can be nullptr if no checksum
+  // is expected.
+  // |file_size| will be populated with the size of the converted file in
+  // bytes. Returns the granular result of the conversion attempt.
   ConvertExtensionBlocklistV5ToV4Result ConvertExtensionsBlocklistFromV5ToV4(
       const base::FilePath& v5_hash_file_path,
       const base::FilePath& v4_hash_file_path,

@@ -213,6 +213,7 @@ chromium-metrics-reviews@google.com.
   <int value="2" label="Invalid hash file size"/>
   <int value="3" label="Invalid extension ID"/>
   <int value="4" label="Failed to write V5 hash file"/>
+  <int value="5" label="V4ChecksumMismatch"/>
 </enum>
 
 <!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/v5_store.h:ConvertExtensionBlocklistV4ToV5Result) -->
@@ -224,6 +225,7 @@ chromium-metrics-reviews@google.com.
   <int value="1" label="Failed to read V5 hash file"/>
   <int value="2" label="Invalid hash file size"/>
   <int value="3" label="Failed to write V4 hash file"/>
+  <int value="4" label="V5ChecksumMismatch"/>
 </enum>
 
 <!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/v4_store.h:ConvertExtensionBlocklistV5ToV4Result) -->

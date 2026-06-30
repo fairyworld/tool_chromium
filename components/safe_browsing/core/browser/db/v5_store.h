@@ -92,7 +92,10 @@ enum class ConvertExtensionBlocklistV4ToV5Result {
   // Failed to write the converted V5 hash file.
   kWriteV5Failed = 4,
 
-  kMaxValue = kWriteV5Failed
+  // The V4 store's checksum did not match the V4 data on disk.
+  kV4ChecksumMismatch = 5,
+
+  kMaxValue = kV4ChecksumMismatch
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:ConvertExtensionBlocklistV4ToV5Result)
 
@@ -160,8 +163,11 @@ class V5Store : public SBStore {
   // `v4_hash_file_path` is the path to the existing V4 hash file.
   // `v5_hash_file_path` is the path where the converted V5 hash file should be
   // written.
-  // `checksum_sha256` is an output parameter that will be populated with the
-  // SHA256 checksum of the converted hash data.
+  // `checksum_sha256` is an in-out parameter. On input, it contains the
+  // expected V4 checksum (if any) used to verify the V4 data before
+  // conversion. On successful conversion, it is overwritten in-place with the
+  // newly calculated V5 checksum of the converted data. Can be nullptr if no
+  // checksum is expected.
   // `file_size` is an output parameter that will be populated with the size of
   // the converted hash data.
   // Returns `ConvertExtensionBlocklistV4ToV5Result::kSuccess` on success, or an
