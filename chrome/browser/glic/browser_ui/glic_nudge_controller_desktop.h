@@ -16,7 +16,7 @@ class ScopedCallToActionLock;
 
 namespace glic {
 
-class GlicNudgeDelegate;
+class GlicSplitButtonDelegate;
 
 class GlicNudgeControllerDesktop : public GlicNudgeController,
                                    public TabListInterfaceObserver {
@@ -41,8 +41,8 @@ class GlicNudgeControllerDesktop : public GlicNudgeController,
   void OnActiveTabChanged(TabListInterface& tab_list,
                           tabs::TabInterface* tab) override;
 
-  void SetTabStripDelegate(GlicNudgeDelegate* delegate) override;
-  void SetToolbarDelegate(GlicNudgeDelegate* delegate) override;
+  void SetTabStripDelegate(GlicSplitButtonDelegate* delegate) override;
+  void SetToolbarDelegate(GlicSplitButtonDelegate* delegate) override;
 
   void SetNudgeActivityCallbackForTesting();
 
@@ -50,15 +50,15 @@ class GlicNudgeControllerDesktop : public GlicNudgeController,
   void ClearPromptSuggestion() override;
 
  private:
-  GlicNudgeDelegate* GetActiveDelegate();
+  GlicSplitButtonDelegate* GetActiveDelegate();
 
   const raw_ptr<BrowserWindowInterface> browser_window_interface_;
   const raw_ptr<TabListInterface> tab_list_;
 
-  raw_ptr<GlicNudgeDelegate> tab_strip_delegate_ = nullptr;
-  raw_ptr<GlicNudgeDelegate> toolbar_delegate_ = nullptr;
+  raw_ptr<GlicSplitButtonDelegate> tab_strip_delegate_ = nullptr;
+  raw_ptr<GlicSplitButtonDelegate> toolbar_delegate_ = nullptr;
 
-  std::unique_ptr<GlicNudgeDelegate> anchored_nudge_controller_;
+  std::unique_ptr<GlicSplitButtonDelegate> anchored_nudge_controller_;
   std::optional<std::string> prompt_suggestion_;
   GlicNudgeActivityCallback nudge_activity_callback_;
 

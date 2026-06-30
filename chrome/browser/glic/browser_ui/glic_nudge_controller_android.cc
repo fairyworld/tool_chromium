@@ -7,8 +7,8 @@
 #include "base/functional/bind.h"
 #include "base/notimplemented.h"
 #include "base/task/sequenced_task_runner.h"
-#include "chrome/browser/glic/browser_ui/glic_nudge_delegate.h"
 #include "chrome/browser/glic/browser_ui/glic_nudge_delegate_android.h"
+#include "chrome/browser/glic/browser_ui/glic_split_button_delegate.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/web_contents.h"
 
@@ -26,12 +26,12 @@ GlicNudgeControllerAndroid::GlicNudgeControllerAndroid(tabs::TabInterface& tab)
 GlicNudgeControllerAndroid::~GlicNudgeControllerAndroid() = default;
 
 void GlicNudgeControllerAndroid::SetTabStripDelegate(
-    GlicNudgeDelegate* delegate) {
+    GlicSplitButtonDelegate* delegate) {
   tab_strip_delegate_ = delegate;
 }
 
 void GlicNudgeControllerAndroid::SetToolbarDelegate(
-    GlicNudgeDelegate* delegate) {
+    GlicSplitButtonDelegate* delegate) {
   NOTIMPLEMENTED() << "No toolbar glic nudge on Android currently.";
 }
 
@@ -53,7 +53,7 @@ void GlicNudgeControllerAndroid::UpdateNudgeLabel(
   nudge_activity_callback_ = callback;
   prompt_suggestion_ = prompt_suggestion;
 
-  GlicNudgeDelegate* delegate = tab_strip_delegate_;
+  GlicSplitButtonDelegate* delegate = tab_strip_delegate_;
 
   if (delegate) {
     if (nudge_label.empty() && delegate->GetIsShowingGlicNudge()) {
@@ -96,7 +96,7 @@ void GlicNudgeControllerAndroid::OnNudgeActivity(GlicNudgeActivity activity) {
 }
 
 void GlicNudgeControllerAndroid::OnTabWillDeactivate(tabs::TabInterface* tab) {
-  GlicNudgeDelegate* delegate = tab_strip_delegate_;
+  GlicSplitButtonDelegate* delegate = tab_strip_delegate_;
   if (delegate && delegate->GetIsShowingGlicNudge()) {
     delegate->OnHideGlicNudgeUI();
     OnNudgeActivity(glic::GlicNudgeActivity::kNudgeIgnoredActiveTabChanged);

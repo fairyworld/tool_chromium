@@ -28,8 +28,8 @@ class GlicNudgeControllerAndroid : public GlicNudgeController {
   ~GlicNudgeControllerAndroid() override;
 
   // GlicNudgeController:
-  void SetTabStripDelegate(GlicNudgeDelegate* delegate) override;
-  void SetToolbarDelegate(GlicNudgeDelegate* delegate) override;
+  void SetTabStripDelegate(GlicSplitButtonDelegate* delegate) override;
+  void SetToolbarDelegate(GlicSplitButtonDelegate* delegate) override;
 
   void UpdateNudgeLabel(content::WebContents* web_contents,
                         const std::string& nudge_label,
@@ -46,10 +46,10 @@ class GlicNudgeControllerAndroid : public GlicNudgeController {
   void OnTabWillDeactivate(tabs::TabInterface* tab);
 
   raw_ref<tabs::TabInterface> tab_;
-  raw_ptr<GlicNudgeDelegate> tab_strip_delegate_ = nullptr;
+  raw_ptr<GlicSplitButtonDelegate> tab_strip_delegate_ = nullptr;
   std::optional<std::string> prompt_suggestion_;
   GlicNudgeActivityCallback nudge_activity_callback_;
-  std::unique_ptr<GlicNudgeDelegate> delegate_;
+  std::unique_ptr<GlicSplitButtonDelegate> delegate_;
   base::CallbackListSubscription tab_deactivate_subscription_;
 };
 

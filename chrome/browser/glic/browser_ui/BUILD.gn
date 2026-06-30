@@ -8,9 +8,7 @@ import("//chrome/common/features.gni")
 
 source_set("browser_ui") {
   sources = [
-    "glic_actor_nudge_delegate.h",
     "glic_nudge_controller.h",
-    "glic_nudge_delegate.h",
     "glic_split_button_delegate.h",
   ]
 
@@ -59,9 +57,8 @@ source_set("browser_ui") {
 
 source_set("impl") {
   sources = [
-    "glic_actor_nudge_delegate.cc",
     "glic_nudge_controller.cc",
-    "glic_nudge_delegate.cc",
+    "glic_split_button_delegate.cc",
   ]
   if (!is_android) {
     sources += [

@@ -6,7 +6,7 @@
 
 #include "base/functional/callback_helpers.h"
 #include "base/test/test_future.h"
-#include "chrome/browser/glic/browser_ui/glic_nudge_delegate.h"
+#include "chrome/browser/glic/browser_ui/glic_split_button_delegate.h"
 #include "chrome/browser/glic/test_support/glic_browser_test.h"
 #include "content/public/test/browser_test.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -16,7 +16,7 @@ namespace glic {
 
 namespace {
 
-class MockGlicNudgeDelegate : public GlicNudgeDelegate {
+class MockGlicNudgeDelegate : public GlicSplitButtonDelegate {
  public:
   MockGlicNudgeDelegate() = default;
   ~MockGlicNudgeDelegate() override = default;

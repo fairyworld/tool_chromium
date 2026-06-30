@@ -6,7 +6,7 @@
 
 #include "chrome/browser/contextual_cueing/features.h"
 #include "chrome/browser/glic/browser_ui/anchored_nudge_controller.h"
-#include "chrome/browser/glic/browser_ui/glic_nudge_delegate.h"
+#include "chrome/browser/glic/browser_ui/glic_split_button_delegate.h"
 #include "chrome/browser/glic/glic_pref_names.h"
 #include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/glic/public/glic_keyed_service_factory.h"
@@ -45,12 +45,12 @@ GlicNudgeControllerDesktop::GlicNudgeControllerDesktop(
 GlicNudgeControllerDesktop::~GlicNudgeControllerDesktop() = default;
 
 void GlicNudgeControllerDesktop::SetTabStripDelegate(
-    GlicNudgeDelegate* delegate) {
+    GlicSplitButtonDelegate* delegate) {
   tab_strip_delegate_ = delegate;
 }
 
 void GlicNudgeControllerDesktop::SetToolbarDelegate(
-    GlicNudgeDelegate* delegate) {
+    GlicSplitButtonDelegate* delegate) {
   toolbar_delegate_ = delegate;
 }
 
@@ -90,7 +90,7 @@ void GlicNudgeControllerDesktop::UpdateNudgeLabel(
     return;
   }
 
-  GlicNudgeDelegate* delegate = GetActiveDelegate();
+  GlicSplitButtonDelegate* delegate = GetActiveDelegate();
 
   if (activity &&
       (activity == glic::GlicNudgeActivity::
@@ -170,14 +170,14 @@ void GlicNudgeControllerDesktop::SetNudgeActivityCallbackForTesting() {
 
 void GlicNudgeControllerDesktop::OnActiveTabChanged(TabListInterface& tab_list,
                                                     tabs::TabInterface* tab) {
-  GlicNudgeDelegate* delegate = GetActiveDelegate();
+  GlicSplitButtonDelegate* delegate = GetActiveDelegate();
   if (delegate && delegate->GetIsShowingGlicNudge()) {
     delegate->OnHideGlicNudgeUI();
     OnNudgeActivity(glic::GlicNudgeActivity::kNudgeIgnoredActiveTabChanged);
   }
 }
 
-GlicNudgeDelegate* GlicNudgeControllerDesktop::GetActiveDelegate() {
+GlicSplitButtonDelegate* GlicNudgeControllerDesktop::GetActiveDelegate() {
   if (anchored_nudge_controller_) {
     return anchored_nudge_controller_.get();
   }

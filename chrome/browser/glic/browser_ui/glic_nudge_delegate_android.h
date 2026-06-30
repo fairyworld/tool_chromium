@@ -6,8 +6,9 @@
 #define CHROME_BROWSER_GLIC_BROWSER_UI_GLIC_NUDGE_DELEGATE_ANDROID_H_
 
 #include "base/android/scoped_java_ref.h"
+#include "base/memory/raw_ptr.h"
 #include "base/memory/raw_ref.h"
-#include "chrome/browser/glic/browser_ui/glic_nudge_delegate.h"
+#include "chrome/browser/glic/browser_ui/glic_split_button_delegate.h"
 
 namespace tabs {
 class TabInterface;
@@ -25,7 +26,7 @@ enum class GlicNudgeActivity;
 // C++ implementation of GlicNudgeDelegate for Android.
 // Acts as JNI bridge to forward C++ nudge trigger/hide calls to Java's
 // GlicNudgeDelegateBridge.
-class GlicNudgeDelegateAndroid : public GlicNudgeDelegate {
+class GlicNudgeDelegateAndroid : public GlicSplitButtonDelegate {
  public:
   GlicNudgeDelegateAndroid(GlicNudgeController& controller,
                            tabs::TabInterface& tab);
@@ -33,7 +34,7 @@ class GlicNudgeDelegateAndroid : public GlicNudgeDelegate {
   GlicNudgeDelegateAndroid& operator=(const GlicNudgeDelegateAndroid&) = delete;
   ~GlicNudgeDelegateAndroid() override;
 
-  // GlicNudgeDelegate:
+  // GlicSplitButtonDelegate:
   void OnTriggerGlicNudgeUI(NudgeParams params) override;
   void OnHideGlicNudgeUI() override;
   bool GetIsShowingGlicNudge() override;

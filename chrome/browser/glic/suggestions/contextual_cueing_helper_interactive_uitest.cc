@@ -11,7 +11,7 @@
 #include "chrome/browser/contextual_cueing/features.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_side_panel_coordinator.h"
 #include "chrome/browser/glic/browser_ui/glic_nudge_controller.h"
-#include "chrome/browser/glic/browser_ui/glic_nudge_delegate.h"
+#include "chrome/browser/glic/browser_ui/glic_split_button_delegate.h"
 #include "chrome/browser/glic/glic_pref_names.h"
 #include "chrome/browser/glic/host/host.h"
 #include "chrome/browser/glic/public/features.h"
@@ -51,7 +51,7 @@
 #include "services/metrics/public/cpp/ukm_builders.h"
 #include "ui/base/l10n/l10n_util.h"
 
-class FakeGlicNudgeDelegate : public glic::GlicNudgeDelegate {
+class FakeGlicNudgeDelegate : public glic::GlicSplitButtonDelegate {
  public:
   void OnTriggerGlicNudgeUI(glic::NudgeParams params) override {
     last_nudge_label_ = params.label;
