@@ -3436,6 +3436,7 @@ if (!is_android) {
       "../browser/ui/webui/searchbox/realbox_handler_browsertest.cc",
       "../browser/ui/webui/settings/appearance_handler_browsertest.cc",
       "../browser/ui/webui/settings/glic_handler_browsertest.cc",
+      "../browser/ui/webui/settings/people_handler_browsertest.cc",
       "../browser/ui/webui/settings/performance_handler_browsertest.cc",
       "../browser/ui/webui/settings/settings_secure_dns_handler_browsertest.cc",
       "../browser/ui/webui/settings/settings_ui_browsertest.cc",
