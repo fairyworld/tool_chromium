@@ -71,6 +71,7 @@ import org.chromium.chrome.browser.share.ShareDelegate.ShareOrigin;
 import org.chromium.chrome.browser.share.ShareHelper;
 import org.chromium.chrome.browser.share.ShareUtils;
 import org.chromium.chrome.browser.share.link_to_text.LinkToTextHelper;
+import org.chromium.chrome.browser.share.send_tab_to_self.SendTabToSelfAndroidBridge;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabContextMenuItemDelegate;
 import org.chromium.chrome.browser.tab.TabUtils;
@@ -254,6 +255,7 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
             Action.COPY_VIDEO_FRAME,
             Action.DOWNLOAD_VIDEO_FRAME,
             Action.READING_MODE,
+            Action.SEND_TAB_TO_SELF,
         })
         @Retention(RetentionPolicy.SOURCE)
         public @interface Action {
@@ -313,7 +315,8 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
             int COPY_VIDEO_FRAME = 53;
             int DOWNLOAD_VIDEO_FRAME = 54;
             int READING_MODE = 55;
-            int NUM_ENTRIES = 56;
+            int SEND_TAB_TO_SELF = 56;
+            int NUM_ENTRIES = 57;
         }
 
         // LINT.ThenChange(/tools/metrics/histograms/enums.xml:ContextMenuOptionAndroid)
@@ -543,6 +546,12 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                 if (!isChromeOrNativePage
                         && !DomDistillerUrlUtils.isDistilledPage(mParams.getPageUrl())) {
                     pageGroup.add(createListItem(Item.READING_MODE));
+                }
+                Integer sendTabToSelfDisplayReason =
+                        SendTabToSelfAndroidBridge.getEntryPointDisplayReason(
+                                getProfile(), mParams.getPageUrl().getSpec());
+                if (sendTabToSelfDisplayReason != null) {
+                    pageGroup.add(createListItem(Item.SEND_TAB_TO_SELF));
                 }
             }
             groupedItems.add(pageGroup);
@@ -1136,6 +1145,12 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
             if (tab != null) {
                 LensOverlayCoordinator.getOrCreateForTab(tab)
                         .start(LensOverlayInvocationSource.CONTEXT_MENU);
+            }
+        } else if (itemId == R.id.contextmenu_send_tab_to_self) {
+            recordContextMenuSelection(ContextMenuUma.Action.SEND_TAB_TO_SELF);
+            Tab tab = getTab();
+            if (tab != null) {
+                assumeNonNull(mShareDelegateSupplier.get()).sendTabToSelf(tab);
             }
         } else if (itemId == R.id.contextmenu_share_link) {
             recordContextMenuSelection(ContextMenuUma.Action.SHARE_LINK);

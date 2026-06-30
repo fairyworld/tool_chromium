@@ -91,6 +91,8 @@ import org.chromium.chrome.browser.profiles.ProfileJni;
 import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
 import org.chromium.chrome.browser.share.ShareDelegate;
 import org.chromium.chrome.browser.share.link_to_text.LinkToTextHelper;
+import org.chromium.chrome.browser.share.send_tab_to_self.SendTabToSelfAndroidBridge;
+import org.chromium.chrome.browser.share.send_tab_to_self.SendTabToSelfAndroidBridgeJni;
 import org.chromium.chrome.browser.signin.services.IdentityServicesProvider;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabContextMenuItemDelegate;
@@ -164,6 +166,7 @@ public class ChromeContextMenuPopulatorTest {
     @Mock private IdentityServicesProvider mIdentityServicesProvider;
     @Mock private IdentityManager mIdentityManager;
     @Mock private DataProtectionBridge.Natives mDataProtectionBridgeMock;
+    @Mock private SendTabToSelfAndroidBridge.Natives mSendTabToSelfAndroidBridgeNatives;
     @Mock private ContextMenuNativeDelegate mNativeDelegate;
     @Mock private WebContents mWebContents;
     @Mock private RenderFrameHost mRenderFrameHost;
@@ -183,6 +186,9 @@ public class ChromeContextMenuPopulatorTest {
         DownloadUtils.setIsDownloadRestrictedByPolicyForTesting(false);
         NativeLibraryTestUtils.loadNativeLibraryNoBrowserProcess();
         ExternalAuthUtils.setInstanceForTesting(mExternalAuthUtils);
+        SendTabToSelfAndroidBridgeJni.setInstanceForTesting(mSendTabToSelfAndroidBridgeNatives);
+        when(mSendTabToSelfAndroidBridgeNatives.getEntryPointDisplayReason(any(), anyString()))
+                .thenReturn(1);
         when(mMenuModelBridge.populateModelList()).thenReturn(new ModelList());
 
         GURL pageUrl = new GURL(PAGE_URL);
@@ -2534,7 +2540,8 @@ public class ChromeContextMenuPopulatorTest {
                 R.id.contextmenu_share_page,
                 R.id.contextmenu_print_page,
                 R.id.contextmenu_search_tab_with_google_lens,
-                R.id.contextmenu_open_in_reading_mode
+                R.id.contextmenu_open_in_reading_mode,
+                R.id.contextmenu_send_tab_to_self
             },
         };
 
@@ -2550,6 +2557,8 @@ public class ChromeContextMenuPopulatorTest {
         setAllMandatoryFlowsComplete();
         when(mItemDelegate.isIncognito()).thenReturn(true);
         when(mTab.isIncognito()).thenReturn(true);
+        when(mSendTabToSelfAndroidBridgeNatives.getEntryPointDisplayReason(any(), anyString()))
+                .thenReturn(null);
         ContextMenuParams params = getPageParams();
 
         int[][] expected = {
@@ -2584,7 +2593,8 @@ public class ChromeContextMenuPopulatorTest {
                 R.id.contextmenu_save_page,
                 R.id.contextmenu_share_page,
                 R.id.contextmenu_print_page,
-                R.id.contextmenu_open_in_reading_mode
+                R.id.contextmenu_open_in_reading_mode,
+                R.id.contextmenu_send_tab_to_self
             },
         };
 
@@ -2611,7 +2621,8 @@ public class ChromeContextMenuPopulatorTest {
                 R.id.contextmenu_save_page,
                 R.id.contextmenu_share_page,
                 R.id.contextmenu_print_page,
-                R.id.contextmenu_open_in_reading_mode
+                R.id.contextmenu_open_in_reading_mode,
+                R.id.contextmenu_send_tab_to_self
             },
         };
 
@@ -2647,7 +2658,8 @@ public class ChromeContextMenuPopulatorTest {
                 R.id.contextmenu_save_page,
                 R.id.contextmenu_share_page,
                 R.id.contextmenu_print_page,
-                R.id.contextmenu_open_in_reading_mode
+                R.id.contextmenu_open_in_reading_mode,
+                R.id.contextmenu_send_tab_to_self
             },
         };
 
@@ -2689,7 +2701,8 @@ public class ChromeContextMenuPopulatorTest {
                 R.id.contextmenu_save_page,
                 R.id.contextmenu_share_page,
                 R.id.contextmenu_print_page,
-                R.id.contextmenu_open_in_reading_mode
+                R.id.contextmenu_open_in_reading_mode,
+                R.id.contextmenu_send_tab_to_self
             },
             {R.id.contextmenu_view_page_source, R.id.contextmenu_inspect_element},
         };
@@ -2739,7 +2752,8 @@ public class ChromeContextMenuPopulatorTest {
             R.id.contextmenu_save_page,
             R.id.contextmenu_share_page,
             R.id.contextmenu_print_page,
-            R.id.contextmenu_open_in_reading_mode
+            R.id.contextmenu_open_in_reading_mode,
+            R.id.contextmenu_send_tab_to_self
         };
         List<Integer> expectedDisabled = Arrays.asList(R.id.contextmenu_save_page);
 
@@ -2774,7 +2788,8 @@ public class ChromeContextMenuPopulatorTest {
                 R.id.contextmenu_reload,
                 R.id.contextmenu_save_page,
                 R.id.contextmenu_share_page,
-                R.id.contextmenu_open_in_reading_mode
+                R.id.contextmenu_open_in_reading_mode,
+                R.id.contextmenu_send_tab_to_self
             },
         };
 
@@ -3581,6 +3596,15 @@ public class ChromeContextMenuPopulatorTest {
                         params.getReferrer(),
                         /* navigateToTab= */ true,
                         /* additionalNavigationParams= */ null);
+    }
+
+    @Test
+    @SmallTest
+    public void testOnItemSelected_sendTabToSelf() {
+        ContextMenuParams params = getPageParams();
+        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
+        mPopulator.onItemSelected(R.id.contextmenu_send_tab_to_self);
+        verify(mShareDelegate).sendTabToSelf(mTab);
     }
 
     private void setMandatoryFlowCompleted(boolean isForcedSigninShowing, boolean isCompleted) {

@@ -84,7 +84,8 @@ class ChromeContextMenuItem {
         Item.INSPECT_ELEMENT,
         Item.COPY_VIDEO_FRAME,
         Item.DOWNLOAD_VIDEO_FRAME,
-        Item.READING_MODE
+        Item.READING_MODE,
+        Item.SEND_TAB_TO_SELF
     })
     @Retention(RetentionPolicy.SOURCE)
     public @interface Item {
@@ -149,8 +150,9 @@ class ChromeContextMenuItem {
         int COPY_VIDEO_FRAME = 47;
         int DOWNLOAD_VIDEO_FRAME = 48;
         int READING_MODE = 49;
+        int SEND_TAB_TO_SELF = 50;
         // ALWAYS UPDATE!
-        int NUM_ENTRIES = 50;
+        int NUM_ENTRIES = 51;
     }
 
     /** Mapping from {@link Item} to the ID found in the ids.xml. */
@@ -205,6 +207,7 @@ class ChromeContextMenuItem {
         R.id.contextmenu_copy_video_frame, // Item.COPY_VIDEO_FRAME
         R.id.contextmenu_download_video_frame, // Item.DOWNLOAD_VIDEO_FRAME
         R.id.contextmenu_open_in_reading_mode, // Item.READING_MODE
+        R.id.contextmenu_send_tab_to_self, // Item.SEND_TAB_TO_SELF
     };
 
     /** Mapping from {@link Item} to the ID of the string that describes the action of the item. */
@@ -259,6 +262,7 @@ class ChromeContextMenuItem {
         R.string.contextmenu_copy_video_frame, // Item.COPY_VIDEO_FRAME
         R.string.contextmenu_download_video_frame, // Item.DOWNLOAD_VIDEO_FRAME
         R.string.contextmenu_open_in_reading_mode, // Item.READING_MODE
+        R.string.sharing_send_tab_to_self, // Item.SEND_TAB_TO_SELF
     };
 
     /**
