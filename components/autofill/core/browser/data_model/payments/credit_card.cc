@@ -379,6 +379,7 @@ int CreditCard::IconResourceId(Suggestion::Icon icon) {
     case Suggestion::Icon::kSettings:
     case Suggestion::Icon::kShipment:
     case Suggestion::Icon::kShipmentSpark:
+    case Suggestion::Icon::kTextSpark:
     case Suggestion::Icon::kUndo:
     case Suggestion::Icon::kBnplGeneric:
     case Suggestion::Icon::kBnplAffirm:

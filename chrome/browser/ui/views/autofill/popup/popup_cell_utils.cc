@@ -209,6 +209,7 @@ std::u16string GetIconAccessibleName(Suggestion::Icon icon) {
     case Suggestion::Icon::kUndo:
     case Suggestion::Icon::kAndroidMessages:
     case Suggestion::Icon::kSpark:
+    case Suggestion::Icon::kTextSpark:
     case Suggestion::Icon::kSadTab:
       return std::u16string();
   }
@@ -405,7 +406,8 @@ std::optional<ui::ImageModel> GetIconImageModelFromIcon(Suggestion::Icon icon) {
                                           : vector_icons::kHomeOldIcon,
                                       kIconSize);
     case Suggestion::Icon::kSpark:
-      return ImageModelFromVectorIcon(omnibox::kSparkIcon, kIconSize);
+    case Suggestion::Icon::kTextSpark:
+      return ImageModelFromVectorIcon(kTextAnalysisIcon, kIconSize);
     case Suggestion::Icon::kWork:
       return ImageModelFromVectorIcon(::features::IsRoundedIconsEnabled()
                                           ? vector_icons::kWorkIcon

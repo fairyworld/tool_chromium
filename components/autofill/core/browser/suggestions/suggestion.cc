@@ -149,6 +149,8 @@ std::string_view ConvertIconToPrintableString(Suggestion::Icon icon) {
       return "kShipmentSpark";
     case Suggestion::Icon::kSpark:
       return "kSpark";
+    case Suggestion::Icon::kTextSpark:
+      return "kTextSpark";
     case Suggestion::Icon::kUndo:
       return "kUndo";
     case Suggestion::Icon::kVehicle:

@@ -396,6 +396,7 @@ struct Suggestion {
     kSettings,
     kShipment,
     kShipmentSpark,
+    kTextSpark,
     kUndo,
     kVehicle,
     kVehicleSpark,
