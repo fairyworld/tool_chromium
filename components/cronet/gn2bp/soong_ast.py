@@ -490,6 +490,25 @@ class JavaModule(Module):
         self.static_libs = set()
         self.min_sdk_version = None
 
+    def add_java_dependency(self, dep_module):
+        if self.java_unfiltered_module and dep_module.java_unfiltered_module:
+            # Soong does not bubble up `libs` dependencies, so we have to
+            # recurse and collect all the transitive dependencies ourselves. This
+            # is not necessary when using `static_libs` as Soong does that for us
+            # at build time.
+            #
+            # (You may wonder: "wait, doesn't Chromium already enforce that a
+            # Java target list all the classes it refers to in its direct
+            # dependencies? Why do we need to pull indirect dependencies then?"
+            # Well the problem is javac needs to see some of the indirect
+            # dependencies in some cases - see
+            # https://crbug.com/400952169#comment4 - which means the direct
+            # dependencies may not be enough.)
+            self.java_unfiltered_module.libs.add(
+                dep_module.java_unfiltered_module.name)
+            self.java_unfiltered_module.libs.update(
+                dep_module.java_unfiltered_module.libs)
+
 
 class RustModule(Module):
     SUPPORTED_FIELDS = {

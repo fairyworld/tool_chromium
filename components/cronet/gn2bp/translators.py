@@ -1790,21 +1790,7 @@ def create_modules_from_target(blueprint, gn, gn_target_name, parent_gn_type,
                     # unfiltered target when the flag is true on the dependency.
                     #
                     # For even more more background, see https://crbug.com/397396295.
-                    module_target.java_unfiltered_module.libs.add(
-                        dep_module.java_unfiltered_module.name)
-                    # As mentioned above, `libs` does not bubble up, so we have to
-                    # recurse and collect all the transitive dependencies ourselves. This
-                    # is not necessary when using `static_libs` as Soong does that for us
-                    # at build time.
-                    #
-                    # (You may wonder: "wait, doesn't Chromium already enforce that a Java
-                    # target list all the classes it refers to in its direct dependencies?
-                    # Why do we need to pull indirect dependencies then?" Well the problem
-                    # is javac needs to see some of the indirect dependencies in some
-                    # cases - see https://crbug.com/400952169#comment4 - which means the
-                    # direct dependencies may not be enough.)
-                    module_target.java_unfiltered_module.libs.update(
-                        dep_module.java_unfiltered_module.libs)
+                    module_target.add_java_dependency(dep_module)
                 elif dep_module.type in ['genrule', 'java_genrule']:
                     if dep_module.jni_zero_target_type == soong_ast.JniZeroTargetType.GENERATOR:
                         # TODO: we are special-casing jni_zero here. Ideally this should be
