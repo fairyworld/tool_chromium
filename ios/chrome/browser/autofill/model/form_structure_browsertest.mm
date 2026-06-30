@@ -13,7 +13,6 @@
 #import "base/files/file_path.h"
 #import "base/files/file_util.h"
 #import "base/memory/ptr_util.h"
-#import "base/no_destructor.h"
 #import "base/path_service.h"
 #import "base/strings/strcat.h"
 #import "base/strings/string_util.h"
@@ -23,7 +22,6 @@
 #import "base/task/thread_pool/thread_pool_instance.h"
 #import "base/test/ios/wait_util.h"
 #import "base/test/scoped_feature_list.h"
-#import "base/threading/thread_restrictions.h"
 #import "base/time/time.h"
 #import "base/time/time_override.h"
 #import "components/autofill/core/browser/foundations/autofill_manager_test_api.h"
@@ -107,39 +105,21 @@ base::FilePath GetIOSOutputDirectory() {
 }
 #endif
 
-const std::vector<base::FilePath>& GetTestFiles() {
-  static const base::NoDestructor<std::vector<base::FilePath>> files([] {
-    base::ScopedAllowBlockingForTesting allow_blocking;
-    base::FilePath dir(GetIOSInputDirectory());
-    std::string input_list_string;
-    if (!base::ReadFileToString(dir.AppendASCII("autofill_test_files"),
-                                &input_list_string)) {
-      return std::vector<base::FilePath>{};
-    }
-    std::vector<base::FilePath> result;
-    for (std::string_view piece :
-         base::SplitStringPiece(input_list_string, "\n", base::TRIM_WHITESPACE,
-                                base::SPLIT_WANT_NONEMPTY)) {
-      result.push_back(dir.AppendASCII(piece));
-    }
-    return result;
-  }());
-  return *files;
+const std::vector<base::FilePath> GetTestFiles() {
+  base::FilePath dir(GetIOSInputDirectory());
+  std::string input_list_string;
+  if (!base::ReadFileToString(dir.AppendASCII("autofill_test_files"),
+                              &input_list_string)) {
+    return {};
+  }
+  std::vector<base::FilePath> result;
+  for (std::string_view piece :
+       base::SplitStringPiece(input_list_string, "\n", base::TRIM_WHITESPACE,
+                              base::SPLIT_WANT_NONEMPTY)) {
+    result.push_back(dir.AppendASCII(piece));
+  }
+  return result;
 }
-
-#if !BUILDFLAG(USE_INTERNAL_AUTOFILL_PATTERNS)
-constexpr int kMaxFilesInShard = 20;
-
-int GetNumShards() {
-  const size_t num_files = GetTestFiles().size();
-  return std::max(1, static_cast<int>((num_files + kMaxFilesInShard - 1) /
-                                      kMaxFilesInShard));
-}
-#else   // !BUILDFLAG(USE_INTERNAL_AUTOFILL_PATTERNS)
-int GetNumShards() {
-  return 1;
-}
-#endif  // !BUILDFLAG(USE_INTERNAL_AUTOFILL_PATTERNS)
 
 }  // namespace
 
@@ -148,9 +128,10 @@ int GetNumShards() {
 // heuristically detected type for each field.
 // This is based on FormStructureBrowserTest from the Chromium Project.
 // TODO(crbug.com/41015125): Unify the tests.
-class FormStructureBrowserTest : public PlatformTest,
-                                 public testing::DataDrivenTest,
-                                 public testing::WithParamInterface<int> {
+class FormStructureBrowserTest
+    : public PlatformTest,
+      public testing::DataDrivenTest,
+      public testing::WithParamInterface<base::FilePath> {
  public:
   FormStructureBrowserTest(const FormStructureBrowserTest&) = delete;
   FormStructureBrowserTest& operator=(const FormStructureBrowserTest&) = delete;
@@ -435,21 +416,14 @@ TEST_P(FormStructureBrowserTest, DataDrivenHeuristics) {
   GTEST_SKIP() << "DataDrivenHeuristics tests are only supported with legacy "
                   "parsing patterns";
 #else
-  const int shard = GetParam();
-  const int num_shards = GetNumShards();
-  const std::vector<base::FilePath>& files = GetTestFiles();
-  for (size_t i = shard; i < files.size(); i += num_shards) {
-    const base::FilePath& file = files[i];
-    SCOPED_TRACE("Running " + file.MaybeAsASCII());
-    const bool is_expected_to_pass =
-        !IsFailingTestName(file.BaseName().value());
-    RunOneDataDrivenTest(file, GetIOSOutputDirectory(), is_expected_to_pass);
-  }
+  bool is_expected_to_pass = !IsFailingTestName(GetParam().BaseName().value());
+  RunOneDataDrivenTest(GetParam(), GetIOSOutputDirectory(),
+                       is_expected_to_pass);
 #endif
 }
 
 INSTANTIATE_TEST_SUITE_P(AllForms,
                          FormStructureBrowserTest,
-                         testing::Range(0, GetNumShards()));
+                         testing::ValuesIn(GetTestFiles()));
 
 }  // namespace autofill
