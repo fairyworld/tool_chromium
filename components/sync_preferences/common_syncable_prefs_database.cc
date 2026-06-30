@@ -158,7 +158,7 @@ enum {
   kCrossDeviceTipsHomeModuleEnabled = 107,
   kCrossDeviceMagicStackHomeModuleEnabled = 108,
   kShowAiModeOmniboxButton = 109,
-  kAutofillAiSyncedOptInStatus = 110,
+  // kAutofillAiSyncedOptInStatus = 110, (deprecated)
   kIOSPromoReminder = 111,
   kAutofillAiReauthBeforeViewingSensitiveData = 112,
   kDriveDisclaimerAccepted = 113,
@@ -212,9 +212,6 @@ constexpr auto kCommonSyncablePrefsAllowlist =
          {syncable_prefs_ids::kAutofillAiReauthBeforeViewingSensitiveData,
           syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
 #endif
-        {autofill::prefs::kAutofillAiSyncedOptInStatus,
-         {syncable_prefs_ids::kAutofillAiSyncedOptInStatus, syncer::PREFERENCES,
-          PrefSensitivity::kNone, MergeBehavior::kNone}},
         {autofill::prefs::kAutofillProfileEnabled,
          {syncable_prefs_ids::kAutofillProfileEnabled, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},

@@ -381,7 +381,7 @@ chromium-metrics-reviews@google.com.
   <int value="107" label="CrossDeviceTipsHomeModuleEnabled"/>
   <int value="108" label="CrossDeviceMagicStackHomeModuleEnabled"/>
   <int value="109" label="ShowAiModeOmniboxButton"/>
-  <int value="110" label="AutofillAiSyncedOptInStatus"/>
+  <int value="110" label="(obsolete) AutofillAiSyncedOptInStatus"/>
   <int value="111" label="iOSPromoReminder"/>
   <int value="112" label="AutofillAiReauthBeforeViewingSensitiveData"/>
   <int value="113" label="DriveDisclaimerAccepted"/>
