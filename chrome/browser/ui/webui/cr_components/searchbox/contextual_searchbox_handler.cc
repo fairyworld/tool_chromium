@@ -237,6 +237,9 @@ void ContextualSearchboxHandler::GetRecentTabs(GetRecentTabsCallback callback) {
       active_tab_interface ? active_tab_interface->GetContents() : nullptr;
   for (tabs::TabInterface* tab : tab_list->GetAllTabs()) {
     content::WebContents* web_contents = tab->GetContents();
+    if (!web_contents) {
+      continue;
+    }
     const GURL& url = web_contents->GetLastCommittedURL();
     if (!url.is_valid()) {
       continue;
