@@ -689,13 +689,6 @@ BASE_FEATURE(kAutofillIgnoreCheckableElements,
              base::FEATURE_ENABLED_BY_DEFAULT);
 // LINT.ThenChange(//components/autofill/ios/form_util/resources/autofill_form_features.ts:autofill_ignore_checkable_elements)
 
-// When enabled, address field swapping suggestions will not include a
-// suggestion matching the field's current value. This decreases noises in the
-// suggestion UI.
-// TODO(crbug.com/381531027): Remove when launched.
-BASE_FEATURE(kAutofillImproveAddressFieldSwapping,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // When enabled, a new grammar for phone numbers is considered and we get
 // slightly better at detecting cases where the generic regex for
 // PHONE_COUNTRY_CODE matches a field that should not actually be classified as
