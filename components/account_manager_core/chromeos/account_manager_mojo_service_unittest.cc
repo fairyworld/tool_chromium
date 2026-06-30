@@ -87,13 +87,6 @@ class TestAccountManagerObserver
     return last_removed_account_.value();
   }
 
-  int GetNumAuthErrors() const { return num_auth_errors_; }
-
-  std::pair<account_manager::AccountKey, GoogleServiceAuthError>
-  GetLastAuthErrorInfo() {
-    return std::make_pair(last_err_account_.value(), last_error_.value());
-  }
-
   int GetNumSigninDialogClosedNotifications() const {
     return num_signin_dialog_closed_notifications_;
   }
@@ -115,26 +108,15 @@ class TestAccountManagerObserver
   }
 
   // mojom::AccountManagerObserverInterceptorForTesting override:
-  void OnAuthErrorChanged(mojom::AccountKeyPtr account,
-                          mojom::GoogleServiceAuthErrorPtr error) override {
-    ++num_auth_errors_;
-    last_err_account_ = account_manager::FromMojoAccountKey(account);
-    last_error_ = account_manager::FromMojoGoogleServiceAuthError(error);
-  }
-
-  // mojom::AccountManagerObserverInterceptorForTesting override:
   void OnSigninDialogClosed() override {
     ++num_signin_dialog_closed_notifications_;
   }
 
   int num_token_upserted_calls_ = 0;
   int num_account_removed_calls_ = 0;
-  int num_auth_errors_ = 0;
   int num_signin_dialog_closed_notifications_ = 0;
   std::optional<account_manager::Account> last_upserted_account_;
   std::optional<account_manager::Account> last_removed_account_;
-  std::optional<account_manager::AccountKey> last_err_account_;
-  std::optional<GoogleServiceAuthError> last_error_;
   mojo::Receiver<mojom::AccountManagerObserver> receiver_;
 };
 
@@ -276,20 +258,6 @@ class AccountManagerMojoServiceTest : public ::testing::Test {
                                          net::HTTP_OK);
   }
 
-  void ReportAuthError(const account_manager::AccountKey& account_key,
-                       const GoogleServiceAuthError& error) {
-    account_manager_mojo_service_->ReportAuthError(
-        account_manager::ToMojoAccountKey(account_key),
-        account_manager::ToMojoGoogleServiceAuthError(error));
-  }
-
-  void ReportAuthError(crosapi::mojom::AccountKeyPtr account_key_ptr,
-                       const GoogleServiceAuthError& error) {
-    account_manager_mojo_service_->ReportAuthError(
-        std::move(account_key_ptr),
-        account_manager::ToMojoGoogleServiceAuthError(error));
-  }
-
   int GetNumObservers() const {
     return account_manager_mojo_service_->observers_.size();
   }
@@ -306,7 +274,6 @@ class AccountManagerMojoServiceTest : public ::testing::Test {
 
  private:
   base::test::SingleThreadTaskEnvironment task_environment_;
-
   network::TestURLLoaderFactory test_url_loader_factory_;
   TestingPrefServiceSimple pref_service_;
   AccountManagerSpy account_manager_;
@@ -702,81 +669,6 @@ TEST_F(AccountManagerMojoServiceTest, FetchAccessToken) {
   // Check that requests are not leaking.
   RunAllPendingTasks();
   EXPECT_EQ(0, GetNumPendingAccessTokenRequests());
-}
-
-TEST_F(AccountManagerMojoServiceTest,
-       ObserversAreNotifiedOnAccountErrorUpdates) {
-  // Set up observer.
-  const account_manager::AccountKey kTestAccountKey =
-      account_manager::AccountKey::FromGaiaId(kFakeGaiaId);
-  ASSERT_TRUE(InitializeAccountManager());
-  TestAccountManagerObserver observer;
-  observer.Observe(account_manager_async_waiter());
-  ASSERT_EQ(1, GetNumObservers());
-  account_manager()->UpsertAccount(kTestAccountKey, kFakeEmail, kFakeToken);
-  FlushMojoForTesting();
-
-  // Report an error.
-  EXPECT_EQ(0, observer.GetNumAuthErrors());
-  const GoogleServiceAuthError error =
-      GoogleServiceAuthError::FromInvalidGaiaCredentialsReason(
-          GoogleServiceAuthError::InvalidGaiaCredentialsReason::
-              CREDENTIALS_REJECTED_BY_SERVER);
-  ReportAuthError(kTestAccountKey, error);
-  FlushMojoForTesting();
-
-  // Test.
-  ASSERT_EQ(1, observer.GetNumAuthErrors());
-  std::pair<account_manager::AccountKey, GoogleServiceAuthError> error_info =
-      observer.GetLastAuthErrorInfo();
-  EXPECT_EQ(kTestAccountKey, error_info.first);
-  EXPECT_EQ(error, error_info.second);
-}
-
-TEST_F(AccountManagerMojoServiceTest,
-       ObserversAreNotNotifiedOnTransientAccountErrorUpdates) {
-  // Set up observer.
-  const account_manager::AccountKey kTestAccountKey =
-      account_manager::AccountKey::FromGaiaId(kFakeGaiaId);
-  ASSERT_TRUE(InitializeAccountManager());
-  TestAccountManagerObserver observer;
-  observer.Observe(account_manager_async_waiter());
-  ASSERT_EQ(1, GetNumObservers());
-  account_manager()->UpsertAccount(kTestAccountKey, kFakeEmail, kFakeToken);
-  FlushMojoForTesting();
-
-  // Report an error.
-  EXPECT_EQ(0, observer.GetNumAuthErrors());
-  const GoogleServiceAuthError error =
-      GoogleServiceAuthError::FromServiceUnavailable("Service Unavailable");
-  ASSERT_TRUE(error.IsTransientError());
-  ReportAuthError(kTestAccountKey, error);
-  FlushMojoForTesting();
-
-  // Transient errors should not be reported.
-  EXPECT_EQ(0, observer.GetNumAuthErrors());
-}
-
-// Regression test for http://b/266465922
-TEST_F(AccountManagerMojoServiceTest,
-       ReportAuthErrorGracefullyHandlesInvalidAccountIds) {
-  // Set up observer.
-  ASSERT_TRUE(InitializeAccountManager());
-  TestAccountManagerObserver observer;
-  observer.Observe(account_manager_async_waiter());
-  ASSERT_EQ(1, GetNumObservers());
-
-  EXPECT_EQ(0, observer.GetNumAuthErrors());
-  const GoogleServiceAuthError error =
-      GoogleServiceAuthError::FromInvalidGaiaCredentialsReason(
-          GoogleServiceAuthError::InvalidGaiaCredentialsReason::
-              CREDENTIALS_REJECTED_BY_SERVER);
-  // Report an error for an invalid (empty) account.
-  ReportAuthError(crosapi::mojom::AccountKey::New(), error);
-  FlushMojoForTesting();
-
-  // No error should be reported and we should not crash.
-  EXPECT_EQ(0, observer.GetNumAuthErrors());
 }
 
 TEST_F(AccountManagerMojoServiceTest,

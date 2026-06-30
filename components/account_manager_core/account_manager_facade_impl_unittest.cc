@@ -184,14 +184,6 @@ class FakeAccountManager : public crosapi::mojom::AccountManager {
     std::move(callback).Run(std::move(pending_remote));
   }
 
-  void ReportAuthError(
-      crosapi::mojom::AccountKeyPtr account,
-      crosapi::mojom::GoogleServiceAuthErrorPtr error) override {
-    for (auto& observer : observers_) {
-      observer->OnAuthErrorChanged(account->Clone(), error->Clone());
-    }
-  }
-
   mojo::Remote<crosapi::mojom::AccountManager> CreateRemote() {
     mojo::Remote<crosapi::mojom::AccountManager> remote;
     receivers_.Add(this, remote.BindNewPipeAndPassReceiver());
@@ -664,6 +656,26 @@ TEST_F(AccountManagerFacadeImplTest, ReportAuthError) {
       .WillOnce(base::test::RunOnceClosure(future.GetCallback()));
   account_manager_facade->ReportAuthError(account.key, error);
   EXPECT_TRUE(future.Wait());
+}
+
+TEST_F(AccountManagerFacadeImplTest, ReportAuthErrorIgnoresTransientErrors) {
+  std::unique_ptr<AccountManagerFacadeImpl> account_manager_facade =
+      CreateFacade();
+  testing::StrictMock<MockAccountManagerFacadeObserver> observer;
+  base::ScopedObservation<AccountManagerFacade, AccountManagerFacade::Observer>
+      observation{&observer};
+  observation.Observe(account_manager_facade.get());
+
+  Account account = CreateTestGaiaAccount(kTestAccountEmail);
+  for (auto state : {GoogleServiceAuthError::CONNECTION_FAILED,
+                     GoogleServiceAuthError::SERVICE_UNAVAILABLE,
+                     GoogleServiceAuthError::REQUEST_CANCELED,
+                     GoogleServiceAuthError::CHALLENGE_RESPONSE_REQUIRED}) {
+    GoogleServiceAuthError error(state);
+    ASSERT_TRUE(error.IsTransientError());
+    // `observer` is a StrictMock; test will fail if any method is called.
+    account_manager_facade->ReportAuthError(account.key, error);
+  }
 }
 
 TEST_F(AccountManagerFacadeImplTest,

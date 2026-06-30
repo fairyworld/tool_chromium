@@ -81,8 +81,6 @@ class COMPONENT_EXPORT(ACCOUNT_MANAGER_CORE) AccountManagerMojoService
       mojom::AccountKeyPtr mojo_account_key,
       const std::string& oauth_consumer_name,
       CreateAccessTokenFetcherCallback callback) override;
-  void ReportAuthError(mojom::AccountKeyPtr account,
-                       mojom::GoogleServiceAuthErrorPtr error) override;
 
   // account_manager::AccountManager::Observer:
   void OnTokenUpserted(const account_manager::Account& account) override;
@@ -100,14 +98,6 @@ class COMPONENT_EXPORT(ACCOUNT_MANAGER_CORE) AccountManagerMojoService
       const account_manager::AccountUpsertionResult& result);
   // Deletes `request` from `pending_access_token_requests_`, if present.
   void DeletePendingAccessTokenFetchRequest(AccessTokenFetcher* request);
-
-  // Notifies observers about a change in the error status of `account_key`.
-  // Does nothing if `account_key` does not correspond to any account in
-  // `known_accounts`.
-  void MaybeNotifyAuthErrorObservers(
-      const account_manager::AccountKey& account_key,
-      const GoogleServiceAuthError& error,
-      const std::vector<account_manager::Account>& known_accounts);
 
   // Notifies observers that the account addition / re-authentication dialog was
   // closed (either successfully, or the user cancelled the flow).
