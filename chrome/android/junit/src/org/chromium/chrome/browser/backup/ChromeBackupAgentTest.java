@@ -1115,7 +1115,7 @@ public class ChromeBackupAgentTest {
             boolean permittedByUser,
             boolean permittedByPolicy,
             int level,
-            boolean levelDisabledByPolicy)
+            boolean levelEnforcedByPolicy)
             throws IOException {
         BackupDataInput backupData = mock(BackupDataInput.class);
         ArrayList<Pair<String, byte[]>> keysAndValues = new ArrayList<>();
@@ -1139,7 +1139,7 @@ public class ChromeBackupAgentTest {
         keysAndValues.add(
                 booleanPrefPair(
                         ChromePreferenceKeys.PRIVACY_METRICS_REPORTING_DISABLED_BY_POLICY,
-                        levelDisabledByPolicy));
+                        levelEnforcedByPolicy));
 
         when(backupData.getKey())
                 .thenAnswer(
@@ -1201,7 +1201,7 @@ public class ChromeBackupAgentTest {
                         /* permittedByUser= */ false,
                         /* permittedByPolicy= */ false,
                         /* level= */ MetricsReportingLevel.BASIC,
-                        /* levelDisabledByPolicy= */ false);
+                        /* levelEnforcedByPolicy= */ false);
 
         try (ParcelFileDescriptor newState =
                 ParcelFileDescriptor.open(
@@ -1225,7 +1225,7 @@ public class ChromeBackupAgentTest {
                         /* permittedByUser= */ false,
                         /* permittedByPolicy= */ false,
                         /* level= */ MetricsReportingLevel.ADVANCED,
-                        /* levelDisabledByPolicy= */ false);
+                        /* levelEnforcedByPolicy= */ false);
 
         try (ParcelFileDescriptor newState =
                 ParcelFileDescriptor.open(
@@ -1249,7 +1249,7 @@ public class ChromeBackupAgentTest {
                         /* permittedByUser= */ false,
                         /* permittedByPolicy= */ false,
                         /* level= */ MetricsReportingLevel.NONE,
-                        /* levelDisabledByPolicy= */ true);
+                        /* levelEnforcedByPolicy= */ true);
 
         try (ParcelFileDescriptor newState =
                 ParcelFileDescriptor.open(
@@ -1271,7 +1271,7 @@ public class ChromeBackupAgentTest {
                         /* permittedByUser= */ true,
                         /* permittedByPolicy= */ true,
                         /* level= */ MetricsReportingLevel.NONE,
-                        /* levelDisabledByPolicy= */ false);
+                        /* levelEnforcedByPolicy= */ false);
 
         try (ParcelFileDescriptor newState =
                 ParcelFileDescriptor.open(
