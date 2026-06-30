@@ -151,11 +151,10 @@ void HatsServiceDesktop::DelayedSurveyTask::Launch() {
                          ? browser_interface->GetBrowserForMigrationOnly()
                          : nullptr;
 
-  LaunchError error = hats_service_->ShowSurvey(
+  hats_service_->ShowSurvey(
       browser, trigger_, std::move(success_callback_),
       std::move(failure_callback_), product_specific_bits_data_,
       product_specific_string_data_, supplied_trigger_id_);
-  std::ignore = error;
 
   hats_service_->RemoveTask(*this);
 }
@@ -438,10 +437,10 @@ bool HatsServiceDesktop::HasPendingTasks() {
 }
 
 bool HatsServiceDesktop::CanShowSurvey(const std::string& trigger) const {
-  return GetCommonLaunchError(trigger) == LaunchError::kNone;
+  return RunCommonLaunchChecks(trigger) == LaunchError::kNone;
 }
 
-HatsService::LaunchError HatsServiceDesktop::GetCommonLaunchError(
+HatsService::LaunchError HatsServiceDesktop::RunCommonLaunchChecks(
     const std::string& trigger) const {
   // Survey should not be loaded if the corresponding survey config is
   // unavailable.
@@ -648,10 +647,10 @@ void HatsServiceDesktop::RemoveTask(const DelayedSurveyTask& task) {
   pending_tasks_.erase(task);
 }
 
-HatsService::LaunchError HatsServiceDesktop::GetLaunchError(
+HatsService::LaunchError HatsServiceDesktop::RunLaunchChecks(
     Browser* browser,
     const std::string& trigger) const {
-  LaunchError error = GetCommonLaunchError(trigger);
+  LaunchError error = RunCommonLaunchChecks(trigger);
   if (error != LaunchError::kNone) {
     return error;
   }
@@ -714,7 +713,7 @@ HatsService::LaunchError HatsServiceDesktop::ShowSurvey(
     const SurveyBitsData& product_specific_bits_data,
     const SurveyStringData& product_specific_string_data,
     const std::optional<std::string_view>& supplied_trigger_id) {
-  LaunchError error = GetLaunchError(browser, trigger);
+  LaunchError error = RunLaunchChecks(browser, trigger);
   if (error != LaunchError::kNone) {
     if (!failure_callback.is_null()) {
       std::move(failure_callback).Run();
