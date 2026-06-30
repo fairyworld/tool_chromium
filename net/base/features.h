@@ -881,13 +881,6 @@ NET_EXPORT BASE_DECLARE_FEATURE(kPermitTcpSocketPoolConnectBackupJobs);
 // permission.
 NET_EXPORT BASE_DECLARE_FEATURE(kLocalNetworkPermissionCheck);
 
-// Whether or not this client is participating in the TCP connection pool proxy
-// limit and, if so, what the limit should be.
-// See crbug.com/467278609 to track efforts to raise defaults.
-NET_EXPORT BASE_DECLARE_FEATURE(kTcpSocketPoolProxyLimit);
-NET_EXPORT BASE_DECLARE_FEATURE_PARAM(int, kTcpSocketPoolProxyLimitNormal);
-NET_EXPORT BASE_DECLARE_FEATURE_PARAM(int, kTcpSocketPoolProxyLimitWebSocket);
-
 // If enabled, QuicCryptoClientConfigOwner will ignore memory pressure events
 // for all network isolation partitions.
 NET_EXPORT BASE_DECLARE_FEATURE(kIgnoreQuicCryptoConfigMemoryPressure);
