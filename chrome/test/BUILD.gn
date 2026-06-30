@@ -1290,6 +1290,7 @@ source_set("platform_browser_tests") {
     "//chrome/browser/browsing_data:constants",
     "//chrome/browser/browsing_data:platform_browser_tests",
     "//chrome/browser/content_settings:content_settings_factory",
+    "//chrome/browser/enterprise/net:platform_browser_tests",
     "//chrome/browser/gcm",
     "//chrome/browser/glic/test_support",
     "//chrome/browser/history",
@@ -1443,15 +1444,6 @@ source_set("platform_browser_tests") {
     deps += [ "//chrome/browser/download/bubble" ]
   }
 
-  if (is_win || is_linux || is_mac || is_android || is_chromeos) {
-    sources +=
-        [ "../browser/enterprise/net/proxy_override_rules_browsertest.cc" ]
-    deps += [
-      "//chrome/browser/enterprise/test:test_support",
-      "//components/proxy_config",
-    ]
-  }
-
   if (is_win || is_linux || is_mac || is_android) {
     sources +=
         [ "../browser/enterprise/reporting/security_reporting_browsertest.cc" ]
@@ -1579,9 +1571,8 @@ source_set("platform_browser_tests") {
   # exist on ChromeOS even though enterprise_client_certificates is enabled
   # there.
   if (enterprise_client_certificates && !is_chromeos) {
-    sources += [ "../browser/enterprise/client_certificates/client_certificates_browsertest.cc" ]
-
     deps += [
+      "//chrome/browser/enterprise/client_certificates:platform_browser_tests",
       "//chrome/browser/enterprise/test:test_support",
       "//components/enterprise",
       "//components/enterprise/client_certificates/core:test_support",
@@ -2329,10 +2320,12 @@ if (!is_android) {
       "//chrome/browser/download:test_support",
       "//chrome/browser/engagement:browser_tests",
       "//chrome/browser/enterprise:browser_tests",
+      "//chrome/browser/enterprise/browser_management:browser_tests",
       "//chrome/browser/enterprise/browser_management:management_identity",
       "//chrome/browser/enterprise/connectors/test:test_support",
       "//chrome/browser/enterprise/data_protection:data_protection_view_lib",
       "//chrome/browser/enterprise/incognito",
+      "//chrome/browser/enterprise/incognito:browser_tests",
       "//chrome/browser/enterprise/signals:browser_tests",
       "//chrome/browser/enterprise/watermark:browser_tests",
       "//chrome/browser/error_reporting:browser_tests",
@@ -3240,8 +3233,6 @@ if (!is_android) {
       "../browser/ai/ai_data_keyed_service_browsertest.cc",
       "../browser/ai/ai_semantic_embedder_browsertest.cc",
       "../browser/direct_sockets/direct_sockets_apitest.cc",
-      "../browser/enterprise/browser_management/management_service_browsertest.cc",
-      "../browser/enterprise/incognito/incognito_navigation_throttle_browsertest.cc",
       "../browser/enterprise/reporting/extension_request/extension_request_notification_browsertest.cc",
       "../browser/enterprise/reporting/extension_request/extension_request_observer_browsertest.cc",
       "../browser/media/audio_ducker_browsertest.cc",
@@ -5806,6 +5797,7 @@ test("unit_tests") {
     "//chrome/browser/engagement",
     "//chrome/browser/engagement:unit_tests",
     "//chrome/browser/enterprise:unit_tests",
+    "//chrome/browser/enterprise/core:unit_tests",
     "//chrome/browser/enterprise/data_protection:unit_tests",
     "//chrome/browser/enterprise/encryption:unit_tests",
     "//chrome/browser/enterprise/identifiers:unit_tests",
@@ -8445,7 +8437,6 @@ test("unit_tests") {
       "../browser/enterprise/connectors/device_trust/attestation/browser/browser_attestation_service_unittest.cc",
       "../browser/enterprise/connectors/device_trust/attestation/browser/device_attester_unittest.cc",
       "../browser/enterprise/connectors/device_trust/attestation/browser/profile_attester_unittest.cc",
-      "../browser/enterprise/core/dependency_factory_impl_unittest.cc",
       "../browser/enterprise/signin/managed_profile_creator_unittest.cc",
       "../browser/enterprise/signin/oidc_managed_profile_creation_delegate_unittest.cc",
       "../browser/enterprise/signin/token_managed_profile_creation_delegate_unittest.cc",
