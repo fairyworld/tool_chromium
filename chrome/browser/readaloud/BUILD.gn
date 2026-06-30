@@ -12,6 +12,7 @@ if (is_android) {
     public_deps = [
       "//base",
       "//chrome/browser/profiles:profile",
+      "//chrome/common:mojo_bindings",
       "//components/dom_distiller/core",
       "//components/keyed_service/core",
       "//content/public/browser",
@@ -28,6 +29,7 @@ if (is_android) {
       ":readaloud",
       "//chrome/browser/dom_distiller",
       "//components/dom_distiller/content/browser",
+      "//content/public/browser",
       "//ui/accessibility:ax_base",
     ]
   }
