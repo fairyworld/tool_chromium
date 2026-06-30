@@ -54,8 +54,9 @@ namespace autofill {
 
 namespace {
 
-SuggestionType GetManageSuggestionType(
-    accessibility_annotator::MemoryDataType type) {
+using MemoryDataType = accessibility_annotator::MemoryDataType;
+
+SuggestionType GetManageSuggestionType(MemoryDataType type) {
   std::optional<AtMemoryDataType> data_type = ToAtMemoryDataType(type);
   if (data_type) {
     if (const auto* field_type = std::get_if<FieldType>(&*data_type)) {
@@ -93,14 +94,14 @@ std::u16string GetSourceDescriptionText(
 }
 
 Suggestion::AtMemoryPayload::Identifier GetPayloadIdentifier(
-    accessibility_annotator::MemoryDataType type,
+    MemoryDataType type,
     const std::variant<std::monostate, std::string, int64_t>& identifier) {
   if (std::holds_alternative<std::monostate>(identifier)) {
     return std::monostate();
   }
 
   switch (type) {
-    case accessibility_annotator::MemoryDataType::kIban: {
+    case MemoryDataType::kIban: {
       if (const std::string* guid = std::get_if<std::string>(&identifier)) {
         return Iban::Guid(*guid);
       }
@@ -109,21 +110,21 @@ Suggestion::AtMemoryPayload::Identifier GetPayloadIdentifier(
       }
       NOTREACHED();
     }
-    case accessibility_annotator::MemoryDataType::kCreditCardNumber:
-    case accessibility_annotator::MemoryDataType::kCreditCardSecurityCode: {
+    case MemoryDataType::kCreditCardNumber:
+    case MemoryDataType::kCreditCardSecurityCode: {
       CHECK(std::holds_alternative<std::string>(identifier));
       return *std::get_if<std::string>(&identifier);
     }
-    case accessibility_annotator::MemoryDataType::kPassportFull:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseFull:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardFull:
-    case accessibility_annotator::MemoryDataType::kKnownTravelerNumberFull:
-    case accessibility_annotator::MemoryDataType::kRedressNumberFull:
-    case accessibility_annotator::MemoryDataType::kPassportNumber:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseNumber:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardNumber:
-    case accessibility_annotator::MemoryDataType::kKnownTravelerNumberNumber:
-    case accessibility_annotator::MemoryDataType::kRedressNumberNumber: {
+    case MemoryDataType::kPassportFull:
+    case MemoryDataType::kDriversLicenseFull:
+    case MemoryDataType::kNationalIdCardFull:
+    case MemoryDataType::kKnownTravelerNumberFull:
+    case MemoryDataType::kRedressNumberFull:
+    case MemoryDataType::kPassportNumber:
+    case MemoryDataType::kDriversLicenseNumber:
+    case MemoryDataType::kNationalIdCardNumber:
+    case MemoryDataType::kKnownTravelerNumberNumber:
+    case MemoryDataType::kRedressNumberNumber: {
       CHECK(std::holds_alternative<std::string>(identifier));
       return EntityInstance::EntityId(*std::get_if<std::string>(&identifier));
     }
@@ -132,105 +133,95 @@ Suggestion::AtMemoryPayload::Identifier GetPayloadIdentifier(
   }
 }
 
-Suggestion::Icon GetIconForMemoryDataType(
-    accessibility_annotator::MemoryDataType type) {
+Suggestion::Icon GetIconForMemoryDataType(MemoryDataType type) {
   switch (type) {
-    case accessibility_annotator::MemoryDataType::kNameFull:
-    case accessibility_annotator::MemoryDataType::kAddressFull:
-    case accessibility_annotator::MemoryDataType::kAddressStreetAddress:
-    case accessibility_annotator::MemoryDataType::kAddressCity:
-    case accessibility_annotator::MemoryDataType::kAddressState:
-    case accessibility_annotator::MemoryDataType::kAddressZip:
-    case accessibility_annotator::MemoryDataType::kAddressCountry:
-    case accessibility_annotator::MemoryDataType::kPhone:
-    case accessibility_annotator::MemoryDataType::kCompanyName:
+    case MemoryDataType::kNameFull:
+    case MemoryDataType::kAddressFull:
+    case MemoryDataType::kAddressStreetAddress:
+    case MemoryDataType::kAddressCity:
+    case MemoryDataType::kAddressState:
+    case MemoryDataType::kAddressZip:
+    case MemoryDataType::kAddressCountry:
+    case MemoryDataType::kPhone:
+    case MemoryDataType::kCompanyName:
       return Suggestion::Icon::kAccount;
-    case accessibility_annotator::MemoryDataType::kEmail:
+    case MemoryDataType::kEmail:
       return Suggestion::Icon::kEmail;
-    case accessibility_annotator::MemoryDataType::kIban:
-    case accessibility_annotator::MemoryDataType::kIbanNickname:
+    case MemoryDataType::kIban:
+    case MemoryDataType::kIbanNickname:
       return Suggestion::Icon::kIban;
-    case accessibility_annotator::MemoryDataType::kVehicle:
-    case accessibility_annotator::MemoryDataType::kVehicleMake:
-    case accessibility_annotator::MemoryDataType::kVehicleModel:
-    case accessibility_annotator::MemoryDataType::kVehicleYear:
-    case accessibility_annotator::MemoryDataType::kVehicleOwner:
-    case accessibility_annotator::MemoryDataType::kVehiclePlateNumber:
-    case accessibility_annotator::MemoryDataType::kVehiclePlateState:
-    case accessibility_annotator::MemoryDataType::kVehicleVin:
+    case MemoryDataType::kVehicle:
+    case MemoryDataType::kVehicleMake:
+    case MemoryDataType::kVehicleModel:
+    case MemoryDataType::kVehicleYear:
+    case MemoryDataType::kVehicleOwner:
+    case MemoryDataType::kVehiclePlateNumber:
+    case MemoryDataType::kVehiclePlateState:
+    case MemoryDataType::kVehicleVin:
       return Suggestion::Icon::kVehicle;
-    case accessibility_annotator::MemoryDataType::kPassportFull:
-    case accessibility_annotator::MemoryDataType::kPassportName:
-    case accessibility_annotator::MemoryDataType::kPassportCountry:
-    case accessibility_annotator::MemoryDataType::kPassportNumber:
-    case accessibility_annotator::MemoryDataType::kPassportIssueDate:
-    case accessibility_annotator::MemoryDataType::kPassportExpirationDate:
+    case MemoryDataType::kPassportFull:
+    case MemoryDataType::kPassportName:
+    case MemoryDataType::kPassportCountry:
+    case MemoryDataType::kPassportNumber:
+    case MemoryDataType::kPassportIssueDate:
+    case MemoryDataType::kPassportExpirationDate:
       return Suggestion::Icon::kPassport;
-    case accessibility_annotator::MemoryDataType::kFlightReservationFull:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationFlightNumber:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationTicketNumber:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationConfirmationCode:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationPassengerName:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationDepartureAirport:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationArrivalAirport:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationDepartureDate:
-    case accessibility_annotator::MemoryDataType::kFlightReservationArrivalDate:
+    case MemoryDataType::kFlightReservationFull:
+    case MemoryDataType::kFlightReservationFlightNumber:
+    case MemoryDataType::kFlightReservationTicketNumber:
+    case MemoryDataType::kFlightReservationConfirmationCode:
+    case MemoryDataType::kFlightReservationPassengerName:
+    case MemoryDataType::kFlightReservationDepartureAirport:
+    case MemoryDataType::kFlightReservationArrivalAirport:
+    case MemoryDataType::kFlightReservationDepartureDate:
+    case MemoryDataType::kFlightReservationArrivalDate:
       return Suggestion::Icon::kFlight;
-    case accessibility_annotator::MemoryDataType::kNationalIdCardFull:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardName:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardCountry:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardNumber:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardIssueDate:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardExpirationDate:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseFull:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseName:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseState:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseNumber:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseIssueDate:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseExpirationDate:
+    case MemoryDataType::kNationalIdCardFull:
+    case MemoryDataType::kNationalIdCardName:
+    case MemoryDataType::kNationalIdCardCountry:
+    case MemoryDataType::kNationalIdCardNumber:
+    case MemoryDataType::kNationalIdCardIssueDate:
+    case MemoryDataType::kNationalIdCardExpirationDate:
+    case MemoryDataType::kDriversLicenseFull:
+    case MemoryDataType::kDriversLicenseName:
+    case MemoryDataType::kDriversLicenseState:
+    case MemoryDataType::kDriversLicenseNumber:
+    case MemoryDataType::kDriversLicenseIssueDate:
+    case MemoryDataType::kDriversLicenseExpirationDate:
       return Suggestion::Icon::kIdCard;
-    case accessibility_annotator::MemoryDataType::kRedressNumberFull:
-    case accessibility_annotator::MemoryDataType::kRedressNumberName:
-    case accessibility_annotator::MemoryDataType::kRedressNumberNumber:
-    case accessibility_annotator::MemoryDataType::kKnownTravelerNumberFull:
-    case accessibility_annotator::MemoryDataType::kKnownTravelerNumberName:
-    case accessibility_annotator::MemoryDataType::kKnownTravelerNumberNumber:
-    case accessibility_annotator::MemoryDataType::
-        kKnownTravelerNumberExpirationDate:
+    case MemoryDataType::kRedressNumberFull:
+    case MemoryDataType::kRedressNumberName:
+    case MemoryDataType::kRedressNumberNumber:
+    case MemoryDataType::kKnownTravelerNumberFull:
+    case MemoryDataType::kKnownTravelerNumberName:
+    case MemoryDataType::kKnownTravelerNumberNumber:
+    case MemoryDataType::kKnownTravelerNumberExpirationDate:
       return Suggestion::Icon::kPersonCheck;
-    case accessibility_annotator::MemoryDataType::kCreditCardNumber:
-    case accessibility_annotator::MemoryDataType::kCreditCardExpirationDate:
-    case accessibility_annotator::MemoryDataType::kCreditCardSecurityCode:
-    case accessibility_annotator::MemoryDataType::kCreditCardNameOnCard:
-    case accessibility_annotator::MemoryDataType::kCreditCardNickname:
+    case MemoryDataType::kCreditCardNumber:
+    case MemoryDataType::kCreditCardExpirationDate:
+    case MemoryDataType::kCreditCardSecurityCode:
+    case MemoryDataType::kCreditCardNameOnCard:
+    case MemoryDataType::kCreditCardNickname:
       return Suggestion::Icon::kCardGeneric;
-    case accessibility_annotator::MemoryDataType::kOrderFull:
-    case accessibility_annotator::MemoryDataType::kOrderId:
-    case accessibility_annotator::MemoryDataType::kOrderAccount:
-    case accessibility_annotator::MemoryDataType::kOrderDate:
-    case accessibility_annotator::MemoryDataType::kOrderMerchantName:
-    case accessibility_annotator::MemoryDataType::kOrderMerchantDomain:
-    case accessibility_annotator::MemoryDataType::kOrderProductNames:
-    case accessibility_annotator::MemoryDataType::kOrderGrandTotal:
+    case MemoryDataType::kOrderFull:
+    case MemoryDataType::kOrderId:
+    case MemoryDataType::kOrderAccount:
+    case MemoryDataType::kOrderDate:
+    case MemoryDataType::kOrderMerchantName:
+    case MemoryDataType::kOrderMerchantDomain:
+    case MemoryDataType::kOrderProductNames:
+    case MemoryDataType::kOrderGrandTotal:
       return Suggestion::Icon::kOrder;
-    case accessibility_annotator::MemoryDataType::kShipmentFull:
-    case accessibility_annotator::MemoryDataType::kShipmentTrackingNumber:
-    case accessibility_annotator::MemoryDataType::kShipmentAssociatedOrderId:
-    case accessibility_annotator::MemoryDataType::kShipmentDeliveryAddress:
-    case accessibility_annotator::MemoryDataType::kShipmentDeliveryZipCode:
-    case accessibility_annotator::MemoryDataType::kShipmentCarrierName:
-    case accessibility_annotator::MemoryDataType::kShipmentCarrierDomain:
-    case accessibility_annotator::MemoryDataType::
-        kShipmentEstimatedDeliveryDate:
-    case accessibility_annotator::MemoryDataType::kShipmentShippedDate:
-    case accessibility_annotator::MemoryDataType::kUnknown:
+    case MemoryDataType::kShipmentFull:
+    case MemoryDataType::kShipmentTrackingNumber:
+    case MemoryDataType::kShipmentAssociatedOrderId:
+    case MemoryDataType::kShipmentDeliveryAddress:
+    case MemoryDataType::kShipmentDeliveryZipCode:
+    case MemoryDataType::kShipmentCarrierName:
+    case MemoryDataType::kShipmentCarrierDomain:
+    case MemoryDataType::kShipmentEstimatedDeliveryDate:
+    case MemoryDataType::kShipmentShippedDate:
+    case MemoryDataType::kUnknown:
       return Suggestion::Icon::kNoIcon;
   }
   return Suggestion::Icon::kNoIcon;
@@ -344,95 +335,86 @@ Suggestion TransformResultIntoSuggestion(
   return suggestion;
 }
 
-bool IsSpiiMemoryDataType(accessibility_annotator::MemoryDataType type) {
+bool IsSpiiMemoryDataType(MemoryDataType type) {
   switch (type) {
-    case accessibility_annotator::MemoryDataType::kIban:
-    case accessibility_annotator::MemoryDataType::kCreditCardNumber:
-    case accessibility_annotator::MemoryDataType::kCreditCardSecurityCode:
-    case accessibility_annotator::MemoryDataType::kPassportNumber:
-    case accessibility_annotator::MemoryDataType::kPassportFull:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardNumber:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardFull:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseNumber:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseFull:
-    case accessibility_annotator::MemoryDataType::kRedressNumberNumber:
-    case accessibility_annotator::MemoryDataType::kRedressNumberFull:
-    case accessibility_annotator::MemoryDataType::kKnownTravelerNumberFull:
-    case accessibility_annotator::MemoryDataType::kKnownTravelerNumberNumber:
+    case MemoryDataType::kIban:
+    case MemoryDataType::kCreditCardNumber:
+    case MemoryDataType::kCreditCardSecurityCode:
+    case MemoryDataType::kPassportNumber:
+    case MemoryDataType::kPassportFull:
+    case MemoryDataType::kNationalIdCardNumber:
+    case MemoryDataType::kNationalIdCardFull:
+    case MemoryDataType::kDriversLicenseNumber:
+    case MemoryDataType::kDriversLicenseFull:
+    case MemoryDataType::kRedressNumberNumber:
+    case MemoryDataType::kRedressNumberFull:
+    case MemoryDataType::kKnownTravelerNumberFull:
+    case MemoryDataType::kKnownTravelerNumberNumber:
       return true;
-    case accessibility_annotator::MemoryDataType::kNameFull:
-    case accessibility_annotator::MemoryDataType::kAddressFull:
-    case accessibility_annotator::MemoryDataType::kAddressStreetAddress:
-    case accessibility_annotator::MemoryDataType::kAddressCity:
-    case accessibility_annotator::MemoryDataType::kAddressState:
-    case accessibility_annotator::MemoryDataType::kAddressZip:
-    case accessibility_annotator::MemoryDataType::kAddressCountry:
-    case accessibility_annotator::MemoryDataType::kPhone:
-    case accessibility_annotator::MemoryDataType::kCompanyName:
-    case accessibility_annotator::MemoryDataType::kEmail:
-    case accessibility_annotator::MemoryDataType::kIbanNickname:
-    case accessibility_annotator::MemoryDataType::kVehicle:
-    case accessibility_annotator::MemoryDataType::kVehicleMake:
-    case accessibility_annotator::MemoryDataType::kVehicleModel:
-    case accessibility_annotator::MemoryDataType::kVehicleYear:
-    case accessibility_annotator::MemoryDataType::kVehicleOwner:
-    case accessibility_annotator::MemoryDataType::kVehiclePlateNumber:
-    case accessibility_annotator::MemoryDataType::kVehiclePlateState:
-    case accessibility_annotator::MemoryDataType::kVehicleVin:
-    case accessibility_annotator::MemoryDataType::kPassportName:
-    case accessibility_annotator::MemoryDataType::kPassportCountry:
-    case accessibility_annotator::MemoryDataType::kPassportIssueDate:
-    case accessibility_annotator::MemoryDataType::kPassportExpirationDate:
-    case accessibility_annotator::MemoryDataType::kFlightReservationFull:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationFlightNumber:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationTicketNumber:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationConfirmationCode:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationPassengerName:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationDepartureAirport:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationArrivalAirport:
-    case accessibility_annotator::MemoryDataType::
-        kFlightReservationDepartureDate:
-    case accessibility_annotator::MemoryDataType::kFlightReservationArrivalDate:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardName:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardCountry:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardIssueDate:
-    case accessibility_annotator::MemoryDataType::kNationalIdCardExpirationDate:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseName:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseState:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseIssueDate:
-    case accessibility_annotator::MemoryDataType::kDriversLicenseExpirationDate:
-    case accessibility_annotator::MemoryDataType::kRedressNumberName:
-    case accessibility_annotator::MemoryDataType::kKnownTravelerNumberName:
-    case accessibility_annotator::MemoryDataType::
-        kKnownTravelerNumberExpirationDate:
-    case accessibility_annotator::MemoryDataType::kCreditCardExpirationDate:
-    case accessibility_annotator::MemoryDataType::kCreditCardNameOnCard:
-    case accessibility_annotator::MemoryDataType::kCreditCardNickname:
-    case accessibility_annotator::MemoryDataType::kOrderFull:
-    case accessibility_annotator::MemoryDataType::kOrderId:
-    case accessibility_annotator::MemoryDataType::kOrderAccount:
-    case accessibility_annotator::MemoryDataType::kOrderDate:
-    case accessibility_annotator::MemoryDataType::kOrderMerchantName:
-    case accessibility_annotator::MemoryDataType::kOrderMerchantDomain:
-    case accessibility_annotator::MemoryDataType::kOrderProductNames:
-    case accessibility_annotator::MemoryDataType::kOrderGrandTotal:
-    case accessibility_annotator::MemoryDataType::kShipmentFull:
-    case accessibility_annotator::MemoryDataType::kShipmentTrackingNumber:
-    case accessibility_annotator::MemoryDataType::kShipmentAssociatedOrderId:
-    case accessibility_annotator::MemoryDataType::kShipmentDeliveryAddress:
-    case accessibility_annotator::MemoryDataType::kShipmentDeliveryZipCode:
-    case accessibility_annotator::MemoryDataType::kShipmentCarrierName:
-    case accessibility_annotator::MemoryDataType::kShipmentCarrierDomain:
-    case accessibility_annotator::MemoryDataType::
-        kShipmentEstimatedDeliveryDate:
-    case accessibility_annotator::MemoryDataType::kShipmentShippedDate:
-    case accessibility_annotator::MemoryDataType::kUnknown:
+    case MemoryDataType::kNameFull:
+    case MemoryDataType::kAddressFull:
+    case MemoryDataType::kAddressStreetAddress:
+    case MemoryDataType::kAddressCity:
+    case MemoryDataType::kAddressState:
+    case MemoryDataType::kAddressZip:
+    case MemoryDataType::kAddressCountry:
+    case MemoryDataType::kPhone:
+    case MemoryDataType::kCompanyName:
+    case MemoryDataType::kEmail:
+    case MemoryDataType::kIbanNickname:
+    case MemoryDataType::kVehicle:
+    case MemoryDataType::kVehicleMake:
+    case MemoryDataType::kVehicleModel:
+    case MemoryDataType::kVehicleYear:
+    case MemoryDataType::kVehicleOwner:
+    case MemoryDataType::kVehiclePlateNumber:
+    case MemoryDataType::kVehiclePlateState:
+    case MemoryDataType::kVehicleVin:
+    case MemoryDataType::kPassportName:
+    case MemoryDataType::kPassportCountry:
+    case MemoryDataType::kPassportIssueDate:
+    case MemoryDataType::kPassportExpirationDate:
+    case MemoryDataType::kFlightReservationFull:
+    case MemoryDataType::kFlightReservationFlightNumber:
+    case MemoryDataType::kFlightReservationTicketNumber:
+    case MemoryDataType::kFlightReservationConfirmationCode:
+    case MemoryDataType::kFlightReservationPassengerName:
+    case MemoryDataType::kFlightReservationDepartureAirport:
+    case MemoryDataType::kFlightReservationArrivalAirport:
+    case MemoryDataType::kFlightReservationDepartureDate:
+    case MemoryDataType::kFlightReservationArrivalDate:
+    case MemoryDataType::kNationalIdCardName:
+    case MemoryDataType::kNationalIdCardCountry:
+    case MemoryDataType::kNationalIdCardIssueDate:
+    case MemoryDataType::kNationalIdCardExpirationDate:
+    case MemoryDataType::kDriversLicenseName:
+    case MemoryDataType::kDriversLicenseState:
+    case MemoryDataType::kDriversLicenseIssueDate:
+    case MemoryDataType::kDriversLicenseExpirationDate:
+    case MemoryDataType::kRedressNumberName:
+    case MemoryDataType::kKnownTravelerNumberName:
+    case MemoryDataType::kKnownTravelerNumberExpirationDate:
+    case MemoryDataType::kCreditCardExpirationDate:
+    case MemoryDataType::kCreditCardNameOnCard:
+    case MemoryDataType::kCreditCardNickname:
+    case MemoryDataType::kOrderFull:
+    case MemoryDataType::kOrderId:
+    case MemoryDataType::kOrderAccount:
+    case MemoryDataType::kOrderDate:
+    case MemoryDataType::kOrderMerchantName:
+    case MemoryDataType::kOrderMerchantDomain:
+    case MemoryDataType::kOrderProductNames:
+    case MemoryDataType::kOrderGrandTotal:
+    case MemoryDataType::kShipmentFull:
+    case MemoryDataType::kShipmentTrackingNumber:
+    case MemoryDataType::kShipmentAssociatedOrderId:
+    case MemoryDataType::kShipmentDeliveryAddress:
+    case MemoryDataType::kShipmentDeliveryZipCode:
+    case MemoryDataType::kShipmentCarrierName:
+    case MemoryDataType::kShipmentCarrierDomain:
+    case MemoryDataType::kShipmentEstimatedDeliveryDate:
+    case MemoryDataType::kShipmentShippedDate:
+    case MemoryDataType::kUnknown:
       return false;
   }
 }
@@ -588,7 +570,7 @@ void AtMemoryManager::FillOrPreviewSearchResult(
       std::unique_ptr<AtMemoryFunnelMetrics> metrics =
           std::move(at_memory_funnel_metrics_);
       switch (payload.memory_data_type) {
-        case accessibility_annotator::MemoryDataType::kIban: {
+        case MemoryDataType::kIban: {
           std::visit(absl::Overload{
                          [&](const Iban::Guid& guid) {
                            FillIban(guid, form_id, field_id, suggestion,
@@ -604,24 +586,23 @@ void AtMemoryManager::FillOrPreviewSearchResult(
                      payload.identifier);
           break;
         }
-        case accessibility_annotator::MemoryDataType::kCreditCardNumber:
-        case accessibility_annotator::MemoryDataType::kCreditCardSecurityCode: {
+        case MemoryDataType::kCreditCardNumber:
+        case MemoryDataType::kCreditCardSecurityCode: {
           CHECK(std::holds_alternative<std::string>(payload.identifier));
           FillCreditCard(std::get<std::string>(payload.identifier), form_id,
                          field_id, suggestion, std::move(metrics));
           break;
         }
-        case accessibility_annotator::MemoryDataType::kPassportFull:
-        case accessibility_annotator::MemoryDataType::kDriversLicenseFull:
-        case accessibility_annotator::MemoryDataType::kNationalIdCardFull:
-        case accessibility_annotator::MemoryDataType::kKnownTravelerNumberFull:
-        case accessibility_annotator::MemoryDataType::kRedressNumberFull:
-        case accessibility_annotator::MemoryDataType::kPassportNumber:
-        case accessibility_annotator::MemoryDataType::kDriversLicenseNumber:
-        case accessibility_annotator::MemoryDataType::kNationalIdCardNumber:
-        case accessibility_annotator::MemoryDataType::
-            kKnownTravelerNumberNumber:
-        case accessibility_annotator::MemoryDataType::kRedressNumberNumber: {
+        case MemoryDataType::kPassportFull:
+        case MemoryDataType::kDriversLicenseFull:
+        case MemoryDataType::kNationalIdCardFull:
+        case MemoryDataType::kKnownTravelerNumberFull:
+        case MemoryDataType::kRedressNumberFull:
+        case MemoryDataType::kPassportNumber:
+        case MemoryDataType::kDriversLicenseNumber:
+        case MemoryDataType::kNationalIdCardNumber:
+        case MemoryDataType::kKnownTravelerNumberNumber:
+        case MemoryDataType::kRedressNumberNumber: {
           CHECK(std::holds_alternative<EntityInstance::EntityId>(
               payload.identifier));
           std::optional<AtMemoryDataType> data_type =
@@ -901,11 +882,10 @@ void AtMemoryManager::FillCreditCard(
                 suggestion.GetPayload<Suggestion::AtMemoryPayload>();
             std::u16string fill_value;
             switch (payload.memory_data_type) {
-              case accessibility_annotator::MemoryDataType::kCreditCardNumber:
+              case MemoryDataType::kCreditCardNumber:
                 fill_value = fetched_card.number();
                 break;
-              case accessibility_annotator::MemoryDataType::
-                  kCreditCardSecurityCode:
+              case MemoryDataType::kCreditCardSecurityCode:
                 fill_value = fetched_card.cvc();
                 break;
               default:
