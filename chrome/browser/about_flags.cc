@@ -7403,6 +7403,10 @@ const FeatureEntry kFeatureEntries[] = {
     {"inline-pdf-v2", flag_descriptions::kInlinePdfV2Name,
      flag_descriptions::kInlinePdfV2Description, kOsAndroid,
      FEATURE_VALUE_TYPE(chrome::android::kInlinePdfV2)},
+    {"android-pdf-reuse-fragment",
+     flag_descriptions::kAndroidPdfReuseFragmentName,
+     flag_descriptions::kAndroidPdfReuseFragmentDescription, kOsAndroid,
+     FEATURE_VALUE_TYPE(chrome::android::kPdfReuseFragment)},
 #endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_PRINTING)

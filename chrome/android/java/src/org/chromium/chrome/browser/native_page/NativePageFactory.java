@@ -487,8 +487,9 @@ public class NativePageFactory {
         }
 
         NativePage page;
-
-        switch (NativePage.nativePageType(gurl, candidatePage, isIncognito, pdfInfo != null)) {
+        boolean isPdf = pdfInfo != null;
+        boolean preferReuse = isPdf && assumeNonNull(pdfInfo).preferReuse;
+        switch (NativePage.nativePageType(gurl, candidatePage, isIncognito, preferReuse, isPdf)) {
             case NativePageType.NONE:
                 return null;
             case NativePageType.CANDIDATE:
@@ -592,7 +593,7 @@ public class NativePageFactory {
             return null;
         }
         NativePage page;
-        if (candidatePage != null && candidatePage.getUrl().equals(url)) {
+        if (candidatePage != null && url.equals(candidatePage.getUrl())) {
             page = candidatePage;
         } else {
             page =

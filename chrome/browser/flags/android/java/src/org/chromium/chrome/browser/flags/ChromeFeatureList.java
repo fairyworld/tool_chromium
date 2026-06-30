@@ -1131,6 +1131,7 @@ public abstract class ChromeFeatureList {
                     /* defaultValueInTests= */ true);
     public static final CachedFlag sPCctMinimumHeight = newCachedFlag(PCCT_MINIMUM_HEIGHT, true);
     public static final CachedFlag sPaintPreviewDemo = newCachedFlag(PAINT_PREVIEW_DEMO, false);
+    public static final CachedFlag sPdfReuseFragment = newCachedFlag(PDF_REUSE_FRAGMENT, false);
     public static final CachedFlag sPersistAcrossReboots =
             newCachedFlag(PERSIST_ACROSS_REBOOTS, true);
     public static final CachedFlag sPersistAcrossRebootsDebugLogs =
@@ -1394,6 +1395,7 @@ public abstract class ChromeFeatureList {
                     sOnStartupWindowPolicy,
                     sPCctMinimumHeight,
                     sPaintPreviewDemo,
+                    sPdfReuseFragment,
                     sPersistAcrossReboots,
                     sPersistAcrossRebootsDebugLogs,
                     sPostGetMyMemoryStateToBackground,

@@ -367,6 +367,11 @@
     "expiry_milestone": 160
   },
   {
+    "name": "android-pdf-reuse-fragment",
+    "owners": [ "jinsukkim@google.com", "shuyng@chromium.org"  ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "android-progress-bar-visual-update",
     "owners": ["agazal@google.com", "peilinwang@google.com", "clank-app-team@google.com"],
     "expiry_milestone": 170

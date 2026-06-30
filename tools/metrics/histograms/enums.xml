@@ -12913,6 +12913,7 @@ from previous Chrome versions.
   <int value="-515913489" label="EphemeralTabUsingBottomSheet:disabled"/>
   <int value="-515066652"
       label="WebAuthenticationAlignErrorTypeForPaymentCredentialCreate:disabled"/>
+  <int value="-514880404" label="PdfReuseFragment:enabled"/>
   <int value="-514807488" label="TabStripDensityChangeAndroid:disabled"/>
   <int value="-514672474"
       label="PolicyProvidedTrustAnchorsAllowedAtLockScreen:enabled"/>
@@ -15260,6 +15261,7 @@ from previous Chrome versions.
   <int value="245896533" label="SearchSuggestionsOnLocalNtp:enabled"/>
   <int value="246106068" label="HandwritingLegacyRecognition:disabled"/>
   <int value="246451316" label="NotificationInteractionHistory:enabled"/>
+  <int value="246571458" label="PdfReuseFragment:disabled"/>
   <int value="247069527" label="GlicToolbarButtonLocation:enabled"/>
   <int value="247200195" label="EnhancedProtectionPromoCard:enabled"/>
   <int value="248485874" label="FieldClassificationModelCaching:disabled"/>

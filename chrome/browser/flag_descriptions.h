@@ -215,6 +215,11 @@ inline constexpr char kAndroidSystemContactsPickerDescription[] =
     "Enables the new Android System Contacts Picker (ACTION_PICK_CONTACTS) "
     "on supported Android versions.";
 
+inline constexpr char kAndroidPdfReuseFragmentName[] =
+    "Reuse PdfViewerFragment";
+inline constexpr char kAndroidPdfReuseFragmentDescription[] =
+    "Reuse PdfViewerFragment instance to restore states";
+
 inline constexpr char kAndroidOpenIncognitoAsWindowName[] =
     "Open incognito tabs in new window";
 inline constexpr char kAndroidOpenIncognitoAsWindowDescription[] =
