@@ -118,7 +118,9 @@ class AutofillAiPermissionUtilsTest : public ::testing::Test {
           {{"ambient_autofill_eligible_tiers", "1"}}},
          {features::kAutofillAiServerModel,
           {{"autofill_ai_model_use_cache_results", "true"}}}},
-        {});
+        // TODO(crbug.com/477163013): Once this feature launches, kLogToMqls can
+        // be deprecated as the behavior will be disabled for everyone.
+        {features::kAutofillAiUsePrivateAi});
 
     client().GetPrefs()->SetInteger(
         subscription_eligibility::prefs::kAiSubscriptionTier, 1);
