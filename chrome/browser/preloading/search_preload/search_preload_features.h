@@ -53,6 +53,9 @@ BASE_DECLARE_FEATURE(kDsePreload2OnPressIncognito);
 // https://docs.google.com/document/d/1f4dcNYP3O_Ft4yMmC42ETxGC5lM7YF5FDbEgnxUua7M/edit?tab=t.38v8gca76tmi
 BASE_DECLARE_FEATURE(kDsePreload2OnSuggestNonDefalutMatch);
 
+// Initial No-Vary-Search hint if there is no No-Vary-Search hint from Prefs.
+//
+// This feature flag is for debug purpose and we'll remove it finally.
 extern const base::FeatureParam<std::string>
     kDsePreload2InitialNoVarySearchHint;
 
