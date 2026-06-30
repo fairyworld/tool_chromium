@@ -125,7 +125,8 @@ class ChromeAutofillClient : public ContentAutofillClient {
   ~ChromeAutofillClient() override;
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+  // Triggers the AtMemory promo bubble.
   void ShowAutofillAtMemoryPromo();
 #endif
 
@@ -345,12 +346,10 @@ class ChromeAutofillClient : public ContentAutofillClient {
   one_time_tokens::OneTimeTokenService* GetOneTimeTokenService() const final;
 
  protected:
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
-  class AtMemoryPromoObserver : public content::WebContentsObserver {
+  class AtMemoryCopyPasteObserver : public content::WebContentsObserver {
    public:
-    explicit AtMemoryPromoObserver(ChromeAutofillClient* client);
-    ~AtMemoryPromoObserver() override = default;
+    explicit AtMemoryCopyPasteObserver(ChromeAutofillClient* client);
+    ~AtMemoryCopyPasteObserver() override = default;
 
     // content::WebContentsObserver:
     void OnTextCopiedToClipboard(content::RenderFrameHost* render_frame_host,
@@ -361,9 +360,7 @@ class ChromeAutofillClient : public ContentAutofillClient {
     const base::raw_ref<ChromeAutofillClient> client_;
   };
 
-  AtMemoryPromoObserver& at_memory_promo_observer();
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-        // BUILDFLAG(IS_CHROMEOS)
+  AtMemoryCopyPasteObserver& at_memory_copy_paste_observer();
   explicit ChromeAutofillClient(content::WebContents* web_contents);
 
  private:
@@ -448,11 +445,7 @@ class ChromeAutofillClient : public ContentAutofillClient {
   std::unique_ptr<FormPredictionsTracker> form_predictions_tracker_;
   std::unique_ptr<ActorKeyMetricsRecorder> actor_key_metrics_recorder_;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
-  AtMemoryPromoObserver at_memory_promo_observer_{this};
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-        // BUILDFLAG(IS_CHROMEOS)
+  AtMemoryCopyPasteObserver at_memory_copy_paste_observer_{this};
 
   SEQUENCE_CHECKER(sequence_checker_);
 

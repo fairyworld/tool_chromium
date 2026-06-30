@@ -2,30 +2,33 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/autofill/at_memory_promo_tracker_factory.h"
+#include "chrome/browser/autofill/at_memory_cross_tab_copy_paste_tracker_factory.h"
 
 #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
 #include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
-#include "components/autofill/core/browser/at_memory_promo_tracker.h"
+#include "components/autofill/core/browser/at_memory_cross_tab_copy_paste_tracker.h"
 
 namespace autofill {
 
 // static
-AtMemoryPromoTracker* AtMemoryPromoTrackerFactory::GetForBrowserContext(
+AtMemoryCrossTabCopyPasteTracker*
+AtMemoryCrossTabCopyPasteTrackerFactory::GetForBrowserContext(
     content::BrowserContext* context) {
-  return static_cast<AtMemoryPromoTracker*>(
+  return static_cast<AtMemoryCrossTabCopyPasteTracker*>(
       GetInstance()->GetServiceForBrowserContext(context, /*create=*/true));
 }
 
 // static
-AtMemoryPromoTrackerFactory* AtMemoryPromoTrackerFactory::GetInstance() {
-  static base::NoDestructor<AtMemoryPromoTrackerFactory> instance;
+AtMemoryCrossTabCopyPasteTrackerFactory*
+AtMemoryCrossTabCopyPasteTrackerFactory::GetInstance() {
+  static base::NoDestructor<AtMemoryCrossTabCopyPasteTrackerFactory> instance;
   return instance.get();
 }
 
-AtMemoryPromoTrackerFactory::AtMemoryPromoTrackerFactory()
+AtMemoryCrossTabCopyPasteTrackerFactory::
+    AtMemoryCrossTabCopyPasteTrackerFactory()
     : ProfileKeyedServiceFactory(
-          "AtMemoryPromoTracker",
+          "AtMemoryCrossTabCopyPasteTracker",
           ProfileSelections::Builder()
               .WithRegular(ProfileSelection::kOriginalOnly)
               .WithGuest(ProfileSelection::kNone)
@@ -33,16 +36,17 @@ AtMemoryPromoTrackerFactory::AtMemoryPromoTrackerFactory()
   DependsOn(GoogleGroupsManagerFactory::GetInstance());
 }
 
-AtMemoryPromoTrackerFactory::~AtMemoryPromoTrackerFactory() = default;
+AtMemoryCrossTabCopyPasteTrackerFactory::
+    ~AtMemoryCrossTabCopyPasteTrackerFactory() = default;
 
 std::unique_ptr<KeyedService>
-AtMemoryPromoTrackerFactory::BuildServiceInstanceForBrowserContext(
+AtMemoryCrossTabCopyPasteTrackerFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
   if (!autofill::IsAtMemoryFeatureEnabled(
           GoogleGroupsManagerFactory::GetForBrowserContext(context))) {
     return nullptr;
   }
-  return std::make_unique<AtMemoryPromoTracker>();
+  return std::make_unique<AtMemoryCrossTabCopyPasteTracker>();
 }
 
 }  // namespace autofill
