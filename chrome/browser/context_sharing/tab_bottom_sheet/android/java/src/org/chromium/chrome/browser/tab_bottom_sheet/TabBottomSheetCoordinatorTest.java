@@ -731,15 +731,16 @@ public class TabBottomSheetCoordinatorTest {
 
     @Test
     @EnableFeatures(ChromeFeatureList.TAB_BOTTOM_SHEET)
-    public void testOnContainerSizeChanged_ActivityPaused_DoesNotChangeHeight() {
+    public void testOnContainerSizeChanged_ActivityPaused_ChangesHeight() {
         BottomSheetObserver observer = simulateShowSuccessAndGetObserver();
         View expandedContent = mView.findViewById(R.id.expanded_content_group);
-        int initialHeight = expandedContent.getLayoutParams().height;
 
         when(mWindowAndroid.getActivityState()).thenReturn(ActivityState.PAUSED);
         observer.onContainerSizeChanged(CONTAINER_WIDTH, CONTAINER_HEIGHT);
 
-        assertEquals(initialHeight, expandedContent.getLayoutParams().height);
+        // MAX_OFFSET * FULL_HEIGHT_RATIO = 1000 * 0.7 = 700
+        int expectedHeight = (int) (MAX_OFFSET * FULL_HEIGHT_RATIO);
+        assertEquals(expectedHeight, expandedContent.getLayoutParams().height);
     }
 
     @Test
