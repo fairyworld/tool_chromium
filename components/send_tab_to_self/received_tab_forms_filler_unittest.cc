@@ -94,8 +94,35 @@ class ReceivedTabFormsFillerTest
   void TearDown() override { DestroyAutofillClient(); }
 
  protected:
+  // Helper to start the filler, simulate seeing a form, and wait for
+  // completion.
+  [[nodiscard]] bool TryStartFillerAndSeeForm(
+      const url::Origin& origin,
+      const PageContext::FormFieldInfo& field_info,
+      const autofill::FormData& form) {
+    TestFuture<void> future;
+    ReceivedTabFormsFiller::Start(autofill_client(), origin, field_info,
+                                  future.GetCallback());
+    autofill_manager().OnFormsSeen({form}, {});
+    return future.Wait();
+  }
+
+  // Helper to assert a unique match outcome sample.
+  void ExpectUniqueMatchOutcome(FormFieldMatchOutcome outcome, int count) {
+    histogram_tester_.ExpectUniqueSample(
+        "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome", outcome,
+        count);
+  }
+
+  // Helper to assert no match outcome was recorded.
+  void ExpectNoMatchOutcome() {
+    histogram_tester_.ExpectTotalCount(
+        "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome", 0);
+  }
+
   base::test::TaskEnvironment task_environment_{
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
+  base::HistogramTester histogram_tester_;
 
  private:
   autofill::test::AutofillUnitTestEnvironment autofill_test_environment_;
@@ -140,18 +167,9 @@ TEST_P(ReceivedTabFormsFillerFillTriggerTest, ShouldConditionallyFill) {
     EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
   }
 
-  base::HistogramTester histogram_tester;
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(TryStartFillerAndSeeForm(kOrigin, form_field_info, form));
 
-  autofill_manager().OnFormsSeen({form}, {});
-
-  EXPECT_TRUE(future.Wait());
-
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kMatchedByIdNameAndType, 1);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kMatchedByIdNameAndType, 1);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -222,18 +240,9 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldNotFillUserClearedPrefilledField) {
   // user-cleared.
   EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
 
-  base::HistogramTester histogram_tester;
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(TryStartFillerAndSeeForm(kOrigin, form_field_info, form));
 
-  autofill_manager().OnFormsSeen({form}, {});
-
-  EXPECT_TRUE(future.Wait());
-
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kMatchedByIdNameAndType, 1);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kMatchedByIdNameAndType, 1);
 }
 
 TEST_F(ReceivedTabFormsFillerTest, ShouldNotFillIncomingSensitiveField) {
@@ -255,17 +264,9 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldNotFillIncomingSensitiveField) {
 
   EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
 
-  base::HistogramTester histogram_tester;
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(TryStartFillerAndSeeForm(kOrigin, form_field_info, form));
 
-  autofill_manager().OnFormsSeen({form}, {});
-
-  EXPECT_TRUE(future.Wait());
-
-  histogram_tester.ExpectTotalCount(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome", 0);
+  ExpectNoMatchOutcome();
 }
 
 // Tests that fallback signature matching is skipped if the control types
@@ -352,16 +353,14 @@ TEST_F(ReceivedTabFormsFillerTest,
 
   EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
 
-  base::HistogramTester histogram_tester;
   TestFuture<void> future;
   ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
                                 future.GetCallback());
 
   EXPECT_TRUE(future.Wait());
 
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kNoMatch, 1);
+  // Since the control types differ, it should not have been filled.
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kNoMatch, 1);
 }
 
 // Tests that fallback signature matching works when names/IDs are dynamic
@@ -397,18 +396,10 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldFillFieldsByUniqueSignatureFallback) {
                                autofill::mojom::ActionPersistence::kFill,
                                Eq(field_id), Eq(u"shared_value")));
 
-  base::HistogramTester histogram_tester;
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(
+      TryStartFillerAndSeeForm(kOrigin, form_field_info, form_receiver));
 
-  autofill_manager().OnFormsSeen({form_receiver}, {});
-
-  EXPECT_TRUE(future.Wait());
-
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kMatchedBySignature, 1);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kMatchedBySignature, 1);
 }
 
 // Tests that fallback matching is skipped if the receiver form has multiple
@@ -445,18 +436,10 @@ TEST_F(ReceivedTabFormsFillerTest,
 
   EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
 
-  base::HistogramTester histogram_tester;
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(
+      TryStartFillerAndSeeForm(kOrigin, form_field_info, form_receiver));
 
-  autofill_manager().OnFormsSeen({form_receiver}, {});
-
-  EXPECT_TRUE(future.Wait());
-
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kNoMatch, 1);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kNoMatch, 1);
 }
 
 // Tests that fallback signature matching works and ignores cross-origin fields
@@ -509,18 +492,10 @@ TEST_F(ReceivedTabFormsFillerTest,
                                autofill::mojom::ActionPersistence::kFill,
                                Eq(field_id), Eq(u"shared_value")));
 
-  base::HistogramTester histogram_tester;
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(
+      TryStartFillerAndSeeForm(kOrigin, form_field_info, form_receiver));
 
-  autofill_manager().OnFormsSeen({form_receiver}, {});
-
-  EXPECT_TRUE(future.Wait());
-
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kMatchedBySignature, 1);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kMatchedBySignature, 1);
 }
 
 // Tests that fallback matching is skipped if there are multiple pending fields
@@ -559,18 +534,10 @@ TEST_F(ReceivedTabFormsFillerTest,
 
   EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
 
-  base::HistogramTester histogram_tester;
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(
+      TryStartFillerAndSeeForm(kOrigin, form_field_info, form_receiver));
 
-  autofill_manager().OnFormsSeen({form_receiver}, {});
-
-  EXPECT_TRUE(future.Wait());
-
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kNoMatch, 2);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kNoMatch, 2);
 }
 // Tests that fallback matching via semantic type works when names and IDs do
 // not match but there is a unique type match.
@@ -601,18 +568,10 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldFillFieldsBySemanticMatchFallback) {
                                autofill::mojom::ActionPersistence::kFill,
                                Eq(field_id), Eq(u"shared_value")));
 
-  base::HistogramTester histogram_tester;
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(
+      TryStartFillerAndSeeForm(kOrigin, form_field_info, form_receiver));
 
-  autofill_manager().OnFormsSeen({form_receiver}, {});
-
-  EXPECT_TRUE(future.Wait());
-
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kMatchedByExactTypeSet, 1);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kMatchedByExactTypeSet, 1);
 }
 
 // Tests that matching is skipped if multiple pending fields share the same
@@ -646,18 +605,10 @@ TEST_F(ReceivedTabFormsFillerTest,
 
   EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
 
-  base::HistogramTester histogram_tester;
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(
+      TryStartFillerAndSeeForm(kOrigin, form_field_info, form_receiver));
 
-  autofill_manager().OnFormsSeen({form_receiver}, {});
-
-  EXPECT_TRUE(future.Wait());
-
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kNoMatch, 2);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kNoMatch, 2);
 }
 
 // Tests that matching is skipped if the semantic type is not unique within
@@ -690,18 +641,10 @@ TEST_F(ReceivedTabFormsFillerTest,
 
   EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
 
-  base::HistogramTester histogram_tester;
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(
+      TryStartFillerAndSeeForm(kOrigin, form_field_info, form_receiver));
 
-  autofill_manager().OnFormsSeen({form_receiver}, {});
-
-  EXPECT_TRUE(future.Wait());
-
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kNoMatch, 1);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kNoMatch, 1);
 }
 
 // Tests that fallback semantic matching works when both the pending field and
@@ -748,6 +691,8 @@ TEST_F(ReceivedTabFormsFillerTest,
                                 future.GetCallback());
 
   EXPECT_TRUE(future.Wait());
+
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kMatchedByExactTypeSet, 1);
 }
 
 // Tests that matching is skipped if a semantic type is not unique within
@@ -792,13 +737,10 @@ TEST_F(ReceivedTabFormsFillerTest,
   // be applied.
   EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
 
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(
+      TryStartFillerAndSeeForm(kOrigin, form_field_info, form_receiver));
 
-  autofill_manager().OnFormsSeen({form_receiver}, {});
-
-  EXPECT_TRUE(future.Wait());
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kNoMatch, 2);
 }
 
 // Tests that a single pending field does not match multiple fields in the
@@ -835,18 +777,10 @@ TEST_F(ReceivedTabFormsFillerTest,
                                Eq(first_field_id), Eq(u"shared_value")))
       .Times(1);
 
-  base::HistogramTester histogram_tester;
-  TestFuture<void> future;
-  ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
-                                future.GetCallback());
+  EXPECT_TRUE(
+      TryStartFillerAndSeeForm(kOrigin, form_field_info, form_receiver));
 
-  autofill_manager().OnFormsSeen({form_receiver}, {});
-
-  EXPECT_TRUE(future.Wait());
-
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kMatchedByIdNameAndType, 1);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kMatchedByIdNameAndType, 1);
 }
 
 TEST_F(ReceivedTabFormsFillerTest, ShouldStopOnManagerDestruction) {
@@ -855,7 +789,6 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldStopOnManagerDestruction) {
 
   EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
 
-  base::HistogramTester histogram_tester;
   TestFuture<void> future;
   ReceivedTabFormsFiller::Start(
       autofill_client(), url::Origin::Create(GURL("https://example.com")),
@@ -871,16 +804,13 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldStopOnManagerDestruction) {
   // destruction.
   EXPECT_TRUE(future.Wait());
 
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kNoMatch, 1);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kNoMatch, 1);
 }
 
 TEST_F(ReceivedTabFormsFillerTest, ShouldStopOnTimeout) {
   PageContext::FormFieldInfo form_field_info;
   form_field_info.fields.push_back(MakeFormField(u"id1", u"", "text", u"val"));
 
-  base::HistogramTester histogram_tester;
   base::MockCallback<base::OnceClosure> completion_callback;
   ReceivedTabFormsFiller::Start(
       autofill_client(), url::Origin::Create(GURL("https://example.com")),
@@ -895,9 +825,7 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldStopOnTimeout) {
   EXPECT_CALL(completion_callback, Run);
   task_environment_.FastForwardBy(base::Seconds(1));
 
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kNoMatch, 1);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kNoMatch, 1);
 }
 
 TEST_F(ReceivedTabFormsFillerTest, ShouldNotFillFieldsWithDifferentOrigin) {
@@ -918,7 +846,6 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldNotFillFieldsWithDifferentOrigin) {
 
   EXPECT_CALL(autofill_driver(), ApplyFieldAction).Times(0);
 
-  base::HistogramTester histogram_tester;
   TestFuture<void> future;
   ReceivedTabFormsFiller::Start(autofill_client(), kOrigin, form_field_info,
                                 future.GetCallback());
@@ -933,9 +860,7 @@ TEST_F(ReceivedTabFormsFillerTest, ShouldNotFillFieldsWithDifferentOrigin) {
 
   EXPECT_TRUE(future.Wait());
 
-  histogram_tester.ExpectUniqueSample(
-      "Sharing.SendTabToSelf.ReceivedTabFormFieldMatchOutcome",
-      FormFieldMatchOutcome::kNoMatch, 1);
+  ExpectUniqueMatchOutcome(FormFieldMatchOutcome::kNoMatch, 1);
 }
 
 }  // namespace
