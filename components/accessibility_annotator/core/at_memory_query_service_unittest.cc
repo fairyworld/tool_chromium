@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "base/test/bind.h"
+#include "base/test/gmock_callback_support.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/repeating_test_future.h"
 #include "base/test/scoped_feature_list.h"
@@ -20,7 +21,10 @@
 #include "components/accessibility_annotator/core/annotation_reducer/memory_search_result.h"
 #include "components/accessibility_annotator/core/at_memory_query_service_delegate.h"
 #include "components/personal_context/core/context_memory_error.h"
+#include "components/personal_context/core/mock_personal_context_service.h"
 #include "components/personal_context/core/personal_context_debug_features.h"
+#include "components/personal_context/core/personal_context_types.h"
+#include "components/personal_context/proto/features/at_memory.pb.h"
 #include "net/base/mock_network_change_notifier.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -30,6 +34,7 @@ namespace accessibility_annotator {
 namespace {
 
 using ::accessibility_annotator::MemoryDataType;
+using ::testing::_;
 
 class MockAtMemoryQueryServiceDelegate : public AtMemoryQueryServiceDelegate {
  public:
@@ -61,33 +66,6 @@ class FakeMemoryDataProvider : public MemoryDataProvider {
   std::vector<MemoryDataType> last_types_;
 };
 
-class FakePersonalContextResolver : public PersonalContextResolver {
- public:
-  void Query(std::u16string query, QueryCallback callback) override {
-    last_query_ = query;
-    if (error_) {
-      std::move(callback).Run(base::unexpected(*error_));
-      return;
-    }
-    std::move(callback).Run(results_);
-  }
-
-  void set_results(std::vector<MemorySearchResult> results) {
-    results_ = std::move(results);
-  }
-
-  void set_error(personal_context::ContextMemoryError error) {
-    error_ = std::move(error);
-  }
-
-  std::u16string last_query() const { return last_query_; }
-
- private:
-  std::u16string last_query_;
-  std::vector<MemorySearchResult> results_;
-  std::optional<personal_context::ContextMemoryError> error_;
-};
-
 class DelayedMemoryDataProvider : public MemoryDataProvider {
  public:
   void RetrieveAll(const std::vector<MemoryDataType>& types,
@@ -111,8 +89,64 @@ class AtMemoryQueryServiceTest : public testing::Test {
  public:
   AtMemoryQueryServiceTest() = default;
 
- private:
+ protected:
+  void StubFetchContextResponse(
+      personal_context::proto::AtMemoryQueryResponse response) {
+    personal_context::proto::Any serialized_response;
+    serialized_response.set_value(response.SerializeAsString());
+    personal_context::FetchContextResult result(std::move(serialized_response));
+
+    EXPECT_CALL(
+        mock_service_,
+        FetchContext(personal_context::proto::CONTEXT_MEMORY_FEATURE_AT_MEMORY,
+                     _, _, _))
+        .WillOnce(base::test::RunOnceCallback<3>(std::move(result)));
+  }
+
+  void StubFetchContextError(personal_context::ContextMemoryError error) {
+    personal_context::FetchContextResult result(
+        base::unexpected(std::move(error)));
+
+    EXPECT_CALL(
+        mock_service_,
+        FetchContext(personal_context::proto::CONTEXT_MEMORY_FEATURE_AT_MEMORY,
+                     _, _, _))
+        .WillOnce(base::test::RunOnceCallback<3>(std::move(result)));
+  }
+
+  personal_context::proto::AtMemoryQueryResponse
+  CreateQueryResponseWithSchemafulKey(
+      personal_context::proto::MemoryDataType type,
+      const std::string& value,
+      double relevance_score = 1.0) {
+    personal_context::proto::AtMemoryQueryResponse response;
+    personal_context::proto::AtMemorySearchResult* result_proto =
+        response.add_results();
+    result_proto->set_relevance_score(relevance_score);
+    personal_context::proto::Attribute* primary =
+        result_proto->mutable_primary_attribute();
+    primary->set_schemaful_key(type);
+    primary->set_value(value);
+    return response;
+  }
+
+  personal_context::proto::AtMemoryQueryResponse
+  CreateQueryResponseWithSchemalessKey(const std::string& key,
+                                       const std::string& value,
+                                       double relevance_score = 1.0) {
+    personal_context::proto::AtMemoryQueryResponse response;
+    personal_context::proto::AtMemorySearchResult* result_proto =
+        response.add_results();
+    result_proto->set_relevance_score(relevance_score);
+    personal_context::proto::Attribute* primary =
+        result_proto->mutable_primary_attribute();
+    primary->set_schemaless_key(key);
+    primary->set_value(value);
+    return response;
+  }
+
   base::test::SingleThreadTaskEnvironment task_environment_;
+  testing::NiceMock<personal_context::MockPersonalContextService> mock_service_;
 };
 
 // Tests that the query service returns an internal failure status after
@@ -120,8 +154,7 @@ class AtMemoryQueryServiceTest : public testing::Test {
 TEST_F(AtMemoryQueryServiceTest, Query_AfterShutdown) {
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::make_unique<FakeMemoryDataProvider>(),
-      /*personal_context_resolver=*/nullptr,
+      std::make_unique<FakeMemoryDataProvider>(), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   service->Shutdown();
@@ -140,7 +173,7 @@ TEST_F(AtMemoryQueryServiceTest, Query_AfterShutdown) {
 TEST_F(AtMemoryQueryServiceTest, Query_NoProviders) {
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      /*data_provider=*/nullptr, /*personal_context_resolver=*/nullptr,
+      /*data_provider=*/nullptr, nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   base::test::TestFuture<MemorySearchResults> future;
@@ -161,8 +194,7 @@ TEST_F(AtMemoryQueryServiceTest, Query_Offline) {
 
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::make_unique<FakeMemoryDataProvider>(),
-      /*personal_context_resolver=*/nullptr,
+      std::make_unique<FakeMemoryDataProvider>(), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   base::test::TestFuture<MemorySearchResults> future;
@@ -181,7 +213,7 @@ TEST_F(AtMemoryQueryServiceTest, Query_Success) {
   auto* fake_data_provider = data_provider.get();
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider), /*personal_context_resolver=*/nullptr,
+      std::move(data_provider), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   MemorySearchResult result(MemoryDataType::kNameFull, u"Name", u"John Doe");
@@ -199,13 +231,11 @@ TEST_F(AtMemoryQueryServiceTest, Query_Success) {
 }
 
 // Tests that the query service returns an empty list when the intent is
-// unknown and there is no personal context resolver available.
-TEST_F(AtMemoryQueryServiceTest,
-       Query_UnknownIntent_NoPersonalContextResolver) {
+// unknown and there is no personal context service available.
+TEST_F(AtMemoryQueryServiceTest, Query_UnknownIntent_NoPersonalContext) {
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::make_unique<FakeMemoryDataProvider>(),
-      /*personal_context_resolver=*/nullptr,
+      std::make_unique<FakeMemoryDataProvider>(), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   base::test::TestFuture<MemorySearchResults> future;
@@ -218,20 +248,16 @@ TEST_F(AtMemoryQueryServiceTest,
 }
 
 // Tests that the query service returns unsupported query when the intent is
-// unknown and the personal context resolver returns nothing.
+// unknown and the personal context service returns nothing.
 TEST_F(AtMemoryQueryServiceTest,
-       Query_UnknownIntent_PersonalContextResolverEmpty_ReturnsUnsupported) {
-  auto personal_context_resolver =
-      std::make_unique<FakePersonalContextResolver>();
-  auto* fake_personal_context_resolver = personal_context_resolver.get();
+       Query_UnknownIntent_PersonalContextEmpty_ReturnsUnsupported) {
+  personal_context::proto::AtMemoryQueryResponse response;
+  StubFetchContextResponse(std::move(response));
 
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::make_unique<FakeMemoryDataProvider>(),
-      std::move(personal_context_resolver),
+      std::make_unique<FakeMemoryDataProvider>(), &mock_service_, "en-US",
       /*remote_model_executor=*/nullptr);
-
-  fake_personal_context_resolver->set_results({});
 
   base::test::TestFuture<MemorySearchResults> future;
   service->Query(u"random query", future.GetRepeatingCallback());
@@ -240,26 +266,20 @@ TEST_F(AtMemoryQueryServiceTest,
   const auto& result = future.Get();
   EXPECT_EQ(result.status, MemorySearchStatus::kUnsupportedQuery);
   EXPECT_TRUE(result.entries.empty());
-  EXPECT_EQ(fake_personal_context_resolver->last_query(), u"random query");
 }
 
-// Tests that the query service queries the personal context resolver when the
+// Tests that the query service queries the personal context service when the
 // intent is unknown.
-TEST_F(AtMemoryQueryServiceTest,
-       Query_UnknownIntent_QueriesPersonalContextResolver) {
-  auto personal_context_resolver =
-      std::make_unique<FakePersonalContextResolver>();
-  auto* fake_personal_context_resolver = personal_context_resolver.get();
+TEST_F(AtMemoryQueryServiceTest, Query_UnknownIntent_QueriesPersonalContext) {
+  personal_context::proto::AtMemoryQueryResponse response =
+      CreateQueryResponseWithSchemalessKey("Custom Type",
+                                           "Some Personal Context Value");
+  StubFetchContextResponse(std::move(response));
 
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::make_unique<FakeMemoryDataProvider>(),
-      std::move(personal_context_resolver),
+      std::make_unique<FakeMemoryDataProvider>(), &mock_service_, "en-US",
       /*remote_model_executor=*/nullptr);
-
-  MemorySearchResult personal_context_entry(
-      MemoryDataType::kUnknown, u"Custom Type", u"Some Personal Context Value");
-  fake_personal_context_resolver->set_results({personal_context_entry});
 
   base::test::TestFuture<MemorySearchResults> future;
   service->Query(u"random query", future.GetRepeatingCallback());
@@ -270,16 +290,14 @@ TEST_F(AtMemoryQueryServiceTest,
   EXPECT_THAT(result.entries,
               testing::ElementsAre(testing::Field(
                   &MemorySearchResult::value, u"Some Personal Context Value")));
-  EXPECT_EQ(fake_personal_context_resolver->last_query(), u"random query");
 }
 
 // Tests that the query service returns empty success when no local data is
-// found for a known intent and there is no personal context resolver.
-TEST_F(AtMemoryQueryServiceTest, Query_NoLocalData_NoPersonalContextResolver) {
+// found for a known intent and there is no personal context service.
+TEST_F(AtMemoryQueryServiceTest, Query_NoLocalData_NoPersonalContext) {
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::make_unique<FakeMemoryDataProvider>(),
-      /*personal_context_resolver=*/nullptr,
+      std::make_unique<FakeMemoryDataProvider>(), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   base::test::TestFuture<MemorySearchResults> future;
@@ -291,23 +309,18 @@ TEST_F(AtMemoryQueryServiceTest, Query_NoLocalData_NoPersonalContextResolver) {
   EXPECT_TRUE(result.entries.empty());
 }
 
-// Tests that the query service queries the personal context resolver when no
+// Tests that the query service queries the personal context service when no
 // local data is found for a known intent.
-TEST_F(AtMemoryQueryServiceTest,
-       Query_NoLocalData_QueriesPersonalContextResolver) {
-  auto personal_context_resolver =
-      std::make_unique<FakePersonalContextResolver>();
-  auto* fake_personal_context_resolver = personal_context_resolver.get();
+TEST_F(AtMemoryQueryServiceTest, Query_NoLocalData_QueriesPersonalContext) {
+  personal_context::proto::AtMemoryQueryResponse response =
+      CreateQueryResponseWithSchemafulKey(
+          personal_context::proto::MEMORY_DATA_TYPE_NAME_FULL, "Jane Doe");
+  StubFetchContextResponse(std::move(response));
 
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::make_unique<FakeMemoryDataProvider>(),
-      std::move(personal_context_resolver),
+      std::make_unique<FakeMemoryDataProvider>(), &mock_service_, "en-US",
       /*remote_model_executor=*/nullptr);
-
-  MemorySearchResult personal_context_entry(MemoryDataType::kNameFull, u"Name",
-                                            u"Jane Doe");
-  fake_personal_context_resolver->set_results({personal_context_entry});
 
   base::test::TestFuture<MemorySearchResults> future;
   service->Query(u"what is my name", future.GetRepeatingCallback());
@@ -317,24 +330,19 @@ TEST_F(AtMemoryQueryServiceTest,
   EXPECT_EQ(result.status, MemorySearchStatus::kFinalResponseSuccess);
   EXPECT_THAT(result.entries, testing::ElementsAre(testing::Field(
                                   &MemorySearchResult::value, u"Jane Doe")));
-  EXPECT_EQ(fake_personal_context_resolver->last_query(), u"what is my name");
 }
 
 // Tests that the query service returns success with an empty list when no local
-// data is found and the personal context resolver also returns nothing.
+// data is found and the personal context service also returns nothing.
 TEST_F(AtMemoryQueryServiceTest,
-       Query_NoLocalData_PersonalContextResolverEmpty_ReturnsEmpty) {
-  auto personal_context_resolver =
-      std::make_unique<FakePersonalContextResolver>();
-  auto* fake_personal_context_resolver = personal_context_resolver.get();
+       Query_NoLocalData_PersonalContextEmpty_ReturnsEmpty) {
+  personal_context::proto::AtMemoryQueryResponse response;
+  StubFetchContextResponse(std::move(response));
 
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::make_unique<FakeMemoryDataProvider>(),
-      std::move(personal_context_resolver),
+      std::make_unique<FakeMemoryDataProvider>(), &mock_service_, "en-US",
       /*remote_model_executor=*/nullptr);
-
-  fake_personal_context_resolver->set_results({});
 
   base::test::TestFuture<MemorySearchResults> future;
   service->Query(u"what is my name", future.GetRepeatingCallback());
@@ -343,7 +351,6 @@ TEST_F(AtMemoryQueryServiceTest,
   const auto& result = future.Get();
   EXPECT_EQ(result.status, MemorySearchStatus::kFinalResponseSuccess);
   EXPECT_TRUE(result.entries.empty());
-  EXPECT_EQ(fake_personal_context_resolver->last_query(), u"what is my name");
 }
 
 // Tests that the query service correctly filters results when filter words
@@ -353,7 +360,7 @@ TEST_F(AtMemoryQueryServiceTest, Query_WithFilterWords) {
   auto* fake_data_provider = data_provider.get();
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider), /*personal_context_resolver=*/nullptr,
+      std::move(data_provider), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   MemorySearchResult entry1(MemoryDataType::kAddressFull, u"Address",
@@ -382,7 +389,7 @@ TEST_F(AtMemoryQueryServiceTest, Query_WithFilterWords_NoMatch_ReturnsAll) {
   auto* fake_data_provider = data_provider.get();
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider), /*personal_context_resolver=*/nullptr,
+      std::move(data_provider), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   MemorySearchResult entry(MemoryDataType::kAddressFull, u"Address",
@@ -410,8 +417,7 @@ TEST_F(AtMemoryQueryServiceTest, RecordsProviderResultCountMetric) {
   auto data_provider = std::make_unique<FakeMemoryDataProvider>();
   auto* fake_data_provider = data_provider.get();
   auto service = std::make_unique<AtMemoryQueryService>(
-      /*delegate=*/nullptr, std::move(data_provider),
-      /*personal_context_resolver=*/nullptr,
+      /*delegate=*/nullptr, std::move(data_provider), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   MemorySearchResult result1(MemoryDataType::kNameFull, u"Name", u"John Doe");
@@ -429,34 +435,30 @@ TEST_F(AtMemoryQueryServiceTest, RecordsProviderResultCountMetric) {
       /*sample=*/2, /*expected_bucket_count=*/1);
 }
 
-// Tests that the query service queries the personal context resolver if local
+// Tests that the query service queries the personal context service if local
 // filtering removes all results.
 TEST_F(AtMemoryQueryServiceTest,
-       Query_WithFilterWords_NoMatch_QueriesPersonalContextResolver) {
+       Query_WithFilterWords_NoMatch_QueriesPersonalContext) {
   auto data_provider = std::make_unique<FakeMemoryDataProvider>();
   auto* fake_data_provider = data_provider.get();
 
-  auto personal_context_resolver =
-      std::make_unique<FakePersonalContextResolver>();
-  auto* fake_personal_context_resolver = personal_context_resolver.get();
-
-  auto service = std::make_unique<AtMemoryQueryService>(
-      std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider), std::move(personal_context_resolver),
-      /*remote_model_executor=*/nullptr);
+  personal_context::proto::AtMemoryQueryResponse response =
+      CreateQueryResponseWithSchemafulKey(
+          personal_context::proto::MEMORY_DATA_TYPE_ADDRESS_FULL,
+          "456 New York Ave Home New York");
+  StubFetchContextResponse(std::move(response));
 
   MemorySearchResult local_entry(MemoryDataType::kAddressFull, u"Address",
                                  u"123 San Diego St Home San Diego");
   fake_data_provider->SetResults({local_entry});
 
-  MemorySearchResult personal_context_entry(MemoryDataType::kAddressFull,
-                                            u"Address",
-                                            u"456 New York Ave Home New York");
-  fake_personal_context_resolver->set_results({personal_context_entry});
-
   // "New York" won't match the local "San Diego" address, so it should
-  // fallback to querying the personal context resolver.
+  // fallback to querying the personal context service.
   base::test::TestFuture<MemorySearchResults> future;
+  auto service = std::make_unique<AtMemoryQueryService>(
+      std::make_unique<MockAtMemoryQueryServiceDelegate>(),
+      std::move(data_provider), &mock_service_, "en-US",
+      /*remote_model_executor=*/nullptr);
   service->Query(u"What's my home address in New York",
                  future.GetRepeatingCallback());
 
@@ -465,35 +467,27 @@ TEST_F(AtMemoryQueryServiceTest,
   EXPECT_THAT(result.entries, testing::ElementsAre(testing::Field(
                                   &MemorySearchResult::value,
                                   u"456 New York Ave Home New York")));
-  EXPECT_EQ(fake_personal_context_resolver->last_query(),
-            u"What's my home address in New York");
 }
 
 // Tests that the query service falls back to original local entries if the
-// personal context resolver returns no results.
-TEST_F(
-    AtMemoryQueryServiceTest,
-    Query_WithFilterWords_NoMatch_PersonalContextResolverEmpty_ReturnsLocal) {
+// personal context service returns no results.
+TEST_F(AtMemoryQueryServiceTest,
+       Query_WithFilterWords_NoMatch_PersonalContextEmpty_ReturnsLocal) {
   auto data_provider = std::make_unique<FakeMemoryDataProvider>();
   auto* fake_data_provider = data_provider.get();
 
-  auto personal_context_resolver =
-      std::make_unique<FakePersonalContextResolver>();
-  auto* fake_personal_context_resolver = personal_context_resolver.get();
-
-  auto service = std::make_unique<AtMemoryQueryService>(
-      std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider), std::move(personal_context_resolver),
-      /*remote_model_executor=*/nullptr);
+  personal_context::proto::AtMemoryQueryResponse response;
+  StubFetchContextResponse(std::move(response));
 
   MemorySearchResult local_entry(MemoryDataType::kAddressFull, u"Address",
                                  u"123 San Diego St Home San Diego");
   fake_data_provider->SetResults({local_entry});
 
-  // The personal context resolver returns nothing.
-  fake_personal_context_resolver->set_results({});
-
   base::test::TestFuture<MemorySearchResults> future;
+  auto service = std::make_unique<AtMemoryQueryService>(
+      std::make_unique<MockAtMemoryQueryServiceDelegate>(),
+      std::move(data_provider), &mock_service_, "en-US",
+      /*remote_model_executor=*/nullptr);
   service->Query(u"What's my home address in New York",
                  future.GetRepeatingCallback());
 
@@ -502,35 +496,29 @@ TEST_F(
   EXPECT_THAT(result.entries, testing::ElementsAre(testing::Field(
                                   &MemorySearchResult::value,
                                   u"123 San Diego St Home San Diego")));
-  EXPECT_EQ(fake_personal_context_resolver->last_query(),
-            u"What's my home address in New York");
 }
 
-// Tests that the query service queries the personal context resolver and merges
+// Tests that the query service queries the personal context service and merges
 // results if local data is found.
 TEST_F(AtMemoryQueryServiceTest,
        Query_QueriesPersonalContextAndMergesIfLocalDataFound) {
   auto data_provider = std::make_unique<FakeMemoryDataProvider>();
   auto* fake_data_provider = data_provider.get();
 
-  auto personal_context_resolver =
-      std::make_unique<FakePersonalContextResolver>();
-  auto* fake_personal_context_resolver = personal_context_resolver.get();
-
-  auto service = std::make_unique<AtMemoryQueryService>(
-      std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider), std::move(personal_context_resolver),
-      /*remote_model_executor=*/nullptr);
+  personal_context::proto::AtMemoryQueryResponse response =
+      CreateQueryResponseWithSchemafulKey(
+          personal_context::proto::MEMORY_DATA_TYPE_NAME_FULL, "Jane Doe");
+  StubFetchContextResponse(std::move(response));
 
   MemorySearchResult local_entry(MemoryDataType::kNameFull, u"Name",
                                  u"John Doe");
   fake_data_provider->SetResults({local_entry});
 
-  MemorySearchResult personal_context_entry(MemoryDataType::kNameFull, u"Name",
-                                            u"Jane Doe");
-  fake_personal_context_resolver->set_results({personal_context_entry});
-
   base::test::RepeatingTestFuture<MemorySearchResults> future;
+  auto service = std::make_unique<AtMemoryQueryService>(
+      std::make_unique<MockAtMemoryQueryServiceDelegate>(),
+      std::move(data_provider), &mock_service_, "en-US",
+      /*remote_model_executor=*/nullptr);
   service->Query(u"what is my name", future.GetCallback());
 
   MemorySearchResults partial_result = future.Take();
@@ -545,26 +533,20 @@ TEST_F(AtMemoryQueryServiceTest,
               testing::UnorderedElementsAre(
                   testing::Field(&MemorySearchResult::value, u"John Doe"),
                   testing::Field(&MemorySearchResult::value, u"Jane Doe")));
-  EXPECT_EQ(fake_personal_context_resolver->last_query(), u"what is my name");
 }
 
 // Tests that the query service returns the appropriate error status when the
-// personal context resolver fails.
-TEST_F(AtMemoryQueryServiceTest, Query_PersonalContextResolverError) {
-  auto personal_context_resolver =
-      std::make_unique<FakePersonalContextResolver>();
-  auto* fake_personal_context_resolver = personal_context_resolver.get();
-
-  auto service = std::make_unique<AtMemoryQueryService>(
-      std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::make_unique<FakeMemoryDataProvider>(),
-      std::move(personal_context_resolver),
-      /*remote_model_executor=*/nullptr);
-
-  fake_personal_context_resolver->set_error(
+// personal context service fails.
+TEST_F(AtMemoryQueryServiceTest, Query_PersonalContextError) {
+  StubFetchContextError(
       personal_context::ContextMemoryError::FromExecutionError(
           personal_context::ContextMemoryError::ExecutionError::
               kPermissionDenied));
+
+  auto service = std::make_unique<AtMemoryQueryService>(
+      std::make_unique<MockAtMemoryQueryServiceDelegate>(),
+      std::make_unique<FakeMemoryDataProvider>(), &mock_service_, "en-US",
+      /*remote_model_executor=*/nullptr);
 
   base::test::TestFuture<MemorySearchResults> future;
   service->Query(u"random query", future.GetRepeatingCallback());
@@ -576,31 +558,26 @@ TEST_F(AtMemoryQueryServiceTest, Query_PersonalContextResolverError) {
 }
 
 // Tests that the query service returns the local fallback entries even when
-// the personal context resolver fails.
+// the personal context service fails.
 TEST_F(AtMemoryQueryServiceTest,
-       Query_PersonalContextResolverError_ReturnsLocalFallback) {
+       Query_PersonalContextError_ReturnsLocalFallback) {
   auto data_provider = std::make_unique<FakeMemoryDataProvider>();
   auto* fake_data_provider = data_provider.get();
 
-  auto personal_context_resolver =
-      std::make_unique<FakePersonalContextResolver>();
-  auto* fake_personal_context_resolver = personal_context_resolver.get();
-
-  auto service = std::make_unique<AtMemoryQueryService>(
-      std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider), std::move(personal_context_resolver),
-      /*remote_model_executor=*/nullptr);
+  StubFetchContextError(
+      personal_context::ContextMemoryError::FromExecutionError(
+          personal_context::ContextMemoryError::ExecutionError::
+              kPermissionDenied));
 
   MemorySearchResult local_entry(MemoryDataType::kNameFull, u"Name",
                                  u"John Doe");
   fake_data_provider->SetResults({local_entry});
 
-  fake_personal_context_resolver->set_error(
-      personal_context::ContextMemoryError::FromExecutionError(
-          personal_context::ContextMemoryError::ExecutionError::
-              kPermissionDenied));
-
   base::test::RepeatingTestFuture<MemorySearchResults> future;
+  auto service = std::make_unique<AtMemoryQueryService>(
+      std::make_unique<MockAtMemoryQueryServiceDelegate>(),
+      std::move(data_provider), &mock_service_, "en-US",
+      /*remote_model_executor=*/nullptr);
   service->Query(u"what is my name", future.GetCallback());
 
   // We should first get the partial success with local entries.
@@ -626,7 +603,7 @@ TEST_F(AtMemoryQueryServiceTest, StaleResultsAreNotSent) {
   auto* fake_data_provider = data_provider.get();
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider), /*personal_context_resolver=*/nullptr,
+      std::move(data_provider), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   base::test::TestFuture<MemorySearchResults> future1;
@@ -656,7 +633,7 @@ TEST_F(AtMemoryQueryServiceTest, Query_DeduplicatesResults_PreservesOrder) {
 
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider1), /*personal_context_resolver=*/nullptr,
+      std::move(data_provider1), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   MemorySearchResult result1(MemoryDataType::kNameFull, u"Name", u"Alice");
@@ -688,7 +665,7 @@ TEST_F(AtMemoryQueryServiceTest,
 
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider1), /*personal_context_resolver=*/nullptr,
+      std::move(data_provider1), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   EntryMetadata metadata(MemoryDataType::kAddressCity, u"City", u"San Diego");
@@ -731,7 +708,7 @@ TEST_F(AtMemoryQueryServiceTest,
 
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider1), /*personal_context_resolver=*/nullptr,
+      std::move(data_provider1), nullptr, "",
       /*remote_model_executor=*/nullptr);
 
   EntryMetadata metadata_sd(MemoryDataType::kAddressCity, u"City",
@@ -801,7 +778,7 @@ TEST_F(AtMemoryQueryServiceTest,
   base::test::TestFuture<MemorySearchResults> future;
   auto service = std::make_unique<AtMemoryQueryService>(
       std::make_unique<MockAtMemoryQueryServiceDelegate>(),
-      std::move(data_provider), /*personal_context_resolver=*/nullptr,
+      std::move(data_provider), nullptr, "",
       /*remote_model_executor=*/nullptr);
   service->Query(u"random query", future.GetRepeatingCallback());
 
@@ -811,6 +788,37 @@ TEST_F(AtMemoryQueryServiceTest,
   EXPECT_THAT(result.entries, testing::ElementsAre(testing::Field(
                                   &MemorySearchResult::value, u"Jane Doe")));
   EXPECT_EQ(fake_data_provider->last_type(), MemoryDataType::kNameFull);
+}
+
+TEST_F(AtMemoryQueryServiceTest,
+       Query_PersonalContextDebug_ReturnsLocalAddressSuggestions) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeature(
+      personal_context::features::debug::kMockPersonalContextResult);
+
+  auto data_provider = std::make_unique<FakeMemoryDataProvider>();
+  auto* fake_data_provider = data_provider.get();
+  auto service = std::make_unique<AtMemoryQueryService>(
+      std::make_unique<MockAtMemoryQueryServiceDelegate>(),
+      std::move(data_provider), /*personal_context_service=*/nullptr,
+      /*locale=*/"", /*remote_model_executor=*/nullptr);
+
+  MemorySearchResult address_entry(MemoryDataType::kAddressFull, u"Address",
+                                   u"123 Main St, Anytown");
+  fake_data_provider->SetResults({address_entry});
+
+  base::test::TestFuture<MemorySearchResults> future;
+  // Send an unrelated query to verify it still returns local address
+  // suggestions.
+  service->Query(u"random query string 12345", future.GetRepeatingCallback());
+
+  ASSERT_TRUE(future.Wait());
+  const auto& result = future.Get();
+  EXPECT_EQ(result.status, MemorySearchStatus::kFinalResponseSuccess);
+  EXPECT_THAT(result.entries,
+              testing::ElementsAre(testing::Field(&MemorySearchResult::value,
+                                                  u"123 Main St, Anytown")));
+  EXPECT_EQ(fake_data_provider->last_type(), MemoryDataType::kAddressFull);
 }
 
 }  // namespace

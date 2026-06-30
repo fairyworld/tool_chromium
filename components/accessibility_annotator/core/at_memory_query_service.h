@@ -15,11 +15,15 @@
 #include "base/types/expected.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_data_provider.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_search_result.h"
-#include "components/accessibility_annotator/core/annotation_reducer/personal_context_resolver.h"
 #include "components/accessibility_annotator/core/annotation_reducer/query_classifier.h"
 #include "components/accessibility_annotator/core/at_memory_query_service_delegate.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/personal_context/core/context_memory_error.h"
+#include "components/personal_context/core/personal_context_types.h"
+
+namespace personal_context {
+class PersonalContextService;
+}
 
 namespace optimization_guide {
 class RemoteModelExecutor;
@@ -35,7 +39,8 @@ class AtMemoryQueryService : public KeyedService {
   AtMemoryQueryService(
       std::unique_ptr<AtMemoryQueryServiceDelegate> delegate,
       std::unique_ptr<MemoryDataProvider> data_provider,
-      std::unique_ptr<PersonalContextResolver> personal_context_resolver,
+      personal_context::PersonalContextService* personal_context_service,
+      const std::string& locale,
       optimization_guide::RemoteModelExecutor* remote_model_executor);
   AtMemoryQueryService(const AtMemoryQueryService&) = delete;
   AtMemoryQueryService& operator=(const AtMemoryQueryService&) = delete;
@@ -64,35 +69,33 @@ class AtMemoryQueryService : public KeyedService {
       base::RepeatingCallback<void(MemorySearchResults)> update_callback,
       std::vector<MemorySearchResult> entries);
 
-  // Queries the `PersonalContextResolver` for remote results.
+  // Queries the `PersonalContextService` for remote results.
   // `filtered_local_entries` are matching local results to be merged with
   // the remote results on success. `fallback_local_entries` are to be returned
   // if the remote query finds no matches (can be the unfiltered local entries
   // as a last resort if absolutely no keyword matches were found).
-  void QueryPersonalContextResolver(
+  void QueryPersonalContext(
       std::u16string query,
       ClassifiedQuery classified_query,
       base::RepeatingCallback<void(MemorySearchResults)> update_callback,
       std::vector<MemorySearchResult> filtered_local_entries,
       std::vector<MemorySearchResult> fallback_local_entries);
 
-  void OnPersonalContextResolverComplete(
+  void OnPersonalContextQueryComplete(
       ClassifiedQuery classified_query,
       base::RepeatingCallback<void(MemorySearchResults)> update_callback,
       std::vector<MemorySearchResult> filtered_local_entries,
       std::vector<MemorySearchResult> fallback_local_entries,
-      base::expected<std::vector<MemorySearchResult>,
-                     personal_context::ContextMemoryError>
-          personal_context_entries);
+      personal_context::FetchContextResult result);
 
   std::unique_ptr<AtMemoryQueryServiceDelegate> delegate_;
   std::unique_ptr<MemoryDataProvider> data_provider_;
-  std::unique_ptr<PersonalContextResolver> personal_context_resolver_;
+  raw_ptr<personal_context::PersonalContextService> personal_context_service_ =
+      nullptr;
+  std::string locale_;
   QueryClassifier classifier_;
 
   base::WeakPtrFactory<AtMemoryQueryService> weak_ptr_factory_{this};
-  base::WeakPtrFactory<AtMemoryQueryService> personal_context_weak_ptr_factory_{
-      this};
 };
 
 }  // namespace accessibility_annotator

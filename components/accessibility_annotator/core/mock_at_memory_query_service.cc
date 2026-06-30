@@ -30,7 +30,8 @@ MockAtMemoryQueryService::MockAtMemoryQueryService()
     : accessibility_annotator::AtMemoryQueryService(
           std::make_unique<StubAtMemoryQueryServiceDelegate>(),
           /*data_provider=*/nullptr,
-          /*personal_context_resolver=*/nullptr,
+          /*personal_context_service=*/nullptr,
+          /*locale=*/"",
           /*remote_model_executor=*/nullptr) {}
 
 MockAtMemoryQueryService::~MockAtMemoryQueryService() = default;

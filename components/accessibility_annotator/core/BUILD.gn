@@ -14,7 +14,6 @@ source_set("core") {
     ":prefs",
     "//base",
     "//components/accessibility_annotator/core/annotation_reducer",
-    "//components/accessibility_annotator/core/annotation_reducer:personal_context_resolver",
     "//components/accessibility_annotator/core/data_models",
     "//components/accessibility_annotator/core/storage",
     "//components/account_settings",
@@ -28,6 +27,8 @@ source_set("core") {
     "//net",
     "//url",
   ]
+
+  deps = [ "//components/personal_context/proto:personal_context_proto" ]
 }
 
 source_set("features") {
@@ -78,6 +79,7 @@ source_set("unit_tests") {
     "//components/accessibility_annotator/core/storage:unit_tests",
     "//components/account_settings",
     "//components/account_settings:test_support",
+    "//components/personal_context/core:test_support",
     "//components/prefs:test_support",
     "//components/signin/public/identity_manager:test_support",
     "//components/subscription_eligibility",

@@ -19,7 +19,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/accessibility_annotator/core/accessibility_annotator_features.h"
-#include "components/accessibility_annotator/core/annotation_reducer/personal_context_resolver_impl.h"
 #include "components/accessibility_annotator/core/at_memory_query_service.h"
 #include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
 #include "components/autofill/core/browser/at_memory/autofill_data_provider_impl.h"
@@ -72,20 +71,11 @@ AtMemoryQueryServiceFactory::BuildServiceInstanceForBrowserContext(
   personal_context::PersonalContextService* personal_context_service =
       PersonalContextServiceFactory::GetForProfile(profile);
 
-  std::unique_ptr<accessibility_annotator::PersonalContextResolver>
-      personal_context_resolver;
-  if (personal_context_service) {
-    personal_context_resolver =
-        std::make_unique<accessibility_annotator::PersonalContextResolverImpl>(
-            personal_context_service,
-            g_browser_process->GetApplicationLocale());
-  }
-
   return std::make_unique<accessibility_annotator::AtMemoryQueryService>(
       std::make_unique<
           accessibility_annotator::AtMemoryQueryServiceDelegateImpl>(profile),
-      std::move(data_provider), std::move(personal_context_resolver),
-      optimization_guide_service);
+      std::move(data_provider), personal_context_service,
+      g_browser_process->GetApplicationLocale(), optimization_guide_service);
 }
 
 bool AtMemoryQueryServiceFactory::ServiceIsCreatedWithBrowserContext() const {
