@@ -1121,6 +1121,27 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Enterprise.DataControls.GlicPaste.EvaluationLatency"
+    units="ms" expires_after="2027-06-29">
+  <owner>haihan@google.com</owner>
+  <owner>cbe-cep-eng@google.com</owner>
+  <summary>
+    Records the time taken to evaluate the Data Controls policy verdict for a
+    Glic paste operation. This is synchronous on the UI thread. Recorded when
+    the policy evaluation finishes, immediately before the verdict is returned.
+  </summary>
+</histogram>
+
+<histogram name="Enterprise.DataControls.GlicPaste.Verdict"
+    enum="EnterpriseDlpPolicyLevel" expires_after="2027-06-29">
+  <owner>haihan@google.com</owner>
+  <owner>cbe-cep-eng@google.com</owner>
+  <summary>
+    Records the verdict of the Data Controls policy check for a Glic paste
+    operation. Recorded when the policy evaluation completes.
+  </summary>
+</histogram>
+
 <histogram name="Enterprise.DataControls.SearchWith.Verdict"
     enum="EnterpriseDlpPolicyLevel" expires_after="2027-05-11">
   <owner>anaercegovac@google.com</owner>
@@ -3383,6 +3404,18 @@ chromium-metrics-reviews@google.com.
     <variant name="Dasher-based" summary="google-backed 3P identity"/>
     <variant name="Dasherless" summary="non-google-backed 3P identity"/>
   </token>
+</histogram>
+
+<histogram name="Enterprise.OnBulkDataEntry.Actor.DataSize" units="bytes"
+    expires_after="2027-06-29">
+  <owner>haihan@google.com</owner>
+  <owner>cbe-cep-eng@google.com</owner>
+  <summary>
+    Records the size (in bytes) of data that might have been scanned by the
+    OnBulkDataEntry Enterprise Connector, specifically for the Actor access
+    point (e.g., Glic Paste). It is logged once per user action that triggers
+    this Connector.
+  </summary>
 </histogram>
 
 <histogram name="Enterprise.OnBulkDataEntry.DataSize" units="bytes"
