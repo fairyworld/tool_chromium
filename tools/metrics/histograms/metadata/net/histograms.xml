@@ -9467,6 +9467,20 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Net.StructuredHeaders.DecimalWithZeroFractionalDigits"
+    enum="Boolean" expires_after="2026-10-01">
+  <owner>apaseltiner@chromium.org</owner>
+  <owner>net-dev@chromium.org</owner>
+  <summary>
+    Whether a decimal point in a Structured Header is erroneously accepted
+    without any digits following it. Emitted whenever a decimal-typed bare item
+    (https://www.rfc-editor.org/rfc/rfc8941.html#name-decimals) is successfully
+    parsed, regardless of whether subsequent parsing of the remainder of the
+    top-level Structured Header is successful. See crbug.com/517189418 for
+    details.
+  </summary>
+</histogram>
+
 <histogram name="Net.TaskRunner.RequestPriority" enum="RequestPriority"
     expires_after="2026-11-01">
   <owner>hayato@chromium.org</owner>
