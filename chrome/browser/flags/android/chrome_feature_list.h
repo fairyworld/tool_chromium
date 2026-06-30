@@ -202,6 +202,7 @@ BASE_DECLARE_FEATURE(kIncognitoScreenshot);
 BASE_DECLARE_FEATURE(kIncognitoThemeOverlayTesting);
 BASE_DECLARE_FEATURE(kInlinePdfV2);
 BASE_DECLARE_FEATURE(kInlinePdfV2Download);
+BASE_DECLARE_FEATURE(kInlinePdfV2Incognito);
 BASE_DECLARE_FEATURE(kKeyboardEscBackNavigation);
 BASE_DECLARE_FEATURE(kLanguagesPreference);
 BASE_DECLARE_FEATURE(kLaunchCauseScreenOffFix);

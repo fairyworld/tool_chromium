@@ -140,7 +140,7 @@ public class PdfUtils {
     public static boolean shouldOpenPdfInline(boolean isIncognito) {
         if (sShouldOpenPdfInlineForTesting) return true;
         if (isIncognito) {
-            return false;
+            return ChromeFeatureList.sInlinePdfV2Incognito.isEnabled();
         }
         return isPlatformSupported();
     }
