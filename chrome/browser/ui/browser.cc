@@ -1153,11 +1153,11 @@ void Browser::UpdateUIForNavigationInTab(WebContents* contents,
 
   bool contents_is_selected =
       contents == tab_strip_model_->GetActiveWebContents();
-  if (user_initiated && contents_is_selected && window()->GetLocationBar()) {
+  if (user_initiated && contents_is_selected && window_->GetLocationBar()) {
     // Forcibly reset the location bar if the url is going to change in the
     // current tab, since otherwise it won't discard any ongoing user edits,
     // since it doesn't realize this is a user-initiated action.
-    window()->GetLocationBar()->Revert();
+    window_->GetLocationBar()->Revert();
   }
 
   std::vector<StatusBubble*> status_bubbles = GetStatusBubbles();
@@ -1180,7 +1180,7 @@ void Browser::UpdateUIForNavigationInTab(WebContents* contents,
   // Note that focusing contents of NTP-initiated navigations is taken care of
   // elsewhere - see FocusTabAfterNavigationHelper.
   if (user_initiated && contents_is_selected &&
-      (window()->IsActive() ||
+      (window_->IsActive() ||
        action == NavigateParams::WindowAction::kShowWindow)) {
     contents->SetInitialFocus();
   }
@@ -1322,15 +1322,15 @@ void Browser::SetFocusToLocationBar() {
 
 void Browser::PreHandleDragUpdate(const content::DropData& drop_data,
                                   const gfx::PointF& client_pt) {
-  window()->PreHandleDragUpdate(drop_data, client_pt);
+  window_->PreHandleDragUpdate(drop_data, client_pt);
 }
 
 void Browser::PreHandleDragExit() {
-  window()->PreHandleDragExit();
+  window_->PreHandleDragExit();
 }
 
 void Browser::HandleDragEnded() {
-  window()->HandleDragEnded();
+  window_->HandleDragEnded();
 }
 
 content::KeyboardEventProcessingResult Browser::PreHandleKeyboardEvent(
@@ -1344,7 +1344,7 @@ content::KeyboardEventProcessingResult Browser::PreHandleKeyboardEvent(
     return content::KeyboardEventProcessingResult::HANDLED;
   }
 
-  return window()->PreHandleKeyboardEvent(event);
+  return window_->PreHandleKeyboardEvent(event);
 }
 
 bool Browser::HandleKeyboardEvent(content::WebContents* source,
@@ -1352,7 +1352,7 @@ bool Browser::HandleKeyboardEvent(content::WebContents* source,
   DevToolsWindow* devtools_window =
       DevToolsWindow::GetInstanceForInspectedWebContents(source);
   return (devtools_window && devtools_window->ForwardKeyboardEvent(event)) ||
-         window()->HandleKeyboardEvent(event);
+         window_->HandleKeyboardEvent(event);
 }
 
 bool Browser::CanDragEnter(content::WebContents* source,
@@ -1989,7 +1989,7 @@ bool Browser::GuestSaveFrame(content::WebContents* guest_web_contents) {
 std::unique_ptr<content::EyeDropper> Browser::OpenEyeDropper(
     content::RenderFrameHost* frame,
     content::EyeDropperListener* listener) {
-  return window()->OpenEyeDropper(frame, listener);
+  return window_->OpenEyeDropper(frame, listener);
 }
 
 bool Browser::ShouldUseInstancedSystemMediaControls() const {
@@ -2836,7 +2836,7 @@ void Browser::ProcessPendingUIUpdates() {
 
       // TODO(crbug.com/40122780): Ideally, we should simply ask the state to
       // update, and doing that in an appropriate and efficient manner.
-      window()->UpdatePageActionIcon(PageActionIconType::kPwaInstall);
+      window_->UpdatePageActionIcon(PageActionIconType::kPwaInstall);
     }
 
     // We don't need to process INVALIDATE_STATE, since that's not visible.
@@ -3000,7 +3000,7 @@ void Browser::TabDetachedAtImpl(content::WebContents* contents,
     // location bar, saving the current tab's location bar state to a
     // non-selected tab can corrupt both tabs.
     if (was_active) {
-      LocationBar* location_bar = window()->GetLocationBar();
+      LocationBar* location_bar = window_->GetLocationBar();
       if (location_bar) {
         location_bar->SaveStateToContents(contents);
       }
