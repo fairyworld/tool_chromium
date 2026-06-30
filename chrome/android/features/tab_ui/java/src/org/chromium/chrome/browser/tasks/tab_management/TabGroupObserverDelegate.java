@@ -13,7 +13,6 @@ import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tabmodel.TabGroupObserver;
-import org.chromium.chrome.browser.tabmodel.TabGroupObserver.DidRemoveTabGroupReason;
 import org.chromium.chrome.browser.tabmodel.TabModel;
 import org.chromium.components.tab_groups.TabGroupColorId;
 import org.chromium.ui.modelutil.PropertyModel;
@@ -71,23 +70,5 @@ abstract class TabGroupObserverDelegate implements TabGroupObserver {
 
         if (!mModelList.isValidIndex(newPosition)) return;
         mModelList.move(curPosition, newPosition);
-    }
-
-    @Override
-    public void didMoveTabGroup(Tab movedTab, int tabModelOldIndex, int tabModelNewIndex) {
-        // TODO(crbug.com/509226293): Pending migration.
-    }
-
-    @Override
-    public void didCreateNewGroup(Tab destinationTab, TabModel tabModel) {
-        // TODO(crbug.com/509226293): Pending migration.
-    }
-
-    @Override
-    public void didRemoveTabGroup(
-            int oldRootId,
-            @Nullable Token oldTabGroupId,
-            @DidRemoveTabGroupReason int removalReason) {
-        // TODO(crbug.com/509226293): Pending migration.
     }
 }

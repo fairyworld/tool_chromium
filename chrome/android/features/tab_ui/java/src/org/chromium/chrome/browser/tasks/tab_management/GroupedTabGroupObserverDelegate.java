@@ -15,7 +15,9 @@ import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabId;
 import org.chromium.chrome.browser.tab_ui.ThumbnailProvider;
+import org.chromium.chrome.browser.tabmodel.TabGroupUtils;
 import org.chromium.chrome.browser.tabmodel.TabModel;
+import org.chromium.components.tab_groups.TabGroupColorId;
 import org.chromium.ui.modelutil.PropertyModel;
 
 import java.util.List;
@@ -137,6 +139,68 @@ class GroupedTabGroupObserverDelegate extends TabGroupObserverDelegate {
             RecordUserAction.record("TabGroup.Created.DropToMerge");
         } else {
             RecordUserAction.record("TabGrid.Drag.DropToMerge");
+        }
+    }
+
+    @Override
+    public void didMoveTabGroup(Tab movedTab, int tabModelOldIndex, int tabModelNewIndex) {
+        List<Tab> relatedTabs = mMediator.getRelatedTabsForId(movedTab.getId());
+        TabModel tabModel = mMediator.getCurrentTabModelChecked();
+        Tab currentGroupSelectedTab = TabGroupUtils.getSelectedTabInGroupForTab(tabModel, movedTab);
+        int curPosition = mModelList.indexFromTabId(currentGroupSelectedTab.getId());
+        if (curPosition == TabModel.INVALID_TAB_INDEX) {
+            // Sync TabListModel with updated TabModel.
+            int indexToUpdate =
+                    mModelList.indexOfNthTabCard(
+                            tabModel.representativeIndexOf(tabModel.getTabAt(tabModelOldIndex)));
+            mModelList.updateTabListModelIdForGroup(currentGroupSelectedTab, indexToUpdate);
+            curPosition = mModelList.indexFromTabId(currentGroupSelectedTab.getId());
+        }
+        if (!mModelList.isValidIndex(curPosition)) return;
+
+        // TODO(crbug.com/526117174): We can use getInsertionIndexOfTab(currentGroupSelectedTab)
+        // to determine the new position, instead of manual offset math and looking up
+        // adjacent tabs.
+
+        // Find the tab which was in the destination index before this move. Use
+        // that tab to figure out the new position.
+        int destinationTabIndex =
+                tabModelNewIndex > tabModelOldIndex
+                        ? tabModelNewIndex - relatedTabs.size()
+                        : tabModelNewIndex + 1;
+        Tab destinationTab = tabModel.getTabAt(destinationTabIndex);
+        assumeNonNull(destinationTab);
+        Tab destinationGroupSelectedTab =
+                TabGroupUtils.getSelectedTabInGroupForTab(tabModel, destinationTab);
+        int newPosition = mModelList.indexFromTabId(destinationGroupSelectedTab.getId());
+        if (newPosition == TabModel.INVALID_TAB_INDEX) {
+            int indexToUpdate =
+                    mModelList.indexOfNthTabCard(
+                            tabModel.representativeIndexOf(destinationTab)
+                                    + (tabModelNewIndex > tabModelOldIndex ? 1 : -1));
+            mModelList.updateTabListModelIdForGroup(destinationGroupSelectedTab, indexToUpdate);
+            newPosition = mModelList.indexFromTabId(destinationGroupSelectedTab.getId());
+        }
+        if (!mModelList.isValidIndex(newPosition) || newPosition == curPosition) return;
+
+        mModelList.move(curPosition, newPosition);
+    }
+
+    @Override
+    public void didCreateNewGroup(Tab destinationTab, TabModel tabModel) {
+        // On new group creation for the tab group representation in the GTS, update
+        // the tab group color icon.
+        int groupIndex = tabModel.representativeIndexOf(destinationTab);
+        Tab groupTab = tabModel.getRepresentativeTabAt(groupIndex);
+        assumeNonNull(groupTab);
+        PropertyModel model = mModelList.getModelFromTabId(groupTab.getId());
+
+        if (model != null) {
+            Token tabGroupId = destinationTab.getTabGroupId();
+            assumeNonNull(tabGroupId);
+            @TabGroupColorId int colorId = tabModel.getTabGroupColorWithFallback(tabGroupId);
+            mMediator.updateTabGroupProperties(destinationTab, model, colorId);
+            mMediator.updateFaviconForTab(model, groupTab, null, null);
         }
     }
 }
