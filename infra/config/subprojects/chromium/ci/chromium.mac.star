@@ -671,13 +671,15 @@ ci.thin_tester(
                 ],
                 remove_mixins = "mac_26_vm_optional",
             ),
+            # TODO(crbug.com/526983048): Can restore after fixing python crashes.
+            "chrome_wpt_tests": targets.mixin(
+                ci_only = True,
+            ),
             "telemetry_perf_unittests": targets.mixin(
                 ci_only = True,
             ),
         },
     ),
-    # TODO(crbug.com/502668461): Enable rotation when builder stabalizes.
-    gardener_rotations = args.ignore_default(None),
     tree_closing = False,
     console_view_entry = consoles.console_view_entry(
         category = "release|arm64",

@@ -186,7 +186,7 @@ try_.orchestrator_builder(
     branch_selector = branches.selector.MAC_BRANCHES,
     mirrors = [
         "ci/mac-arm64-rel",
-        "ci/mac15-arm64-rel-tests",
+        "ci/mac26-arm64-rel-tests",
         "ci/GPU Mac arm64 Builder",
         "ci/Mac Retina Release (Apple M2)",
     ],
