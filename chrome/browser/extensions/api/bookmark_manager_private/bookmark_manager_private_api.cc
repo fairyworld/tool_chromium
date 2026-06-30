@@ -965,6 +965,35 @@ BookmarkManagerPrivateOpenInNewTabGroupFunction::RunOnReady() {
                             base::JoinString(params->id_list, ", ")));
   }
 
+  // OpenAllIfAllowed opens each URL node plus the immediate URL children of any
+  // folder (GetURLsToOpen recurses one level). Run each through the
+  // extension-navigation deny-list first, like the sibling OpenInNewTab path,
+  // so a compromised renderer can't open a denied scheme (e.g. devtools://).
+  auto check_url = [&](const GURL& url) -> std::optional<std::string> {
+    base::expected<GURL, std::string> maybe_url =
+        ExtensionTabUtil::PrepareURLForNavigation(url.spec(), extension(),
+                                                  browser_context());
+    if (!maybe_url.has_value()) {
+      return std::move(maybe_url.error());
+    }
+    return std::nullopt;
+  };
+  for (const bookmarks::BookmarkNode* node : nodes) {
+    if (node->is_url()) {
+      if (auto error = check_url(node->url())) {
+        return RespondNow(Error(std::move(*error)));
+      }
+    } else {
+      for (const auto& child : node->children()) {
+        if (child->is_url()) {
+          if (auto error = check_url(child->url())) {
+            return RespondNow(Error(std::move(*error)));
+          }
+        }
+      }
+    }
+  }
+
   bookmarks::OpenAllIfAllowed(browser, nodes,
                               WindowOpenDisposition::NEW_BACKGROUND_TAB,
                               bookmarks::OpenAllBookmarksContext::kInGroup);
