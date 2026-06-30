@@ -64,8 +64,9 @@ def turn_off_allocator_shim_for_musl(module):
 
 
 def create_cc_defaults_module(context: translation_context.TranslationContext):
-    defaults = soong_ast.Module('cc_defaults', context.cc_defaults_module,
-                                '//gn:default_deps', context)
+    defaults = soong_ast.create_module('cc_defaults',
+                                       context.cc_defaults_module,
+                                       '//gn:default_deps', context)
     defaults.cflags = [
         # TODO: this list is brittle and painful to maintain. We are too easily
         # broken by changes to Chromium cflags, e.g. https://crbug.com/406704769.
@@ -145,7 +146,7 @@ def apply_post_processing(module, context):
         elif add_val is None:
             setattr(module, key, None)
         elif isinstance(add_val[1], dict) and isinstance(
-                curr[add_val[0]], soong_ast.Module.Target):
+                curr[add_val[0]], soong_ast.Target):
             curr[add_val[0]].__dict__.update(add_val[1])
         elif isinstance(curr, dict):
             curr[add_val[0]] = add_val[1]
@@ -158,12 +159,12 @@ def make_cc_defaults_from_boringssl(
         boringssl_module: soong_ast.Module,
         context: translation_context.TranslationContext) -> soong_ast.Module:
     module_name = boringssl_module.name + "__flags"
-    cc_default_flags_module = soong_ast.Module(
+    cc_default_flags_module = soong_ast.create_module(
         "cc_defaults", module_name,
         "Flags auto-extracted from BoringSSL GN rules, to be used in manually maintained BoringSSL Android.bp rules",
         context)
 
-    libcrypto_cc_defaults_flags_module = soong_ast.Module(
+    libcrypto_cc_defaults_flags_module = soong_ast.create_module(
         "cc_defaults", f'{module_name}_libcrypto',
         f"""This cc_defaults inherits the same flags from {module_name} except some flags that breaks FIPS compliance.""",
         context)
@@ -336,29 +337,29 @@ def _rebase_module(module: soong_ast.Module,
     module_copy = copy.deepcopy(module)
     # TODO: Find a better way to rebase attribute and verify if all rebase operations
     # have succeeded or not.
-    if module_copy.crate_root:
+    if getattr(module_copy, 'crate_root', None):
         module_copy.crate_root = _rebase_file(module_copy.crate_root,
                                               blueprint_path)
         if module_copy.crate_root is None:
             return None
 
-    if module_copy.path:
+    if getattr(module_copy, 'path', None):
         module_copy.path = _rebase_file(module_copy.path, blueprint_path)
         if module_copy.path is None:
             return None
 
-    if module_copy.wrapper_src:
+    if getattr(module_copy, 'wrapper_src', None):
         module_copy.wrapper_src = _rebase_file(module_copy.wrapper_src,
                                                blueprint_path)
         if module_copy.wrapper_src is None:
             return None
 
-    if module_copy.srcs:
+    if getattr(module_copy, 'srcs', None):
         module_copy.srcs = _rebase_files(module_copy.srcs, blueprint_path)
         if module_copy.srcs is None:
             return None
 
-    if module_copy.jars:
+    if getattr(module_copy, 'jars', None):
         module_copy.jars = _rebase_files(module_copy.jars, blueprint_path)
         if module_copy.jars is None:
             return None
@@ -395,8 +396,9 @@ def _maybe_create_license_module(
             or license_utils.is_ignored_readme_chromium(readme_relative_path)):
         return None
 
-    license_module = soong_ast.Module("license", _path_to_name(path, context),
-                                      "License-Artificial", context)
+    license_module = soong_ast.create_module("license",
+                                             _path_to_name(path, context),
+                                             "License-Artificial", context)
     license_module.visibility = {":__subpackages__"}
     # Assume that a LICENSE file always exist as we run the
     # create_android_metadata_license.py script each time we run GN2BP.
@@ -444,8 +446,8 @@ def finalize_package_modules(blueprints: Dict[str, soong_ast.Blueprint],
             # manually in Android.extras.bp.
             continue
 
-        package_module = soong_ast.Module("package", None,
-                                          "Package-Artificial", context)
+        package_module = soong_ast.create_module("package", None,
+                                                 "Package-Artificial", context)
         if blueprint.get_license_module():
             package_module.default_applicable_licenses.add(
                 blueprint.get_license_module().name)
@@ -512,7 +514,7 @@ def _locate_android_bp_destination(module: soong_ast.Module) -> str:
   :returns the appropriate location for the blueprint
   """
     crate_root_dir = _get_rust_crate_root_directory_from_crate_root(
-        module.crate_root)
+        getattr(module, 'crate_root', None))
     if module.build_file_path in translation_config.BLUEPRINTS_MAPPING:
         return translation_config.BLUEPRINTS_MAPPING[module.build_file_path]
     if crate_root_dir:
