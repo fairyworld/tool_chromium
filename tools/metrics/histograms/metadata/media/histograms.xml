@@ -3225,7 +3225,6 @@ chromium-metrics-reviews@google.com.
 <histogram name="Media.BreakoutBox.Usage" enum="BreakoutBoxUsage"
     expires_after="2026-09-25">
   <owner>guidou@chromium.org</owner>
-  <owner>hta@chromium.org</owner>
   <owner>tguilbert@chromium.org</owner>
   <summary>
     Usage of various BreakoutBox features. Recorded when a stream is created or
@@ -8570,7 +8569,6 @@ chromium-metrics-reviews@google.com.
 <histogram name="Media.VideoCapture.Win.ErrorEvent" enum="Hresult"
     expires_after="2026-12-06">
   <owner>toprice@chromium.org</owner>
-  <owner>hta@chromium.org</owner>
   <owner>video-cmi-apis@google.com</owner>
   <summary>
     Error codes received by VideoCaptureDeviceMFWin on Windows which caused a

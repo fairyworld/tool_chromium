@@ -27430,7 +27430,8 @@ be describing additional metrics about the same event.
 </event>
 
 <event name="WebRTC.AddressHarvesting">
-  <owner>hta@chromium.org</owner>
+  <owner>solenberg@chromium.org</owner>
+  <owner>webrtc-dev@chromium.org</owner>
   <summary>
     Collects usage patterns that may indicate attempts to gather users' IP
     addresses. A heuristic in the webrtc library tries to detect usages that may
