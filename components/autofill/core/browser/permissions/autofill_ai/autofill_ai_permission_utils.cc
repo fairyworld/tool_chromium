@@ -375,7 +375,8 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
 
   // State of the Address-Autofill pref.
   if (!prefs->GetBoolean(prefs::kAutofillProfileEnabled) &&
-      !base::FeatureList::IsEnabled(features::kAutofillAddOtherDatatypesPref)) {
+      !base::FeatureList::IsEnabled(
+          features::kAutofillEnableAutofillSettingsEnterprisePolicy)) {
     MaybeOutputReason(debug_message, "Address Autofill is not enabled.");
     return false;
   }

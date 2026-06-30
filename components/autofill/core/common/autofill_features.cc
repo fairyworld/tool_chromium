@@ -59,12 +59,6 @@ BASE_FEATURE(kAutofillActorRewriteCreditCardTriggerField,
 // saving to Autocomplete.
 BASE_FEATURE(kAutofillActorSuppressImport, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// When enabled, other Autofill AI data types are controlled by the
-// autofillOtherDatatypesEnabled policy and extension API. Previously, these
-// were controlled by autofillAddressesEnabled; consequently, Autofill AI no
-// longer depends on address-based Autofill being enabled.
-BASE_FEATURE(kAutofillAddOtherDatatypesPref, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Feature flag to control displaying of Autofill suggestions on
 // unclassified fields based on prefix matching. These suggestions are displayed
 // after the user typed a certain number of characters that match some data

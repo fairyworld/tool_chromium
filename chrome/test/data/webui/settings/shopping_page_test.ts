@@ -190,7 +190,7 @@ suite('ShoppingPage', function() {
         async function() {
           loadTimeData.overrideValues({
             userEligibleForAutofillAi: true,
-            AutofillAddOtherDatatypesPrefIsEnabled: experimentEnabled,
+            AutofillSettingsEnterprisePolicyEnabled: experimentEnabled,
             autofillAiAvailableByDefault: false,
           });
 
@@ -214,7 +214,7 @@ suite('ShoppingPage', function() {
       async function() {
         loadTimeData.overrideValues({
           userEligibleForAutofillAi: true,
-          AutofillAddOtherDatatypesPrefIsEnabled: false,
+          AutofillSettingsEnterprisePolicyEnabled: false,
           autofillAiAvailableByDefault: true,
           canEnableOrDisableAutofillAi: true,
         });
@@ -244,7 +244,7 @@ suite('ShoppingPage', function() {
       async function() {
         loadTimeData.overrideValues({
           userEligibleForAutofillAi: true,
-          AutofillAddOtherDatatypesPrefIsEnabled: false,
+          AutofillSettingsEnterprisePolicyEnabled: false,
           autofillAiAvailableByDefault: true,
           canEnableOrDisableAutofillAi: true,
         });
@@ -275,7 +275,7 @@ suite('ShoppingPage', function() {
       async function() {
         loadTimeData.overrideValues({
           userEligibleForAutofillAi: true,
-          AutofillAddOtherDatatypesPrefIsEnabled: false,
+          AutofillSettingsEnterprisePolicyEnabled: false,
           autofillAiAvailableByDefault: true,
           canEnableOrDisableAutofillAi: true,
         });
@@ -304,7 +304,7 @@ suite('ShoppingPage', function() {
       async function() {
         loadTimeData.overrideValues({
           userEligibleForAutofillAi: true,
-          AutofillAddOtherDatatypesPrefIsEnabled: false,
+          AutofillSettingsEnterprisePolicyEnabled: false,
           autofillAiAvailableByDefault: true,
           canEnableOrDisableAutofillAi: true,
         });
@@ -331,7 +331,7 @@ suite('ShoppingPage', function() {
       async function() {
         loadTimeData.overrideValues({
           userEligibleForAutofillAi: true,
-          AutofillAddOtherDatatypesPrefIsEnabled: false,
+          AutofillSettingsEnterprisePolicyEnabled: false,
           autofillAiAvailableByDefault: true,
           canEnableOrDisableAutofillAi: true,
         });
