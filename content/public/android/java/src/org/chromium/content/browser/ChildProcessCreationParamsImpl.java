@@ -35,7 +35,7 @@ public class ChildProcessCreationParamsImpl {
     // Use only the explicit WebContents.setImportance signal, and ignore other implicit
     // signals in content.
     private static boolean sIgnoreVisibilityForImportance;
-    private static boolean sForceNativeSandboxedService;
+    private static @Nullable Boolean sForceNativeSandboxedService;
 
     private static boolean sInitialized;
 
@@ -113,9 +113,10 @@ public class ChildProcessCreationParamsImpl {
     }
 
     public static boolean isNativeSandboxedServiceEnabled() {
-        return sForceNativeSandboxedService
-                || (isNativeSandboxedServiceSupported()
-                        && JavalessRenderersFeatureList.isEnabled());
+        if (sForceNativeSandboxedService != null) {
+            return sForceNativeSandboxedService;
+        }
+        return isNativeSandboxedServiceSupported() && JavalessRenderersFeatureList.isEnabled();
     }
 
     public static String getSandboxedServicesName() {
