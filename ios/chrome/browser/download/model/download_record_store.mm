@@ -4,13 +4,20 @@
 
 #import "ios/chrome/browser/download/model/download_record_store.h"
 
+#import <algorithm>
 #import <tuple>
 #import <utility>
 
 #import "base/files/file_util.h"
+#import "base/i18n/string_search.h"
+#import "base/strings/utf_string_conversions.h"
+#import "ios/chrome/browser/download/model/download_filename_util.h"
 #import "ios/chrome/browser/download/model/download_record_database.h"
+#import "ios/chrome/browser/download/model/download_record_query.h"
 
 namespace {
+
+using ::download_model::NormalizeFileName;
 
 // Determines whether a download record update should be persisted to the
 // database by comparing critical fields between the new and cached
@@ -27,6 +34,82 @@ bool ShouldPersistUpdate(const DownloadRecord& new_record,
   // Progress fields (received_bytes, progress_percent) are not persisted to
   // database.
   return !new_record.EqualsExcludingProgress(cached_record);
+}
+
+// Orders two records by `(created_time DESC, download_id DESC)`,
+// matching the DB layer's keyset pagination order.
+bool RecordSortsBefore(const DownloadRecord& lhs, const DownloadRecord& rhs) {
+  if (lhs.created_time != rhs.created_time) {
+    return lhs.created_time > rhs.created_time;
+  }
+  return lhs.download_id > rhs.download_id;
+}
+
+// Mirrors the DB layer's `created_time < ? OR (created_time = ? AND
+// download_id < ?)` so merged incognito rows obey the same cursor
+// contract as DB rows.
+bool RecordIsOlderThanCursor(const DownloadRecord& record,
+                             const DownloadRecordQuery& query) {
+  if (!query.cursor_created_time.has_value() ||
+      !query.cursor_download_id.has_value()) {
+    return true;
+  }
+  if (record.created_time != *query.cursor_created_time) {
+    return record.created_time < *query.cursor_created_time;
+  }
+  return record.download_id < *query.cursor_download_id;
+}
+
+// Pre-built per-query state shared across all records evaluated by
+// `MatchesNonCursorFilters`. Build via `MakeNameMatcher`.
+struct NameMatcher {
+  // Empty iff `query.name_query` is unset/empty.
+  std::string normalized;
+  // Non-null iff `normalized` is non-empty.
+  std::unique_ptr<base::i18n::FixedPatternStringSearchIgnoringCaseAndAccents>
+      icu_search;
+};
+
+// Empty matcher when `name_query` is unset/empty.
+NameMatcher MakeNameMatcher(const DownloadRecordQuery& query) {
+  NameMatcher matcher;
+  if (query.name_query.has_value() && !query.name_query->empty()) {
+    matcher.normalized = NormalizeFileName(*query.name_query);
+    matcher.icu_search = std::make_unique<
+        base::i18n::FixedPatternStringSearchIgnoringCaseAndAccents>(
+        base::UTF8ToUTF16(*query.name_query));
+  }
+  return matcher;
+}
+
+// Mirrors the DB layer's two-phase name filter so cache hits are
+// byte-identical to a cold DB scan: cheap superset (`NormalizeFileName`
+// substring) then authoritative ICU re-check. Cursor handling is
+// separate (`RecordIsOlderThanCursor`).
+bool MatchesNonCursorFilters(const DownloadRecord& record,
+                             const DownloadRecordQuery& query,
+                             const NameMatcher& matcher) {
+  if (query.filter_type.has_value() &&
+      *query.filter_type != DownloadFilterType::kAll) {
+    if (!IsDownloadFilterMatch(record.mime_type, *query.filter_type)) {
+      return false;
+    }
+  }
+
+  if (!matcher.normalized.empty()) {
+    if (NormalizeFileName(record.file_name).find(matcher.normalized) ==
+        std::string::npos) {
+      return false;
+    }
+    size_t match_index = 0;
+    size_t match_length = 0;
+    if (!matcher.icu_search->Search(base::UTF8ToUTF16(record.file_name),
+                                    &match_index, &match_length)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 }  // namespace
@@ -381,13 +464,50 @@ std::optional<DownloadRecord> DownloadRecordStore::GetById(
 std::vector<DownloadRecord> DownloadRecordStore::GetDownloadsPage(
     const DownloadRecordQuery& query) const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  // Paginated readers require kDownloadListPagination.
   DCHECK(pagination_enabled_);
 
   if (!IsDatabaseReady()) {
     return {};
   }
-  return database_->GetDownloadRecordsPage(query);
+
+  std::vector<DownloadRecord> db_page =
+      database_->GetDownloadRecordsPage(query);
+
+  const NameMatcher name_matcher = MakeNameMatcher(query);
+
+  // Overlay cache before filtering so volatile-only updates (which skip
+  // the DB write) are visible. `UpdateRecord` preserves `created_time`,
+  // so the overlaid row keeps its sort slot.
+  std::vector<DownloadRecord> merged;
+  merged.reserve(db_page.size() + incognito_records_.size());
+  for (DownloadRecord& record : db_page) {
+    auto it = active_records_cache_.find(record.download_id);
+    if (it != active_records_cache_.end()) {
+      record = it->second;
+    }
+    if (!MatchesNonCursorFilters(record, query, name_matcher)) {
+      continue;
+    }
+    merged.push_back(std::move(record));
+  }
+
+  // Incognito rows are never persisted; this is their only entry point.
+  for (const auto& [unused_id, record] : incognito_records_) {
+    if (!RecordIsOlderThanCursor(record, query)) {
+      continue;
+    }
+    if (!MatchesNonCursorFilters(record, query, name_matcher)) {
+      continue;
+    }
+    merged.push_back(record);
+  }
+
+  std::sort(merged.begin(), merged.end(), RecordSortsBefore);
+
+  if (merged.size() > static_cast<size_t>(kDownloadRecordsPageSize)) {
+    merged.resize(kDownloadRecordsPageSize);
+  }
+  return merged;
 }
 
 size_t DownloadRecordStore::GetDownloadsCount(
@@ -398,7 +518,23 @@ size_t DownloadRecordStore::GetDownloadsCount(
   if (!IsDatabaseReady()) {
     return 0;
   }
-  return static_cast<size_t>(database_->GetDownloadRecordsCount(query));
+
+  const int raw_db_count = database_->GetDownloadRecordsCount(query);
+  const size_t db_count =
+      raw_db_count > 0 ? static_cast<size_t>(raw_db_count) : 0u;
+
+  // `active_records_cache_` shares PKs with `db_count`; don't double-count.
+  // Incognito rows are memory-only and must be added in.
+  const NameMatcher name_matcher = MakeNameMatcher(query);
+
+  size_t incognito_match_count = 0;
+  for (const auto& [unused_id, record] : incognito_records_) {
+    if (MatchesNonCursorFilters(record, query, name_matcher)) {
+      ++incognito_match_count;
+    }
+  }
+
+  return db_count + incognito_match_count;
 }
 
 bool DownloadRecordStore::IsDatabaseReady() const {

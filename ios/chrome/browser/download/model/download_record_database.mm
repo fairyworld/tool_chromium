@@ -62,11 +62,6 @@ const char kFileNameNormalizedField[] = "file_name_normalized";
 const char kTableName[] = "download_records";
 const char kIndexName[] = "idx_records_created_time";
 
-// Page size for keyset pagination. Internal to the DB layer: callers paginate
-// by advancing the (created_time, download_id) cursor, not by choosing a size.
-// 50 balances index scan cost, peak memory, and per-frame UI rendering.
-constexpr int kPageSize = 50;
-
 const std::string& CreateTableSql() {
   static const base::NoDestructor<std::string> sql(base::StringPrintf(
       "CREATE TABLE IF NOT EXISTS %s ("
@@ -519,10 +514,10 @@ std::vector<DownloadRecord> DownloadRecordDatabase::GetDownloadRecordsPage(
     // what's needed.
     int batch_limit =
         has_name_query
-            ? std::max<int>(kPageSize * 2,
-                            static_cast<int>(kPageSize) -
+            ? std::max<int>(kDownloadRecordsPageSize * 2,
+                            kDownloadRecordsPageSize -
                                 static_cast<int>(records.size()) + 4)
-            : (static_cast<int>(kPageSize) - static_cast<int>(records.size()));
+            : (kDownloadRecordsPageSize - static_cast<int>(records.size()));
     if (batch_limit <= 0) {
       break;
     }
@@ -546,13 +541,13 @@ std::vector<DownloadRecord> DownloadRecordDatabase::GetDownloadRecordsPage(
       }
       if (keep) {
         records.push_back(std::move(record));
-        if (static_cast<int>(records.size()) >= kPageSize) {
+        if (static_cast<int>(records.size()) >= kDownloadRecordsPageSize) {
           break;
         }
       }
     }
 
-    if (static_cast<int>(records.size()) >= kPageSize) {
+    if (static_cast<int>(records.size()) >= kDownloadRecordsPageSize) {
       break;
     }
     // Underlying SQL stream is exhausted for this filter; no more pages.

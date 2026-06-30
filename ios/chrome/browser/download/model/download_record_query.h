@@ -11,6 +11,11 @@
 #include "base/time/time.h"
 #include "ios/chrome/browser/download/model/download_filter_util.h"
 
+// Page size shared by `DownloadRecordDatabase::GetDownloadRecordsPage`
+// and `DownloadRecordStore::GetDownloadsPage`. Balances index scan cost,
+// peak memory, and per-frame UI rendering.
+inline constexpr int kDownloadRecordsPageSize = 50;
+
 // Query parameters for keyset-based pagination of download records.
 //
 // Records are returned ordered by (created_time DESC, download_id DESC). When
