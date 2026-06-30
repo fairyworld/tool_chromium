@@ -21763,83 +21763,33 @@
             ]
         }
     ],
-    "ScrollPredictorEnhancements": [
+    "ScrollJankV4SlowPathScrollHandling": [
         {
             "platforms": [
-                "android"
+                "android",
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
             ],
             "experiments": [
                 {
-                    "name": "KalmanBypassOneEuroFilter_20260311",
+                    "name": "Enabled_Both",
                     "enable_features": [
-                        "ResamplingScrollEvents",
-                        "ScrollPredictorFilteringBypassOnSynthetic",
-                        "ScrollPredictorRefinedHasPrediction",
-                        "ScrollPredictorSyntheticKalman"
+                        "ScrollEndRepaintFollowsScrollUpdate",
+                        "UseScrollIdToCalculateScrollJankV4FrameStages"
                     ]
                 },
                 {
-                    "name": "KalmanRetainOneEuroFilter_20260311",
+                    "name": "Enabled_ScrollEndRepaintFollowsScrollUpdateOnly",
                     "enable_features": [
-                        "ResamplingScrollEvents",
-                        "ScrollPredictorRefinedHasPrediction",
-                        "ScrollPredictorSyntheticKalman"
-                    ],
-                    "disable_features": [
-                        "ScrollPredictorFilteringBypassOnSynthetic"
+                        "ScrollEndRepaintFollowsScrollUpdate"
                     ]
                 },
                 {
-                    "name": "RefinedPredictionOnly_20260311",
+                    "name": "Enabled_UseScrollIdToCalculateScrollJankV4FrameStagesOnly",
                     "enable_features": [
-                        "ResamplingScrollEvents",
-                        "ScrollPredictorRefinedHasPrediction"
-                    ],
-                    "disable_features": [
-                        "ScrollPredictorFilteringBypassOnSynthetic",
-                        "ScrollPredictorSyntheticKalman"
-                    ]
-                },
-                {
-                    "name": "ResampleLimit25ms_20260311",
-                    "params": {
-                        "max_resample_time": "25ms"
-                    },
-                    "enable_features": [
-                        "ResamplingScrollEvents",
-                        "ScrollPredictorRefinedHasPrediction"
-                    ],
-                    "disable_features": [
-                        "ScrollPredictorFilteringBypassOnSynthetic",
-                        "ScrollPredictorSyntheticKalman"
-                    ]
-                },
-                {
-                    "name": "ResampleLimit30ms_20260311",
-                    "params": {
-                        "max_resample_time": "30ms"
-                    },
-                    "enable_features": [
-                        "ResamplingScrollEvents",
-                        "ScrollPredictorRefinedHasPrediction"
-                    ],
-                    "disable_features": [
-                        "ScrollPredictorFilteringBypassOnSynthetic",
-                        "ScrollPredictorSyntheticKalman"
-                    ]
-                },
-                {
-                    "name": "ResampleLimit35ms_20260311",
-                    "params": {
-                        "max_resample_time": "35ms"
-                    },
-                    "enable_features": [
-                        "ResamplingScrollEvents",
-                        "ScrollPredictorRefinedHasPrediction"
-                    ],
-                    "disable_features": [
-                        "ScrollPredictorFilteringBypassOnSynthetic",
-                        "ScrollPredictorSyntheticKalman"
+                        "UseScrollIdToCalculateScrollJankV4FrameStages"
                     ]
                 }
             ]
