@@ -527,7 +527,6 @@ Browser::Browser(const CreateParams& params)
               ? nullptr
               : TabGroupModelFactory::GetInstance())),
       app_name_(params.app_name),
-      is_trusted_source_(params.trusted_source),
       session_id_(SessionID::NewUnique()),
       omit_from_session_restore_(params.omit_from_session_restore),
       should_trigger_session_restore_(params.should_trigger_session_restore),

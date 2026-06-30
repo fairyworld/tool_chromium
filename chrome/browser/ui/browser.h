@@ -199,7 +199,7 @@ class Browser : public TabStripModelObserver,
     // The associated profile.
     raw_ptr<Profile, AcrossTasksDanglingUntriaged> profile;
 
-    // Specifies the browser `is_trusted_source_` value.
+    // Specifies the WindowFeatureController `is_trusted_source_` value.
     bool trusted_source = false;
 
     // Specifies the browser `omit_from_session_restore_` value, whether the new
@@ -393,7 +393,6 @@ class Browser : public TabStripModelObserver,
   std::optional<int> get_vertical_tabs_initial_uncollapsed_width() const {
     return initial_vertical_tab_strip_uncollapsed_width_;
   }
-  bool is_trusted_source() const { return is_trusted_source_; }
   Profile* profile() const { return profile_; }
   gfx::Rect override_bounds() const { return override_bounds_; }
   const std::string& initial_workspace() const { return initial_workspace_; }
@@ -1099,11 +1098,6 @@ class Browser : public TabStripModelObserver,
   // 1) we launch an application via an application shortcut or extension API.
   // 2) we launch an undocked devtool window.
   const std::string app_name_;
-
-  // True if the source is trusted (i.e. we do not need to show the URL in a
-  // a popup window). Also used to determine which app windows to save and
-  // restore on Chrome OS.
-  bool is_trusted_source_;
 
   // Unique identifier of this browser for session restore. This id is only
   // unique within the current session, and is not guaranteed to be unique
