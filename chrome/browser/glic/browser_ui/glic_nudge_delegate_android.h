@@ -6,17 +6,15 @@
 #define CHROME_BROWSER_GLIC_BROWSER_UI_GLIC_NUDGE_DELEGATE_ANDROID_H_
 
 #include "base/android/scoped_java_ref.h"
-#include "base/memory/raw_ptr.h"
+#include "base/memory/raw_ref.h"
 #include "chrome/browser/glic/browser_ui/glic_nudge_delegate.h"
 
-class TabListInterface;
+namespace tabs {
+class TabInterface;
+}
 
 namespace ui {
 class WindowAndroid;
-}
-
-namespace content {
-class WebContents;
 }
 
 namespace glic {
@@ -29,9 +27,8 @@ enum class GlicNudgeActivity;
 // GlicNudgeDelegateBridge.
 class GlicNudgeDelegateAndroid : public GlicNudgeDelegate {
  public:
-  GlicNudgeDelegateAndroid(GlicNudgeController* controller,
-                           TabListInterface* tab_list,
-                           content::WebContents* web_contents);
+  GlicNudgeDelegateAndroid(GlicNudgeController& controller,
+                           tabs::TabInterface& tab);
   GlicNudgeDelegateAndroid(const GlicNudgeDelegateAndroid&) = delete;
   GlicNudgeDelegateAndroid& operator=(const GlicNudgeDelegateAndroid&) = delete;
   ~GlicNudgeDelegateAndroid() override;
@@ -47,12 +44,8 @@ class GlicNudgeDelegateAndroid : public GlicNudgeDelegate {
   bool IsActiveTab();
 
  private:
-  raw_ptr<GlicNudgeController> controller_ = nullptr;
-  raw_ptr<TabListInterface> tab_list_ = nullptr;
-  // Holding this raw pointer is safe because the WebContents is guaranteed to
-  // outlive this delegate (via its ownership chain: WebContents owns
-  // ContextualCueingHelper -> GlicNudgeControllerAndroid -> this).
-  raw_ptr<content::WebContents> web_contents_ = nullptr;
+  raw_ref<GlicNudgeController> controller_;
+  raw_ref<tabs::TabInterface> tab_;
 };
 
 }  // namespace glic

@@ -13,7 +13,7 @@
 #include "base/no_destructor.h"
 #include "chrome/browser/glic/android/jni_headers/GlicNudgeDelegateBridge_jni.h"
 #include "chrome/browser/glic/browser_ui/glic_nudge_controller.h"
-#include "chrome/browser/tab_list/tab_list_interface.h"
+#include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/web_contents.h"
 #include "ui/android/window_android.h"
 
@@ -27,13 +27,9 @@ std::vector<GlicNudgeDelegateAndroid*>& GetDelegates() {
 }  // namespace
 
 GlicNudgeDelegateAndroid::GlicNudgeDelegateAndroid(
-    GlicNudgeController* controller,
-    TabListInterface* tab_list,
-    content::WebContents* web_contents)
-    : controller_(controller),
-      tab_list_(tab_list),
-      web_contents_(web_contents) {
-  CHECK(controller_);
+    GlicNudgeController& controller,
+    tabs::TabInterface& tab)
+    : controller_(controller), tab_(tab) {
   GetDelegates().push_back(this);
 }
 
@@ -87,26 +83,14 @@ void GlicNudgeDelegateAndroid::OnNudgeActivity(GlicNudgeActivity activity) {
 }
 
 ui::WindowAndroid* GlicNudgeDelegateAndroid::GetWindowAndroid() {
-  if (!tab_list_) {
-    return nullptr;
+  if (content::WebContents* contents = tab_->GetContents()) {
+    return contents->GetTopLevelNativeWindow();
   }
-  tabs::TabInterface* active_tab = tab_list_->GetActiveTab();
-  if (!active_tab) {
-    return nullptr;
-  }
-  content::WebContents* web_contents = active_tab->GetContents();
-  if (!web_contents) {
-    return nullptr;
-  }
-  return web_contents->GetTopLevelNativeWindow();
+  return nullptr;
 }
 
 bool GlicNudgeDelegateAndroid::IsActiveTab() {
-  if (!tab_list_ || !web_contents_) {
-    return false;
-  }
-  tabs::TabInterface* active_tab = tab_list_->GetActiveTab();
-  return active_tab && active_tab->GetContents() == web_contents_;
+  return tab_->IsActivated();
 }
 
 static void JNI_GlicNudgeDelegateBridge_OnNudgeActivity(

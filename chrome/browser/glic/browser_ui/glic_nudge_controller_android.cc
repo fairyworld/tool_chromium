@@ -4,19 +4,24 @@
 
 #include "chrome/browser/glic/browser_ui/glic_nudge_controller_android.h"
 
+#include "base/functional/bind.h"
 #include "base/notimplemented.h"
+#include "base/task/sequenced_task_runner.h"
 #include "chrome/browser/glic/browser_ui/glic_nudge_delegate.h"
 #include "chrome/browser/glic/browser_ui/glic_nudge_delegate_android.h"
-#include "chrome/browser/tab_list/tab_list_interface.h"
+#include "components/tabs/public/tab_interface.h"
+#include "content/public/browser/web_contents.h"
 
 namespace glic {
 
-GlicNudgeControllerAndroid::GlicNudgeControllerAndroid(
-    content::WebContents* web_contents) {
-  // TODO(crbug.com/524810240): Observe tab changes.
-  delegate_ = std::make_unique<GlicNudgeDelegateAndroid>(
-      this, /*tab_list=*/nullptr, web_contents);
+GlicNudgeControllerAndroid::GlicNudgeControllerAndroid(tabs::TabInterface& tab)
+    : tab_(tab) {
+  delegate_ = std::make_unique<GlicNudgeDelegateAndroid>(*this, tab);
   SetTabStripDelegate(delegate_.get());
+
+  tab_deactivate_subscription_ = tab.RegisterWillDeactivate(
+      base::BindRepeating(&GlicNudgeControllerAndroid::OnTabWillDeactivate,
+                          base::Unretained(this)));
 }
 GlicNudgeControllerAndroid::~GlicNudgeControllerAndroid() = default;
 
@@ -37,7 +42,14 @@ void GlicNudgeControllerAndroid::UpdateNudgeLabel(
     const std::string& anchored_message_text,
     std::optional<GlicNudgeActivity> activity,
     GlicNudgeActivityCallback callback) {
-  // TODO(crbug.com/524810240): Skip update if this isn't the active tab.
+  if (tab_->GetContents() != web_contents || !tab_->IsActivated()) {
+    base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
+        FROM_HERE,
+        base::BindOnce(std::move(callback),
+                       GlicNudgeActivity::kNudgeNotShownWebContents));
+    return;
+  }
+
   nudge_activity_callback_ = callback;
   prompt_suggestion_ = prompt_suggestion;
 
@@ -83,8 +95,7 @@ void GlicNudgeControllerAndroid::OnNudgeActivity(GlicNudgeActivity activity) {
   }
 }
 
-void GlicNudgeControllerAndroid::OnActiveTabChanged(TabListInterface& tab_list,
-                                                    tabs::TabInterface* tab) {
+void GlicNudgeControllerAndroid::OnTabWillDeactivate(tabs::TabInterface* tab) {
   GlicNudgeDelegate* delegate = tab_strip_delegate_;
   if (delegate && delegate->GetIsShowingGlicNudge()) {
     delegate->OnHideGlicNudgeUI();

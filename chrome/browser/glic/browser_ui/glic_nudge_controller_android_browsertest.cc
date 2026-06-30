@@ -49,7 +49,7 @@ class GlicNudgeControllerAndroidBrowserTest : public GlicBrowserTest {
   void SetUpOnMainThread() override {
     GlicBrowserTest::SetUpOnMainThread();
     nudge_controller_ = std::make_unique<GlicNudgeControllerAndroid>(
-        GetTabListInterface()->GetActiveTab()->GetContents());
+        *GetTabListInterface()->GetActiveTab());
     nudge_controller_->SetTabStripDelegate(&mock_delegate_);
   }
 
@@ -104,7 +104,7 @@ IN_PROC_BROWSER_TEST_F(GlicNudgeControllerAndroidBrowserTest, HidesNudge) {
 }
 
 IN_PROC_BROWSER_TEST_F(GlicNudgeControllerAndroidBrowserTest,
-                       DISABLED_HidesNudgeOnActiveTabChanged) {
+                       HidesNudgeOnActiveTabChanged) {
   content::WebContents* web_contents =
       GetTabListInterface()->GetActiveTab()->GetContents();
 
@@ -126,15 +126,19 @@ IN_PROC_BROWSER_TEST_F(GlicNudgeControllerAndroidBrowserTest,
 }
 
 IN_PROC_BROWSER_TEST_F(GlicNudgeControllerAndroidBrowserTest,
-                       DISABLED_DoesNotShowNudgeForInactiveTab) {
+                       DoesNotShowNudgeForInactiveTab) {
   tabs::TabInterface* active_tab = GetTabListInterface()->GetActiveTab();
   tabs::TabInterface* inactive_tab = CreateAndActivateTab(GetSimpleTestUrl());
   GetTabListInterface()->ActivateTab(active_tab->GetHandle());
 
+  auto inactive_nudge_controller =
+      std::make_unique<GlicNudgeControllerAndroid>(*inactive_tab);
+  inactive_nudge_controller->SetTabStripDelegate(&mock_delegate_);
+
   EXPECT_FALSE(mock_delegate_.GetIsShowingGlicNudge());
 
   base::test::TestFuture<GlicNudgeActivity> future;
-  nudge_controller_->UpdateNudgeLabel(
+  inactive_nudge_controller->UpdateNudgeLabel(
       inactive_tab->GetContents(), "Nudge Label", "Prompt Suggestion",
       "Anchored Message Text", std::nullopt, future.GetRepeatingCallback());
 

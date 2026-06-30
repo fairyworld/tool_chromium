@@ -146,9 +146,15 @@ glic::GlicNudgeController* ContextualCueingHelper::GetGlicNudgeController() {
     return nullptr;
   }
 
+  tabs::TabInterface* tab =
+      tabs::TabInterface::MaybeGetFromContents(web_contents());
+  if (!tab) {
+    return nullptr;
+  }
+
   if (!glic_nudge_controller_) {
     glic_nudge_controller_ =
-        std::make_unique<glic::GlicNudgeControllerAndroid>(web_contents());
+        std::make_unique<glic::GlicNudgeControllerAndroid>(*tab);
   }
   return glic_nudge_controller_.get();
 #endif
