@@ -62,6 +62,13 @@ namespace {
 BASE_FEATURE(kPrerenderCancelOnCrossDocumentRestart,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
+constexpr base::MemoryConsumerTraits kPrerenderHostRegistryTraits(
+    base::MemoryConsumerTraits::EstimatedMemoryUsage::kLarge,
+    base::MemoryConsumerTraits::ReleaseMemoryCost::kRequiresTraversal,
+    base::MemoryConsumerTraits::InformationRetention::kLossy,
+    base::MemoryConsumerTraits::ExecutionType::kAsynchronous,
+    base::MemoryConsumerTraits::IsStateful::kNo);
+
 bool IsBackground(Visibility visibility) {
   // PrerenderHostRegistry treats HIDDEN and OCCLUDED as background.
   switch (visibility) {
@@ -500,7 +507,7 @@ bool IsSlowNetwork(WebContents* web_contents) {
 PrerenderHostRegistry::PrerenderHostRegistry(WebContents& web_contents)
     : memory_consumer_registration_(
           "PrerenderHostRegistry",
-          std::nullopt,  // TODO(crbug.com/489671163): Add traits.
+          kPrerenderHostRegistryTraits,
           this,
           base::MemoryConsumerRegistration::CheckUnregister::kDisabled) {
   Observe(&web_contents);
