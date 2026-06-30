@@ -5688,6 +5688,7 @@ if (is_android) {
     android_library("ui_java") {
       sources = [ "android/java/src/org/chromium/base/ui/KeyboardUtils.java" ]
       deps = [
+        ":base_java",
         ":build_info_java",
         ":log_java",
         ":tasks_java",
@@ -6224,6 +6225,12 @@ if (is_android) {
       "//third_party/hamcrest:hamcrest_java",
       "//third_party/jni_zero:jni_zero_java",
     ]
+
+    if (!is_cronet_build) {
+      sources +=
+          [ "android/junit/src/org/chromium/base/ui/KeyboardUtilsTest.java" ]
+      deps += [ ":ui_java" ]
+    }
   }
 
   # LocationTest.java needs to always be processed by the Java location rewriter
