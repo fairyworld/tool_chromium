@@ -191,7 +191,6 @@ extern const base::FeatureParam<base::TimeDelta> kGlicActorPageToolTimeout;
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<base::TimeDelta> kGlicActorClickDelay;
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicActorUi);
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicConfirmTabClose);
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicActorUiTabIndicatorSpinnerIgnoreReducedMotion);
 COMPONENT_EXPORT(CHROME_FEATURES)
