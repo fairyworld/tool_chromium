@@ -536,6 +536,15 @@ bool PaymentHandlerWebFlowViewController::HandleKeyboardEvent(
              event, content_view()->GetFocusManager());
 }
 
+// We explicitly ignore close requests from the WebContents (e.g., via
+// window.close()) to prevent merchant JS or unauthorized scripts from
+// unexpectedly closing the dialog. The payment dialog lifecycle is managed
+// by the browser UI and the Payment Request API.
+void PaymentHandlerWebFlowViewController::CloseContents(
+    content::WebContents* source) {
+  // Do nothing.
+}
+
 void PaymentHandlerWebFlowViewController::DidFinishNavigation(
     content::NavigationHandle* navigation_handle) {
   if (!is_active()) {
