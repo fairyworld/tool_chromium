@@ -5,14 +5,17 @@
 #ifndef COMPONENTS_CRITICAL_ACTIONS_CORE_BROWSER_CRITICAL_ACTION_SERVICE_H_
 #define COMPONENTS_CRITICAL_ACTIONS_CORE_BROWSER_CRITICAL_ACTION_SERVICE_H_
 
+#include <cstdint>
 #include <optional>
 #include <string_view>
+#include <vector>
 
 #include "base/files/file_path.h"
 #include "base/functional/callback.h"
 #include "base/sequence_checker.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/threading/sequence_bound.h"
+#include "base/time/time.h"
 #include "components/critical_actions/core/browser/critical_action_types.h"
 #include "components/keyed_service/core/keyed_service.h"
 
@@ -47,6 +50,10 @@ class CriticalActionService : public KeyedService {
   // UI thread entry point to delete all critical action records in given range.
   void DeleteCriticalActionsInTimeRange(base::Time start_time,
                                         base::Time end_time);
+
+  // UI thread entry point to delete all critical action records associated with
+  // the given visit IDs.
+  void DeleteCriticalActionsByVisitIds(const std::vector<int64_t>& visit_ids);
 
  private:
   SEQUENCE_CHECKER(sequence_checker_);

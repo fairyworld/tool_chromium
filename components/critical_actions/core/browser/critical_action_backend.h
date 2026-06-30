@@ -5,10 +5,12 @@
 #ifndef COMPONENTS_CRITICAL_ACTIONS_CORE_BROWSER_CRITICAL_ACTION_BACKEND_H_
 #define COMPONENTS_CRITICAL_ACTIONS_CORE_BROWSER_CRITICAL_ACTION_BACKEND_H_
 
+#include <cstdint>
 #include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "base/files/file_path.h"
 #include "base/sequence_checker.h"
@@ -52,6 +54,9 @@ class CriticalActionBackend {
   // inclusive of start_time and exclusive of end_time.
   void DeleteCriticalActionsInTimeRange(base::Time start_time,
                                         base::Time end_time);
+
+  // Deletes all critical action records associated with the given visit IDs.
+  void DeleteCriticalActionsByVisitIds(const std::vector<int64_t>& visit_ids);
 
  private:
   const base::FilePath db_path_;

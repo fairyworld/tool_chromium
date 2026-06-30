@@ -93,4 +93,17 @@ void CriticalActionBackend::DeleteCriticalActionsInTimeRange(
   }
 }
 
+void CriticalActionBackend::DeleteCriticalActionsByVisitIds(
+    const std::vector<int64_t>& visit_ids) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+  VLOG(1) << "CriticalActionBackend::DeleteCriticalActionsByVisitIds: "
+          << "count=" << visit_ids.size();
+  if (!db_) {
+    return;
+  }
+  if (!db_->DeleteCriticalActionsByVisitIds(visit_ids)) {
+    LOG(WARNING) << "Failed to delete critical actions by visit IDs";
+  }
+}
+
 }  // namespace critical_actions

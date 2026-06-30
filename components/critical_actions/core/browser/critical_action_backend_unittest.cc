@@ -51,6 +51,7 @@ TEST_F(CriticalActionBackendTest, CallBeforeInitReturnsGracefully) {
   backend_->DeleteCriticalAction("test-uuid");
   backend_->DeleteCriticalActionsInTimeRange(base::Time::Now(),
                                              base::Time::Now());
+  backend_->DeleteCriticalActionsByVisitIds({123, 456});
 }
 
 TEST_F(CriticalActionBackendTest, ForwardCallsToDatabase) {

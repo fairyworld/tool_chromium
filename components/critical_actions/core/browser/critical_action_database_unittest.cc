@@ -149,4 +149,38 @@ TEST_F(CriticalActionDatabaseTest, DeleteInTimeRange) {
   database.Close();
 }
 
+TEST_F(CriticalActionDatabaseTest, DeleteByVisitIds) {
+  CriticalActionDatabase database(db_path_);
+  ASSERT_TRUE(database.Init());
+
+  // Insert test actions with different visit IDs.
+  CriticalActionEntry entry1;
+  entry1.critical_action_id = "v-1";
+  entry1.visit_id = 456;
+  entry1.action_type = ActionType::kFormFill;
+  ASSERT_TRUE(database.AddCriticalAction(entry1));
+
+  CriticalActionEntry entry2;
+  entry2.critical_action_id = "v-2";
+  entry2.visit_id = 789;
+  entry2.action_type = ActionType::kDownload;
+  ASSERT_TRUE(database.AddCriticalAction(entry2));
+
+  CriticalActionEntry entry3;
+  entry3.critical_action_id = "v-3";
+  entry3.visit_id = 999;
+  entry3.action_type = ActionType::kSettingChange;
+  ASSERT_TRUE(database.AddCriticalAction(entry3));
+
+  // Deleting visit 456 and 999.
+  EXPECT_TRUE(database.DeleteCriticalActionsByVisitIds({456, 999}));
+
+  // v-1 and v-3 should be deleted, v-2 should remain.
+  EXPECT_FALSE(database.GetCriticalAction("v-1").has_value());
+  EXPECT_TRUE(database.GetCriticalAction("v-2").has_value());
+  EXPECT_FALSE(database.GetCriticalAction("v-3").has_value());
+
+  database.Close();
+}
+
 }  // namespace critical_actions

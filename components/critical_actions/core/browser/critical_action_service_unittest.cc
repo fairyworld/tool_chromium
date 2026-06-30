@@ -103,6 +103,7 @@ TEST_F(CriticalActionServiceTest, CallsAfterShutdownGracefullyFail) {
   service_->AddCriticalAction(entry);
   service_->DeleteCriticalAction("after-shutdown");
   service_->DeleteCriticalActionsInTimeRange(base::Time(), base::Time());
+  service_->DeleteCriticalActionsByVisitIds({123, 456});
 
   base::test::TestFuture<std::optional<CriticalActionEntry>> get_future;
   service_->GetCriticalAction("after-shutdown", get_future.GetCallback());

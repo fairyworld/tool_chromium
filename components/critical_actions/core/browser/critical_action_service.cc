@@ -4,10 +4,13 @@
 
 #include "components/critical_actions/core/browser/critical_action_service.h"
 
+#include <cstdint>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "base/check.h"
+#include "base/time/time.h"
 #include "components/critical_actions/core/browser/critical_action_backend.h"
 
 namespace critical_actions {
@@ -70,6 +73,16 @@ void CriticalActionService::DeleteCriticalActionsInTimeRange(
   }
   backend_.AsyncCall(&CriticalActionBackend::DeleteCriticalActionsInTimeRange)
       .WithArgs(start_time, end_time);
+}
+
+void CriticalActionService::DeleteCriticalActionsByVisitIds(
+    const std::vector<int64_t>& visit_ids) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+  if (!backend_) {
+    return;
+  }
+  backend_.AsyncCall(&CriticalActionBackend::DeleteCriticalActionsByVisitIds)
+      .WithArgs(visit_ids);
 }
 
 }  // namespace critical_actions

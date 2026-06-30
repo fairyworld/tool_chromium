@@ -4,8 +4,12 @@
 
 #include "components/critical_actions/core/browser/critical_action_database.h"
 
+#include <cstdint>
+#include <vector>
+
 #include "base/functional/bind.h"
 #include "base/logging.h"
+#include "base/time/time.h"
 #include "sql/error_delegate_util.h"
 #include "sql/statement.h"
 #include "sql/transaction.h"
@@ -190,6 +194,32 @@ bool CriticalActionDatabase::DeleteCriticalActionsInTimeRange(
   statement.BindTime(0, start_time);
   statement.BindTime(1, end_time);
   return statement.Run();
+}
+
+bool CriticalActionDatabase::DeleteCriticalActionsByVisitIds(
+    const std::vector<int64_t>& visit_ids) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+  if (visit_ids.empty()) {
+    return true;
+  }
+
+  sql::Transaction transaction(&db_);
+  if (!transaction.Begin()) {
+    return false;
+  }
+
+  sql::Statement statement(db_.GetCachedStatement(
+      SQL_FROM_HERE, "DELETE FROM CriticalActions WHERE visit_id = ?"));
+
+  for (int64_t visit_id : visit_ids) {
+    statement.Reset(true);
+    statement.BindInt64(0, visit_id);
+    if (!statement.Run()) {
+      return false;
+    }
+  }
+
+  return transaction.Commit();
 }
 
 void CriticalActionDatabase::Close() {

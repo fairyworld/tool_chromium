@@ -5,9 +5,11 @@
 #ifndef COMPONENTS_CRITICAL_ACTIONS_CORE_BROWSER_CRITICAL_ACTION_DATABASE_H_
 #define COMPONENTS_CRITICAL_ACTIONS_CORE_BROWSER_CRITICAL_ACTION_DATABASE_H_
 
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "base/files/file_path.h"
 #include "base/sequence_checker.h"
@@ -55,6 +57,11 @@ class CriticalActionDatabase {
   // was deleted), or false on database error.
   bool DeleteCriticalActionsInTimeRange(base::Time start_time,
                                         base::Time end_time);
+
+  // Deletes all critical action records associated with the given visit IDs.
+  // Returns true if the transaction executed successfully (even if no matching
+  // record was deleted), or false on database error.
+  bool DeleteCriticalActionsByVisitIds(const std::vector<int64_t>& visit_ids);
 
   // Cleanly closes the database.
   void Close();
