@@ -1597,24 +1597,26 @@ public abstract class ChromeFeatureList {
                             "multi_data_source_skip_device_check",
                             false);
 
+    // go/keep-sorted start
     public static final BooleanCachedFeatureParam sAndroidBottomBarAlwaysUseFilledGlicIcon =
             newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "always_use_filled_glic_icon", false);
+    public static final BooleanCachedFeatureParam sAndroidBottomBarBypassAimGeofencing =
+            newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "bypass_aim_geofencing", false);
+    public static final BooleanCachedFeatureParam sAndroidBottomBarBypassGlicGeofencing =
+            newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "bypass_glic_geofencing", false);
     public static final BooleanCachedFeatureParam sAndroidBottomBarDisableOnNtp =
             newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "disable_on_ntp", true);
     public static final BooleanCachedFeatureParam sAndroidBottomBarKeepAppMenuInToolbar =
             newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "keep_app_menu_in_toolbar", false);
-    public static final BooleanCachedFeatureParam sAndroidBottomBarShowUpdateBadge =
-            newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "show_update_badge", true);
     public static final BooleanCachedFeatureParam sAndroidBottomBarKeepHomeButtonInToolbar =
             newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "keep_home_button_in_toolbar", false);
     public static final BooleanCachedFeatureParam sAndroidBottomBarNtpScrollOffEnabled =
             newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "ntp_scroll_off_enabled", true);
     public static final BooleanCachedFeatureParam sAndroidBottomBarShowBottomBarOnGts =
             newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "show_bottom_bar_on_gts", false);
-    public static final BooleanCachedFeatureParam sAndroidBottomBarBypassGlicGeofencing =
-            newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "bypass_glic_geofencing", false);
-    public static final BooleanCachedFeatureParam sAndroidBottomBarBypassAimGeofencing =
-            newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "bypass_aim_geofencing", false);
+    public static final BooleanCachedFeatureParam sAndroidBottomBarShowUpdateBadge =
+            newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "show_update_badge", true);
+    // go/keep-sorted end
 
     public static final IntCachedFeatureParam sBackgroundThreadPoolFieldTrialConfig =
             newIntCachedFeatureParam(BACKGROUND_THREAD_POOL_FIELD_TRIAL, "config", 4);
