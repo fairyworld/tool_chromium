@@ -21,6 +21,7 @@
 namespace media {
 class AudioBus;
 class AudioParameters;
+class VoiceIsolation;
 }  // namespace media
 
 namespace audio {
@@ -109,7 +110,8 @@ class AudioProcessorHandler final : public ReferenceOutput::Listener,
       mojo::PendingReceiver<media::mojom::AudioProcessorControls>
           controls_receiver,
       media::AecdumpRecordingManager* aecdump_recording_manager,
-      raw_ptr<MlModelManager> ml_model_manager);
+      raw_ptr<MlModelManager> ml_model_manager,
+      std::unique_ptr<media::VoiceIsolation> voice_isolation);
 
   AudioProcessorHandler(const AudioProcessorHandler&) = delete;
   AudioProcessorHandler& operator=(const AudioProcessorHandler&) = delete;

@@ -14,6 +14,7 @@
 #include "base/time/time.h"
 #include "media/base/audio_bus.h"
 #include "media/base/audio_parameters.h"
+#include "media/webrtc/voice_isolation/voice_isolation.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -66,7 +67,8 @@ TEST_F(AudioProcessorHandlerTest, SynchronousProcessingWithoutVoiceIsolation) {
       deliver_callback_.Get(), error_callback_.Get(),
       controls_remote.InitWithNewPipeAndPassReceiver(),
       /*aecdump_recording_manager=*/nullptr,
-      /*ml_model_manager=*/nullptr);
+      /*ml_model_manager=*/nullptr,
+      /*voice_isolation=*/nullptr);
 
   handler->StartProcessing();
   EXPECT_FALSE(HasVoiceIsolationHandler(*handler));
@@ -102,7 +104,7 @@ TEST_F(AudioProcessorHandlerTest, SynchronousProcessingWithVoiceIsolation) {
       deliver_callback_.Get(), error_callback_.Get(),
       controls_remote.InitWithNewPipeAndPassReceiver(),
       /*aecdump_recording_manager=*/nullptr,
-      /*ml_model_manager=*/nullptr);
+      /*ml_model_manager=*/nullptr, std::make_unique<media::VoiceIsolation>());
 
   handler->StartProcessing();
   EXPECT_EQ(HasVoiceIsolationHandler(*handler), settings.voice_isolation);
@@ -136,7 +138,8 @@ TEST_F(AudioProcessorHandlerTest, AsynchronousProcessingWithFifo) {
       deliver_callback_.Get(), error_callback_.Get(),
       controls_remote.InitWithNewPipeAndPassReceiver(),
       /*aecdump_recording_manager=*/nullptr,
-      /*ml_model_manager=*/nullptr);
+      /*ml_model_manager=*/nullptr,
+      /*voice_isolation=*/nullptr);
 
   handler->StartProcessing();
   EXPECT_FALSE(HasVoiceIsolationHandler(*handler));
@@ -175,7 +178,7 @@ TEST_F(AudioProcessorHandlerTest,
       deliver_callback_.Get(), error_callback_.Get(),
       controls_remote.InitWithNewPipeAndPassReceiver(),
       /*aecdump_recording_manager=*/nullptr,
-      /*ml_model_manager=*/nullptr);
+      /*ml_model_manager=*/nullptr, std::make_unique<media::VoiceIsolation>());
 
   handler->StartProcessing();
   EXPECT_EQ(HasVoiceIsolationHandler(*handler), settings.voice_isolation);
@@ -214,7 +217,8 @@ TEST_F(AudioProcessorHandlerTest, GlitchInfoAccumulation) {
       deliver_callback_.Get(), error_callback_.Get(),
       controls_remote.InitWithNewPipeAndPassReceiver(),
       /*aecdump_recording_manager=*/nullptr,
-      /*ml_model_manager=*/nullptr);
+      /*ml_model_manager=*/nullptr,
+      /*voice_isolation=*/nullptr);
 
   handler->StartProcessing();
 
@@ -246,7 +250,8 @@ TEST_F(AudioProcessorHandlerTest, GlitchInfoAccumulationWithFifo) {
       deliver_callback_.Get(), error_callback_.Get(),
       controls_remote.InitWithNewPipeAndPassReceiver(),
       /*aecdump_recording_manager=*/nullptr,
-      /*ml_model_manager=*/nullptr);
+      /*ml_model_manager=*/nullptr,
+      /*voice_isolation=*/nullptr);
 
   handler->StartProcessing();
 
@@ -300,7 +305,8 @@ TEST_F(AudioProcessorHandlerTest, VolumePropagation) {
       deliver_callback_.Get(), error_callback_.Get(),
       controls_remote.InitWithNewPipeAndPassReceiver(),
       /*aecdump_recording_manager=*/nullptr,
-      /*ml_model_manager=*/nullptr);
+      /*ml_model_manager=*/nullptr,
+      /*voice_isolation=*/nullptr);
 
   handler->StartProcessing();
 
@@ -328,7 +334,7 @@ TEST_F(AudioProcessorHandlerTest, GlitchInfoAccumulationWithVoiceIsolation) {
       deliver_callback_.Get(), error_callback_.Get(),
       controls_remote.InitWithNewPipeAndPassReceiver(),
       /*aecdump_recording_manager=*/nullptr,
-      /*ml_model_manager=*/nullptr);
+      /*ml_model_manager=*/nullptr, std::make_unique<media::VoiceIsolation>());
 
   handler->StartProcessing();
   EXPECT_EQ(HasVoiceIsolationHandler(*handler), settings.voice_isolation);
@@ -363,7 +369,7 @@ TEST_F(AudioProcessorHandlerTest,
       deliver_callback_.Get(), error_callback_.Get(),
       controls_remote.InitWithNewPipeAndPassReceiver(),
       /*aecdump_recording_manager=*/nullptr,
-      /*ml_model_manager=*/nullptr);
+      /*ml_model_manager=*/nullptr, std::make_unique<media::VoiceIsolation>());
 
   handler->StartProcessing();
   EXPECT_EQ(HasVoiceIsolationHandler(*handler), settings.voice_isolation);

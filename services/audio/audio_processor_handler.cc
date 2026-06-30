@@ -12,6 +12,7 @@
 #include "media/base/audio_bus.h"
 #include "media/base/audio_parameters.h"
 #include "media/base/media_switches.h"
+#include "media/webrtc/voice_isolation/voice_isolation.h"
 #include "services/audio/ml_model_manager.h"
 #include "services/audio/processing_audio_fifo.h"
 #include "services/audio/voice_isolation_handler.h"
@@ -28,13 +29,14 @@ AudioProcessorHandler::AudioProcessorHandler(
     mojo::PendingReceiver<media::mojom::AudioProcessorControls>
         controls_receiver,
     media::AecdumpRecordingManager* aecdump_recording_manager,
-    raw_ptr<MlModelManager> ml_model_manager)
+    raw_ptr<MlModelManager> ml_model_manager,
+    std::unique_ptr<media::VoiceIsolation> voice_isolation)
     : voice_isolation_handler_(
 #if BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)
-          settings.voice_isolation
-              ? std::make_unique<VoiceIsolationHandler>(
-                    std::move(deliver_processed_audio_callback))
-              : nullptr
+          voice_isolation ? std::make_unique<VoiceIsolationHandler>(
+                                std::move(voice_isolation), output_format,
+                                std::move(deliver_processed_audio_callback))
+                          : nullptr
 #else
           nullptr
 #endif

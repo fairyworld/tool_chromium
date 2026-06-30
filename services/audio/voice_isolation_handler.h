@@ -14,6 +14,8 @@
 
 namespace media {
 class AudioBus;
+class AudioParameters;
+class VoiceIsolation;
 }  // namespace media
 
 namespace audio {
@@ -32,8 +34,9 @@ class VoiceIsolationHandler {
       std::optional<double> new_volume,
       const media::AudioGlitchInfo& audio_glitch_info)>;
 
-  // TODO(tomasl): Add a parameter to pass a VoiceIsolation instance.
   explicit VoiceIsolationHandler(
+      std::unique_ptr<media::VoiceIsolation> voice_isolation,
+      const media::AudioParameters& output_params,
       DeliverProcessedAudioCallback deliver_processed_audio_callback);
 
   VoiceIsolationHandler(const VoiceIsolationHandler&) = delete;
@@ -52,7 +55,9 @@ class VoiceIsolationHandler {
                             const media::AudioGlitchInfo& audio_glitch_info);
 
  private:
+  const std::unique_ptr<media::VoiceIsolation> voice_isolation_;
   const DeliverProcessedAudioCallback deliver_processed_audio_callback_;
+  std::unique_ptr<media::AudioBus> output_bus_;
 };
 
 }  // namespace audio
