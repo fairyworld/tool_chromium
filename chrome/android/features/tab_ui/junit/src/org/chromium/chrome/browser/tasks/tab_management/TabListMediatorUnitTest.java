@@ -1247,7 +1247,7 @@ public class TabListMediatorUnitTest {
         TabGridItemTouchHelperCallback itemTouchHelperCallback = getItemTouchHelperCallback();
         itemTouchHelperCallback.setHoveredTabIndexForTesting(POSITION1);
         itemTouchHelperCallback.setSelectedTabIndexForTesting(POSITION2);
-        itemTouchHelperCallback.getMovementFlags(mRecyclerView, mFakeViewHolder1);
+        itemTouchHelperCallback.setRecyclerView(mRecyclerView);
 
         doReturn(mAdapter).when(mRecyclerView).getAdapter();
 
@@ -1283,7 +1283,7 @@ public class TabListMediatorUnitTest {
         TabGridItemTouchHelperCallback itemTouchHelperCallback = getItemTouchHelperCallback();
         itemTouchHelperCallback.setHoveredTabIndexForTesting(POSITION1);
         itemTouchHelperCallback.setSelectedTabIndexForTesting(POSITION2);
-        itemTouchHelperCallback.getMovementFlags(mRecyclerView, mFakeViewHolder1);
+        itemTouchHelperCallback.setRecyclerView(mRecyclerView);
 
         doReturn(mAdapter).when(mRecyclerView).getAdapter();
 
@@ -1308,7 +1308,7 @@ public class TabListMediatorUnitTest {
         mockRepresentativeTabs(mTab1, tab3, tab4);
         itemTouchHelperCallback.setHoveredTabIndexForTesting(1);
         itemTouchHelperCallback.setSelectedTabIndexForTesting(2);
-        itemTouchHelperCallback.getMovementFlags(mRecyclerView, fakeViewHolder3);
+        itemTouchHelperCallback.setRecyclerView(mRecyclerView);
 
         itemTouchHelperCallback.onSelectedChanged(
                 fakeViewHolder4, ItemTouchHelper.ACTION_STATE_IDLE);
@@ -1331,7 +1331,7 @@ public class TabListMediatorUnitTest {
         mockRepresentativeTabs(mTab1, tab3);
         itemTouchHelperCallback.setHoveredTabIndexForTesting(0);
         itemTouchHelperCallback.setSelectedTabIndexForTesting(1);
-        itemTouchHelperCallback.getMovementFlags(mRecyclerView, mFakeViewHolder1);
+        itemTouchHelperCallback.setRecyclerView(mRecyclerView);
 
         itemTouchHelperCallback.onSelectedChanged(
                 fakeViewHolder3, ItemTouchHelper.ACTION_STATE_IDLE);
@@ -1352,7 +1352,7 @@ public class TabListMediatorUnitTest {
         setUpTabListMediator(TabListMediatorType.TAB_GRID_DIALOG, TabListMode.GRID);
         TabGridItemTouchHelperCallback itemTouchHelperCallback = getItemTouchHelperCallback();
         itemTouchHelperCallback.setUnGroupTabIndexForTesting(POSITION1);
-        itemTouchHelperCallback.getMovementFlags(mRecyclerView, mFakeViewHolder1);
+        itemTouchHelperCallback.setRecyclerView(mRecyclerView);
 
         doReturn(mAdapter).when(mRecyclerView).getAdapter();
         doReturn(1).when(mAdapter).getItemCount();
@@ -2086,7 +2086,7 @@ public class TabListMediatorUnitTest {
     public void testHidingClearsCardState() {
         initAndAssertAllProperties();
         TabGridItemTouchHelperCallback callback = getItemTouchHelperCallback();
-        callback.getMovementFlags(mRecyclerView, mViewHolder1);
+        callback.setRecyclerView(mRecyclerView);
 
         when(mViewHolder1.getBindingAdapterPosition()).thenReturn(POSITION1);
         when(mViewHolder1.getItemViewType()).thenReturn(UiType.TAB);

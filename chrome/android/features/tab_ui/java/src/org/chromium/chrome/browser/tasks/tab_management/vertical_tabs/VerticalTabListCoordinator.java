@@ -358,6 +358,7 @@ public class VerticalTabListCoordinator {
                 touchHelperCallback.createMouseDragDetector(itemTouchHelper));
 
         itemTouchHelper.attachToRecyclerView(recyclerView);
+        touchHelperCallback.setRecyclerView(recyclerView);
 
         recyclerView.addOnItemTouchListener(
                 VerticalTabListItemTouchHelperCallback.createAfterOnItemTouchListener(

@@ -121,6 +121,7 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
         mCallback =
                 new VerticalTabListItemTouchHelperCallback(
                         context, mModel, mCurrentTabModelSupplier);
+        mCallback.setRecyclerView(mRecyclerView);
     }
 
     @Test

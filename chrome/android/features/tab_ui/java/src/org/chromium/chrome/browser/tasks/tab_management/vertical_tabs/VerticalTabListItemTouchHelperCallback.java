@@ -70,10 +70,6 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
      */
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-        // TODO(crbug.com/518307037): Handle this in the initializer. (Change this for GTS also.)
-        if (mRecyclerViewSupplier.get() == null) {
-            mRecyclerViewSupplier.set(recyclerView);
-        }
         if (!hasTabPropertiesModel(viewHolder)) return 0;
 
         // Regular and child tabs can move vertically.
