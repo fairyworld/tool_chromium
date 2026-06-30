@@ -2627,6 +2627,7 @@ component("base") {
 group("base_rust") {
   public_deps = [
     ":callback",
+    ":command_line",
     ":feature",
     ":file_path",
     ":run_loop",
@@ -2721,6 +2722,25 @@ rust_static_library("run_loop") {
   ]
 }
 
+source_set("command_line_shim") {
+  sources = [
+    "command_line_rust_shim.cc",
+    "command_line_rust_shim.h",
+  ]
+  deps = [ "//base" ]
+}
+
+rust_static_library("command_line") {
+  sources = [ "command_line.rs" ]
+  crate_root = "command_line.rs"
+  cxx_bindings = [ "command_line.rs" ]
+  allow_unsafe = true
+  deps = [
+    ":command_line_shim",
+    "//base",
+  ]
+}
+
 rust_static_library("feature") {
   sources = [ "feature.rs" ]
   crate_root = "feature.rs"
@@ -2796,11 +2816,13 @@ rust_static_library("base_rust_unittests") {
   allow_unsafe = true
   sources = [
     "base_rust_unittests.rs",
+    "command_line_unittest.rs",
     "files/file_path_unittest.rs",
     "task/sequenced_task_runner_unittest.rs",
   ]
   crate_root = "base_rust_unittests.rs"
   deps = [
+    ":command_line",
     ":file_path",
     ":scoped_refptr",
     ":sequenced_task_runner",
