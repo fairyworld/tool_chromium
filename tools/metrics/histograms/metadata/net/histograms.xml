@@ -7131,6 +7131,25 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Net.QuicSession.ResumeAttemptTicketAge.{Status}"
+    units="seconds" expires_after="2027-07-01">
+  <owner>thesalsa@google.com</owner>
+  <owner>src/net/quic/OWNERS</owner>
+  <summary>
+    The age of the session ticket when the client attempted 0-RTT and the
+    handshake completed. Recorded for 0-RTT attempts that were {Status}. The
+    maximum valid age of session tickets is capped at 7 days by the TLS 1.3
+    spec, though in practice this may be set lower by the client.
+
+    https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.1
+  </summary>
+  <token key="Status">
+    <variant name="Accepted" summary="accepted by the server"/>
+    <variant name="All" summary="either accepted or rejected"/>
+    <variant name="Rejected" summary="rejected by the server"/>
+  </token>
+</histogram>
+
 <histogram name="Net.QuicSession.RetryAfterWriteErrorCount2" units="retries"
     expires_after="2024-06-02">
   <owner>dschinazi@chromium.org</owner>
