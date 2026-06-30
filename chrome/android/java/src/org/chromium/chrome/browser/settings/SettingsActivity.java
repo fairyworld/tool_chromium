@@ -26,7 +26,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -427,7 +426,7 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
     }
 
     @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (mMultiColumnSettings != null) {
             for (Fragment fragment :
@@ -463,9 +462,9 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
 
                             @Override
                             public void onFragmentViewCreated(
-                                    @NonNull FragmentManager fm,
-                                    @NonNull Fragment f,
-                                    @NonNull View v,
+                                    FragmentManager fm,
+                                    Fragment f,
+                                    View v,
                                     @Nullable Bundle savedFragmentState) {
                                 assert mMultiColumnSettings != null;
 
