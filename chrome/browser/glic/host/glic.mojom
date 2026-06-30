@@ -46,8 +46,8 @@ struct ProfileEnablement {
   // `GlicRollout` flag, or by the `GlicTieredRollout` flag and synced pref.
   bool is_rolled_out;
 
-  // Whether a primary account exists and is capable, by having the
-  // can_use_model_execution_features accountcapability.
+  // Whether a primary account exists and has the required Account Capabilities
+  // to use Glic.
   bool primary_account_is_capable;
 
   // Whether the primary account exists and is fully signed in.

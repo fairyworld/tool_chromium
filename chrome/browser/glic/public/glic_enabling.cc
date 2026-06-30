@@ -544,22 +544,16 @@ GlicEnabling::ProfileEnablement GlicEnabling::EnablementForProfile(
       }
 
       // Check account capabilities.
-      //
-      // TODO(crbug.com/470004757): when cleaning up the
-      // kGlicEligibilitySeparateAccountCapability feature, also remove the
-      // fallback to can_use_model_execution_features().
-      signin::Tribool capability_value =
-          primary_account.GetAccountCapabilities()
-              .can_use_model_execution_features();
+      result.primary_account_is_capable =
+          CanUseAdultFeatures(primary_account.GetAccountCapabilities());
       if (base::FeatureList::IsEnabled(
               switches::kGlicEligibilitySeparateAccountCapability) &&
           (CanUseGeminiInChrome(primary_account.GetAccountCapabilities()) !=
            signin::Tribool::kUnknown)) {
-        capability_value =
-            CanUseGeminiInChrome(primary_account.GetAccountCapabilities());
+        result.primary_account_is_capable =
+            CanUseGeminiInChrome(primary_account.GetAccountCapabilities()) ==
+            signin::Tribool::kTrue;
       }
-      result.primary_account_is_capable =
-          (capability_value == signin::Tribool::kTrue);
 
       if (!result.primary_account_is_capable && result.fre_is_consented &&
           base::FeatureList::IsEnabled(
@@ -573,14 +567,9 @@ GlicEnabling::ProfileEnablement GlicEnabling::EnablementForProfile(
       base::FieldTrial* field_trial = base::FeatureList::GetFieldTrial(
           switches::kGlicEligibilitySeparateAccountCapability);
       if (field_trial &&
-          (CanUseGeminiInChrome(primary_account.GetAccountCapabilities()) !=
-           signin::Tribool::kUnknown) &&
-          (primary_account.GetAccountCapabilities()
-               .can_use_model_execution_features() !=
-           signin::Tribool::kUnknown) &&
-          (CanUseGeminiInChrome(primary_account.GetAccountCapabilities()) !=
-           primary_account.GetAccountCapabilities()
-               .can_use_model_execution_features())) {
+          (CanUseGeminiInChrome(primary_account.GetAccountCapabilities()) ==
+           signin::Tribool::kTrue !=
+           CanUseAdultFeatures(primary_account.GetAccountCapabilities()))) {
         g_browser_process->GetFeatures()
             ->glic_synthetic_trial_manager()
             ->SetSyntheticExperimentState(
@@ -589,12 +578,10 @@ GlicEnabling::ProfileEnablement GlicEnabling::EnablementForProfile(
       }
 
       result.live_allowed =
-          primary_account.GetAccountCapabilities()
-              .can_use_model_execution_features() == signin::Tribool::kTrue;
+          CanUseAdultFeatures(primary_account.GetAccountCapabilities());
 
       result.share_image_allowed =
-          primary_account.GetAccountCapabilities()
-              .can_use_model_execution_features() == signin::Tribool::kTrue;
+          CanUseAdultFeatures(primary_account.GetAccountCapabilities());
     }
   }
 
@@ -1024,7 +1011,8 @@ bool GlicEnabling::IsAutoOpenForPdfEnabled(Profile* profile) {
 
 // static
 bool GlicEnabling::IsContextualMenuItemEnabled(
-    Profile* profile, const std::u16string& selection_text) {
+    Profile* profile,
+    const std::u16string& selection_text) {
   const bool text_selection_menu_enabled =
       base::FeatureList::IsEnabled(features::kGlicTextSelectionContextMenu) &&
       !base::TrimWhitespace(std::u16string_view(selection_text), base::TRIM_ALL)
@@ -1090,8 +1078,7 @@ GlicEnabling::GetGeminiEnterpriseSettings(Profile* profile) {
     auto parsed_json = base::JSONReader::Read(
         switch_value, base::JSON_PARSE_CHROMIUM_EXTENSIONS);
     if (parsed_json && parsed_json->is_dict()) {
-      if (auto settings =
-              ParseGeminiEnterpriseSettings(parsed_json->GetDict());
+      if (auto settings = ParseGeminiEnterpriseSettings(parsed_json->GetDict());
           settings.has_value()) {
         return settings;
       } else {
@@ -1322,6 +1309,13 @@ bool GlicEnabling::IsEnterpriseAccount(Profile* profile) {
   // Workspace accounts. They are backed by two different Google API endpoints.
   return IsAccountDataProtected(profile) ||
          (IsAccountManaged(profile) == signin::Tribool::kTrue);
+}
+
+// static
+bool GlicEnabling::CanUseAdultFeatures(
+    const AccountCapabilities& capabilities) {
+  return capabilities.can_use_model_execution_features() ==
+         signin::Tribool::kTrue;
 }
 
 syncer::DeviceInfo::GlicExperimentalTriggeringState
