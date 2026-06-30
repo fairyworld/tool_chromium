@@ -1291,6 +1291,7 @@ if (use_blink) {
       sources += [
         "pdf/browser/pdf_document_helper_browsertest.cc",
         "pdf/renderer/pdf_accessibility_tree_browsertest.cc",
+        "pdf/renderer/pdf_view_web_plugin_client_browsertest.cc",
       ]
       deps += [
         "//components/pdf/browser",
