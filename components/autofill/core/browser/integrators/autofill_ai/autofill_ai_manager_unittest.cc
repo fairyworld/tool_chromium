@@ -2397,8 +2397,10 @@ TEST_F(AutofillAiManagerTest, OnPrefetchContextComplete_FormNotFound) {
                                       base::span<const EntityInstance>());
 }
 
-TEST_F(AutofillAiManagerTest, OnPrefetchContextComplete_Failure_ShowsToast) {
-  EXPECT_CALL(autofill_client(), ShowAutofillAiPreFetchFailureNotification());
+TEST_F(AutofillAiManagerTest,
+       OnPrefetchContextComplete_Failure_NoFetchingSuggestion_DoNotShowToast) {
+  EXPECT_CALL(autofill_client(), ShowAutofillAiPreFetchFailureNotification())
+      .Times(0);
   manager().OnPrefetchContextComplete(pcontext_manager(), std::nullopt);
 }
 

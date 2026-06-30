@@ -368,13 +368,14 @@ void AutofillAiManager::OnAfterLoadedServerPredictions(
 void AutofillAiManager::OnPrefetchContextComplete(
     const PersonalContextAccessManager& manager,
     std::optional<base::span<const EntityInstance>> entities) {
-  if (!entities.has_value()) {
-    client_->ShowAutofillAiPreFetchFailureNotification();
-  }
   if (!std::ranges::contains(client_->GetAutofillSuggestions(),
                              SuggestionType::kFetchingAmbientData,
                              &Suggestion::type)) {
     return;
+  }
+
+  if (!entities.has_value()) {
+    client_->ShowAutofillAiPreFetchFailureNotification();
   }
 
   if (generate_suggestions_and_update_popup_callback_) {
