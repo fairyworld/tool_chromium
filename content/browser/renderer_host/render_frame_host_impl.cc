@@ -11291,12 +11291,6 @@ void RenderFrameHostImpl::RequestUnboundedSurface(
     }
     return;
   }
-  if (!HasTransientUserActivation()) {
-    local_frame_host_receiver_.ReportBadMessage(
-        "RequestUnboundedSurface should not be called without user "
-        "activation.");
-    return;
-  }
   // If you change the preconditions/permissions for unbounded elements, be sure
   // to update the corresponding Blink-side checks in
   // HTMLElement::showUnboundedElement.
@@ -11304,6 +11298,12 @@ void RenderFrameHostImpl::RequestUnboundedSurface(
   // scheme callers.
   bool is_privileged = GetWebUI() != nullptr ||
                        GetLastCommittedOrigin().scheme() == kChromeUIScheme;
+  if (!is_privileged && !HasTransientUserActivation()) {
+    local_frame_host_receiver_.ReportBadMessage(
+        "RequestUnboundedSurface should not be called without user "
+        "activation.");
+    return;
+  }
   if (!is_privileged && !base::FeatureList::IsEnabled(
                             blink::features::kUnboundedElementOnTheOpenWeb)) {
     local_frame_host_receiver_.ReportBadMessage(

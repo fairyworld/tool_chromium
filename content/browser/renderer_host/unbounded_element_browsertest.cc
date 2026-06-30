@@ -11,6 +11,7 @@
 #include "content/browser/renderer_host/render_widget_host_impl.h"
 #include "content/browser/renderer_host/unbounded_surface_window.h"
 #include "content/browser/web_contents/web_contents_impl.h"
+#include "content/public/common/url_constants.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "content/public/test/content_browser_test.h"
@@ -127,6 +128,27 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, ActivationPreconditions) {
   // user gesture.
   EXPECT_EQ("NotAllowedError", EvalJs(primary_main_frame_host(), script,
                                       EXECUTE_SCRIPT_NO_USER_GESTURE));
+}
+
+IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
+                       WebUIPrivilegedBypassesUserActivation) {
+  GURL webui_url = GURL(std::string(kChromeUIScheme) + "://" +
+                        std::string(kChromeUIGpuHost));
+  EXPECT_TRUE(NavigateToURL(shell(), webui_url));
+
+  // Create an unbounded element via HTML snippet:
+  std::string script = R"(
+    const div = document.createElement('div');
+    div.setAttribute('unbounded', '');
+    div.style.width = '100px';
+    div.style.height = '100px';
+    document.body.appendChild(div);
+    div.showUnboundedElement().then(() => "Success", e => e.name);
+  )";
+  // Since it's a privileged WebUI page, it should bypass the transient user
+  // activation requirement.
+  EXPECT_EQ("Success", EvalJs(primary_main_frame_host(), script,
+                              EXECUTE_SCRIPT_NO_USER_GESTURE));
 }
 
 IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, AncestorClipping) {
