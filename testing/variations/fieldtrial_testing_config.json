@@ -10544,6 +10544,29 @@
             ]
         }
     ],
+    "EncryptSessionStorage_Phase1": [
+        {
+            "platforms": [
+                "chromeos",
+                "linux",
+                "mac",
+                "windows",
+                "android",
+                "ios"
+            ],
+            "experiments": [
+                {
+                    "name": "Phase1",
+                    "params": {
+                        "stage": "write_both_read_only_clear"
+                    },
+                    "enable_features": [
+                        "EncryptSessionStorage"
+                    ]
+                }
+            ]
+        }
+    ],
     "EnergyEffectVisdStudy": [
         {
             "platforms": [
