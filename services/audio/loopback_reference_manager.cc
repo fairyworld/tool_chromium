@@ -9,6 +9,7 @@
 #include "base/containers/flat_set.h"
 #include "base/functional/callback.h"
 #include "base/logging.h"
+#include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/strings/strcat.h"
@@ -303,7 +304,8 @@ class LoopbackReferenceManagerCore
   int sample_rate_;
 
   base::Lock lock_;
-  base::flat_set<ReferenceOutput::Listener*> listeners_ GUARDED_BY(lock_);
+  base::flat_set<raw_ptr<ReferenceOutput::Listener>> listeners_
+      GUARDED_BY(lock_);
 
   base::WeakPtrFactory<LoopbackReferenceManagerCore> weak_ptr_factory_{this};
 };
