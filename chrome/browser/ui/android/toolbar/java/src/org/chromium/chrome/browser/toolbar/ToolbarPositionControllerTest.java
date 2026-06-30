@@ -7,7 +7,6 @@ package org.chromium.chrome.browser.toolbar;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeFalse;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,7 +53,6 @@ import org.chromium.base.test.RobolectricUtil;
 import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.base.test.util.HistogramWatcher;
-import org.chromium.build.BuildConfig;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.browser_controls.BottomControlsLayer;
 import org.chromium.chrome.browser.browser_controls.BottomControlsStacker;
@@ -358,7 +356,6 @@ public class ToolbarPositionControllerTest {
 
     @Before
     public void setUp() {
-        assumeFalse(BuildConfig.IS_DESKTOP_ANDROID);
         doReturn(TOOLBAR_HEIGHT).when(mControlContainer).getToolbarHeight();
         doReturn(mControlContainerLayoutParams).when(mControlContainer).mutateLayoutParams();
         mHairlineLayoutParams.anchorGravity = Gravity.BOTTOM;
@@ -377,7 +374,11 @@ public class ToolbarPositionControllerTest {
         mBrowserControlsSizer.setControlsPosition(
                 ControlsPosition.TOP, TOOLBAR_HEIGHT, 0, 0, 0, 0, 0);
         mControlContainerLayoutParams.gravity = Gravity.START | Gravity.TOP;
-        mProgressBarLayoutParams.gravity = Gravity.BOTTOM;
+        boolean animatedProgressBarEnabled =
+                ChromeFeatureList.sAndroidAnimatedProgressBarInBrowser.isEnabled()
+                        && ChromeFeatureList.sAndroidApb144Patch4.isEnabled();
+        mProgressBarLayoutParams.gravity =
+                animatedProgressBarEnabled ? Gravity.BOTTOM : Gravity.CENTER;
         mProgressBarLayoutParams.anchorGravity = Gravity.BOTTOM;
         mProgressBarLayoutParams.setAnchorId(CONTROL_CONTAINER_ID);
         mProfileSupplier = ObservableSuppliers.createNonNull(mProfile);
@@ -1049,6 +1050,7 @@ public class ToolbarPositionControllerTest {
     }
 
     @Test
+    @EnableFeatures(ChromeFeatureList.NEW_TAB_PAGE_CUSTOMIZATION_V2)
     public void testMaybeForceBottomToolbarLayoutUpdateAndCapture() {
         // 1. Test mIsFirstPositionChange is true.
         assertTrue(mController.getIsFirstPositionChangeForTesting());
@@ -1302,7 +1304,12 @@ public class ToolbarPositionControllerTest {
         assertEquals(Gravity.BOTTOM, mHairlineLayoutParams.gravity);
         assertEquals(Gravity.START | Gravity.TOP, mControlContainerLayoutParams.gravity);
         assertEquals(1, mToolbarLayoutParams.bottomMargin);
-        assertEquals(Gravity.BOTTOM, mProgressBarLayoutParams.gravity);
+        boolean animatedProgressBarEnabled =
+                ChromeFeatureList.sAndroidAnimatedProgressBarInBrowser.isEnabled()
+                        && ChromeFeatureList.sAndroidApb144Patch4.isEnabled();
+        assertEquals(
+                animatedProgressBarEnabled ? Gravity.BOTTOM : Gravity.CENTER,
+                mProgressBarLayoutParams.gravity);
         assertEquals(Gravity.BOTTOM, mProgressBarLayoutParams.anchorGravity);
         assertEquals(CONTROL_CONTAINER_ID, mProgressBarLayoutParams.getAnchorId());
     }
