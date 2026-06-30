@@ -77,11 +77,14 @@ class V4StoreFactory {
   // we plan to migrate.
   // |is_eligible_for_migration| specifies whether this store is eligible
   // to migrate between V4 and V5 disk formats.
+  // |is_extensions_blocklist| specifies whether this store is for the
+  // extensions blocklist.
   virtual V4StorePtr CreateV4Store(
       const scoped_refptr<base::SequencedTaskRunner>& task_runner,
       const base::FilePath& store_path,
       PrefixSize v5_prefix_size,
-      bool is_eligible_for_migration);
+      bool is_eligible_for_migration,
+      bool is_extensions_blocklist);
 };
 
 // Enumerate different results of the migration attempt from v5 to v4.
@@ -125,9 +128,33 @@ enum class V5ToV4MigrationResult {
   // V5 to V4 migration was ineligible, and wiping V5 succeeded.
   kStoreIneligibleWipeSucceeded = 11,
 
-  kMaxValue = kStoreIneligibleWipeSucceeded
+  // Failed to migrate extensions blocklist due to conversion or write failure.
+  kExtensionBlocklistMigrationFailed = 12,
+
+  kMaxValue = kExtensionBlocklistMigrationFailed
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:V5ToV4MigrationResult)
+
+// Enumerate different results of converting the extensions blocklist from v5 to
+// v4. These values are persisted to logs. Entries should not be renumbered and
+// numeric values should never be reused.
+// LINT.IfChange(ConvertExtensionBlocklistV5ToV4Result)
+enum class ConvertExtensionBlocklistV5ToV4Result {
+  // Conversion succeeded.
+  kSuccess = 0,
+
+  // Failed to read the v5 hash file.
+  kReadV5Failed = 1,
+
+  // The v5 hash file size is not a multiple of the expected hash size.
+  kInvalidFileSize = 2,
+
+  // Failed to write the converted v4 hash file.
+  kWriteV4Failed = 3,
+
+  kMaxValue = kWriteV4Failed
+};
+// LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:ConvertExtensionBlocklistV5ToV4Result)
 
 class V4Store : public SBStore {
  public:
@@ -138,6 +165,8 @@ class V4Store : public SBStore {
   // we plan to migrate.
   // |is_eligible_for_migration| specifies whether this store is eligible
   // to migrate between V4 and V5 disk formats.
+  // |is_extensions_blocklist| specifies whether this store is for the
+  // extensions blocklist.
   // If the store is being created to apply an update to the old store, then
   // |old_file_size| is the size of the existing file on disk for this store;
   // 0 otherwise. This is needed so that we can correctly report the size of
@@ -147,6 +176,7 @@ class V4Store : public SBStore {
           const base::FilePath& store_path,
           PrefixSize v5_prefix_size,
           bool is_eligible_for_migration,
+          bool is_extensions_blocklist,
           int64_t old_file_size = 0);
   ~V4Store() override;
 
@@ -444,6 +474,19 @@ class V4Store : public SBStore {
   // Returns the reason for the failure or reports success.
   V5ToV4MigrationResult MigrateFromV5(const base::FilePath& v5_store_path);
 
+  // Converts the extensions blocklist from v5 hash file format to v4 ID file
+  // format. |v5_hash_file_path| is the path to the source v5 hash file
+  // containing 16-byte hashes. |v4_hash_file_path| is the path where the
+  // converted 32-byte hex IDs should be written. |checksum_sha256| will be
+  // populated with the SHA256 checksum of the converted data. |file_size| will
+  // be populated with the size of the converted file in bytes. Returns the
+  // granular result of the conversion attempt.
+  ConvertExtensionBlocklistV5ToV4Result ConvertExtensionsBlocklistFromV5ToV4(
+      const base::FilePath& v5_hash_file_path,
+      const base::FilePath& v4_hash_file_path,
+      std::string* checksum_sha256,
+      uint64_t* file_size);
+
   // Wipes the V5 store file and its associated hash files.
   // |v5_store_path| is the path of the V5 store to delete.
   // Returns true if both the store file and all of its associated hash files
@@ -493,6 +536,9 @@ class V4Store : public SBStore {
 
   // Whether this store is eligible for v5 to v4 disk migration.
   const bool is_eligible_for_migration_ = true;
+
+  // Whether this store is for the extensions blocklist.
+  const bool is_extensions_blocklist_ = false;
 
   // The state of the store as returned by the PVer4 server in the last applied
   // update response.

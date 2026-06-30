@@ -165,7 +165,8 @@ void V4Database::CreateOnTaskRunner(
     V4StorePtr store = GetStoreFactory()->CreateV4Store(
         db_task_runner, store_path,
         /*v5_prefix_size=*/0,
-        /*is_eligible_for_migration=*/it.list_id() != GetUrlCsdAllowlistId());
+        /*is_eligible_for_migration=*/it.list_id() != GetUrlCsdAllowlistId(),
+        /*is_extensions_blocklist=*/it.list_id() == GetChromeExtMalwareId());
     base::UmaHistogramBoolean("SafeBrowsing.V4Store.ReadyOnStartup",
                               store->HasValidData());
     store_map->insert({it.list_id(), std::move(store)});

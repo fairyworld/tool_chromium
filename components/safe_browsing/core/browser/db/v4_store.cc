@@ -29,6 +29,7 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/timer/elapsed_timer.h"
 #include "base/types/to_address.h"
+#include "components/crx_file/id_util.h"
 #include "components/safe_browsing/core/browser/db/prefix_iterator.h"
 #include "components/safe_browsing/core/browser/db/sb_store_file_format.h"
 #include "components/safe_browsing/core/browser/db/v4_rice.h"
@@ -249,10 +250,12 @@ V4StorePtr V4StoreFactory::CreateV4Store(
     const scoped_refptr<base::SequencedTaskRunner>& task_runner,
     const base::FilePath& store_path,
     PrefixSize v5_prefix_size,
-    bool is_eligible_for_migration) {
-  V4StorePtr new_store(new V4Store(task_runner, store_path, v5_prefix_size,
-                                   is_eligible_for_migration),
-                       V4StoreDeleter(task_runner));
+    bool is_eligible_for_migration,
+    bool is_extensions_blocklist) {
+  V4StorePtr new_store(
+      new V4Store(task_runner, store_path, v5_prefix_size,
+                  is_eligible_for_migration, is_extensions_blocklist),
+      V4StoreDeleter(task_runner));
   new_store->Initialize();
   return new_store;
 }
@@ -274,12 +277,20 @@ V4Store::V4Store(const scoped_refptr<base::SequencedTaskRunner>& task_runner,
                  const base::FilePath& store_path,
                  PrefixSize v5_prefix_size,
                  bool is_eligible_for_migration,
+                 bool is_extensions_blocklist,
                  const int64_t old_file_size)
     : SBStore(task_runner, store_path, old_file_size),
       hash_prefix_map_(
           std::make_unique<HashPrefixMap>(store_path, task_runner)),
       v5_prefix_size_(v5_prefix_size),
-      is_eligible_for_migration_(is_eligible_for_migration) {}
+      is_eligible_for_migration_(is_eligible_for_migration),
+      is_extensions_blocklist_(is_extensions_blocklist) {
+  if (base::FeatureList::IsEnabled(
+          kAllowSafeBrowsingV4StoreDiskMigrationChanges) &&
+      is_extensions_blocklist_) {
+    CHECK_EQ(v5_prefix_size_, 16u);
+  }
+}
 
 V4Store::~V4Store() = default;
 
@@ -440,7 +451,8 @@ void V4Store::ApplyUpdate(
     UpdatedStoreReadyCallback callback) {
   base::ElapsedThreadTimer thread_timer;
   V4StorePtr new_store(new V4Store(task_runner_, store_path_, v5_prefix_size_,
-                                   is_eligible_for_migration_, file_size_),
+                                   is_eligible_for_migration_,
+                                   is_extensions_blocklist_, file_size_),
                        V4StoreDeleter(task_runner_));
   ApplyUpdateResult apply_update_result;
   std::optional<std::string> metric;
@@ -926,6 +938,7 @@ StoreReadResult V4Store::ReadFromDisk() {
     case V5ToV4MigrationResult::kRenameV4StoreFileFailure:
     case V5ToV4MigrationResult::kProtoSerializationFailure:
     case V5ToV4MigrationResult::kStoreIneligibleWipeFailed:
+    case V5ToV4MigrationResult::kExtensionBlocklistMigrationFailed:
       return V5_TO_V4_MIGRATION_FAILURE;
   }
 }
@@ -966,8 +979,42 @@ StoreReadResult V4Store::ReadFromDiskInternal() {
   return READ_SUCCESS;
 }
 
+ConvertExtensionBlocklistV5ToV4Result
+V4Store::ConvertExtensionsBlocklistFromV5ToV4(
+    const base::FilePath& v5_hash_file_path,
+    const base::FilePath& v4_hash_file_path,
+    std::string* checksum_sha256,
+    uint64_t* file_size) {
+  std::string v5_data;
+  if (!base::ReadFileToString(v5_hash_file_path, &v5_data)) {
+    return ConvertExtensionBlocklistV5ToV4Result::kReadV5Failed;
+  }
+  if (v5_data.size() % 16 != 0) {
+    return ConvertExtensionBlocklistV5ToV4Result::kInvalidFileSize;
+  }
+  base::span<const uint8_t> v5_span = base::as_byte_span(v5_data);
+  std::string v4_id_data;
+  v4_id_data.reserve(v5_span.size() * 2);
+  for (size_t i = 0; i < v5_span.size(); i += 16u) {
+    v4_id_data.append(
+        crx_file::id_util::GenerateIdFromHash(v5_span.subspan(i, 16u)));
+  }
+  if (!base::WriteFile(v4_hash_file_path, v4_id_data)) {
+    return ConvertExtensionBlocklistV5ToV4Result::kWriteV4Failed;
+  }
+  *file_size = v4_id_data.size();
+
+  std::array<uint8_t, crypto::hash::kSha256Size> checksum;
+  crypto::hash::Hash(crypto::hash::HashKind::kSha256,
+                     base::as_byte_span(v4_id_data), checksum);
+  checksum_sha256->assign(checksum.begin(), checksum.end());
+
+  return ConvertExtensionBlocklistV5ToV4Result::kSuccess;
+}
+
 V5ToV4MigrationResult V4Store::MigrateFromV5(
     const base::FilePath& v5_store_path) {
+  const PrefixSize kV4ExtensionIdPrefixSize = 32;
   V5StoreFileFormat v5_file_format;
   int64_t v5_file_size = 0;
   base::FilePath v5_hash_file_path;
@@ -1004,7 +1051,13 @@ V5ToV4MigrationResult V4Store::MigrateFromV5(
 
   const auto& list_details = v5_file_format.list_details();
   std::string v4_ext;
+  PrefixSize v4_prefix_size =
+      is_extensions_blocklist_ ? kV4ExtensionIdPrefixSize : v5_prefix_size_;
   uint64_t file_size = 0;
+  std::optional<std::string> v4_checksum;
+  if (list_details.has_checksum()) {
+    v4_checksum = list_details.checksum().sha256();
+  }
 
   // Move the V5 hash file to the V4 path if it exists.
   if (list_details.has_hash_file()) {
@@ -1015,20 +1068,43 @@ V5ToV4MigrationResult V4Store::MigrateFromV5(
         HashPrefixContainer::GetPath(v5_store_path, hash_file.extension());
     // TODO(crbug.com/362791941): Eventually change `v5_prefix_size_ != 0` to a
     // CHECK in the constructor.
-    if (v5_prefix_size_ == 0 || hash_file.file_size() % v5_prefix_size_ != 0) {
+    if (v5_prefix_size_ == 0) {
       return V5ToV4MigrationResult::kPrefixSizeMismatchFailure;
     }
+    if (hash_file.file_size() % v5_prefix_size_ != 0) {
+      return V5ToV4MigrationResult::kPrefixSizeMismatchFailure;
+    }
+    // Determine the new v4 hash file's path.
     file_size = hash_file.file_size();
-    v4_ext =
-        base::NumberToString(v5_prefix_size_) + "_" + hash_file.extension();
+    v4_ext = base::NumberToString(v4_prefix_size) + "_" + hash_file.extension();
     v4_hash_file_path = HashPrefixContainer::GetPath(store_path_, v4_ext);
 
     if (!base::PathExists(v5_hash_file_path)) {
       return V5ToV4MigrationResult::kHashFileMissingFailure;
     }
 
-    if (!base::Move(v5_hash_file_path, v4_hash_file_path)) {
-      return V5ToV4MigrationResult::kRenameHashFileFailure;
+    // Write to the new hash file.
+    if (is_extensions_blocklist_) {
+      // For the extensions blocklist, migrate the 16-byte extension hashes to
+      // length-16 extension IDs into the v4 hash file, and delete the v5 hash
+      // file.
+      std::string converted_checksum;
+      ConvertExtensionBlocklistV5ToV4Result result =
+          ConvertExtensionsBlocklistFromV5ToV4(v5_hash_file_path,
+                                               v4_hash_file_path,
+                                               &converted_checksum, &file_size);
+      base::UmaHistogramEnumeration(
+          "SafeBrowsing.V4Store.ConvertExtensionBlocklistV5ToV4Result", result);
+      if (result != ConvertExtensionBlocklistV5ToV4Result::kSuccess) {
+        return V5ToV4MigrationResult::kExtensionBlocklistMigrationFailed;
+      }
+      v4_checksum = std::move(converted_checksum);
+      base::DeleteFile(v5_hash_file_path);
+    } else {
+      // For other blocklists, just rename the v5 hash file to v4.
+      if (!base::Move(v5_hash_file_path, v4_hash_file_path)) {
+        return V5ToV4MigrationResult::kRenameHashFileFailure;
+      }
     }
   }
 
@@ -1041,14 +1117,14 @@ V5ToV4MigrationResult V4Store::MigrateFromV5(
   if (list_details.has_version()) {
     response->set_new_client_state(list_details.version());
   }
-  if (list_details.has_checksum()) {
-    response->mutable_checksum()->set_sha256(list_details.checksum().sha256());
+  if (v4_checksum.has_value()) {
+    response->mutable_checksum()->set_sha256(std::move(*v4_checksum));
   }
   response->set_response_type(ListUpdateResponse::FULL_UPDATE);
 
   if (list_details.has_hash_file()) {
     HashFile* hash_file = v4_file_format.add_hash_files();
-    hash_file->set_prefix_size(v5_prefix_size_);
+    hash_file->set_prefix_size(v4_prefix_size);
     hash_file->set_extension(v4_ext);
     hash_file->set_file_size(file_size);
   }

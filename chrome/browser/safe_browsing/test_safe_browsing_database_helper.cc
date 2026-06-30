@@ -69,7 +69,8 @@ class InsertingDatabaseFactory : public safe_browsing::TestV4DatabaseFactory {
                      db_task_runner,
                      store_path.empty() ? base_store_path : store_path,
                      /*v5_prefix_size=*/0,
-                     /*is_eligible_for_migration=*/true)});
+                     /*is_eligible_for_migration=*/true,
+                     /*is_extensions_blocklist=*/false)});
       }
     }
 

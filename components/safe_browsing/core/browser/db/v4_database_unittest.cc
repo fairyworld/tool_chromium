@@ -33,7 +33,8 @@ class FakeV4Store : public V4Store {
             task_runner,
             base::FilePath(store_path.value() + FILE_PATH_LITERAL(".store")),
             /*v5_prefix_size=*/0,
-            /*is_eligible_for_migration=*/true),
+            /*is_eligible_for_migration=*/true,
+            /*is_extensions_blocklist=*/false),
         hash_prefix_should_match_(hash_prefix_matches) {}
 
   HashPrefixStr GetMatchingHashPrefix(const FullHashStr& full_hash) override {
@@ -62,7 +63,8 @@ class FakeV4StoreFactory : public V4StoreFactory {
       const scoped_refptr<base::SequencedTaskRunner>& task_runner,
       const base::FilePath& store_path,
       PrefixSize v5_prefix_size,
-      bool is_eligible_for_migration) override {
+      bool is_eligible_for_migration,
+      bool is_extensions_blocklist) override {
     return V4StorePtr(
         new FakeV4Store(task_runner, store_path, hash_prefix_should_match_),
         V4StoreDeleter(task_runner));

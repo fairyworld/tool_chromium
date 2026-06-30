@@ -6,6 +6,7 @@
 #define COMPONENTS_SAFE_BROWSING_CORE_BROWSER_DB_SB_STORE_H_
 
 #include <string>
+#include <string_view>
 
 #include "base/files/file.h"
 #include "base/files/file_path.h"
@@ -190,6 +191,13 @@ class SBStore {
   int64_t file_size() const { return file_size_; }
 
  protected:
+  // Converts a 32-character V4 extension ID string into its raw 16-byte V5
+  // binary hash representation.
+  // `v4_id` is the base-16 string extension ID to convert. Must be exactly 32
+  // characters long.
+  // Returns a string containing the raw 16 binary bytes.
+  static std::string ExtensionV4IdToV5Hash(std::string_view v4_id);
+
   static constexpr uint32_t kFileMagic = 0x600D71FE;
   static constexpr uint32_t kV4FileVersion = 9;
   static constexpr uint32_t kV5FileVersion = 10;
@@ -219,6 +227,9 @@ class SBStore {
   const scoped_refptr<base::SequencedTaskRunner> task_runner_;
 
  private:
+  friend class V4StoreTest;
+  friend class V5StoreTest;
+
   static void RecordBooleanWithAndWithoutSuffix(const std::string& metric,
                                                 bool value,
                                                 const std::string& suffix);

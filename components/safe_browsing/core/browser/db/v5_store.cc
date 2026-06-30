@@ -4,14 +4,19 @@
 
 #include "components/safe_browsing/core/browser/db/v5_store.h"
 
+#include <optional>
+#include <utility>
+
 #include "base/files/file_util.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
 #include "base/strings/string_util.h"
+#include "components/crx_file/id_util.h"
 #include "components/safe_browsing/core/browser/db/hash_prefix_container.h"
 #include "components/safe_browsing/core/browser/db/sb_protocol_manager_util.h"
 #include "components/safe_browsing/core/browser/db/v4_store.pb.h"
 #include "components/safe_browsing/core/common/proto/v5_store.pb.h"
+#include "crypto/hash.h"
 #include "third_party/abseil-cpp/absl/cleanup/cleanup.h"
 #include "third_party/protobuf/src/google/protobuf/io/zero_copy_stream_impl_lite.h"
 
@@ -50,6 +55,7 @@ V5Store::V5Store(const scoped_refptr<base::SequencedTaskRunner>& task_runner,
                  PrefixSize prefix_size,
                  const base::FilePath& v4_store_path,
                  bool is_eligible_for_v4_to_v5_disk_migration,
+                 bool is_extensions_blocklist,
                  const int64_t old_file_size)
     : SBStore(task_runner, store_path, old_file_size),
       hash_prefix_list_(std::make_unique<HashPrefixList>(store_path,
@@ -57,7 +63,8 @@ V5Store::V5Store(const scoped_refptr<base::SequencedTaskRunner>& task_runner,
                                                          task_runner)),
       prefix_size_(prefix_size),
       v4_store_path_(v4_store_path),
-      is_eligible_for_migration_(is_eligible_for_v4_to_v5_disk_migration) {}
+      is_eligible_for_migration_(is_eligible_for_v4_to_v5_disk_migration),
+      is_extensions_blocklist_(is_extensions_blocklist) {}
 
 V5Store::~V5Store() = default;
 
@@ -98,6 +105,7 @@ V5StoreReadResult V5Store::ReadFromDisk() {
     case V4ToV5MigrationResult::kExtensionParsingFailure:
     case V4ToV5MigrationResult::kRenameV5StoreFileFailure:
     case V4ToV5MigrationResult::kStoreIneligibleWipeFailed:
+    case V4ToV5MigrationResult::kExtensionBlocklistMigrationFailed:
       return V5StoreReadResult::kV4ToV5MigrationFailure;
   }
 }
@@ -199,6 +207,11 @@ V4ToV5MigrationResult V5Store::MigrateFromV4(
     return V4ToV5MigrationResult::kMultipleHashFilesFailure;
   }
 
+  std::optional<std::string> v5_checksum;
+  if (v4_file_format.list_update_response().has_checksum()) {
+    v5_checksum = v4_file_format.list_update_response().checksum().sha256();
+  }
+
   base::FilePath v4_hash_file_path;
   std::string v5_ext;
   uint64_t file_size = 0;
@@ -207,7 +220,9 @@ V4ToV5MigrationResult V5Store::MigrateFromV4(
   if (v4_file_format.hash_files_size() == 1) {
     const auto& hash_file = v4_file_format.hash_files(0);
     PrefixSize v4_prefix_size = hash_file.prefix_size();
-    if (v4_prefix_size != prefix_size_) {
+    PrefixSize expected_v4_prefix_size =
+        is_extensions_blocklist_ ? 32 : prefix_size_;
+    if (v4_prefix_size != expected_v4_prefix_size) {
       return V4ToV5MigrationResult::kPrefixSizeMismatchFailure;
     }
     v4_hash_file_path =
@@ -228,11 +243,28 @@ V4ToV5MigrationResult V5Store::MigrateFromV4(
     if (v5_ext.empty()) {
       return V4ToV5MigrationResult::kExtensionParsingFailure;
     }
-
-    // Move the V4 hash file to the V5 path with the new extension.
     v5_hash_file_path = HashPrefixContainer::GetPath(store_path_, v5_ext);
-    if (!base::Move(v4_hash_file_path, v5_hash_file_path)) {
-      return V4ToV5MigrationResult::kRenameHashFileFailure;
+    // Write to the new hash file.
+    if (is_extensions_blocklist_) {
+      // For the extensions blocklist, migrate the length-32 extension IDs to
+      // 16-byte hashes into the v5 hash file, and delete the v4 hash file.
+      std::string converted_checksum;
+      ConvertExtensionBlocklistV4ToV5Result result =
+          ConvertExtensionsBlocklistFromV4ToV5(v4_hash_file_path,
+                                               v5_hash_file_path,
+                                               &converted_checksum, &file_size);
+      base::UmaHistogramEnumeration(
+          "SafeBrowsing.V5Store.ConvertExtensionBlocklistV4ToV5Result", result);
+      if (result != ConvertExtensionBlocklistV4ToV5Result::kSuccess) {
+        return V4ToV5MigrationResult::kExtensionBlocklistMigrationFailed;
+      }
+      v5_checksum = std::move(converted_checksum);
+      base::DeleteFile(v4_hash_file_path);
+    } else {
+      // For other blocklists, just rename the v4 hash file to v5.
+      if (!base::Move(v4_hash_file_path, v5_hash_file_path)) {
+        return V4ToV5MigrationResult::kRenameHashFileFailure;
+      }
     }
   }
 
@@ -246,9 +278,8 @@ V4ToV5MigrationResult V5Store::MigrateFromV4(
     list_details->set_version(
         v4_file_format.list_update_response().new_client_state());
   }
-  if (v4_file_format.list_update_response().has_checksum()) {
-    list_details->mutable_checksum()->set_sha256(
-        v4_file_format.list_update_response().checksum().sha256());
+  if (v5_checksum.has_value()) {
+    list_details->mutable_checksum()->set_sha256(std::move(*v5_checksum));
   }
 
   if (!v5_ext.empty()) {
@@ -296,6 +327,41 @@ bool V5Store::WipeV4Store(const base::FilePath& v4_store_path) {
   }
   bool store_delete_success = base::DeleteFile(v4_store_path);
   return hash_delete_success && store_delete_success;
+}
+
+ConvertExtensionBlocklistV4ToV5Result
+V5Store::ConvertExtensionsBlocklistFromV4ToV5(
+    const base::FilePath& v4_hash_file_path,
+    const base::FilePath& v5_hash_file_path,
+    std::string* checksum_sha256,
+    uint64_t* file_size) {
+  std::string v4_data;
+  if (!base::ReadFileToString(v4_hash_file_path, &v4_data)) {
+    return ConvertExtensionBlocklistV4ToV5Result::kReadV4Failed;
+  }
+  if (v4_data.size() % 32 != 0) {
+    return ConvertExtensionBlocklistV4ToV5Result::kInvalidFileSize;
+  }
+  std::string v5_hash_data;
+  v5_hash_data.reserve(v4_data.size() / 2);
+  for (size_t i = 0; i < v4_data.size(); i += 32) {
+    std::string_view id = std::string_view(v4_data).substr(i, 32);
+    if (!crx_file::id_util::IdIsValid(id)) {
+      return ConvertExtensionBlocklistV4ToV5Result::kInvalidExtensionId;
+    }
+    v5_hash_data.append(SBStore::ExtensionV4IdToV5Hash(id));
+  }
+  if (!base::WriteFile(v5_hash_file_path, v5_hash_data)) {
+    return ConvertExtensionBlocklistV4ToV5Result::kWriteV5Failed;
+  }
+  *file_size = v5_hash_data.size();
+
+  std::array<uint8_t, crypto::hash::kSha256Size> checksum;
+  crypto::hash::Hash(crypto::hash::HashKind::kSha256,
+                     base::as_byte_span(v5_hash_data), checksum);
+  checksum_sha256->assign(checksum.begin(), checksum.end());
+
+  return ConvertExtensionBlocklistV4ToV5Result::kSuccess;
 }
 
 }  // namespace safe_browsing

@@ -64,9 +64,37 @@ enum class V4ToV5MigrationResult {
   // V4 to V5 migration was ineligible, and wiping V4 succeeded.
   kStoreIneligibleWipeSucceeded = 13,
 
-  kMaxValue = kStoreIneligibleWipeSucceeded
+  // Failed to migrate extensions blocklist due to conversion or write failure.
+  kExtensionBlocklistMigrationFailed = 14,
+
+  kMaxValue = kExtensionBlocklistMigrationFailed
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:V4ToV5MigrationResult)
+
+// Enumerate different results of converting the extensions blocklist from v4 to
+// v5.
+// These values are persisted to logs. Entries should not be renumbered and
+// numeric values should never be reused.
+// LINT.IfChange(ConvertExtensionBlocklistV4ToV5Result)
+enum class ConvertExtensionBlocklistV4ToV5Result {
+  // Conversion completed successfully.
+  kSuccess = 0,
+
+  // Failed to read the V4 hash file.
+  kReadV4Failed = 1,
+
+  // The V4 hash file size was not a multiple of 32 bytes.
+  kInvalidFileSize = 2,
+
+  // An extension ID in the V4 hash file was invalid.
+  kInvalidExtensionId = 3,
+
+  // Failed to write the converted V5 hash file.
+  kWriteV5Failed = 4,
+
+  kMaxValue = kWriteV5Failed
+};
+// LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:ConvertExtensionBlocklistV4ToV5Result)
 
 class V5Store : public SBStore {
  public:
@@ -77,6 +105,8 @@ class V5Store : public SBStore {
   // used for migrating from a v4 database to a v5 database.
   // `is_eligible_for_v4_to_v5_disk_migration` specifies whether this store is
   // eligible to migrate its old V4 disk format to V5.
+  // `is_extensions_blocklist` specifies whether this store is for the
+  // extensions blocklist.
   // If the store is being created to apply an update to the old store, then
   // `old_file_size` is the size of the existing file on disk for this store;
   // 0 otherwise. This is needed so that we can correctly report the size of
@@ -87,6 +117,7 @@ class V5Store : public SBStore {
           PrefixSize prefix_size,
           const base::FilePath& v4_store_path,
           bool is_eligible_for_v4_to_v5_disk_migration,
+          bool is_extensions_blocklist,
           int64_t old_file_size = 0);
   ~V5Store() override;
 
@@ -125,6 +156,22 @@ class V5Store : public SBStore {
   // are successfully deleted; false otherwise.
   bool WipeV4Store(const base::FilePath& v4_store_path);
 
+  // Converts the extensions blocklist hash file from V4 to V5 format.
+  // `v4_hash_file_path` is the path to the existing V4 hash file.
+  // `v5_hash_file_path` is the path where the converted V5 hash file should be
+  // written.
+  // `checksum_sha256` is an output parameter that will be populated with the
+  // SHA256 checksum of the converted hash data.
+  // `file_size` is an output parameter that will be populated with the size of
+  // the converted hash data.
+  // Returns `ConvertExtensionBlocklistV4ToV5Result::kSuccess` on success, or an
+  // appropriate error code on failure.
+  ConvertExtensionBlocklistV4ToV5Result ConvertExtensionsBlocklistFromV4ToV5(
+      const base::FilePath& v4_hash_file_path,
+      const base::FilePath& v5_hash_file_path,
+      std::string* checksum_sha256,
+      uint64_t* file_size);
+
   std::unique_ptr<HashPrefixList> hash_prefix_list_;
 
   // The expected prefix size for the hash prefixes in this store.
@@ -135,6 +182,9 @@ class V5Store : public SBStore {
 
   // Whether this store is eligible for v4 to v5 disk migration.
   const bool is_eligible_for_migration_ = true;
+
+  // Whether this store is for the extensions blocklist.
+  const bool is_extensions_blocklist_ = false;
 
   // The version of the store as returned by the PVer5 server in the last
   // applied update response.

@@ -4203,6 +4203,16 @@ and applied correctly. -->
   </summary>
 </histogram>
 
+<histogram name="SafeBrowsing.V4Store.ConvertExtensionBlocklistV5ToV4Result"
+    enum="ConvertExtensionBlocklistV5ToV4Result" expires_after="2027-05-05">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records the granular outcome of converting the extensions blocklist from v5
+    to v4 format. Logged immediately after the conversion attempt completes.
+  </summary>
+</histogram>
+
 <histogram
     name="SafeBrowsing.V4Store.DbThread.CheckHighConfidenceAllowlistStoreDuration"
     units="ms" expires_after="2026-01-04">
@@ -4320,6 +4330,16 @@ parsed correctly. -->
     parsing it successfully as a protobuf for V5.
   </summary>
   <token key="Store" variants="SafeBrowsing_SBStore_Metrics"/>
+</histogram>
+
+<histogram name="SafeBrowsing.V5Store.ConvertExtensionBlocklistV4ToV5Result"
+    enum="ConvertExtensionBlocklistV4ToV5Result" expires_after="2027-05-05">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records the granular outcome of converting the extensions blocklist from v4
+    to v5 format. Logged immediately after the conversion attempt completes.
+  </summary>
 </histogram>
 
 <histogram name="SafeBrowsing.V5Store.IsStoreValid{Store}_v5"
