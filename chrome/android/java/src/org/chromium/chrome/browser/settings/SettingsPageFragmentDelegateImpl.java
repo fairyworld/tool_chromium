@@ -15,6 +15,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.preference.PreferenceFragmentCompat;
+
+import com.google.android.material.appbar.AppBarLayout;
 
 import org.chromium.base.supplier.ObservableSuppliers;
 import org.chromium.base.supplier.OneshotSupplierImpl;
@@ -27,6 +30,8 @@ import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.settings.search.SettingsSearchCoordinator;
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
+import org.chromium.components.browser_ui.settings.PreferenceUpdateObserver;
+import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.ui.base.ActivityResultTracker;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.modaldialog.ModalDialogManager;
@@ -38,7 +43,10 @@ import org.chromium.ui.modaldialog.ModalDialogManager;
  */
 @NullMarked
 public class SettingsPageFragmentDelegateImpl
-        implements SettingsPage.FragmentDelegate, SettingsMenuHelper.Delegate {
+        implements SettingsPage.FragmentDelegate,
+                SettingsMenuHelper.Delegate,
+                ContainmentHelper.Delegate,
+                PreferenceUpdateObserver {
     private static final String SETTINGS_NATIVE_PAGE_TAG = "settings_native_page";
 
     private final Activity mActivity;
@@ -48,6 +56,7 @@ public class SettingsPageFragmentDelegateImpl
     private final SnackbarManager mSnackbarManager;
     private final BottomSheetController mBottomSheetController;
     private final ModalDialogManager mModalDialogManager;
+    private final ContainmentHelper mContainmentHelper;
 
     private @Nullable SettingsHostFragment mSettingsHostFragment;
     private FragmentManager.@Nullable FragmentLifecycleCallbacks mDependencyProvider;
@@ -67,6 +76,7 @@ public class SettingsPageFragmentDelegateImpl
         mSnackbarManager = snackbarManager;
         mBottomSheetController = bottomSheetController;
         mModalDialogManager = modalDialogManager;
+        mContainmentHelper = new ContainmentHelper(activity, this);
     }
 
     @Override
@@ -102,6 +112,8 @@ public class SettingsPageFragmentDelegateImpl
         fragmentManager.registerFragmentLifecycleCallbacks(
                 mDependencyProvider, /* recursive= */ true);
 
+        mContainmentHelper.registerCallbacks(fragmentManager);
+
         // Inflate the settings layout into the container view.
         // TODO(crbug.com/521895796): Rename settings_activity.xml since with settings-in-a-tab it
         // doesn't map directly to its own activity.
@@ -111,10 +123,18 @@ public class SettingsPageFragmentDelegateImpl
         ViewGroup fragmentContainer = settingsView.findViewById(R.id.content);
         Toolbar toolbar = settingsView.findViewById(R.id.action_bar);
 
+        // Apply semantic colors to the top-level container and app bar.
+        int backgroundColor = SemanticColorUtils.getSettingsBackgroundColor(mActivity);
+        settingsView.findViewById(R.id.content).setBackgroundColor(backgroundColor);
+        AppBarLayout appBarLayout = settingsView.findViewById(R.id.app_bar_layout);
+        appBarLayout.setBackgroundColor(backgroundColor);
+        appBarLayout.setElevation(0);
+        appBarLayout.setStateListAnimator(null);
+
         // Set up the back navigation arrow in the toolbar.
         // TODO(crbug.com/521895796): This is a placeholder for testing. Move the arrow to
         // the right column before launch.
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
         toolbar.setNavigationOnClickListener(v -> mActivity.onBackPressed());
 
         toolbar.setTitle(R.string.settings);
@@ -147,6 +167,7 @@ public class SettingsPageFragmentDelegateImpl
         assumeNonNull(mDependencyProvider);
         fragmentManager.unregisterFragmentLifecycleCallbacks(mDependencyProvider);
         mDependencyProvider = null;
+        mContainmentHelper.unregisterCallbacks(fragmentManager);
         assumeNonNull(mSettingsHostFragment);
         fragmentManager.beginTransaction().remove(mSettingsHostFragment).commitAllowingStateLoss();
         mSettingsHostFragment = null;
@@ -186,5 +207,21 @@ public class SettingsPageFragmentDelegateImpl
     @Override
     public void finishCurrentSettings(Fragment fragment) {
         // TODO(crbug.com/521895796): Define settings-in-tab finish/back behavior.
+    }
+
+    @Override
+    public boolean isTwoColumnSettingsVisible() {
+        MultiColumnSettings multiColumnSettings = getMultiColumnSettings();
+        return multiColumnSettings != null && multiColumnSettings.isTwoColumn();
+    }
+
+    @Override
+    public PreferenceUpdateObserver getPreferenceUpdateObserver() {
+        return this;
+    }
+
+    @Override
+    public void onPreferencesUpdated(PreferenceFragmentCompat fragment) {
+        mContainmentHelper.postUpdateContainmentOnLayout(fragment);
     }
 }

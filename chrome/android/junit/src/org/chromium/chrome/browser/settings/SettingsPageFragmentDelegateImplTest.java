@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -111,11 +112,18 @@ public class SettingsPageFragmentDelegateImplTest {
         // Verify FragmentDependencyProvider registration.
         ArgumentCaptor<FragmentManager.FragmentLifecycleCallbacks> callbackCaptor =
                 ArgumentCaptor.forClass(FragmentManager.FragmentLifecycleCallbacks.class);
-        verify(mFragmentManager)
+        verify(mFragmentManager, atLeastOnce())
                 .registerFragmentLifecycleCallbacks(callbackCaptor.capture(), eq(true));
+        boolean foundDependencyProvider = false;
+        for (FragmentManager.FragmentLifecycleCallbacks callback : callbackCaptor.getAllValues()) {
+            if (callback instanceof FragmentDependencyProvider) {
+                foundDependencyProvider = true;
+                break;
+            }
+        }
         assertTrue(
-                "Lifecycle callbacks should be FragmentDependencyProvider",
-                callbackCaptor.getValue() instanceof FragmentDependencyProvider);
+                "Lifecycle callbacks should include FragmentDependencyProvider",
+                foundDependencyProvider);
 
         // Verify fragment creation and addition.
         verify(mFragmentTransaction)
@@ -131,7 +139,7 @@ public class SettingsPageFragmentDelegateImplTest {
         mDelegate.initSettings(mContainerView);
 
         // Verify we registered the callback but did NOT add a new fragment
-        verify(mFragmentManager).registerFragmentLifecycleCallbacks(any(), eq(true));
+        verify(mFragmentManager, atLeastOnce()).registerFragmentLifecycleCallbacks(any(), eq(true));
         verify(mFragmentTransaction, never()).add(anyInt(), any(), anyString());
     }
 
@@ -142,17 +150,18 @@ public class SettingsPageFragmentDelegateImplTest {
         // Initialize first so the delegate has callbacks and fragment references.
         mDelegate.initSettings(mContainerView);
 
-        // Retrieve the registered callback to verify it gets unregistered.
+        // Retrieve the registered callbacks to verify they get unregistered.
         ArgumentCaptor<FragmentManager.FragmentLifecycleCallbacks> callbackCaptor =
                 ArgumentCaptor.forClass(FragmentManager.FragmentLifecycleCallbacks.class);
-        verify(mFragmentManager)
+        verify(mFragmentManager, atLeastOnce())
                 .registerFragmentLifecycleCallbacks(callbackCaptor.capture(), eq(true));
-        FragmentManager.FragmentLifecycleCallbacks registeredCallback = callbackCaptor.getValue();
 
         mDelegate.destroySettings();
 
-        // Verify unregistration.
-        verify(mFragmentManager).unregisterFragmentLifecycleCallbacks(registeredCallback);
+        // Verify unregistration for all registered callbacks.
+        for (FragmentManager.FragmentLifecycleCallbacks callback : callbackCaptor.getAllValues()) {
+            verify(mFragmentManager).unregisterFragmentLifecycleCallbacks(callback);
+        }
 
         // Verify fragment removal.
         verify(mFragmentTransaction).remove(any(SettingsHostFragment.class));
