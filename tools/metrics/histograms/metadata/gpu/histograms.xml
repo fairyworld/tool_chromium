@@ -2567,6 +2567,19 @@ chromium-metrics-reviews@google.com.
   </token>
 </histogram>
 
+<histogram name="Viz.DisplayLink.IpcTimeFromNeedsBeginFramesToVSyncReceived"
+    units="ms" expires_after="2027-06-28">
+  <owner>magchen@chromium.org</owner>
+  <owner>chrome-gpu-metric-alerts@chromium.org</owner>
+  <summary>
+    The time elapsed from when a NeedsBeginFrames(true) request is sent via IPC
+    to the browser process until the first VSync signal is received by the GPU
+    process. This is recorded once per request cycle per display. This is
+    recorded only when the CADisplayLinkInBrowser feature is enabled (which uses
+    ExternalDisplayLink and VSyncProviderMac).
+  </summary>
+</histogram>
+
 <histogram name="Viz.ExternalBeginFrameSource.Interval" units="ms"
     expires_after="2026-11-22">
   <owner>lizeb@chromium.org</owner>

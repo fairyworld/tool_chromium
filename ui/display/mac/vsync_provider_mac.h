@@ -67,6 +67,10 @@ class DISPLAY_EXPORT VSyncProviderMac {
   void AddSupportedDisplayLinkId(CGDirectDisplayID display_id);
   void RemoveSupportedDisplayLinkId(CGDirectDisplayID display_id);
 
+  // Records the time elapsed between sending the NeedsBeginFrames request via
+  // IPC and receiving the first VSync signal for the specified display.
+  void RecordTimeFromNeedsBeginFramesToVSync(CGDirectDisplayID display_id);
+
   // Must only be accessed on the Viz thread.
   NeedsBeginFrameCB needs_begin_frame_callback_;
 
@@ -77,6 +81,11 @@ class DISPLAY_EXPORT VSyncProviderMac {
   base::Lock id_lock_;
   std::map<CGDirectDisplayID, std::list<VSyncCallbackMac::Callback>>
       callback_lists_;
+
+  // Map of display ID to the time when NeedsBeginFrames(true) was sent to
+  // request VSync from the browser. This is used to measure the latency until
+  // the first VSync signal is received.
+  std::map<CGDirectDisplayID, base::TimeTicks> begin_frame_request_times_;
 
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
 
