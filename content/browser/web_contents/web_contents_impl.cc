@@ -1397,7 +1397,7 @@ WebContentsImpl::~WebContentsImpl() {
   base::trace_event::TraceSessionObserverList::RemoveObserver(this);
   TRACE_EVENT0("content", "WebContentsImpl::~WebContentsImpl");
   if (tracing_track_) {
-    TRACE_EVENT_END("content", tracing_track_->track());
+    TRACE_STATE("content", nullptr, tracing_track_->track());
   }
 
   WebContentsOfBrowserContext::Detach(*this);
@@ -1715,7 +1715,7 @@ const WebContents::UniqueToken& WebContentsImpl::GetUniqueToken() const {
   return web_contents_token_;
 }
 
-const perfetto::NamedTrack& WebContentsImpl::GetTracingTrack() const {
+const perfetto::Track& WebContentsImpl::GetTracingTrack() const {
   CHECK(tracing_track_);
   return tracing_track_->track();
 }
@@ -7214,7 +7214,6 @@ void WebContentsImpl::SetVisibilityAndNotifyObservers(Visibility visibility) {
 
 void WebContentsImpl::OnStart(const perfetto::DataSourceBase::StartArgs&) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  TRACE_EVENT_END("content", tracing_track_->track());
   EmitTracingSlice(base::UTF16ToUTF8(GetTitle()));
 }
 
@@ -12947,15 +12946,14 @@ void WebContentsImpl::WarmUpAndroidSpareRenderer() {
 }
 
 void WebContentsImpl::EmitTracingSlice(const std::string& title) {
-  TRACE_EVENT_BEGIN(
-      "content", nullptr, tracing_track_->track(),
-      [&](perfetto::EventContext ctx) {
-        if (!ctx.ShouldFilterDynamicEventNames() && !title.empty()) {
-          ctx.event()->set_name(title);
-        } else {
-          ctx.event()->set_name("WebContents");
-        }
-      });
+  TRACE_STATE("content", nullptr, tracing_track_->track(),
+              [&](perfetto::EventContext ctx) {
+                if (!ctx.ShouldFilterDynamicEventNames() && !title.empty()) {
+                  ctx.event()->set_name(title);
+                } else {
+                  ctx.event()->set_name("WebContents");
+                }
+              });
 }
 
 }  // namespace content
