@@ -2884,8 +2884,10 @@ void PdfViewWebPlugin::RecordDocumentMetrics() {
   if (ink_module_) {
     // Use a timeout limit of 100ms, which will capture over 90 percent of PDFs
     // without increasing the PDF load time a significant amount.
-    RecordPdfLoadedWithV2InkAnnotations(
-        engine_->ContainsV2InkPath(base::Milliseconds(100)));
+    PDFiumEngine::InkIdentifiers ink_identifiers =
+        engine_->ScanForInkAnnotations(base::Milliseconds(100));
+    RecordPdfLoadedWithV2InkAnnotations(ink_identifiers.v2_ink_path);
+    RecordPdfLoadedWithInkTextAnnotations(ink_identifiers.ink_text_annotations);
   }
 #endif  // BUILDFLAG(ENABLE_PDF_INK2)
 }

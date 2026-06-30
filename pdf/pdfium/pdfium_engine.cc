@@ -5475,25 +5475,54 @@ void PDFiumEngine::DiscardStroke(int page_index, InkStrokeId id) {
   }
 }
 
-PDFLoadedWithV2InkAnnotations PDFiumEngine::ContainsV2InkPath(
+PDFiumEngine::InkIdentifiers PDFiumEngine::ScanForInkAnnotations(
     base::TimeDelta timeout) const {
   base::TimeTicks start_time = base::TimeTicks::Now();
+
+  InkIdentifiers result = {
+      .ink_text_annotations = PDFLoadedWithInkTextAnnotations::kUnknown,
+      .v2_ink_path = PDFLoadedWithV2InkAnnotations::kUnknown,
+  };
+
   for (const auto& page : pages_) {
     if (base::TimeTicks::Now() - start_time >= timeout) {
-      return PDFLoadedWithV2InkAnnotations::kUnknown;
+      return result;
     }
 
     bool page_already_loaded = !!page->page();
-    bool contains_v2_ink_path = PageContainsV2InkPath(page->GetPage());
+    FPDF_PAGE fpdf_page = page->GetPage();
+
+    if (result.ink_text_annotations ==
+            PDFLoadedWithInkTextAnnotations::kUnknown &&
+        PageContainsInkTextAnnotation(fpdf_page)) {
+      result.ink_text_annotations = PDFLoadedWithInkTextAnnotations::kTrue;
+    }
+
+    if (result.v2_ink_path == PDFLoadedWithV2InkAnnotations::kUnknown &&
+        PageContainsV2InkPath(fpdf_page)) {
+      result.v2_ink_path = PDFLoadedWithV2InkAnnotations::kTrue;
+    }
+
     if (!page_already_loaded) {
       // Unload the page to avoid loading all pages into memory.
       page->Unload();
     }
-    if (contains_v2_ink_path) {
-      return PDFLoadedWithV2InkAnnotations::kTrue;
+
+    if (result.ink_text_annotations == PDFLoadedWithInkTextAnnotations::kTrue &&
+        result.v2_ink_path == PDFLoadedWithV2InkAnnotations::kTrue) {
+      return result;
     }
   }
-  return PDFLoadedWithV2InkAnnotations::kFalse;
+
+  if (result.ink_text_annotations ==
+      PDFLoadedWithInkTextAnnotations::kUnknown) {
+    result.ink_text_annotations = PDFLoadedWithInkTextAnnotations::kFalse;
+  }
+  if (result.v2_ink_path == PDFLoadedWithV2InkAnnotations::kUnknown) {
+    result.v2_ink_path = PDFLoadedWithV2InkAnnotations::kFalse;
+  }
+
+  return result;
 }
 
 std::map<InkModeledShapeId, ink::PartitionedMesh>

@@ -143,8 +143,8 @@ class TestPDFiumEngine : public PDFiumEngine {
 
   MOCK_METHOD(void, DiscardText, (InkTextId), (override));
 
-  MOCK_METHOD(PDFLoadedWithV2InkAnnotations,
-              ContainsV2InkPath,
+  MOCK_METHOD(InkIdentifiers,
+              ScanForInkAnnotations,
               (base::TimeDelta),
               (const override));
 
