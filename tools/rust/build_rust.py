@@ -56,8 +56,8 @@ sys.path.append(
                  'scripts'))
 
 from build import (AddCMakeToPath, AddZlibToPath, CheckoutGitRepo, CopyFile,
-                   DownloadDebianSysroot, GetLibXml2Dirs, GitCherryPick,
-                   GitRevert, LLVM_DIR, IsGitAncestorToHead,
+                   DownloadDebianSysroot, FetchUrl, GetLibXml2Dirs,
+                   GitCherryPick, GitRevert, LLVM_DIR, IsGitAncestorToHead,
                    LLVM_BUILD_TOOLS_DIR, RunCommand,
                    DEFAULT_MACOSX_DEPLOYMENT_TARGET, GetLatestCommit)
 from update import (CHROMIUM_DIR, DownloadAndUnpack, EnsureDirExists,
@@ -208,8 +208,7 @@ def VerifyStage0JsonHash(stage0_json_url=None):
     hasher = hashlib.sha256()
     if stage0_json_url:
         print(stage0_json_url)
-        base64_text = urllib.request.urlopen(stage0_json_url).read().decode(
-            "utf-8")
+        base64_text = FetchUrl(stage0_json_url).decode("utf-8")
         stage0 = base64.b64decode(base64_text)
         hasher.update(stage0)
     else:
@@ -242,8 +241,8 @@ def FetchBetaPackage(name, rust_git_hash, triple=None):
     STAGE0_JSON_URL = (
         'https://chromium.googlesource.com/external/github.com/'
         'rust-lang/rust/+/{GIT_HASH}/src/stage0?format=TEXT')
-    base64_text = urllib.request.urlopen(
-        STAGE0_JSON_URL.format(GIT_HASH=rust_git_hash)).read().decode("utf-8")
+    base64_text = FetchUrl(
+        STAGE0_JSON_URL.format(GIT_HASH=rust_git_hash)).decode("utf-8")
     stage0 = base64.b64decode(base64_text).decode("utf-8")
     lines = stage0.splitlines()
 
