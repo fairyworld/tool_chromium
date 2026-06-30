@@ -7,6 +7,7 @@ package org.chromium.chrome.browser.toolbar;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -50,10 +51,10 @@ import org.chromium.base.supplier.SettableMonotonicObservableSupplier;
 import org.chromium.base.supplier.SettableNonNullObservableSupplier;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.RobolectricUtil;
-import org.chromium.base.test.util.DisabledTest;
 import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.base.test.util.HistogramWatcher;
+import org.chromium.build.BuildConfig;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.browser_controls.BottomControlsLayer;
 import org.chromium.chrome.browser.browser_controls.BottomControlsStacker;
@@ -99,7 +100,6 @@ import java.util.concurrent.atomic.AtomicReference;
 @RunWith(BaseRobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
 @DisableFeatures(ChromeFeatureList.CROSS_DEVICE_PREF_TRACKER_EXTRA_LOGS)
-@DisabledTest(message = "crbug.com/525121694")
 public class ToolbarPositionControllerTest {
 
     @Rule public MockitoRule mMockitoJUnit = MockitoJUnit.rule();
@@ -358,6 +358,7 @@ public class ToolbarPositionControllerTest {
 
     @Before
     public void setUp() {
+        assumeFalse(BuildConfig.IS_DESKTOP_ANDROID);
         doReturn(TOOLBAR_HEIGHT).when(mControlContainer).getToolbarHeight();
         doReturn(mControlContainerLayoutParams).when(mControlContainer).mutateLayoutParams();
         mHairlineLayoutParams.anchorGravity = Gravity.BOTTOM;
