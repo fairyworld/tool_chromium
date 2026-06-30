@@ -4828,7 +4828,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/permissions/chip:impl",
       "//chrome/browser/ui/views/personal_context",
       "//chrome/browser/ui/views/send_tab_to_self",
-      "//chrome/browser/ui/views/send_tab_to_self:impl",
       "//chrome/browser/ui/views/sharing_hub",
       "//chrome/browser/ui/views/sharing_hub:impl",
       "//chrome/browser/ui/views/tabs/common",
