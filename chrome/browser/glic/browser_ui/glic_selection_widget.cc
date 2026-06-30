@@ -309,62 +309,64 @@ class GlicSelectionContentsView : public views::View,
     CreateToolbarInkdropCallbacks(ask_gemini_btn, kColorToolbarInkDropHover,
                                   kColorToolbarInkDropRipple);
 
-    // Copy Button
-    auto copy_tooltip = gfx::LocateAndRemoveAcceleratorChar(
-        l10n_util::GetStringUTF16(IDS_APP_COPY), nullptr, nullptr);
-    auto* copy_btn =
-        ask_pill_->AddChildView(views::ImageButton::CreateIconButton(
-            base::BindRepeating(
-                &GlicSelectionWidgetDelegate::ActionDelegate::OnCopy,
-                base::Unretained(&widget_delegate_->action_delegate())),
-            features::IsRoundedIconsEnabled()
-                ? vector_icons::kContentCopyIcon
-                : vector_icons::kContentCopyOldIcon,
-            copy_tooltip));
-    copy_btn->SetTooltipText(copy_tooltip);
-    copy_btn->SetImageVerticalAlignment(views::ImageButton::ALIGN_MIDDLE);
-    copy_btn->SetBorder(
-        views::CreateEmptyBorder(views::LayoutProvider::Get()->GetInsetsMetric(
-            views::INSETS_VECTOR_IMAGE_BUTTON)));
-    views::SetImageFromVectorIconWithColor(
-        copy_btn,
-        features::IsRoundedIconsEnabled() ? vector_icons::kContentCopyIcon
-                                          : vector_icons::kContentCopyOldIcon,
-        kIconSize,
-        views::IconColors(ui::kColorSysOnSurfaceVariant,
-                          ui::kColorLabelForegroundDisabled,
-                          ui::kColorSysOnSurfaceVariant));
-    CreateToolbarInkdropCallbacks(copy_btn, kColorToolbarInkDropHover,
-                                  kColorToolbarInkDropRipple);
+    if (features::kGlicSelectionShowCopyButtons.Get()) {
+      // Copy Button
+      auto copy_tooltip = gfx::LocateAndRemoveAcceleratorChar(
+          l10n_util::GetStringUTF16(IDS_APP_COPY), nullptr, nullptr);
+      auto* copy_btn =
+          ask_pill_->AddChildView(views::ImageButton::CreateIconButton(
+              base::BindRepeating(
+                  &GlicSelectionWidgetDelegate::ActionDelegate::OnCopy,
+                  base::Unretained(&widget_delegate_->action_delegate())),
+              features::IsRoundedIconsEnabled()
+                  ? vector_icons::kContentCopyIcon
+                  : vector_icons::kContentCopyOldIcon,
+              copy_tooltip));
+      copy_btn->SetTooltipText(copy_tooltip);
+      copy_btn->SetImageVerticalAlignment(views::ImageButton::ALIGN_MIDDLE);
+      copy_btn->SetBorder(
+          views::CreateEmptyBorder(views::LayoutProvider::Get()->GetInsetsMetric(
+              views::INSETS_VECTOR_IMAGE_BUTTON)));
+      views::SetImageFromVectorIconWithColor(
+          copy_btn,
+          features::IsRoundedIconsEnabled() ? vector_icons::kContentCopyIcon
+                                            : vector_icons::kContentCopyOldIcon,
+          kIconSize,
+          views::IconColors(ui::kColorSysOnSurfaceVariant,
+                            ui::kColorLabelForegroundDisabled,
+                            ui::kColorSysOnSurfaceVariant));
+      CreateToolbarInkdropCallbacks(copy_btn, kColorToolbarInkDropHover,
+                                    kColorToolbarInkDropRipple);
 
-    // Copy Link Button
-    auto copy_link_tooltip =
-        l10n_util::GetStringUTF16(IDS_CONTENT_CONTEXT_COPYLINKTOTEXT);
-    copy_link_btn_ =
-        ask_pill_->AddChildView(views::ImageButton::CreateIconButton(
-            base::BindRepeating(
-                &GlicSelectionWidgetDelegate::ActionDelegate::OnCopyLink,
-                base::Unretained(&widget_delegate_->action_delegate())),
-            features::IsRoundedIconsEnabled()
-                ? omnibox::kShareIcon
-                : omnibox::kShareChromeRefreshOldIcon,
-            copy_link_tooltip));
-    copy_link_btn_->SetTooltipText(copy_link_tooltip);
-    copy_link_btn_->SetImageVerticalAlignment(views::ImageButton::ALIGN_MIDDLE);
-    copy_link_btn_->SetBorder(
-        views::CreateEmptyBorder(views::LayoutProvider::Get()->GetInsetsMetric(
-            views::INSETS_VECTOR_IMAGE_BUTTON)));
-    views::SetImageFromVectorIconWithColor(
-        copy_link_btn_,
-        features::IsRoundedIconsEnabled() ? omnibox::kShareIcon
-                                          : omnibox::kShareChromeRefreshOldIcon,
-        kIconSize,
-        views::IconColors(ui::kColorSysOnSurfaceVariant,
-                          ui::kColorLabelForegroundDisabled,
-                          ui::kColorSysOnSurfaceVariant));
-    CreateToolbarInkdropCallbacks(copy_link_btn_, kColorToolbarInkDropHover,
-                                  kColorToolbarInkDropRipple);
-    copy_link_btn_->SetEnabled(false);
+      // Copy Link Button
+      auto copy_link_tooltip =
+          l10n_util::GetStringUTF16(IDS_CONTENT_CONTEXT_COPYLINKTOTEXT);
+      copy_link_btn_ =
+          ask_pill_->AddChildView(views::ImageButton::CreateIconButton(
+              base::BindRepeating(
+                  &GlicSelectionWidgetDelegate::ActionDelegate::OnCopyLink,
+                  base::Unretained(&widget_delegate_->action_delegate())),
+              features::IsRoundedIconsEnabled()
+                  ? omnibox::kShareIcon
+                  : omnibox::kShareChromeRefreshOldIcon,
+              copy_link_tooltip));
+      copy_link_btn_->SetTooltipText(copy_link_tooltip);
+      copy_link_btn_->SetImageVerticalAlignment(views::ImageButton::ALIGN_MIDDLE);
+      copy_link_btn_->SetBorder(
+          views::CreateEmptyBorder(views::LayoutProvider::Get()->GetInsetsMetric(
+              views::INSETS_VECTOR_IMAGE_BUTTON)));
+      views::SetImageFromVectorIconWithColor(
+          copy_link_btn_,
+          features::IsRoundedIconsEnabled() ? omnibox::kShareIcon
+                                            : omnibox::kShareChromeRefreshOldIcon,
+          kIconSize,
+          views::IconColors(ui::kColorSysOnSurfaceVariant,
+                            ui::kColorLabelForegroundDisabled,
+                            ui::kColorSysOnSurfaceVariant));
+      CreateToolbarInkdropCallbacks(copy_link_btn_, kColorToolbarInkDropHover,
+                                    kColorToolbarInkDropRipple);
+      copy_link_btn_->SetEnabled(false);
+    }
 
     // Pill 2
     control_pill_ = AddChildView(std::make_unique<views::BoxLayoutView>());

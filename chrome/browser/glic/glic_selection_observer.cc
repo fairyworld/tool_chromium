@@ -723,7 +723,9 @@ void GlicSelectionObserver::ShowSelectionAffordance(
         widget_delegate_->set_parent_window(platform_util::GetViewForWindow(
             web_contents()->GetTopLevelNativeWindow()));
         widget_delegate_->ShowWidget();
-        RequestLinkGeneration(selected_frame);
+        if (features::kGlicSelectionShowCopyButtons.Get()) {
+          RequestLinkGeneration(selected_frame);
+        }
       } else if (bounds_retry_count_ < 5) {
         // Retry showing the widget, bounds might not be available yet due
         // to IPC timing (especially on double click).

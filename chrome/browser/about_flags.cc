@@ -3711,7 +3711,9 @@ const FeatureEntry::Choice kGlicSelectionPromptChoices[] = {
     {"Enabled with InlineCue and Pinning", switches::kEnableFeatures,
      "GlicSelectionPrompt:use_widget/true/enable_pinning/true"},
     {"Enabled with InlineCue and Settings", switches::kEnableFeatures,
-     "GlicSelectionPrompt:use_widget/true/enable_site_settings/true"}};
+     "GlicSelectionPrompt:use_widget/true/enable_site_settings/true"},
+    {"Enabled with InlineCue and Copy Buttons", switches::kEnableFeatures,
+     "GlicSelectionPrompt:use_widget/true/show_copy_buttons/true"}};
 
 const FeatureEntry::FeatureParam kAutofillShowTypePredictionsAsTitle[] = {
     {"as-title", "true"}};

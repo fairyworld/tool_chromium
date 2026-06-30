@@ -42,6 +42,8 @@ const base::FeatureParam<std::string> kGlicSelectionTopCueOnlyList{
     &kGlicSelectionPrompt, "top_cue_only_list", ""};
 const base::FeatureParam<bool> kGlicSelectionEnableSiteSettings{
     &kGlicSelectionPrompt, "enable_site_settings", false};
+const base::FeatureParam<bool> kGlicSelectionShowCopyButtons{
+    &kGlicSelectionPrompt, "show_copy_buttons", false};
 
 BASE_FEATURE(kGlicClearTurnIdOnPanelWillOpen,
              base::FEATURE_DISABLED_BY_DEFAULT);
