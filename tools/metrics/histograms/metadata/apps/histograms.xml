@@ -1939,10 +1939,23 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Apps.AppShimRegistry.VerifyCdHashResult"
+    enum="AppShimRegistryVerifyCdHashResult" expires_after="2026-10-01">
+  <owner>dmurph@google.com</owner>
+  <owner>pwa-team@google.com</owner>
+  <summary>
+    The result of verifying the code directory hash for an app. Logged once per
+    app shim connection (launch) when Chrome verifies the ad-hoc signature of
+    the connecting app shim.
+  </summary>
+</histogram>
+
 <histogram name="Apps.AppShimSignatureValidationResult"
     enum="WebAppShimSignatureValidationResult" expires_after="2026-11-29">
   <owner>markrowe@chromium.org</owner>
   <owner>chrome-platform-security-core@google.com</owner>
+  <owner>dmurph@google.com</owner>
+  <owner>pwa-team@google.com</owner>
   <summary>
     Records the result of validating the code signature of a web app shim
     connecting to the browser on macOS.
