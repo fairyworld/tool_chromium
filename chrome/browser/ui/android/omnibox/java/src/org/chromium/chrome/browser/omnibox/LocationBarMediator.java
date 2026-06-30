@@ -1247,7 +1247,7 @@ class LocationBarMediator
         }
 
         // See if there's any existing user selection that we can pick and work with.
-        var selection =
+        var displayTextSelection =
                 new TextSelection(
                         mUrlCoordinator.getSelectionStart(), mUrlCoordinator.getSelectionEnd());
 
@@ -1258,7 +1258,14 @@ class LocationBarMediator
                 () -> {
                     if (mAutocompleteCoordinator == null || mCurrentInput == null) return;
 
-                    if (!selection.isCollapsed()) mCurrentInput.setSelection(selection);
+                    var editingTextSelection =
+                            translateDisplaySelectionToEditing(
+                                    displayTextSelection,
+                                    mUrlCoordinator.getTextWithoutAutocomplete(),
+                                    mCurrentInput.getUserText());
+                    if (!editingTextSelection.isCollapsed()) {
+                        mCurrentInput.setSelection(editingTextSelection);
+                    }
 
                     if (mScrimHandler != null) {
                         mScrimHandler.updateScrimVisualState();
@@ -1294,6 +1301,23 @@ class LocationBarMediator
         }
         mLocationBarLayout.setIsInStandby(
                 mCurrentInput.getAutocompleteState() == AutocompleteState.STANDBY);
+    }
+
+    /**
+     * Translates a text selection captured against the unfocused display text into the coordinate
+     * space of the focused editing text.
+     */
+    @VisibleForTesting
+    /* package */ static TextSelection translateDisplaySelectionToEditing(
+            TextSelection displaySelection, String displayText, String editingText) {
+        if (displaySelection.isCollapsed()) return displaySelection;
+
+        if (editingText.endsWith(displayText)) {
+            int delta = editingText.length() - displayText.length();
+            return new TextSelection(displaySelection.from + delta, displaySelection.to + delta);
+        }
+
+        return TextSelection.SELECT_ALL;
     }
 
     @VisibleForTesting

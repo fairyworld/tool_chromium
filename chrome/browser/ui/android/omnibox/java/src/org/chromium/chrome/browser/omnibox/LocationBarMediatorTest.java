@@ -2325,6 +2325,7 @@ public class LocationBarMediatorTest {
 
         // Prepare a session state to be restored.
         String newText = "new text";
+        doReturn(newText).when(mUrlCoordinator).getTextWithoutAutocomplete();
         final int newSelectionStart = 2;
         final int newSelectionEnd = 6;
         var newState = mSessionState;
@@ -3367,5 +3368,23 @@ public class LocationBarMediatorTest {
         mMediator.onUrlFocusChange(new UrlBarFocusChangeInfo(true, View.FOCUS_DOWN));
 
         verify(mLocationBarLayout, never()).setIsInStandby(true);
+    }
+
+    @Test
+    public void testTranslateDisplaySelectionToEditing() {
+        // display: "youtube.com/?app=desktop", selection [3,7] = "tube"
+        // editing: "www.youtube.com/?app=desktop", expect [7,11] = "tube"
+        assertEquals(
+                new TextSelection(7, 11),
+                LocationBarMediator.translateDisplaySelectionToEditing(
+                        new TextSelection(3, 7),
+                        "youtube.com/?app=desktop",
+                        "www.youtube.com/?app=desktop"));
+
+        // Collapsed selection (just a cursor) -> unchanged, never select-all.
+        assertEquals(
+                new TextSelection(5, 5),
+                LocationBarMediator.translateDisplaySelectionToEditing(
+                        new TextSelection(5, 5), "youtube.com", "www.youtube.com"));
     }
 }
