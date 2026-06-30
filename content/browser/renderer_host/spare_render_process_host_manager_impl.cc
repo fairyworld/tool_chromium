@@ -40,6 +40,12 @@ BASE_FEATURE(kKillSpareRenderOnMemoryPressure,
 BASE_FEATURE(kSpareRPHKeepOneAliveOnMemoryPressure,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
+// If enabled, MEMORY_PRESSURE_LEVEL_CRITICAL is used as the threshold that
+// determines when a spare RPH can be created or killed. By default,
+// MEMORY_PRESSURE_LEVEL_MODERATE is used.
+BASE_FEATURE(kSpareRPHUseCriticalMemoryPressure,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 using performance_scenarios::LoadingScenario;
 using performance_scenarios::PerformanceScenarioObserverList;
 using performance_scenarios::ScenarioScope;
@@ -47,12 +53,6 @@ using SpareProcessMaybeTakeAction =
     content::RenderProcessHostImpl::SpareProcessMaybeTakeAction;
 
 namespace {
-
-// If enabled, MEMORY_PRESSURE_LEVEL_CRITICAL is used as the threshold that
-// determines when a spare RPH can be created or killed. By default,
-// MEMORY_PRESSURE_LEVEL_MODERATE is used.
-BASE_FEATURE(kSpareRPHUseCriticalMemoryPressure,
-             base::FEATURE_DISABLED_BY_DEFAULT);
 
 #if BUILDFLAG(IS_ANDROID)
 // Enables the available memory threshold for creating a spare renderer.
