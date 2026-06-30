@@ -1540,10 +1540,6 @@ static_library("ui") {
       "webui/settings/site_settings_handler.h",
       "webui/settings/site_settings_helper.cc",
       "webui/settings/site_settings_helper.h",
-      "webui/side_panel/bookmarks/bookmarks_page_handler.cc",
-      "webui/side_panel/bookmarks/bookmarks_page_handler.h",
-      "webui/side_panel/bookmarks/bookmarks_side_panel_ui.cc",
-      "webui/side_panel/bookmarks/bookmarks_side_panel_ui.h",
       "webui/side_panel/comments/comments_page_handler.cc",
       "webui/side_panel/comments/comments_page_handler.h",
       "webui/side_panel/comments/comments_side_panel_ui.cc",
@@ -1558,10 +1554,6 @@ static_library("ui") {
       "webui/side_panel/customize_chrome/wallpaper_search/wallpaper_search_handler.h",
       "webui/side_panel/customize_chrome/wallpaper_search/wallpaper_search_string_map.cc",
       "webui/side_panel/customize_chrome/wallpaper_search/wallpaper_search_string_map.h",
-      "webui/side_panel/reading_list/reading_list_page_handler.cc",
-      "webui/side_panel/reading_list/reading_list_page_handler.h",
-      "webui/side_panel/reading_list/reading_list_ui.cc",
-      "webui/side_panel/reading_list/reading_list_ui.h",
       "webui/theme_colors_source_manager.cc",
       "webui/theme_colors_source_manager.h",
       "webui/theme_colors_source_manager_factory.cc",
@@ -1857,6 +1849,8 @@ static_library("ui") {
       "//chrome/browser/ui/webui/profile_internals",
       "//chrome/browser/ui/webui/settings",
       "//chrome/browser/ui/webui/settings:impl",
+      "//chrome/browser/ui/webui/side_panel/bookmarks:impl",
+      "//chrome/browser/ui/webui/side_panel/reading_list:impl",
       "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices:impl",
       "//chrome/browser/ui/webui/signin",
       "//chrome/browser/ui/webui/signin:login_ui_service",
@@ -2002,9 +1996,11 @@ static_library("ui") {
       "//chrome/browser/ui/webui/on_device_internals",
       "//chrome/browser/ui/webui/password_manager:password_manager_ui",
       "//chrome/browser/ui/webui/search_engine_choice",
+      "//chrome/browser/ui/webui/side_panel/bookmarks",
       "//chrome/browser/ui/webui/side_panel/history",
       "//chrome/browser/ui/webui/side_panel/history_clusters",
       "//chrome/browser/ui/webui/side_panel/read_anything",
+      "//chrome/browser/ui/webui/side_panel/reading_list",
       "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices",
       "//chrome/browser/ui/webui/suggest_internals",
       "//chrome/browser/ui/webui/util",
@@ -2054,6 +2050,12 @@ static_library("ui") {
       # extension_control_handler.h and settings handler headers from
       # //chrome/browser/ui:ui.
       "//chrome/browser/ui/webui/password_manager:password_manager_ui",
+
+      # These side panel UIs include loose headers that remain in
+      # //chrome/browser/ui:ui (browser.h, browser_window.h, browser_commands.h,
+      # chrome_pages.h, views/frame/browser_view.h).
+      "//chrome/browser/ui/webui/side_panel/bookmarks:impl",
+      "//chrome/browser/ui/webui/side_panel/reading_list:impl",
 
       # //chrome/browser/ui/webui/util/webui_util_desktop.h is included by
       # :ui and its implementation is in //chrome/browser/ui/webui/util:impl.
