@@ -192,20 +192,6 @@ struct AutofillFieldCase {
                                      // or Preview.
 };
 
-struct WebElementDescriptor {
-  enum RetrievalMethod {
-    CSS_SELECTOR,
-    ID,
-    NONE,
-  };
-
-  // Information to retrieve element with.
-  std::string descriptor;
-
-  // Which retrieval method to use.
-  RetrievalMethod retrieval_method = NONE;
-};
-
 const char kFormHtml[] =
     R"(<form id=TestForm name=TestForm action='http://abc.com'>
          <input id=firstname>
@@ -352,49 +338,6 @@ const char kUnownedNonEnglishFormHtml[] =
          <textarea id='textarea-nonempty'>Go&#10;away!</textarea>
          <input type=submit name='reply-send' value=Send>
        </html>)";
-
-std::string RetrievalMethodToString(
-    const WebElementDescriptor::RetrievalMethod& method) {
-  switch (method) {
-    case WebElementDescriptor::CSS_SELECTOR:
-      return "CSS_SELECTOR";
-    case WebElementDescriptor::ID:
-      return "ID";
-    case WebElementDescriptor::NONE:
-      return "NONE";
-  }
-  NOTREACHED();
-}
-
-bool ClickElement(const WebDocument& document,
-                  const WebElementDescriptor& element_descriptor) {
-  WebString web_descriptor = WebString::FromUtf8(element_descriptor.descriptor);
-  blink::WebElement element;
-
-  switch (element_descriptor.retrieval_method) {
-    case WebElementDescriptor::CSS_SELECTOR: {
-      element = document.QuerySelector(web_descriptor);
-      break;
-    }
-    case WebElementDescriptor::ID:
-      element = document.GetElementById(web_descriptor);
-      break;
-    case WebElementDescriptor::NONE:
-      return true;
-  }
-
-  if (!element) {
-    DVLOG(1) << "Could not find "
-             << element_descriptor.descriptor
-             << " by "
-             << RetrievalMethodToString(element_descriptor.retrieval_method)
-             << ".";
-    return false;
-  }
-
-  element.SimulateClick();
-  return true;
-}
 
 void ApplyFieldsAction(
     const blink::WebDocument& document,
@@ -3995,32 +3938,6 @@ TEST_F(FormAutofillTest, MultipleLabelsPerElement) {
                                         .name_attribute = u"",
                                         .id_attribute = u"email",
                                         .value = u"john@example.com"})));
-}
-
-TEST_F(FormAutofillTest, ClickElement) {
-  LoadHTML(R"(<button id=link>Button</button>
-              <button name=button>Button</button>)");
-  WebLocalFrame* frame = GetMainFrame();
-  ASSERT_NE(nullptr, frame);
-
-  // Successful retrieval by id.
-  WebElementDescriptor clicker;
-  clicker.retrieval_method = WebElementDescriptor::ID;
-  clicker.descriptor = "link";
-  EXPECT_TRUE(ClickElement(frame->GetDocument(), clicker));
-
-  // Successful retrieval by css selector.
-  clicker.retrieval_method = WebElementDescriptor::CSS_SELECTOR;
-  clicker.descriptor = "button[name='button']";
-  EXPECT_TRUE(ClickElement(frame->GetDocument(), clicker));
-
-  // Unsuccessful retrieval due to invalid CSS selector.
-  clicker.descriptor = "^*&";
-  EXPECT_FALSE(ClickElement(frame->GetDocument(), clicker));
-
-  // Unsuccessful retrieval because element does not exist.
-  clicker.descriptor = "#junk";
-  EXPECT_FALSE(ClickElement(frame->GetDocument(), clicker));
 }
 
 TEST_F(FormAutofillTest, SelectOneAsText) {
