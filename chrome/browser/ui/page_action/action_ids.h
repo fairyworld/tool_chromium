@@ -52,6 +52,7 @@ inline constexpr auto kActionIds = std::to_array<actions::ActionId>({
     kActionWebAuthnAmbientSignin,
     kActionFederation,
     kActionAutofillPayment,
+    kActionShowPaymentsChurnedUsersBubble,
 
     // Add any new page actions before this line to ensure that the bookmark
     // star is always the right-most page action.

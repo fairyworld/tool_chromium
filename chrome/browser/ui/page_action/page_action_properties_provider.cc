@@ -320,6 +320,14 @@ constexpr auto kPageActionProperties = base::MakeFixedFlatMap<
             .element_identifier = kAutofillPaymentIconElementId,
         },
     },
+    {
+        kActionShowPaymentsChurnedUsersBubble,
+        {
+            .histogram_name = "PaymentsChurnedUsers",
+            .type = PageActionIconType::kPaymentsChurnedUsers,
+            .element_identifier = kPaymentsChurnedUsersBubbleId,
+        },
+    },
 });
 // LINT.ThenChange(//components/browser_apis/ui_controllers/toolbar/toolbar_ui_api_data_model.mojom:PageActionId)
 

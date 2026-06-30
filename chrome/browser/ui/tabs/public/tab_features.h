@@ -59,6 +59,7 @@ class BubbleManager;
 class OmniboxAutofillBubbleController;
 class OmniboxAutofillPageActionController;
 class PaymentsChurnedUsersBubbleController;
+class PaymentsChurnedUsersPageActionController;
 }  // namespace autofill
 
 namespace actor {
@@ -323,6 +324,11 @@ class TabFeatures {
     return tab_creation_metrics_controller_.get();
   }
 
+  autofill::PaymentsChurnedUsersPageActionController*
+  payments_churned_users_page_action_controller() {
+    return payments_churned_users_page_action_controller_.get();
+  }
+
   autofill::BubbleManager* autofill_bubble_manager() {
     return autofill_bubble_manager_.get();
   }
@@ -527,6 +533,10 @@ class TabFeatures {
       tab_creation_metrics_controller_;
 
   std::unique_ptr<autofill::BubbleManager> autofill_bubble_manager_;
+
+  // Responsible for managing the "Payments Churned Users" page action.
+  std::unique_ptr<autofill::PaymentsChurnedUsersPageActionController>
+      payments_churned_users_page_action_controller_;
 
   // Responsible for managing the "Autofill payment" page action.
   std::unique_ptr<autofill::OmniboxAutofillPageActionController>
