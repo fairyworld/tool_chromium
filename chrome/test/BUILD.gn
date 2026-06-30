@@ -247,8 +247,6 @@ static_library("test_support") {
     "../browser/policy/messaging_layer/util/test_request_payload.h",
     "../browser/policy/messaging_layer/util/test_response_payload.cc",
     "../browser/policy/messaging_layer/util/test_response_payload.h",
-    "../browser/profiles/keep_alive/profile_keep_alive_waiter.cc",
-    "../browser/profiles/keep_alive/profile_keep_alive_waiter.h",
     "../browser/profiles/profile_test_util.cc",
     "../browser/profiles/profile_test_util.h",
     "../browser/safe_browsing/test_safe_browsing_database_helper.cc",
@@ -1639,7 +1637,6 @@ if (is_android) {
       "../browser/page_load_metrics/observers/ad_metrics/ad_density_intervention_android_browsertest.cc",
       "../browser/password_manager/android/password_manager_android_browsertest.cc",
       "../browser/policy/test/v8_optimizer_policy_browsertest.cc",
-      "../browser/profiles/profile_browsertest_android.cc",
       "../browser/renderer_host/javascript_optimizer_feature_browsertest.cc",
       "../browser/ui/webui/policy/policy_test_ui_browsertest.cc",
       "../browser/ui/webui/policy/policy_ui_browsertest.cc",
@@ -1715,6 +1712,7 @@ if (is_android) {
       "//chrome/browser/preloading/prerender:browser_tests",
       "//chrome/browser/privacy_sandbox:browser_tests",
       "//chrome/browser/profiles",
+      "//chrome/browser/profiles:android_browsertests",
       "//chrome/browser/profiling_host:profiling_browsertests",
       "//chrome/browser/safe_browsing:test_support",
       "//chrome/browser/safe_browsing/android:test_support_java",
@@ -3340,7 +3338,6 @@ if (!is_android) {
       "../browser/policy/test/url_blocklist_policy_browsertest.cc",
       "../browser/policy/test/v8_optimizer_policy_browsertest.cc",
       "../browser/prefs/tracked/pref_hash_browsertest.cc",
-      "../browser/profiles/profile_list_desktop_browsertest.cc",
       "../browser/renderer_host/javascript_optimizer_feature_browsertest.cc",
       "../browser/renderer_host/render_process_host_chrome_browsertest.cc",
       "../browser/safe_browsing/download_protection/download_protection_service_browsertest.cc",
@@ -3848,7 +3845,6 @@ if (!is_android) {
 
     if (is_win) {
       sources += [
-        "../browser/profiles/profile_shortcut_manager_browsertest_win.cc",
         "../browser/ui/color/win/native_chrome_color_mixer_win_browsertest.cc",
         "../browser/ui/views/sync/inline_login_ui_browsertest.cc",
         "../browser/ui/views/uninstall_view_browsertest.cc",
@@ -4522,7 +4518,6 @@ if (!is_android) {
 
       sources -= [
         # chromeos does not support profile list avatar menu
-        "../browser/profiles/profile_list_desktop_browsertest.cc",
         "../browser/ui/views/external_protocol_dialog_browsertest.cc",
 
         # chromeos does not use the profile chooser view
@@ -5029,7 +5024,6 @@ if (!is_android) {
         "../browser/enterprise/signin/enterprise_signin_service_browsertest.cc",
         "../browser/enterprise/signin/oidc_authentication_signin_interceptor_browsertest.cc",
         "../browser/enterprise/signin/user_policy_oidc_signin_service_browsertest.cc",
-        "../browser/profiles/profile_statistics_browsertest.cc",
         "../browser/signin/signin_hats_util_browsertest.cc",
       ]
       deps += [
@@ -5612,7 +5606,6 @@ test("unit_tests") {
     "../browser/policy/profile_policy_connector_unittest.cc",
     "../browser/policy/serial_allow_usb_devices_for_urls_policy_handler_unittest.cc",
     "../browser/policy/webusb_allow_devices_for_urls_policy_handler_unittest.cc",
-    "../browser/profiles/gaia_info_update_service_unittest.cc",
     "../browser/renderer_preferences_util_unittest.cc",
     "../browser/resources_util_unittest.cc",
     "../browser/safe_browsing/gemini_antiscam_protection/gemini_antiscam_protection_service_factory_unittest.cc",
@@ -6559,7 +6552,6 @@ test("unit_tests") {
       "../browser/performance_manager/policies/dll_pre_read_policy_win_unittest.cc",
       "../browser/policy/browser_dm_token_storage_win_unittest.cc",
       "../browser/process_singleton_win_unittest.cc",
-      "../browser/profiles/profile_shortcut_manager_unittest_win.cc",
       "../browser/shell_integration_win_unittest.cc",
       "../browser/ui/views/frame/windows_caption_button_unittest.cc",
       "../browser/ui/views/uninstall_view_unittest.cc",
@@ -7705,7 +7697,6 @@ test("unit_tests") {
     sources -= [
       "../browser/policy/cloud/user_policy_signin_service_unittest.cc",
       "../browser/policy/cloud/user_policy_signin_service_util_unittest.cc",
-      "../browser/profiles/gaia_info_update_service_unittest.cc",
       "../browser/ui/webui/settings/settings_manage_profile_handler_unittest.cc",
     ]
     sources += [

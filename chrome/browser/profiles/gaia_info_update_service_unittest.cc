@@ -54,10 +54,10 @@
 #include "ui/gfx/image/image_unittest_util.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/glic/glic_pref_names.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/test_support/glic_test_environment.h"
-#include "chrome/browser/glic/test_support/glic_test_util.h"
+#include "chrome/browser/glic/glic_pref_names.h"       // nogncheck
+#include "chrome/browser/glic/public/glic_enabling.h"  // nogncheck
+#include "chrome/browser/glic/test_support/glic_test_environment.h"  // nogncheck
+#include "chrome/browser/glic/test_support/glic_test_util.h"  // nogncheck
 #endif
 
 using ::testing::Return;
