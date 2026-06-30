@@ -6,32 +6,46 @@
 import 'chrome://settings/lazy_load.js';
 
 import {keyDownOn, keyUpOn} from 'chrome://webui-test/keyboard_mock_interactions.js';
-import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import type {CrSliderElement,SettingsSliderElement} from 'chrome://settings/lazy_load.js';
 import {assertEquals, assertFalse, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.js';
 import {flushTasks} from 'chrome://webui-test/polymer_test_util.js';
+import {PrefService, PrefsBrowserProxy} from 'chrome://settings/settings.js';
+
+import {TestPrefsBrowserProxy} from './test_prefs_browser_proxy.js';
 // clang-format on
 
 /** @fileoverview Suite of tests for settings-slider. */
 suite('SettingsSlider', function() {
   let slider: SettingsSliderElement;
-
-  /**
-   * cr-slider instance wrapped by settings-slider.
-   */
   let crSlider: CrSliderElement;
+  let prefsBrowserProxy: TestPrefsBrowserProxy;
 
   const ticks: number[] = [2, 4, 8, 16, 32, 64, 128];
 
-  setup(function() {
+  setup(async function() {
     document.body.innerHTML = window.trustedTypes!.emptyHTML;
+
+    const initialPrefs = [
+      {
+        key: 'test_pref',
+        type: chrome.settingsPrivate.PrefType.NUMBER,
+        value: 16,
+      },
+      {
+        key: 'other_pref',
+        type: chrome.settingsPrivate.PrefType.NUMBER,
+        value: 32,
+      },
+    ];
+    prefsBrowserProxy = new TestPrefsBrowserProxy(initialPrefs);
+    PrefsBrowserProxy.setInstance(prefsBrowserProxy);
+    PrefService.resetInstanceForTesting();
+    await PrefService.getInstance().whenInitialized();
+
     slider = document.createElement('settings-slider');
-    slider.pref = {
-      key: '',
-      type: chrome.settingsPrivate.PrefType.NUMBER,
-      value: 16,
-    };
+    slider.prefKey = 'test_pref';
+
     document.body.appendChild(slider);
     crSlider = slider.shadowRoot!.querySelector('cr-slider')!;
     return flushTasks();
@@ -110,24 +124,30 @@ suite('SettingsSlider', function() {
     if (crSlider.updatingFromKey) {
       await eventToPromise('updating-from-key-changed', crSlider);
     }
-    slider.set('pref.value', prefValue);
+    prefsBrowserProxy.fakeApi.sendPrefChanges([
+      {key: 'test_pref', value: prefValue},
+    ]);
+    await flushTasks();
     assertEquals(sliderValue, crSlider.value);
   }
 
-  test('enforce value', function() {
+  test('enforce value', async function() {
     // Test that the indicator is not present until after the pref is
     // enforced.
     let indicator =
         slider.shadowRoot!.querySelector('cr-policy-pref-indicator');
     assertFalse(!!indicator);
-    slider.pref = {
-      key: '',
+    prefsBrowserProxy.fakeApi.prefs['test_pref'] = {
+      key: 'test_pref',
       controlledBy: chrome.settingsPrivate.ControlledBy.DEVICE_POLICY,
       enforcement: chrome.settingsPrivate.Enforcement.ENFORCED,
       type: chrome.settingsPrivate.PrefType.NUMBER,
       value: 16,
     };
-    flush();
+    prefsBrowserProxy.fakeApi.sendPrefChanges([
+      {key: 'test_pref', value: 16},
+    ]);
+    await flushTasks();
     indicator = slider.shadowRoot!.querySelector('cr-policy-pref-indicator');
     assertTrue(!!indicator);
   });
@@ -292,5 +312,33 @@ suite('SettingsSlider', function() {
     await eventToPromise('dragging-changed', crSlider);
     assertCloseTo(20, crSlider.value);
     assertCloseTo(2, slider.pref.value);
+  });
+
+  test('change prefKey dynamically', async function() {
+    const key1 = 'test_pref';
+    const key2 = 'other_pref';
+
+    assertEquals(key1, slider.pref.key);
+    assertEquals(16, slider.pref.value);
+
+    slider.prefKey = key2;
+    await flushTasks();
+
+    assertEquals(key2, slider.pref.key);
+    assertEquals(32, slider.pref.value);
+
+    prefsBrowserProxy.fakeApi.sendPrefChanges([
+      {key: key1, value: 20},
+    ]);
+    await flushTasks();
+
+    assertEquals(32, slider.pref.value);
+
+    prefsBrowserProxy.fakeApi.sendPrefChanges([
+      {key: key2, value: 40},
+    ]);
+    await flushTasks();
+
+    assertEquals(40, slider.pref.value);
   });
 });

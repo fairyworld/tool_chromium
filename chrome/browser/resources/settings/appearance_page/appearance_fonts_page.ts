@@ -10,6 +10,7 @@ import '../controls/settings_dropdown_menu.js';
 
 import type {FontsBrowserProxy, FontsData} from '/shared/settings/appearance_page/fonts_browser_proxy.js';
 import {FontsBrowserProxyImpl} from '/shared/settings/appearance_page/fonts_browser_proxy.js';
+import {PrefServiceObserverMixin} from '/shared/settings/prefs2/pref_service_observer_mixin.js';
 import type {SliderTick} from 'chrome://resources/cr_elements/cr_slider/cr_slider.js';
 import {PolymerElement} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 
@@ -47,7 +48,7 @@ export interface SettingsAppearanceFontsPageElement {
 }
 
 const SettingsAppearanceFontsPageElementBase =
-    SettingsViewMixin(PolymerElement);
+    PrefServiceObserverMixin(SettingsViewMixin(PolymerElement));
 
 export class SettingsAppearanceFontsPageElement extends
     SettingsAppearanceFontsPageElementBase {
@@ -77,32 +78,59 @@ export class SettingsAppearanceFontsPageElement extends
         value: ticksWithLabels(MINIMUM_FONT_SIZE_RANGE),
       },
 
-      /**
-       * Preferences state.
-       */
-      prefs: {
-        type: Object,
-        notify: true,
-      },
+      defaultFixedFontSizePref_: Object,
+      defaultFontSizePref_: Object,
+      fixedFontPref_: Object,
+      mathFontPref_: Object,
+      minimumFontSizePref_: Object,
+      sansSerifFontPref_: Object,
+      serifFontPref_: Object,
+      standardFontPref_: Object,
     };
   }
 
-  static get observers() {
-    return [
-      'onMinimumSizeChange_(prefs.webkit.webprefs.minimum_font_size.value)',
-    ];
-  }
-
-  declare prefs: Object;
   declare private fontOptions_: DropdownMenuOptionList;
   declare private fontSizeRange_: SliderTick[];
+
   declare private minimumFontSizeRange_: SliderTick[];
+  declare private defaultFixedFontSizePref_:
+      chrome.settingsPrivate.PrefObject<number>|undefined;
+  declare private defaultFontSizePref_:
+      chrome.settingsPrivate.PrefObject<number>|undefined;
+  declare private fixedFontPref_: chrome.settingsPrivate.PrefObject<string>|
+      undefined;
+  declare private mathFontPref_: chrome.settingsPrivate.PrefObject<string>|
+      undefined;
+  declare private minimumFontSizePref_:
+      chrome.settingsPrivate.PrefObject<number>|undefined;
+  declare private sansSerifFontPref_: chrome.settingsPrivate.PrefObject<string>|
+      undefined;
+  declare private serifFontPref_: chrome.settingsPrivate.PrefObject<string>|
+      undefined;
+  declare private standardFontPref_: chrome.settingsPrivate.PrefObject<string>|
+      undefined;
+
+
   private browserProxy_: FontsBrowserProxy =
       FontsBrowserProxyImpl.getInstance();
 
+  override connectedCallback() {
+    super.connectedCallback();
+
+    this.mirrorPrefs({
+      'webkit.webprefs.default_fixed_font_size': 'defaultFixedFontSizePref_',
+      'webkit.webprefs.default_font_size': 'defaultFontSizePref_',
+      'webkit.webprefs.fonts.fixed.Zyyy': 'fixedFontPref_',
+      'webkit.webprefs.fonts.math.Zyyy': 'mathFontPref_',
+      'webkit.webprefs.fonts.sansserif.Zyyy': 'sansSerifFontPref_',
+      'webkit.webprefs.fonts.serif.Zyyy': 'serifFontPref_',
+      'webkit.webprefs.fonts.standard.Zyyy': 'standardFontPref_',
+      'webkit.webprefs.minimum_font_size': 'minimumFontSizePref_',
+    });
+  }
+
   override ready() {
     super.ready();
-
     this.browserProxy_.fetchFontsData().then(this.setFontsData_.bind(this));
   }
 
@@ -117,26 +145,29 @@ export class SettingsAppearanceFontsPageElement extends
   /**
    * Get the minimum font size, accounting for unset prefs.
    */
-  private computeMinimumFontSize_(): number {
-    const prefValue = this.get('prefs.webkit.webprefs.minimum_font_size.value');
-    return prefValue || MINIMUM_FONT_SIZE_RANGE[0];
+  private getMinimumFontSize_(): number {
+    return this.minimumFontSizePref_?.value || MINIMUM_FONT_SIZE_RANGE[0];
   }
 
-  private onMinimumSizeChange_() {
-    this.$.minimumSizeFontPreview.hidden = this.computeMinimumFontSize_() <= 0;
+  private getMinimumSizeHidden_(): boolean {
+    return this.minimumFontSizePref_ === undefined ||
+        this.minimumFontSizePref_.value <= 0;
   }
 
-  private fontFamilyValueForFixed_(prefValue: string) {
+  private fontFamilyValueForFixed_(): string {
+    if (!this.fixedFontPref_) {
+      return '';
+    }
     // <if expr="is_macosx">
     // Osaka font family, which is bundled with macOS, contains a proportional
     // and a fixed-width fonts. The CSS `font-family` property distinguishes
     // them by assuming 'Osaka' for the proportional font and 'Osaka-Mono' for
     // the fixed-width font. See crbug.com/40535332.
-    if (prefValue === 'Osaka') {
+    if (this.fixedFontPref_.value === 'Osaka') {
       return 'Osaka-Mono';
     }
     // </if>
-    return prefValue;
+    return this.fixedFontPref_.value;
   }
 
   // SettingsViewMixin implementation.

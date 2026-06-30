@@ -3,13 +3,14 @@
 // found in the LICENSE file.
 
 // clang-format off
-import 'chrome://settings/settings.js';
-
+import {PrefService, PrefsBrowserProxy} from 'chrome://settings/settings.js';
 import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
-import type {FontsBrowserProxy, FontsData,SettingsAppearanceFontsPageElement} from 'chrome://settings/lazy_load.js';
+import type {FontsBrowserProxy, FontsData, SettingsAppearanceFontsPageElement} from 'chrome://settings/lazy_load.js';
 import {FontsBrowserProxyImpl} from 'chrome://settings/lazy_load.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
+
+import {TestPrefsBrowserProxy} from './test_prefs_browser_proxy.js';
 
 // clang-format on
 
@@ -33,11 +34,59 @@ class TestFontsBrowserProxy extends TestBrowserProxy implements
   }
 }
 
+
 let fontsPage: SettingsAppearanceFontsPageElement;
 let fontsBrowserProxy: TestFontsBrowserProxy;
+let prefsBrowserProxy: TestPrefsBrowserProxy;
 
 suite('AppearanceFontHandler', function() {
-  setup(function() {
+  setup(async function() {
+    const initialPrefs = [
+      {
+        key: 'webkit.webprefs.minimum_font_size',
+        type: chrome.settingsPrivate.PrefType.NUMBER,
+        value: 0,
+      },
+      {
+        key: 'webkit.webprefs.fonts.standard.Zyyy',
+        type: chrome.settingsPrivate.PrefType.STRING,
+        value: 'Roboto',
+      },
+      {
+        key: 'webkit.webprefs.default_font_size',
+        type: chrome.settingsPrivate.PrefType.NUMBER,
+        value: 16,
+      },
+      {
+        key: 'webkit.webprefs.fonts.serif.Zyyy',
+        type: chrome.settingsPrivate.PrefType.STRING,
+        value: 'Roboto',
+      },
+      {
+        key: 'webkit.webprefs.default_fixed_font_size',
+        type: chrome.settingsPrivate.PrefType.NUMBER,
+        value: 16,
+      },
+      {
+        key: 'webkit.webprefs.fonts.math.Zyyy',
+        type: chrome.settingsPrivate.PrefType.STRING,
+        value: 'Roboto',
+      },
+      {
+        key: 'webkit.webprefs.fonts.sansserif.Zyyy',
+        type: chrome.settingsPrivate.PrefType.STRING,
+        value: 'Roboto',
+      },
+      {
+        key: 'webkit.webprefs.fonts.fixed.Zyyy',
+        type: chrome.settingsPrivate.PrefType.STRING,
+        value: 'Roboto',
+      },
+    ];
+    prefsBrowserProxy = new TestPrefsBrowserProxy(initialPrefs);
+    PrefsBrowserProxy.setInstance(prefsBrowserProxy);
+    PrefService.resetInstanceForTesting();
+
     fontsBrowserProxy = new TestFontsBrowserProxy();
     FontsBrowserProxyImpl.setInstance(fontsBrowserProxy);
 
@@ -45,11 +94,14 @@ suite('AppearanceFontHandler', function() {
 
     fontsPage = document.createElement('settings-appearance-fonts-page');
     document.body.appendChild(fontsPage);
+
+    await PrefService.getInstance().whenInitialized();
     flush();  // #mathFontPreview is inserted dynamically via dom-if.
   });
 
   teardown(function() {
     fontsPage.remove();
+    PrefService.resetInstanceForTesting();
   });
 
   test('fetchFontsData', function() {
@@ -57,18 +109,19 @@ suite('AppearanceFontHandler', function() {
   });
 
   test('minimum font size preview', () => {
-    fontsPage.prefs = {
-      webkit: {
-        webprefs: {
-          minimum_font_size:
-              {value: 0, type: chrome.settingsPrivate.PrefType.NUMBER},
-        },
-      },
-    };
     assertTrue(fontsPage.$.minimumSizeFontPreview.hidden);
-    fontsPage.set('prefs.webkit.webprefs.minimum_font_size.value', 6);
+
+    prefsBrowserProxy.fakeApi.sendPrefChanges([
+      {key: 'webkit.webprefs.minimum_font_size', value: 6},
+    ]);
+    flush();
     assertFalse(fontsPage.$.minimumSizeFontPreview.hidden);
-    fontsPage.set('prefs.webkit.webprefs.minimum_font_size.value', 0);
+    assertEquals('6px', fontsPage.$.minimumSizeFontPreview.style.fontSize);
+
+    prefsBrowserProxy.fakeApi.sendPrefChanges([
+      {key: 'webkit.webprefs.minimum_font_size', value: 0},
+    ]);
+    flush();
     assertTrue(fontsPage.$.minimumSizeFontPreview.hidden);
   });
 
@@ -84,16 +137,13 @@ suite('AppearanceFontHandler', function() {
           element.textContent.trim().startsWith(expectedFontSize.toString()));
     }
 
-    fontsPage.prefs = {
-      webkit: {
-        webprefs: {
-          default_font_size:
-              {value: 20, type: chrome.settingsPrivate.PrefType.NUMBER},
-          default_fixed_font_size:
-              {value: 10, type: chrome.settingsPrivate.PrefType.NUMBER},
-        },
-      },
-    };
+    // Simulate backend change for default font size and default fixed font
+    // size.
+    prefsBrowserProxy.fakeApi.sendPrefChanges([
+      {key: 'webkit.webprefs.default_font_size', value: 20},
+      {key: 'webkit.webprefs.default_fixed_font_size', value: 10},
+    ]);
+    flush();
 
     assertFontSize(fontsPage.$.standardFontPreview, 20);
     assertFontSize(fontsPage.$.serifFontPreview, 20);
@@ -114,44 +164,16 @@ suite('AppearanceFontHandler', function() {
       assertEquals(`custom_${genericFamily}`, family.toString());
     }
 
-    fontsPage.prefs = {
-      webkit: {
-        webprefs: {
-          fonts: {
-            standard: {
-              Zyyy: {
-                value: 'custom_standard',
-                type: chrome.settingsPrivate.PrefType.STRING,
-              },
-            },
-            serif: {
-              Zyyy: {
-                value: 'custom_serif',
-                type: chrome.settingsPrivate.PrefType.STRING,
-              },
-            },
-            sansserif: {
-              Zyyy: {
-                value: 'custom_sansserif',
-                type: chrome.settingsPrivate.PrefType.STRING,
-              },
-            },
-            fixed: {
-              Zyyy: {
-                value: 'custom_fixed',
-                type: chrome.settingsPrivate.PrefType.STRING,
-              },
-            },
-            math: {
-              Zyyy: {
-                value: 'custom_math',
-                type: chrome.settingsPrivate.PrefType.STRING,
-              },
-            },
-          },
-        },
-      },
-    };
+    // Simulate backend change for standard, serif, sansserif, fixed and math
+    // fonts.
+    prefsBrowserProxy.fakeApi.sendPrefChanges([
+      {key: 'webkit.webprefs.fonts.standard.Zyyy', value: 'custom_standard'},
+      {key: 'webkit.webprefs.fonts.serif.Zyyy', value: 'custom_serif'},
+      {key: 'webkit.webprefs.fonts.sansserif.Zyyy', value: 'custom_sansserif'},
+      {key: 'webkit.webprefs.fonts.fixed.Zyyy', value: 'custom_fixed'},
+      {key: 'webkit.webprefs.fonts.math.Zyyy', value: 'custom_math'},
+    ]);
+    flush();
 
     assertFontFamily(fontsPage.$.standardFontPreview, 'standard');
     assertFontFamily(fontsPage.$.serifFontPreview, 'serif');
@@ -165,20 +187,11 @@ suite('AppearanceFontHandler', function() {
   });
 
   test('font preview fixed Osaka', () => {
-    fontsPage.prefs = {
-      webkit: {
-        webprefs: {
-          fonts: {
-            fixed: {
-              Zyyy: {
-                value: 'Osaka',
-                type: chrome.settingsPrivate.PrefType.STRING,
-              },
-            },
-          },
-        },
-      },
-    };
+    // Simulate backend change for fixed font.
+    prefsBrowserProxy.fakeApi.sendPrefChanges([
+      {key: 'webkit.webprefs.fonts.fixed.Zyyy', value: 'Osaka'},
+    ]);
+    flush();
 
     const cssFamilyName = fontsPage.$.fixedFontPreview.computedStyleMap().get(
                               'font-family') as CSSStyleValue;
@@ -203,24 +216,12 @@ suite('AppearanceFontHandler', function() {
     // Check that the font properties are inherited on the sample formula.
     const EXPECTED_FONT_SIZE = 20;
     const EXPECTED_FONT_FAMILY = 'inherited_math_font';
-    fontsPage.prefs = {
-      webkit: {
-        webprefs: {
-          fonts: {
-            math: {
-              Zyyy: {
-                value: EXPECTED_FONT_FAMILY,
-                type: chrome.settingsPrivate.PrefType.STRING,
-              },
-            },
-          },
-          default_font_size: {
-            value: EXPECTED_FONT_SIZE,
-            type: chrome.settingsPrivate.PrefType.NUMBER,
-          },
-        },
-      },
-    };
+    // Simulate backend change for default font size and math font.
+    prefsBrowserProxy.fakeApi.sendPrefChanges([
+      {key: 'webkit.webprefs.default_font_size', value: EXPECTED_FONT_SIZE},
+      {key: 'webkit.webprefs.fonts.math.Zyyy', value: EXPECTED_FONT_FAMILY},
+    ]);
+    flush();
     const family = math.computedStyleMap().get('font-family') as CSSStyleValue;
     assertEquals(EXPECTED_FONT_FAMILY, family.toString());
     const {value, unit} = math.computedStyleMap().get('font-size') as

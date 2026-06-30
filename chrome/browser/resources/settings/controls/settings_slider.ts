@@ -16,6 +16,8 @@ import type {CrSliderElement, SliderTick} from '//resources/cr_elements/cr_slide
 import {assert} from '//resources/js/assert.js';
 import {PolymerElement} from '//resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import {CrPolicyPrefMixin} from '/shared/settings/controls/cr_policy_pref_mixin.js';
+import {PrefService} from '/shared/settings/prefs2/pref_service.js';
+import {PrefServiceObserverMixin} from '/shared/settings/prefs2/pref_service_observer_mixin.js';
 
 import {loadTimeData} from '../i18n_setup.js';
 
@@ -27,7 +29,8 @@ export interface SettingsSliderElement {
   };
 }
 
-const SettingsSliderElementBase = CrPolicyPrefMixin(PolymerElement);
+const SettingsSliderElementBase =
+    PrefServiceObserverMixin(CrPolicyPrefMixin(PolymerElement));
 
 export class SettingsSliderElement extends SettingsSliderElementBase {
   static get is() {
@@ -40,6 +43,11 @@ export class SettingsSliderElement extends SettingsSliderElementBase {
 
   static get properties() {
     return {
+      prefKey: {
+        type: String,
+        observer: 'prefKeyChanged_',
+      },
+
       pref: Object,
 
       /**
@@ -78,7 +86,7 @@ export class SettingsSliderElement extends SettingsSliderElementBase {
       showMarkers: Boolean,
 
       disableSlider_: {
-        computed: 'computeDisableSlider_(pref.*, disabled, ticks.*)',
+        computed: 'computeDisableSlider_(pref, disabled, ticks.*)',
         type: Boolean,
       },
 
@@ -94,10 +102,11 @@ export class SettingsSliderElement extends SettingsSliderElementBase {
 
   static get observers() {
     return [
-      'valueChanged_(pref.*, ticks.*, loaded_)',
+      'valueChanged_(pref, ticks.*, loaded_)',
     ];
   }
 
+  declare prefKey: string;
   declare pref: chrome.settingsPrivate.PrefObject<number>;
   declare ticks: SliderTick[]|number[];
   declare scale: number;
@@ -116,8 +125,20 @@ export class SettingsSliderElement extends SettingsSliderElementBase {
 
   override connectedCallback() {
     super.connectedCallback();
-
     this.loaded_ = true;
+  }
+
+  private prefObserverId_: number|null = null;
+
+  private prefKeyChanged_(newKey: string) {
+    if (this.prefObserverId_ !== null) {
+      this.removePrefObserver(this.prefObserverId_);
+      this.prefObserverId_ = null;
+    }
+
+    this.prefObserverId_ = this.addPrefObserver<number>(newKey, pref => {
+      this.pref = pref;
+    });
   }
 
   override focus() {
@@ -154,7 +175,7 @@ export class SettingsSliderElement extends SettingsSliderElementBase {
       newValue = sliderValue / this.scale;
     }
 
-    this.set('pref.value', newValue);
+    PrefService.getInstance().setPrefValue(this.prefKey, newValue);
   }
 
   private computeDisableSlider_(): boolean {
@@ -210,7 +231,7 @@ export class SettingsSliderElement extends SettingsSliderElementBase {
     }
     const tickValue = this.getTickValueAtIndex_(index);
     if (this.pref.value !== tickValue) {
-      this.set('pref.value', tickValue);
+      PrefService.getInstance().setPrefValue(this.pref.key, tickValue);
     }
   }
 
