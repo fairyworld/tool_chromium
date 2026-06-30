@@ -63,6 +63,9 @@ enum StoreReadResult {
   // Failed to migrate from v5 to v4.
   V5_TO_V4_MIGRATION_FAILURE = 11,
 
+  // V5 to V4 migration was ineligible, and wiping V5 succeeded.
+  V5_TO_V4_MIGRATION_WIPED_SUCCESSFULLY = 12,
+
   // Memory space for histograms is determined by the max.  ALWAYS
   // ADD NEW VALUES BEFORE THIS ONE.
   STORE_READ_RESULT_MAX
@@ -109,7 +112,10 @@ enum class V5StoreReadResult {
   // Failed to migrate from v4 to v5.
   kV4ToV5MigrationFailure = 10,
 
-  kMaxValue = kV4ToV5MigrationFailure
+  // Migration was needed but the store was ineligible, and wiping V4 succeeded.
+  kV4ToV5MigrationWipedSuccessfully = 11,
+
+  kMaxValue = kV4ToV5MigrationWipedSuccessfully
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:SafeBrowsingV5StoreReadResult)
 

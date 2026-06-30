@@ -58,7 +58,13 @@ enum class V4ToV5MigrationResult {
   // Failed to rename the temp V5 store file to the final path.
   kRenameV5StoreFileFailure = 11,
 
-  kMaxValue = kRenameV5StoreFileFailure
+  // V4 to V5 migration was ineligible, and wiping V4 failed.
+  kStoreIneligibleWipeFailed = 12,
+
+  // V4 to V5 migration was ineligible, and wiping V4 succeeded.
+  kStoreIneligibleWipeSucceeded = 13,
+
+  kMaxValue = kStoreIneligibleWipeSucceeded
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:V4ToV5MigrationResult)
 
@@ -69,6 +75,8 @@ class V5Store : public SBStore {
   // disk for this file. The constructor doesn't read the store file from disk.
   // `v4_store_path` is the store path for the corresponding v4 store; this is
   // used for migrating from a v4 database to a v5 database.
+  // `is_eligible_for_v4_to_v5_disk_migration` specifies whether this store is
+  // eligible to migrate its old V4 disk format to V5.
   // If the store is being created to apply an update to the old store, then
   // `old_file_size` is the size of the existing file on disk for this store;
   // 0 otherwise. This is needed so that we can correctly report the size of
@@ -78,6 +86,7 @@ class V5Store : public SBStore {
           const base::FilePath& store_path,
           PrefixSize prefix_size,
           const base::FilePath& v4_store_path,
+          bool is_eligible_for_v4_to_v5_disk_migration,
           int64_t old_file_size = 0);
   ~V5Store() override;
 
@@ -110,6 +119,12 @@ class V5Store : public SBStore {
   // reason for the failure or reports success.
   V4ToV5MigrationResult MigrateFromV4(const base::FilePath& v4_store_path);
 
+  // Wipes the V4 store file and its associated hash files.
+  // `v4_store_path` is the path of the V4 store to delete.
+  // Returns true if both the store file and all of its associated hash files
+  // are successfully deleted; false otherwise.
+  bool WipeV4Store(const base::FilePath& v4_store_path);
+
   std::unique_ptr<HashPrefixList> hash_prefix_list_;
 
   // The expected prefix size for the hash prefixes in this store.
@@ -117,6 +132,9 @@ class V5Store : public SBStore {
 
   // The path to the corresponding v4 store file on disk.
   const base::FilePath v4_store_path_;
+
+  // Whether this store is eligible for v4 to v5 disk migration.
+  const bool is_eligible_for_migration_ = true;
 
   // The version of the store as returned by the PVer5 server in the last
   // applied update response.

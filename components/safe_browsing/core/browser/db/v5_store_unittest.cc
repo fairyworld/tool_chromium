@@ -127,19 +127,22 @@ class V5StoreTest : public PlatformTest {
 TEST_F(V5StoreTest, TestReadFromEmptyFile) {
   base::CloseFile(base::OpenFile(store_path_, "wb+"));
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kFileEmptyFailure, ReadFromDisk(store));
 }
 
 TEST_F(V5StoreTest, TestReadFromAbsentFile) {
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kFileOpenFailure, ReadFromDisk(store));
 }
 
 TEST_F(V5StoreTest, TestReadFromInvalidContentsFile) {
   const char kInvalidContents[] = "Chromium";
   base::WriteFile(store_path_, kInvalidContents);
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kProtoParsingFailure, ReadFromDisk(store));
 }
 
@@ -152,28 +155,32 @@ TEST_F(V5StoreTest, TestReadFromFileWithUnknownProto) {
 
   // Even though we wrote a completely different proto to file, the proto
   // parsing method does not fail. This shows the importance of a magic number.
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kUnexpectedMagicNumberFailure,
             ReadFromDisk(store));
 }
 
 TEST_F(V5StoreTest, TestReadFromUnexpectedMagicFile) {
   WriteFileFormatProtoToFile(111);
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kUnexpectedMagicNumberFailure,
             ReadFromDisk(store));
 }
 
 TEST_F(V5StoreTest, TestReadFromLowVersionFile) {
   WriteFileFormatProtoToFile(0x600D71FE, 2);
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kFileVersionIncompatibleFailure,
             ReadFromDisk(store));
 }
 
 TEST_F(V5StoreTest, TestReadFromNoHashPrefixInfoFile) {
   WriteFileFormatProtoToFile(0x600D71FE, 10);
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kHashPrefixInfoMissingFailure,
             ReadFromDisk(store));
 }
@@ -183,7 +190,8 @@ TEST_F(V5StoreTest, TestReadFromNoHashPrefixesFile) {
   ListDetails list_details;
   list_details.set_version("test_version");
   WriteFileFormatProtoToFile(0x600D71FE, 10, &list_details);
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kReadSuccess, ReadFromDisk(store));
   EXPECT_TRUE(GetHashPrefixList(store).view().empty());
   EXPECT_EQ(24, GetFileSize(store));
@@ -212,7 +220,8 @@ TEST_F(V5StoreTest, TestReadFromInvalidHashPrefixList) {
   base::WriteFile(store_path_, file_format.SerializeAsString());
   base::WriteFile(store_path_.AddExtensionASCII("foo"), "abcdef");
   // Set the prefix size to 4. This will cause a failure in the read.
-  V5Store read_store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store read_store(task_runner(), store_path_, 4, v4_store_path_,
+                     /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kHashPrefixListGenerationFailure,
             ReadFromDisk(read_store));
   EXPECT_TRUE(read_store.version().empty());
@@ -237,7 +246,8 @@ TEST_F(V5StoreTest, TestReadWithMissingHashFile) {
   hash_file->set_file_size(4);
   // Write only the file format to disk. The hash file is missing.
   WriteFileFormatProtoToFile(&file_format, 0x600D71FE, 10, &list_details);
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
 
   EXPECT_EQ(V5StoreReadResult::kHashPrefixListGenerationFailure,
             ReadFromDisk(store));
@@ -255,7 +265,8 @@ TEST_F(V5StoreTest, TestInitializeSucceeds) {
   ListDetails list_details;
   list_details.set_version("test_version");
   WriteFileFormatProtoToFile(0x600D71FE, 10, &list_details);
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   store.Initialize();
   EXPECT_TRUE(store.HasValidData());
 
@@ -287,7 +298,8 @@ TEST_F(V5StoreTest, TestInitializeSucceedsWithV5Suffix) {
   WriteFileFormatProtoToFile(0x600D71FE, 10, &list_details);
   store_path_ = original_store_path;  // restore
 
-  V5Store store(task_runner(), v5_store_path, 4, v4_store_path_);
+  V5Store store(task_runner(), v5_store_path, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   store.Initialize();
   EXPECT_TRUE(store.HasValidData());
 
@@ -310,7 +322,8 @@ TEST_F(V5StoreTest, TestInitializeSucceedsWithV5Suffix) {
 TEST_F(V5StoreTest, TestInitializeFails) {
   base::HistogramTester histogram_tester;
   // No file on disk, so Initialize will fail.
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   store.Initialize();
   EXPECT_FALSE(store.HasValidData());
 
@@ -336,7 +349,8 @@ TEST_F(V5StoreTest, TestReadFromDiskDoesNotSetValidData) {
   ListDetails list_details;
   list_details.set_version("test_version");
   WriteFileFormatProtoToFile(0x600D71FE, 10, &list_details);
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kReadSuccess, ReadFromDisk(store));
   // Only `Initialize()` sets the `has_valid_data_` property.
   EXPECT_FALSE(store.HasValidData());
@@ -355,7 +369,8 @@ TEST_F(V5StoreTest, TestReadFromDiskDoesNotSetValidData) {
 
 TEST_F(V5StoreTest, TestHasValidDataLoggingHeuristic) {
   base::HistogramTester histogram_tester;
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
 
   // First call should log.
   store.HasValidData();
@@ -385,7 +400,8 @@ TEST_F(V5StoreTest, TestReadFromNoVersionFile) {
   ListDetails list_details;
   // `version` is omitted.
   WriteFileFormatProtoToFile(0x600D71FE, 10, &list_details);
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kReadSuccess, ReadFromDisk(store));
   EXPECT_TRUE(store.version().empty());
 }
@@ -396,7 +412,8 @@ TEST_F(V5StoreTest, TestReadWithValidChecksum) {
   list_details.mutable_checksum()->set_sha256(
       "test_checksum_value_32_bytes____");
   WriteFileFormatProtoToFile(0x600D71FE, 10, &list_details);
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kReadSuccess, ReadFromDisk(store));
   EXPECT_EQ("test_checksum_value_32_bytes____", GetExpectedChecksum(store));
 }
@@ -406,7 +423,8 @@ TEST_F(V5StoreTest, TestReadWithMissingSha256) {
   list_details.set_version("test_version");
   list_details.mutable_checksum();  // checksum is present but empty
   WriteFileFormatProtoToFile(0x600D71FE, 10, &list_details);
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kReadSuccess, ReadFromDisk(store));
   EXPECT_TRUE(GetExpectedChecksum(store).empty());
 }
@@ -427,7 +445,8 @@ TEST_F(V5StoreTest, TestReadWithValidHashPrefixList) {
   // Write valid hash file (4 bytes).
   base::WriteFile(store_path_.AddExtensionASCII("foo"), "abcd");
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kReadSuccess, ReadFromDisk(store));
   EXPECT_EQ("test_version", store.version());
   EXPECT_EQ(GetHashPrefixList(store).view().at(4), "abcd");
@@ -448,7 +467,8 @@ TEST_F(V5StoreTest, TestMigrationAlreadyV5) {
   list_details.set_version("test_version");
   WriteFileFormatProtoToFile(0x600D71FE, 10, &list_details);
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kReadSuccess, ReadFromDisk(store));
 
   histogram_tester.ExpectUniqueSample(
@@ -456,10 +476,85 @@ TEST_F(V5StoreTest, TestMigrationAlreadyV5) {
       V4ToV5MigrationResult::kDiskAlreadyV5, 1);
 }
 
+TEST_F(V5StoreTest, TestMigrationNotEligible_WipeSucceeds) {
+  base::HistogramTester histogram_tester;
+  std::vector<std::pair<std::string, uint64_t>> v4_hash_files = {{"4_foo", 4}};
+  WriteV4FileFormatProtoToFile(v4_store_path_, 0x600D71FE, 9, "v4_version",
+                               "v4_checksum", v4_hash_files);
+  base::WriteFile(v4_store_path_.AddExtensionASCII("4_foo"), "abcd");
+
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/false);
+  EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationWipedSuccessfully,
+            ReadFromDisk(store));
+
+  // Verify V4 files are wiped.
+  EXPECT_FALSE(base::PathExists(v4_store_path_));
+  EXPECT_FALSE(base::PathExists(v4_store_path_.AddExtensionASCII("4_foo")));
+
+  histogram_tester.ExpectUniqueSample(
+      "SafeBrowsing.V5Store.V4ToV5MigrationResult",
+      V4ToV5MigrationResult::kStoreIneligibleWipeSucceeded, 1);
+}
+
+TEST_F(V5StoreTest, TestMigrationNotEligible_WipeFails) {
+  base::HistogramTester histogram_tester;
+  std::vector<std::pair<std::string, uint64_t>> v4_hash_files = {{"4_foo", 4}};
+  WriteV4FileFormatProtoToFile(v4_store_path_, 0x600D71FE, 9, "v4_version",
+                               "v4_checksum", v4_hash_files);
+  base::WriteFile(v4_store_path_.AddExtensionASCII("4_foo"), "abcd");
+
+  // Force wipe to fail by making the V4 store path a non-empty directory.
+  base::DeleteFile(v4_store_path_);
+  ASSERT_TRUE(base::CreateDirectory(v4_store_path_));
+  ASSERT_TRUE(base::WriteFile(v4_store_path_.AppendASCII("dummy"), "dummy"));
+
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/false);
+  EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
+
+  histogram_tester.ExpectUniqueSample(
+      "SafeBrowsing.V5Store.V4ToV5MigrationResult",
+      V4ToV5MigrationResult::kStoreIneligibleWipeFailed, 1);
+
+  // Cleanup dummy directory.
+  base::DeletePathRecursively(v4_store_path_);
+}
+
+TEST_F(V5StoreTest,
+       TestMigrationNotEligible_WipeHashFileFails_WipeStoreFileSucceeds) {
+  base::HistogramTester histogram_tester;
+  std::vector<std::pair<std::string, uint64_t>> v4_hash_files = {{"4_foo", 4}};
+  WriteV4FileFormatProtoToFile(v4_store_path_, 0x600D71FE, 9, "v4_version",
+                               "v4_checksum", v4_hash_files);
+
+  // Force hash file wipe to fail by making it a non-empty directory.
+  base::FilePath hash_file_path = v4_store_path_.AddExtensionASCII("4_foo");
+  ASSERT_TRUE(base::CreateDirectory(hash_file_path));
+  ASSERT_TRUE(base::WriteFile(hash_file_path.AppendASCII("dummy"), "dummy"));
+
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/false);
+  EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
+
+  // The V4 hash file still exists because the wipe failed to delete it.
+  EXPECT_TRUE(base::PathExists(hash_file_path));
+  // But in spite of that, the V4 store file was still able to be deleted.
+  EXPECT_FALSE(base::PathExists(v4_store_path_));
+
+  histogram_tester.ExpectUniqueSample(
+      "SafeBrowsing.V5Store.V4ToV5MigrationResult",
+      V4ToV5MigrationResult::kStoreIneligibleWipeFailed, 1);
+
+  // Cleanup dummy directory.
+  base::DeletePathRecursively(hash_file_path);
+}
+
 TEST_F(V5StoreTest, TestMigrationV4NotFound) {
   base::HistogramTester histogram_tester;
   // V5 doesn't exist, V4 doesn't exist.
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kFileOpenFailure, ReadFromDisk(store));
 
   histogram_tester.ExpectUniqueSample(
@@ -475,7 +570,8 @@ TEST_F(V5StoreTest, TestMigrationSuccess) {
                                "v4_checksum", v4_hash_files);
   base::WriteFile(v4_store_path_.AddExtensionASCII("4_foo"), "abcd");
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   // Verify ReadFromDisk performs the migration and succeeds.
   EXPECT_EQ(V5StoreReadResult::kReadSuccess, ReadFromDisk(store));
 
@@ -503,7 +599,8 @@ TEST_F(V5StoreTest, TestMigrationProtoParsingFailure) {
   // Write corrupted V4 file.
   base::WriteFile(v4_store_path_, "CorruptedProtoContent");
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
 
   histogram_tester.ExpectUniqueSample(
@@ -519,7 +616,8 @@ TEST_F(V5StoreTest, TestMigrationUnexpectedMagic) {
   WriteV4FileFormatProtoToFile(v4_store_path_, 111, 9, "v4_version",
                                "v4_checksum", {});
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
 
   histogram_tester.ExpectUniqueSample(
@@ -535,7 +633,8 @@ TEST_F(V5StoreTest, TestMigrationVersionIncompatible) {
   WriteV4FileFormatProtoToFile(v4_store_path_, 0x600D71FE, 8, "v4_version",
                                "v4_checksum", {});
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
 
   histogram_tester.ExpectUniqueSample(
@@ -553,7 +652,8 @@ TEST_F(V5StoreTest, TestMigrationMultipleHashFilesNotSupported) {
   WriteV4FileFormatProtoToFile(v4_store_path_, 0x600D71FE, 9, "v4_version",
                                "v4_checksum", v4_hash_files);
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
 
   histogram_tester.ExpectUniqueSample(
@@ -568,7 +668,8 @@ TEST_F(V5StoreTest, TestMigrationPrefixSizeMismatch) {
                                "v4_checksum", v4_hash_files);
   base::WriteFile(v4_store_path_.AddExtensionASCII("foo"), "abcd");
 
-  V5Store store(task_runner(), store_path_, 8, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 8, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
 
   histogram_tester.ExpectUniqueSample(
@@ -582,7 +683,8 @@ TEST_F(V5StoreTest, TestMigrationHashFileMissing) {
   WriteV4FileFormatProtoToFile(v4_store_path_, 0x600D71FE, 9, "v4_version",
                                "v4_checksum", v4_hash_files);
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
 
   histogram_tester.ExpectUniqueSample(
@@ -601,7 +703,8 @@ TEST_F(V5StoreTest, TestMigrationWriteV5Failure) {
   base::FilePath temp_store_path = store_path_.AddExtensionASCII("tmp");
   ASSERT_TRUE(base::CreateDirectory(temp_store_path));
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
 
   // Verify V4 files and partial V5 files are deleted.
@@ -621,7 +724,8 @@ TEST_F(V5StoreTest, TestMigrationV4Empty) {
   base::HistogramTester histogram_tester;
   base::CloseFile(base::OpenFile(v4_store_path_, "wb+"));
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
 
   histogram_tester.ExpectUniqueSample(
@@ -637,7 +741,8 @@ TEST_F(V5StoreTest, TestMigrationNoHashFiles) {
   WriteV4FileFormatProtoToFile(v4_store_path_, 0x600D71FE, 9, "v4_version",
                                "v4_checksum", {});
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kReadSuccess, ReadFromDisk(store));
 
   EXPECT_TRUE(base::PathExists(store_path_));
@@ -658,7 +763,8 @@ TEST_F(V5StoreTest, TestMigrationFailureNoUnderscore) {
                                "v4_checksum", v4_hash_files);
   base::WriteFile(v4_store_path_.AddExtensionASCII("foo"), "abcd");
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
 
   histogram_tester.ExpectUniqueSample(
@@ -673,7 +779,8 @@ TEST_F(V5StoreTest, TestMigrationFailureEmptyV5Extension) {
                                "v4_checksum", v4_hash_files);
   base::WriteFile(v4_store_path_.AddExtensionASCII("foo_"), "abcd");
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
 
   histogram_tester.ExpectUniqueSample(
@@ -693,7 +800,8 @@ TEST_F(V5StoreTest, TestMigrationRenameFailure) {
   base::FilePath v5_hash_file_path = store_path_.AddExtensionASCII("foo");
   ASSERT_TRUE(base::CreateDirectory(v5_hash_file_path));
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kV4ToV5MigrationFailure, ReadFromDisk(store));
 
   // Verify V4 files are deleted.
@@ -716,7 +824,8 @@ TEST_F(V5StoreTest, TestMigrationMissingOptionalFields) {
                                std::nullopt, v4_hash_files);
   base::WriteFile(v4_store_path_.AddExtensionASCII("4_foo"), "abcd");
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   EXPECT_EQ(V5StoreReadResult::kReadSuccess, ReadFromDisk(store));
 
   EXPECT_TRUE(base::PathExists(store_path_));
@@ -739,7 +848,8 @@ TEST_F(V5StoreTest, TestMigrationSuccessButReadFailure) {
   // Write corrupted hash file (only 2 bytes, expected 4).
   base::WriteFile(v4_store_path_.AddExtensionASCII("4_foo"), "ab");
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
   // Reading it fails because the hash file is corrupted (size mismatch),
   // even though migration itself succeeded.
   EXPECT_EQ(V5StoreReadResult::kHashPrefixListGenerationFailure,
@@ -760,7 +870,8 @@ TEST_F(V5StoreTest, TestMigrationRenameV5StoreFileFailure) {
   // Create a directory at store_path_ to force base::Move to fail.
   ASSERT_TRUE(base::CreateDirectory(store_path_));
 
-  V5Store store(task_runner(), store_path_, 4, v4_store_path_);
+  V5Store store(task_runner(), store_path_, 4, v4_store_path_,
+                /*is_eligible_for_v4_to_v5_disk_migration=*/true);
 
   // Call MigrateFromV4 directly to bypass PathExists check in
   // AttemptV4ToV5Migration so this test is able to trigger this case.

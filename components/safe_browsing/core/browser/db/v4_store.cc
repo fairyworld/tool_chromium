@@ -248,8 +248,10 @@ std::ostream& operator<<(std::ostream& os, const V4Store& store) {
 V4StorePtr V4StoreFactory::CreateV4Store(
     const scoped_refptr<base::SequencedTaskRunner>& task_runner,
     const base::FilePath& store_path,
-    PrefixSize v5_prefix_size) {
-  V4StorePtr new_store(new V4Store(task_runner, store_path, v5_prefix_size),
+    PrefixSize v5_prefix_size,
+    bool is_eligible_for_migration) {
+  V4StorePtr new_store(new V4Store(task_runner, store_path, v5_prefix_size,
+                                   is_eligible_for_migration),
                        V4StoreDeleter(task_runner));
   new_store->Initialize();
   return new_store;
@@ -271,11 +273,13 @@ std::string V4Store::GetMetricPrefix() const {
 V4Store::V4Store(const scoped_refptr<base::SequencedTaskRunner>& task_runner,
                  const base::FilePath& store_path,
                  PrefixSize v5_prefix_size,
+                 bool is_eligible_for_migration,
                  const int64_t old_file_size)
     : SBStore(task_runner, store_path, old_file_size),
       hash_prefix_map_(
           std::make_unique<HashPrefixMap>(store_path, task_runner)),
-      v5_prefix_size_(v5_prefix_size) {}
+      v5_prefix_size_(v5_prefix_size),
+      is_eligible_for_migration_(is_eligible_for_migration) {}
 
 V4Store::~V4Store() = default;
 
@@ -435,9 +439,9 @@ void V4Store::ApplyUpdate(
     const scoped_refptr<base::SequencedTaskRunner>& callback_task_runner,
     UpdatedStoreReadyCallback callback) {
   base::ElapsedThreadTimer thread_timer;
-  V4StorePtr new_store(
-      new V4Store(task_runner_, store_path_, v5_prefix_size_, file_size_),
-      V4StoreDeleter(task_runner_));
+  V4StorePtr new_store(new V4Store(task_runner_, store_path_, v5_prefix_size_,
+                                   is_eligible_for_migration_, file_size_),
+                       V4StoreDeleter(task_runner_));
   ApplyUpdateResult apply_update_result;
   std::optional<std::string> metric;
   ApplyUpdateType apply_update_type;
@@ -887,6 +891,11 @@ V5ToV4MigrationResult V4Store::AttemptV5ToV4Migration() {
   if (!base::PathExists(v5_store_path)) {
     return V5ToV4MigrationResult::kV5StoreNotFound;
   }
+  if (!is_eligible_for_migration_) {
+    bool wipe_succeeded = WipeV5Store(v5_store_path);
+    return wipe_succeeded ? V5ToV4MigrationResult::kStoreIneligibleWipeSucceeded
+                          : V5ToV4MigrationResult::kStoreIneligibleWipeFailed;
+  }
   return MigrateFromV5(v5_store_path);
 }
 
@@ -905,6 +914,8 @@ StoreReadResult V4Store::ReadFromDisk() {
     case V5ToV4MigrationResult::kDiskAlreadyV4:
     case V5ToV4MigrationResult::kV5ToV4MigrationSucceeded:
       return ReadFromDiskInternal();
+    case V5ToV4MigrationResult::kStoreIneligibleWipeSucceeded:
+      return V5_TO_V4_MIGRATION_WIPED_SUCCESSFULLY;
     case V5ToV4MigrationResult::kV5StoreNotFound:
       return FILE_UNREADABLE_FAILURE;
     case V5ToV4MigrationResult::kReadV5Failed:
@@ -914,6 +925,7 @@ StoreReadResult V4Store::ReadFromDisk() {
     case V5ToV4MigrationResult::kWriteV4FileFailure:
     case V5ToV4MigrationResult::kRenameV4StoreFileFailure:
     case V5ToV4MigrationResult::kProtoSerializationFailure:
+    case V5ToV4MigrationResult::kStoreIneligibleWipeFailed:
       return V5_TO_V4_MIGRATION_FAILURE;
   }
 }
@@ -1061,6 +1073,22 @@ V5ToV4MigrationResult V4Store::MigrateFromV5(
   base::DeleteFile(v5_store_path);
 
   return V5ToV4MigrationResult::kV5ToV4MigrationSucceeded;
+}
+
+bool V4Store::WipeV5Store(const base::FilePath& v5_store_path) {
+  V5StoreFileFormat v5_file_format;
+  bool hash_delete_success = true;
+  if (ParseAndValidateV5StoreFileFormat(v5_store_path, v5_file_format) ==
+      V5StoreReadResult::kReadSuccess) {
+    const auto& list_details = v5_file_format.list_details();
+    if (list_details.has_hash_file()) {
+      base::FilePath v5_hash_file_path = HashPrefixContainer::GetPath(
+          v5_store_path, list_details.hash_file().extension());
+      hash_delete_success = base::DeleteFile(v5_hash_file_path);
+    }
+  }
+  bool store_delete_success = base::DeleteFile(v5_store_path);
+  return hash_delete_success && store_delete_success;
 }
 
 StoreWriteResult V4Store::WriteToDisk(const Checksum& checksum) {

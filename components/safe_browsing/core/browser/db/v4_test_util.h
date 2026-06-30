@@ -30,7 +30,8 @@ class TestV4Store : public V4Store {
  public:
   TestV4Store(const scoped_refptr<base::SequencedTaskRunner>& task_runner,
               const base::FilePath& store_path,
-              PrefixSize v5_prefix_size);
+              PrefixSize v5_prefix_size,
+              bool is_eligible_for_migration);
   ~TestV4Store() override;
 
   bool HasValidData() override;
@@ -56,7 +57,8 @@ class TestV4StoreFactory : public V4StoreFactory {
   V4StorePtr CreateV4Store(
       const scoped_refptr<base::SequencedTaskRunner>& task_runner,
       const base::FilePath& store_path,
-      PrefixSize v5_prefix_size) override;
+      PrefixSize v5_prefix_size,
+      bool is_eligible_for_migration) override;
 };
 
 class TestV4Database : public V4Database {

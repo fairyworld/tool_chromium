@@ -605,6 +605,7 @@ chromium-metrics-reviews@google.com.
   <int value="9" label="MIGRATION_FAILURE"/>
   <int value="10" label="PRE_MMAP_MIGRATION_FILE_FORMAT_FAILURE"/>
   <int value="11" label="V5_TO_V4_MIGRATION_FAILURE"/>
+  <int value="12" label="V5_TO_V4_MIGRATION_WIPED_SUCCESSFULLY"/>
 </enum>
 
 <enum name="SafeBrowsingV4StoreWriteResult">
@@ -650,6 +651,7 @@ chromium-metrics-reviews@google.com.
   <int value="8" label="HashPrefixListGenerationFailure"/>
   <int value="9" label="FileReadFailure"/>
   <int value="10" label="V4ToV5MigrationFailure"/>
+  <int value="11" label="V4ToV5MigrationWipedSuccessfully"/>
 </enum>
 
 <!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/sb_store.h:V5StoreReadResult) -->
@@ -667,6 +669,8 @@ chromium-metrics-reviews@google.com.
   <int value="7" label="WriteV4FileFailure"/>
   <int value="8" label="RenameV4StoreFileFailure"/>
   <int value="9" label="ProtoSerializationFailure"/>
+  <int value="10" label="StoreIneligibleWipeFailed"/>
+  <int value="11" label="StoreIneligibleWipeSucceeded"/>
 </enum>
 
 <!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/v4_store.h:V5ToV4MigrationResult) -->
@@ -885,6 +889,8 @@ chromium-metrics-reviews@google.com.
   <int value="9" label="ProtoSerializationFailure"/>
   <int value="10" label="ExtensionParsingFailure"/>
   <int value="11" label="RenameV5StoreFileFailure"/>
+  <int value="12" label="StoreIneligibleWipeFailed"/>
+  <int value="13" label="StoreIneligibleWipeSucceeded"/>
 </enum>
 
 <!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/v5_store.h:V4ToV5MigrationResult) -->

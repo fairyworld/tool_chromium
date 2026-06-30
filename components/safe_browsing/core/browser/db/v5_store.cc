@@ -49,13 +49,15 @@ V5Store::V5Store(const scoped_refptr<base::SequencedTaskRunner>& task_runner,
                  const base::FilePath& store_path,
                  PrefixSize prefix_size,
                  const base::FilePath& v4_store_path,
+                 bool is_eligible_for_v4_to_v5_disk_migration,
                  const int64_t old_file_size)
     : SBStore(task_runner, store_path, old_file_size),
       hash_prefix_list_(std::make_unique<HashPrefixList>(store_path,
                                                          prefix_size,
                                                          task_runner)),
       prefix_size_(prefix_size),
-      v4_store_path_(v4_store_path) {}
+      v4_store_path_(v4_store_path),
+      is_eligible_for_migration_(is_eligible_for_v4_to_v5_disk_migration) {}
 
 V5Store::~V5Store() = default;
 
@@ -82,6 +84,8 @@ V5StoreReadResult V5Store::ReadFromDisk() {
     case V4ToV5MigrationResult::kDiskAlreadyV5:
     case V4ToV5MigrationResult::kV4ToV5MigrationSucceeded:
       return ReadFromDiskInternal();
+    case V4ToV5MigrationResult::kStoreIneligibleWipeSucceeded:
+      return V5StoreReadResult::kV4ToV5MigrationWipedSuccessfully;
     case V4ToV5MigrationResult::kV4StoreNotFound:
       return V5StoreReadResult::kFileOpenFailure;
     case V4ToV5MigrationResult::kReadV4Failed:
@@ -93,6 +97,7 @@ V5StoreReadResult V5Store::ReadFromDisk() {
     case V4ToV5MigrationResult::kProtoSerializationFailure:
     case V4ToV5MigrationResult::kExtensionParsingFailure:
     case V4ToV5MigrationResult::kRenameV5StoreFileFailure:
+    case V4ToV5MigrationResult::kStoreIneligibleWipeFailed:
       return V5StoreReadResult::kV4ToV5MigrationFailure;
   }
 }
@@ -106,6 +111,11 @@ V4ToV5MigrationResult V5Store::AttemptV4ToV5Migration() {
   }
   if (!base::PathExists(v4_store_path_)) {
     return V4ToV5MigrationResult::kV4StoreNotFound;
+  }
+  if (!is_eligible_for_migration_) {
+    bool wipe_succeeded = WipeV4Store(v4_store_path_);
+    return wipe_succeeded ? V4ToV5MigrationResult::kStoreIneligibleWipeSucceeded
+                          : V4ToV5MigrationResult::kStoreIneligibleWipeFailed;
   }
   return MigrateFromV4(v4_store_path_);
 }
@@ -269,6 +279,23 @@ V4ToV5MigrationResult V5Store::MigrateFromV4(
   base::DeleteFile(v4_store_path);
 
   return V4ToV5MigrationResult::kV4ToV5MigrationSucceeded;
+}
+
+bool V5Store::WipeV4Store(const base::FilePath& v4_store_path) {
+  V4StoreFileFormat v4_file_format;
+  bool hash_delete_success = true;
+  if (ParseAndValidateV4StoreFileFormat(v4_store_path, v4_file_format) ==
+      READ_SUCCESS) {
+    for (const auto& hash_file : v4_file_format.hash_files()) {
+      base::FilePath v4_hash_file_path =
+          HashPrefixContainer::GetPath(v4_store_path, hash_file.extension());
+      if (!base::DeleteFile(v4_hash_file_path)) {
+        hash_delete_success = false;
+      }
+    }
+  }
+  bool store_delete_success = base::DeleteFile(v4_store_path);
+  return hash_delete_success && store_delete_success;
 }
 
 }  // namespace safe_browsing

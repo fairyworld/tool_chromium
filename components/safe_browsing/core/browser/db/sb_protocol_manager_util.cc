@@ -355,6 +355,10 @@ bool ListIdentifier::operator==(const ListIdentifier& other) const {
          threat_type_ == other.threat_type_;
 }
 
+bool ListIdentifier::operator!=(const ListIdentifier& other) const {
+  return !(*this == other);
+}
+
 size_t ListIdentifier::hash() const {
   if (uses_v5_api_) {
     return std::hash<SBThreatType>()(sb_threat_type_);
