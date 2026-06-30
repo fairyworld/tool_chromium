@@ -75,18 +75,6 @@ class TestAccountManagerObserver
     receiver_.Bind(std::move(receiver));
   }
 
-  int GetNumOnTokenUpsertedCalls() const { return num_token_upserted_calls_; }
-
-  account_manager::Account GetLastUpsertedAccount() const {
-    return last_upserted_account_.value();
-  }
-
-  int GetNumOnAccountRemovedCalls() const { return num_account_removed_calls_; }
-
-  account_manager::Account GetLastRemovedAccount() const {
-    return last_removed_account_.value();
-  }
-
   int GetNumSigninDialogClosedNotifications() const {
     return num_signin_dialog_closed_notifications_;
   }
@@ -96,27 +84,11 @@ class TestAccountManagerObserver
   AccountManagerObserver* GetForwardingInterface() override { return this; }
 
   // mojom::AccountManagerObserverInterceptorForTesting override:
-  void OnTokenUpserted(mojom::AccountPtr account) override {
-    ++num_token_upserted_calls_;
-    last_upserted_account_ = account_manager::FromMojoAccount(account);
-  }
-
-  // mojom::AccountManagerObserverInterceptorForTesting override:
-  void OnAccountRemoved(mojom::AccountPtr account) override {
-    ++num_account_removed_calls_;
-    last_removed_account_ = account_manager::FromMojoAccount(account);
-  }
-
-  // mojom::AccountManagerObserverInterceptorForTesting override:
   void OnSigninDialogClosed() override {
     ++num_signin_dialog_closed_notifications_;
   }
 
-  int num_token_upserted_calls_ = 0;
-  int num_account_removed_calls_ = 0;
   int num_signin_dialog_closed_notifications_ = 0;
-  std::optional<account_manager::Account> last_upserted_account_;
-  std::optional<account_manager::Account> last_removed_account_;
   mojo::Receiver<mojom::AccountManagerObserver> receiver_;
 };
 
@@ -295,42 +267,6 @@ TEST_F(AccountManagerMojoServiceTest,
   // Wait for the disconnect handler to be called.
   RunAllPendingTasks();
   EXPECT_EQ(0, GetNumObservers());
-}
-
-TEST_F(AccountManagerMojoServiceTest,
-       LacrosObserversAreNotifiedOnAccountUpdates) {
-  const account_manager::AccountKey kTestAccountKey =
-      account_manager::AccountKey::FromGaiaId(kFakeGaiaId);
-  ASSERT_TRUE(InitializeAccountManager());
-  TestAccountManagerObserver observer;
-  observer.Observe(account_manager_async_waiter());
-  ASSERT_EQ(1, GetNumObservers());
-
-  EXPECT_EQ(0, observer.GetNumOnTokenUpsertedCalls());
-  account_manager()->UpsertAccount(kTestAccountKey, kFakeEmail, kFakeToken);
-  FlushMojoForTesting();
-  EXPECT_EQ(1, observer.GetNumOnTokenUpsertedCalls());
-  EXPECT_EQ(kTestAccountKey, observer.GetLastUpsertedAccount().key);
-  EXPECT_EQ(kFakeEmail, observer.GetLastUpsertedAccount().raw_email);
-}
-
-TEST_F(AccountManagerMojoServiceTest,
-       LacrosObserversAreNotifiedOnAccountRemovals) {
-  const account_manager::AccountKey kTestAccountKey =
-      account_manager::AccountKey::FromGaiaId(kFakeGaiaId);
-  ASSERT_TRUE(InitializeAccountManager());
-  TestAccountManagerObserver observer;
-  observer.Observe(account_manager_async_waiter());
-  ASSERT_EQ(1, GetNumObservers());
-  account_manager()->UpsertAccount(kTestAccountKey, kFakeEmail, kFakeToken);
-  FlushMojoForTesting();
-
-  EXPECT_EQ(0, observer.GetNumOnAccountRemovedCalls());
-  account_manager()->RemoveAccount(kTestAccountKey);
-  FlushMojoForTesting();
-  EXPECT_EQ(1, observer.GetNumOnAccountRemovedCalls());
-  EXPECT_EQ(kTestAccountKey, observer.GetLastRemovedAccount().key);
-  EXPECT_EQ(kFakeEmail, observer.GetLastRemovedAccount().raw_email);
 }
 
 TEST_F(AccountManagerMojoServiceTest,

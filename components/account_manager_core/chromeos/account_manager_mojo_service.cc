@@ -61,12 +61,9 @@ AccountManagerMojoService::AccountManagerMojoService(
     account_manager::AccountManager* account_manager)
     : account_manager_(account_manager) {
   CHECK(account_manager_);
-  account_manager_->AddObserver(this);
 }
 
-AccountManagerMojoService::~AccountManagerMojoService() {
-  account_manager_->RemoveObserver(this);
-}
+AccountManagerMojoService::~AccountManagerMojoService() = default;
 
 void AccountManagerMojoService::BindReceiver(
     mojo::PendingReceiver<mojom::AccountManager> receiver) {
@@ -188,18 +185,6 @@ void AccountManagerMojoService::CreateAccessTokenFetcher(
       /*receiver=*/pending_remote.InitWithNewPipeAndPassReceiver());
   pending_access_token_requests_.emplace_back(std::move(access_token_fetcher));
   std::move(callback).Run(std::move(pending_remote));
-}
-
-void AccountManagerMojoService::OnTokenUpserted(
-    const account_manager::Account& account) {
-  for (auto& observer : observers_)
-    observer->OnTokenUpserted(ToMojoAccount(account));
-}
-
-void AccountManagerMojoService::OnAccountRemoved(
-    const account_manager::Account& account) {
-  for (auto& observer : observers_)
-    observer->OnAccountRemoved(ToMojoAccount(account));
 }
 
 void AccountManagerMojoService::OnAccountUpsertionFinished(

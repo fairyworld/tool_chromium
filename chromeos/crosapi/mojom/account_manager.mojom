@@ -173,20 +173,8 @@ union AccessTokenResult {
 // Next id: 4
 [Uuid="f75c4963-497b-411f-97ab-c53c7f6b46ed"]
 interface AccountManagerObserver {
-  // Called when the token for `account` is updated/inserted.
-  // Note: Observers which register with `AccountManager` before its
-  // initialization is complete will get notified when `AccountManager` is fully
-  // initialized.
-  // Note: Observers which register with `AccountManager` after its
-  // initialization is complete will not get an immediate
-  // notification-on-registration.
-  OnTokenUpserted@0(Account account);
-
-  // Called when an account has been removed from Account Manager.
-  // Note: Observers that may have cached access tokens for `account` must clear
-  // their cache entry for this `account` on receiving this callback.
-  OnAccountRemoved@1(Account account);
-
+  // OnTokenUpserted@0 was removed.
+  // OnAccountRemoved@1 was removed.
   // OnAuthErrorChanged@2 was removed.
 
   // Called when Ash's signin dialog is closed, regardless of the reason, e.g.:

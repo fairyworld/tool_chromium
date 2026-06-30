@@ -190,18 +190,6 @@ class FakeAccountManager : public crosapi::mojom::AccountManager {
     return remote;
   }
 
-  void NotifyOnTokenUpsertedObservers(const Account& account) {
-    for (auto& observer : observers_) {
-      observer->OnTokenUpserted(ToMojoAccount(account));
-    }
-  }
-
-  void NotifyOnAccountRemovedObservers(const Account& account) {
-    for (auto& observer : observers_) {
-      observer->OnAccountRemoved(ToMojoAccount(account));
-    }
-  }
-
   void SetAccounts(const std::vector<Account>& accounts) {
     accounts_ = accounts;
   }
@@ -297,24 +285,34 @@ TEST_F(AccountManagerFacadeImplTest, OnTokenUpsertedIsPropagatedToObservers) {
   base::test::TestFuture<void> future;
   EXPECT_CALL(observer, OnAccountUpserted(AccountEq(account)))
       .WillOnce(base::test::RunOnceClosure(future.GetCallback()));
-  account_manager().NotifyOnTokenUpsertedObservers(account);
+  real_account_manager()->UpsertAccount(account.key, account.raw_email,
+                                        "test_token");
   EXPECT_TRUE(future.Wait());
 }
 
 TEST_F(AccountManagerFacadeImplTest, OnAccountRemovedIsPropagatedToObservers) {
   std::unique_ptr<AccountManagerFacadeImpl> account_manager_facade =
       CreateFacade();
+
   testing::StrictMock<MockAccountManagerFacadeObserver> observer;
   base::ScopedObservation<AccountManagerFacade, AccountManagerFacade::Observer>
       observation{&observer};
   observation.Observe(account_manager_facade.get());
 
   Account account = CreateTestGaiaAccount(kTestAccountEmail);
-  base::test::TestFuture<void> future;
+
+  base::test::TestFuture<void> upsert_future;
+  EXPECT_CALL(observer, OnAccountUpserted(AccountEq(account)))
+      .WillOnce(base::test::RunOnceClosure(upsert_future.GetCallback()));
+  real_account_manager()->UpsertAccount(account.key, account.raw_email,
+                                        "test_token");
+  EXPECT_TRUE(upsert_future.Wait());
+
+  base::test::TestFuture<void> remove_future;
   EXPECT_CALL(observer, OnAccountRemoved(AccountEq(account)))
-      .WillOnce(base::test::RunOnceClosure(future.GetCallback()));
-  account_manager().NotifyOnAccountRemovedObservers(account);
-  EXPECT_TRUE(future.Wait());
+      .WillOnce(base::test::RunOnceClosure(remove_future.GetCallback()));
+  real_account_manager()->RemoveAccount(account.key);
+  EXPECT_TRUE(remove_future.Wait());
 }
 
 TEST_F(AccountManagerFacadeImplTest,

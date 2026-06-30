@@ -37,8 +37,7 @@ namespace crosapi {
 // coordinator. Furthermore, once the remaining crosapi/facade users are gone,
 // delete this service and the crosapi::mojom::AccountManager interface.
 class COMPONENT_EXPORT(ACCOUNT_MANAGER_CORE) AccountManagerMojoService
-    : public mojom::AccountManager,
-      public account_manager::AccountManager::Observer {
+    : public mojom::AccountManager {
  public:
   explicit AccountManagerMojoService(
       account_manager::AccountManager* account_manager);
@@ -81,10 +80,6 @@ class COMPONENT_EXPORT(ACCOUNT_MANAGER_CORE) AccountManagerMojoService
       mojom::AccountKeyPtr mojo_account_key,
       const std::string& oauth_consumer_name,
       CreateAccessTokenFetcherCallback callback) override;
-
-  // account_manager::AccountManager::Observer:
-  void OnTokenUpserted(const account_manager::Account& account) override;
-  void OnAccountRemoved(const account_manager::Account& account) override;
 
  private:
   friend class AccountManagerMojoServiceTest;
