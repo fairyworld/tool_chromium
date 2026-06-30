@@ -15024,6 +15024,24 @@
             ]
         }
     ],
+    "InfiniteTabsFreezingOnMemoryPressureV2": [
+        {
+            "platforms": [
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "InfiniteTabsFreezingOnMemoryPressure"
+                    ],
+                    "disable_features": [
+                        "DiscardOnCommitLimit"
+                    ]
+                }
+            ]
+        }
+    ],
     "InfoBarInlineLinks": [
         {
             "platforms": [
