@@ -11297,6 +11297,9 @@ void RenderFrameHostImpl::RequestUnboundedSurface(
         "activation.");
     return;
   }
+  // If you change the preconditions/permissions for unbounded elements, be sure
+  // to update the corresponding Blink-side checks in
+  // HTMLElement::showUnboundedElement.
   // Only allow unbounded elements to be used by WebUI and other chrome://
   // scheme callers.
   bool is_privileged = GetWebUI() != nullptr ||

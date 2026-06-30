@@ -802,4 +802,40 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
             EvalJs(primary_main_frame_host(), script).ExtractString());
 }
 
+class UnboundedElementOnTheOpenWebDisabledBrowserTest
+    : public UnboundedElementBrowserTest {
+ public:
+  UnboundedElementOnTheOpenWebDisabledBrowserTest() = default;
+  ~UnboundedElementOnTheOpenWebDisabledBrowserTest() override = default;
+  void SetUp() override {
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+    GTEST_SKIP();
+#else
+    feature_list_.InitWithFeatures(
+        {blink::features::kUnboundedElement},
+        {blink::features::kUnboundedElementOnTheOpenWeb,
+         ::features::kTreesInViz});
+    ContentBrowserTest::SetUp();
+#endif
+  }
+
+ private:
+  base::test::ScopedFeatureList feature_list_;
+};
+
+IN_PROC_BROWSER_TEST_F(UnboundedElementOnTheOpenWebDisabledBrowserTest,
+                       RequestWithoutOpenWebFeatureFlagThrowsSecurityError) {
+  GURL url(embedded_test_server()->GetURL("/title1.html"));
+  EXPECT_TRUE(NavigateToURL(shell(), url));
+
+  std::string script = R"(
+    document.body.innerHTML = `
+        <div id="target"
+             style="width:50px; height:50px;" unbounded></div>`;
+    document.getElementById('target').showUnboundedElement()
+        .then(() => "Success", e => e.name);
+  )";
+  EXPECT_EQ("SecurityError", EvalJs(primary_main_frame_host(), script));
+}
+
 }  // namespace content
