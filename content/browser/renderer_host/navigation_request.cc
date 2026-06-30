@@ -1878,15 +1878,18 @@ NavigationRequest::NavigationRequest(
 
 #if !BUILDFLAG(IS_ANDROID)
   // It should not be possible to navigate away from the initial WebUI page,
-  // except when recovering from a crash or doing a manual reload from e.g.
-  // DevTools.
+  // except when recovering from a crash. We allow navigating away to
+  // about:blank if `kDebugTopChromeWebUI` is enabled so that DevTools can
+  // reload.
   bool current_rfh_is_initial_webui =
       GetContentClient()->browser()->IsInitialWebUIURL(
           frame_tree_node_->current_frame_host()
               ->GetSiteInstance()
               ->GetSecurityPrincipal()
               .GetDeprecatedSiteURL());
-  if (current_rfh_is_initial_webui && !IsInitialWebUINavigation()) {
+  if (current_rfh_is_initial_webui && !IsInitialWebUINavigation() &&
+      !(base::FeatureList::IsEnabled(features::kDebugTopChromeWebUI) &&
+        GetURL().IsAboutBlank())) {
     // TODO(crbug.com/511971445): Turn this into a CHECK again once
     // investigation on what can cause this is finished.
     base::debug::DumpWithoutCrashing();
@@ -1915,7 +1918,8 @@ NavigationRequest::NavigationRequest(
             .controller()
             .GetLastCommittedEntry()
             ->IsInitialEntry();
-    CHECK(is_navigating_from_initial_empty_document ||
+    CHECK(base::FeatureList::IsEnabled(features::kDebugTopChromeWebUI) ||
+          is_navigating_from_initial_empty_document ||
           current_rfh_is_initial_webui);
   }
 #endif
