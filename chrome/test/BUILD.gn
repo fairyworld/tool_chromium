@@ -3235,6 +3235,7 @@ if (!is_android) {
       "../../components/record_replay/content/renderer/record_replay_agent_browsertest.cc",
       "../app/chrome_main_delegate_browsertest.cc",
       "../browser/ai/ai_data_keyed_service_browsertest.cc",
+      "../browser/ai/ai_semantic_embedder_browsertest.cc",
       "../browser/direct_sockets/direct_sockets_apitest.cc",
       "../browser/enterprise/browser_management/management_service_browsertest.cc",
       "../browser/enterprise/incognito/incognito_navigation_throttle_browsertest.cc",
