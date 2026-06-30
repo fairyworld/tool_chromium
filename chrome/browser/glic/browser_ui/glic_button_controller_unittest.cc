@@ -5,6 +5,7 @@
 #include "chrome/browser/glic/browser_ui/glic_button_controller.h"
 
 #include <memory>
+#include <utility>
 
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
@@ -177,7 +178,7 @@ class GlicButtonControllerTest : public testing::Test {
     PrefService* prefs = profile()->GetPrefs();
     prefs->SetInteger(
         ::prefs::kGeminiSettings,
-        static_cast<int>(glic::prefs::SettingsPolicyState::kEnabled));
+        std::to_underlying(glic::prefs::SettingsPolicyState::kEnabled));
     prefs->SetBoolean(glic::prefs::kGlicPinnedToTabstrip, true);
   }
 
@@ -248,28 +249,28 @@ TEST_F(GlicButtonControllerTest, GlicSettings) {
 
   prefs->SetInteger(
       ::prefs::kGeminiSettings,
-      static_cast<int>(glic::prefs::SettingsPolicyState::kEnabled));
+      std::to_underlying(glic::prefs::SettingsPolicyState::kEnabled));
   prefs->SetBoolean(glic::prefs::kGlicPinnedToTabstrip, true);
   EXPECT_TRUE(tab_strip_controller_delegate()->show_state());
   EXPECT_TRUE(toolbar_controller_delegate()->show_state());
 
   prefs->SetInteger(
       ::prefs::kGeminiSettings,
-      static_cast<int>(glic::prefs::SettingsPolicyState::kDisabled));
+      std::to_underlying(glic::prefs::SettingsPolicyState::kDisabled));
   prefs->SetBoolean(glic::prefs::kGlicPinnedToTabstrip, true);
   EXPECT_FALSE(tab_strip_controller_delegate()->show_state());
   EXPECT_FALSE(toolbar_controller_delegate()->show_state());
 
   prefs->SetInteger(
       ::prefs::kGeminiSettings,
-      static_cast<int>(glic::prefs::SettingsPolicyState::kEnabled));
+      std::to_underlying(glic::prefs::SettingsPolicyState::kEnabled));
   prefs->SetBoolean(glic::prefs::kGlicPinnedToTabstrip, false);
   EXPECT_FALSE(tab_strip_controller_delegate()->show_state());
   EXPECT_FALSE(toolbar_controller_delegate()->show_state());
 
   prefs->SetInteger(
       ::prefs::kGeminiSettings,
-      static_cast<int>(glic::prefs::SettingsPolicyState::kDisabled));
+      std::to_underlying(glic::prefs::SettingsPolicyState::kDisabled));
   prefs->SetBoolean(glic::prefs::kGlicPinnedToTabstrip, false);
   EXPECT_FALSE(tab_strip_controller_delegate()->show_state());
   EXPECT_FALSE(toolbar_controller_delegate()->show_state());

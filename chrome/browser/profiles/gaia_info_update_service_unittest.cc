@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "base/functional/bind.h"
 #include "base/memory/raw_ptr.h"
@@ -452,7 +453,7 @@ class GAIAInfoUpdateServiceWithGlicEnablingTest
     // Enable enterprise policy for glic control
     pref_service_.SetInteger(
         ::prefs::kGeminiSettings,
-        static_cast<int>(glic::prefs::SettingsPolicyState::kEnabled));
+        std::to_underlying(glic::prefs::SettingsPolicyState::kEnabled));
   }
 
  private:

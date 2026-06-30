@@ -6,6 +6,7 @@
 
 #include <optional>
 #include <ranges>
+#include <utility>
 
 #include "base/byte_size.h"
 #include "base/command_line.h"
@@ -600,7 +601,7 @@ GlicEnabling::ProfileEnablement GlicEnabling::EnablementForProfile(
   result.gemini_enterprise_settings = GetGeminiEnterpriseSettings(profile);
 
   if (profile->GetPrefs()->GetInteger(::prefs::kGeminiSettings) !=
-      static_cast<int>(glic::prefs::SettingsPolicyState::kEnabled)) {
+      std::to_underlying(glic::prefs::SettingsPolicyState::kEnabled)) {
     result.allowed_by_chrome_policy = false;
   }
 
@@ -1199,7 +1200,7 @@ prefs::FreStatus GlicEnabling::GetCompletedFre() const {
 
 void GlicEnabling::SetCompletedFre(prefs::FreStatus status) {
   profile_->GetPrefs()->SetInteger(prefs::kGlicCompletedFre,
-                                   static_cast<int>(status));
+                                   std::to_underlying(status));
 }
 
 bool GlicEnabling::GetUserEnabledActuationOnWeb() const {

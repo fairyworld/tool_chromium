@@ -734,7 +734,7 @@ TEST_F(GlicEnablingAnchorEntryPointTestBase,
        FeatureFlagDisablesButtonWhenAnchored) {
   profile()->GetPrefs()->SetInteger(
       glic::prefs::kGlicCompletedFre,
-      static_cast<int>(glic::prefs::FreStatus::kCompleted));
+      std::to_underlying(glic::prefs::FreStatus::kCompleted));
 
   base::test::ScopedFeatureList features;
   features.InitAndEnableFeature(
@@ -755,7 +755,7 @@ TEST_F(GlicEnablingAnchorEntryPointTestBase,
 TEST_F(GlicEnablingAnchorEntryPointTestBase, FeatureFlagDisablesAnchoring) {
   profile()->GetPrefs()->SetInteger(
       glic::prefs::kGlicCompletedFre,
-      static_cast<int>(glic::prefs::FreStatus::kCompleted));
+      std::to_underlying(glic::prefs::FreStatus::kCompleted));
 
   base::test::ScopedFeatureList features;
   features.InitAndDisableFeature(
@@ -780,7 +780,7 @@ TEST_F(GlicEnablingAnchorEntryPointTestBase,
        GlobalDisablementPropagatedToReadyState) {
   profile()->GetPrefs()->SetInteger(
       glic::prefs::kGlicCompletedFre,
-      static_cast<int>(glic::prefs::FreStatus::kCompleted));
+      std::to_underlying(glic::prefs::FreStatus::kCompleted));
 
   base::test::ScopedFeatureList features;
   features.InitAndEnableFeature(
@@ -798,7 +798,7 @@ TEST_F(GlicEnablingAnchorEntryPointTestBase,
        PrimaryAccountNotCapable_ReturnsIneligibleAccountWhenAnchored) {
   profile()->GetPrefs()->SetInteger(
       glic::prefs::kGlicCompletedFre,
-      static_cast<int>(glic::prefs::FreStatus::kCompleted));
+      std::to_underlying(glic::prefs::FreStatus::kCompleted));
 
   base::test::ScopedFeatureList features;
   features.InitAndEnableFeature(
@@ -1760,7 +1760,8 @@ TEST_F(GlicEnablingWebActuationToggleTest, ManagedProfile_CannotActOnWeb) {
 
   profile()->GetPrefs()->SetInteger(
       glic::prefs::kGlicActuationOnWeb,
-      static_cast<int>(glic::prefs::GlicActuationOnWebPolicyState::kDisabled));
+      std::to_underlying(
+          glic::prefs::GlicActuationOnWebPolicyState::kDisabled));
   profile()->GetPrefs()->SetInteger(
       subscription_eligibility::prefs::kAiSubscriptionTier, 1);
 
@@ -1783,7 +1784,7 @@ TEST_F(GlicEnablingWebActuationToggleTest, ManagedProfile_CanActOnWeb) {
 
   profile()->GetPrefs()->SetInteger(
       glic::prefs::kGlicActuationOnWeb,
-      static_cast<int>(glic::prefs::GlicActuationOnWebPolicyState::kEnabled));
+      std::to_underlying(glic::prefs::GlicActuationOnWebPolicyState::kEnabled));
   profile()->GetPrefs()->SetInteger(
       subscription_eligibility::prefs::kAiSubscriptionTier, 1);
 
