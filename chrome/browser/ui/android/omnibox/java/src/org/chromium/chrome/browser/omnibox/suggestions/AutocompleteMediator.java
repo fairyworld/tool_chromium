@@ -1150,6 +1150,7 @@ class AutocompleteMediator
         boolean allowParking =
                 isInZeroPrefixContext || !OmniboxCapabilities.hasDesktopExperience(mContext);
         mListPropertyModel.set(SuggestionListProperties.ALLOW_PARKING_AT_SENTINEL, allowParking);
+        mListPropertyModel.set(SuggestionListProperties.RESET_SELECTION, null);
         cancelAutocompleteRequests();
 
         // The user recently focused the Omnibox, began typing, or cleared the Omnibox.

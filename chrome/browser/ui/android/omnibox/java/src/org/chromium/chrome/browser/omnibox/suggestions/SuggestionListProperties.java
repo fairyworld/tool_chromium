@@ -92,6 +92,9 @@ import org.chromium.ui.modelutil.PropertyModel.WritableObjectPropertyKey;
     /** Whether the suggestions are being rendered on a large screen. */
     WritableBooleanPropertyKey IS_LARGE_SCREEN = new WritableBooleanPropertyKey();
 
+    WritableObjectPropertyKey<Void> RESET_SELECTION =
+            new WritableObjectPropertyKey<>(/* skipEquality= */ true);
+
     WritableBooleanPropertyKey ROUND_TOP_CORNERS = new WritableBooleanPropertyKey();
 
     WritableBooleanPropertyKey ALLOW_PARKING_AT_SENTINEL = new WritableBooleanPropertyKey();
@@ -116,6 +119,7 @@ import org.chromium.ui.modelutil.PropertyModel.WritableObjectPropertyKey;
                 LIST_IS_FINAL,
                 NAVIGATION_LISTENER,
                 OMNIBOX_SESSION_ACTIVE,
+                RESET_SELECTION,
                 ROUND_TOP_CORNERS,
                 SUGGESTION_MODELS,
                 TOOLBAR_POSITION,

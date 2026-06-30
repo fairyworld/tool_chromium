@@ -111,7 +111,9 @@ import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.insets.InsetObserver;
 import org.chromium.ui.modaldialog.ModalDialogManager;
 import org.chromium.ui.modelutil.MVCListAdapter.ModelList;
+import org.chromium.ui.modelutil.PropertyKey;
 import org.chromium.ui.modelutil.PropertyModel;
+import org.chromium.ui.modelutil.PropertyObservable.PropertyObserver;
 import org.chromium.url.GURL;
 import org.chromium.url.JUnitTestGURLs;
 
@@ -170,6 +172,7 @@ public class AutocompleteMediatorUnitTest {
     private @Mock Profile mProfile;
     private @Mock PrefService mPrefService;
     private @Mock TemplateUrl mTemplateUrl;
+    private @Mock PropertyObserver<PropertyKey> mPropertyObserver;
     private PropertyModel mListModel;
     private AutocompleteMediator mMediator;
     private List<AutocompleteMatch> mSuggestionsList;
@@ -2487,6 +2490,19 @@ public class AutocompleteMediatorUnitTest {
         input.setUserText("test");
         mMediator.onInputChanged();
         assertFalse(mListModel.get(SuggestionListProperties.ALLOW_PARKING_AT_SENTINEL));
+    }
+
+    @Test
+    @SmallTest
+    public void onInputChanged_resetsSelection() {
+        FuseboxSessionState session = createEmptySession();
+        mMediator.beginInput(session);
+
+        mListModel.addObserver(mPropertyObserver);
+
+        mMediator.onInputChanged();
+        verify(mPropertyObserver)
+                .onPropertyChanged(mListModel, SuggestionListProperties.RESET_SELECTION);
     }
 
     @Test
