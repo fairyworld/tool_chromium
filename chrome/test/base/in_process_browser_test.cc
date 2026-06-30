@@ -35,6 +35,9 @@
 #include "chrome/browser/chrome_browser_main_extra_parts.h"
 #include "chrome/browser/chrome_content_browser_client.h"
 #include "chrome/browser/devtools/devtools_window.h"
+#if !BUILDFLAG(IS_ANDROID)
+#include "chrome/browser/actor/ui/actor_task_unload_handler.h"
+#endif
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
@@ -980,6 +983,10 @@ void InProcessBrowserTest::PreRunTestOnMainThread() {
 void InProcessBrowserTest::PostRunTestOnMainThread() {
 #if BUILDFLAG(IS_MAC)
   autorelease_pool_->Recycle();
+#endif
+
+#if !BUILDFLAG(IS_ANDROID)
+  actor::ActorTaskTabCloseConfirmDialog::SetSuppressForTesting(true);
 #endif
 
   QuitBrowsers();
