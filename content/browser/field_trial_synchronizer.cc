@@ -8,6 +8,7 @@
 #include "base/functional/bind.h"
 #include "base/metrics/field_trial.h"
 #include "base/metrics/field_trial_list_including_low_anonymity.h"
+#include "base/metrics/runtime_field_trial_overrides.h"
 #include "base/strings/strcat.h"
 #include "base/threading/thread.h"
 #include "components/metrics/persistent_system_profile.h"
@@ -88,6 +89,7 @@ FieldTrialSynchronizer::FieldTrialSynchronizer() {
   DCHECK(success);
 
   variations::VariationsIdsProvider::GetInstance()->AddObserver(this);
+  base::RuntimeFieldTrialOverrides::GetInstance()->AddObserver(this);
   NotifyAllRenderersOfVariationsHeader();
 }
 
@@ -170,6 +172,37 @@ void FieldTrialSynchronizer::VariationIdsHeaderUpdated() {
       FROM_HERE,
       base::BindOnce(
           &FieldTrialSynchronizer::NotifyAllRenderersOfVariationsHeader));
+}
+
+void FieldTrialSynchronizer::OnRuntimeFieldTrialOverride(
+    const base::RuntimeFieldTrialOverrides::RuntimeOverrideInfo& override_info,
+    std::string_view previous_override_trial_name) {
+  // Runtime FieldTrial Overrides only happen on the main/UI thread.
+  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+
+  // When an override is applied, the overridden trial and/or the previous
+  // override should be removed from the persistent data.
+  if (override_info.overridden_trial) {
+    metrics::GlobalPersistentSystemProfile::GetInstance()->RemoveFieldTrial(
+        override_info.overridden_trial->trial_name());
+  }
+  if (!previous_override_trial_name.empty()) {
+    // Note that if a `previous_override_trial_name` is specified, we don't need
+    // to remove `overridden_trial` above since it should have been removed
+    // already, so the above removal is technically redundant.
+    metrics::GlobalPersistentSystemProfile::GetInstance()->RemoveFieldTrial(
+        previous_override_trial_name);
+  }
+
+  // Add the new override to the persistent data. This must be done after the
+  // previous override is removed, since the `previous_override_trial_name` may
+  // be the same name as the new override (in which case, if the order was
+  // reversed, the new override would be removed immediately after being added).
+  metrics::GlobalPersistentSystemProfile::GetInstance()->AddFieldTrial(
+      override_info.trial_name, override_info.group_name);
+
+  // TODO(crbug.com/482449878): Notify renderers of the new override for
+  // reporting purposes (e.g. crash keys).
 }
 
 FieldTrialSynchronizer::~FieldTrialSynchronizer() {
