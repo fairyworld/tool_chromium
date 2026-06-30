@@ -13,11 +13,8 @@
 #include "chrome/browser/autofill/personal_data_manager_factory.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
-#include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
-#include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/personal_context/personal_context_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/accessibility_annotator/core/accessibility_annotator_features.h"
 #include "components/accessibility_annotator/core/at_memory_query_service.h"
 #include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
@@ -43,8 +40,6 @@ AtMemoryQueryServiceFactory::AtMemoryQueryServiceFactory()
                                  ProfileSelections::BuildForRegularProfile()) {
   DependsOn(autofill::PersonalDataManagerFactory::GetInstance());
   DependsOn(autofill::AutofillEntityDataManagerFactory::GetInstance());
-  DependsOn(OptimizationGuideKeyedServiceFactory::GetInstance());
-  DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(GoogleGroupsManagerFactory::GetInstance());
   DependsOn(PersonalContextServiceFactory::GetInstance());
 }
@@ -65,9 +60,6 @@ AtMemoryQueryServiceFactory::BuildServiceInstanceForBrowserContext(
           autofill::PersonalDataManagerFactory::GetForBrowserContext(context),
           autofill::AutofillEntityDataManagerFactory::GetForProfile(profile));
 
-  auto* optimization_guide_service =
-      OptimizationGuideKeyedServiceFactory::GetForProfile(profile);
-
   personal_context::PersonalContextService* personal_context_service =
       PersonalContextServiceFactory::GetForProfile(profile);
 
@@ -75,7 +67,7 @@ AtMemoryQueryServiceFactory::BuildServiceInstanceForBrowserContext(
       std::make_unique<
           accessibility_annotator::AtMemoryQueryServiceDelegateImpl>(profile),
       std::move(data_provider), personal_context_service,
-      g_browser_process->GetApplicationLocale(), optimization_guide_service);
+      g_browser_process->GetApplicationLocale());
 }
 
 bool AtMemoryQueryServiceFactory::ServiceIsCreatedWithBrowserContext() const {

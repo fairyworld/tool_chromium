@@ -14,6 +14,7 @@
 
 #include "base/containers/extend.h"
 #include "base/containers/flat_set.h"
+#include "base/containers/to_vector.h"
 #include "base/functional/bind.h"
 #include "base/i18n/break_iterator.h"
 #include "base/metrics/histogram_functions.h"
@@ -22,7 +23,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_data_provider.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_data_type.h"
-#include "components/accessibility_annotator/core/annotation_reducer/query_classifier.h"
 #include "components/personal_context/core/personal_context_debug_features.h"
 #include "components/personal_context/core/personal_context_service.h"
 #include "components/personal_context/proto/context_memory_service.pb.h"
@@ -377,6 +377,7 @@ std::vector<MemorySearchResult> FilterResults(
   }
   std::vector<MemorySearchResult> filtered_entries;
   filtered_entries.reserve(entries.size());
+  // TODO(crbug.com/512755034): Improve filtering logic.
   std::ranges::copy_if(entries, std::back_inserter(filtered_entries),
                        [&](const MemorySearchResult& entry) {
                          return EntryMatchesAnyFilterWord(entry, filter_words);
@@ -410,6 +411,11 @@ MemorySearchStatus MapContextMemoryError(
 void QueryPersonalContextDebug(
     MemoryDataProvider* data_provider,
     base::RepeatingCallback<void(MemorySearchResults)> update_callback) {
+  if (!data_provider) {
+    update_callback.Run(
+        MemorySearchResults(MemorySearchStatus::kInternalFailure));
+    return;
+  }
   data_provider->RetrieveAll(
       {static_cast<MemoryDataType>(
           personal_context::features::debug::kMockPersonalContextResultTypeParam
@@ -430,13 +436,11 @@ AtMemoryQueryService::AtMemoryQueryService(
     std::unique_ptr<AtMemoryQueryServiceDelegate> delegate,
     std::unique_ptr<MemoryDataProvider> data_provider,
     personal_context::PersonalContextService* personal_context_service,
-    const std::string& locale,
-    optimization_guide::RemoteModelExecutor* remote_model_executor)
+    const std::string& locale)
     : delegate_(std::move(delegate)),
       data_provider_(std::move(data_provider)),
       personal_context_service_(personal_context_service),
-      locale_(locale),
-      classifier_(CreateQueryClassifier(remote_model_executor)) {}
+      locale_(locale) {}
 
 AtMemoryQueryService::~AtMemoryQueryService() = default;
 
@@ -448,123 +452,22 @@ void AtMemoryQueryService::Shutdown() {
 
 void AtMemoryQueryService::Query(
     std::u16string_view query,
-    base::RepeatingCallback<void(MemorySearchResults)> update_callback) {
+    base::RepeatingCallback<void(MemorySearchResults)> callback) {
   // Invalidate any in-flight queries.
   weak_ptr_factory_.InvalidateWeakPtrs();
 
   if (net::NetworkChangeNotifier::IsOffline()) {
-    update_callback.Run(
-        MemorySearchResults(MemorySearchStatus::kNoConnectionFailure));
-    return;
-  }
-
-  // We can't query if we don't have any data providers configured.
-  if (!data_provider_) {
-    update_callback.Run(
-        MemorySearchResults(MemorySearchStatus::kInternalFailure));
+    callback.Run(MemorySearchResults(MemorySearchStatus::kNoConnectionFailure));
     return;
   }
   if (base::FeatureList::IsEnabled(
           personal_context::features::debug::kMockPersonalContextResult)) {
-    QueryPersonalContextDebug(data_provider_.get(), std::move(update_callback));
+    QueryPersonalContextDebug(data_provider_.get(), callback);
     return;
   }
-
-  // Run the query classifier to understand the user's intent, extracting
-  // intent type and filter words.
-  // TODO(crbug.com/524177036): The `PersonalContextService` query should
-  // return the AutofillFetchPlan, which then should be used to access the data
-  // from `AutofillDataProvider`.
-  classifier_.Run(
-      std::u16string(query),
-      base::BindOnce(&AtMemoryQueryService::OnClassificationComplete,
-                     weak_ptr_factory_.GetWeakPtr(), std::u16string(query),
-                     std::move(update_callback)));
-}
-
-void AtMemoryQueryService::OnClassificationComplete(
-    std::u16string query,
-    base::RepeatingCallback<void(MemorySearchResults)> update_callback,
-    ClassifiedQuery classified_query) {
-  // If the classifier couldn't figure out what the user is asking for, we try
-  // the personal context resolver as a fallback.
-  if (classified_query.intent == MemoryDataType::kUnknown) {
-    QueryPersonalContext(std::move(query), classified_query, update_callback,
-                         /*filtered_local_entries=*/{},
-                         /*fallback_local_entries=*/{});
-    return;
-  }
-
-  MemoryDataType intent = classified_query.intent;
-
-  auto callback = base::BindOnce(
-      &AtMemoryQueryService::OnDataRetrieved, weak_ptr_factory_.GetWeakPtr(),
-      std::move(query), std::move(classified_query), update_callback);
-
-  auto log_and_call_retrieved = base::BindOnce(
-      [](base::OnceCallback<void(std::vector<MemorySearchResult>)> callback,
-         std::vector<MemorySearchResult> results) {
-        base::UmaHistogramCounts1000(
-            "AccessibilityAnnotator.AtMemoryQueryService."
-            "ProviderResultCount.AutofillDataProvider",
-            results.size());
-        std::move(callback).Run(std::move(results));
-      },
-      std::move(callback));
-
-  data_provider_->RetrieveAll({intent}, std::move(log_and_call_retrieved));
-}
-
-void AtMemoryQueryService::OnDataRetrieved(
-    std::u16string query,
-    ClassifiedQuery classified_query,
-    base::RepeatingCallback<void(MemorySearchResults)> update_callback,
-    std::vector<MemorySearchResult> entries) {
-  DeduplicateResults(entries);
-  std::vector<MemorySearchResult> filtered_entries =
-      FilterResults(entries, classified_query.filter_words);
 
   if (!personal_context_service_) {
-    update_callback.Run(MemorySearchResults(
-        MemorySearchStatus::kFinalResponseSuccess,
-        filtered_entries.empty() ? std::move(entries)
-                                 : std::move(filtered_entries)));
-    return;
-  }
-
-  if (filtered_entries.empty()) {
-    QueryPersonalContext(std::move(query), std::move(classified_query),
-                         update_callback,
-                         /*filtered_local_entries=*/{},
-                         /*fallback_local_entries=*/std::move(entries));
-    return;
-  }
-
-  // Report the matching local results as a partial response.
-  update_callback.Run(MemorySearchResults(
-      MemorySearchStatus::kPartialResponseSuccess, filtered_entries));
-
-  // Query the personal context resolver in the background. If it finds matches,
-  // they will be merged with the filtered local entries. Otherwise, we fallback
-  // to the filtered local entries.
-  std::vector<MemorySearchResult> fallback_local_entries = filtered_entries;
-  QueryPersonalContext(std::move(query), classified_query, update_callback,
-                       std::move(filtered_entries),
-                       std::move(fallback_local_entries));
-}
-
-void AtMemoryQueryService::QueryPersonalContext(
-    std::u16string query,
-    ClassifiedQuery classified_query,
-    base::RepeatingCallback<void(MemorySearchResults)> update_callback,
-    std::vector<MemorySearchResult> filtered_local_entries,
-    std::vector<MemorySearchResult> fallback_local_entries) {
-  if (!personal_context_service_) {
-    update_callback.Run(
-        MemorySearchResults(classified_query.intent == MemoryDataType::kUnknown
-                                ? MemorySearchStatus::kUnsupportedQuery
-                                : MemorySearchStatus::kFinalResponseSuccess,
-                            std::move(fallback_local_entries)));
+    callback.Run(MemorySearchResults(MemorySearchStatus::kInternalFailure));
     return;
   }
 
@@ -572,22 +475,17 @@ void AtMemoryQueryService::QueryPersonalContext(
       BuildAtMemoryQueryRequest(query, locale_);
 
   personal_context::ContextMemoryRequestOptions options;
+  // TODO(crbug.com/525668259): Control this timeout via a Finch parameter.
   options.request_timeout = base::Seconds(30);
   personal_context_service_->FetchContext(
       personal_context::proto::CONTEXT_MEMORY_FEATURE_AT_MEMORY,
       request_metadata, options,
-      base::BindOnce(&AtMemoryQueryService::OnPersonalContextQueryComplete,
-                     weak_ptr_factory_.GetWeakPtr(),
-                     std::move(classified_query), update_callback,
-                     std::move(filtered_local_entries),
-                     std::move(fallback_local_entries)));
+      base::BindOnce(&AtMemoryQueryService::OnPersonalContextRetrieved,
+                     weak_ptr_factory_.GetWeakPtr(), callback));
 }
 
-void AtMemoryQueryService::OnPersonalContextQueryComplete(
-    ClassifiedQuery classified_query,
-    base::RepeatingCallback<void(MemorySearchResults)> update_callback,
-    std::vector<MemorySearchResult> filtered_local_entries,
-    std::vector<MemorySearchResult> fallback_local_entries,
+void AtMemoryQueryService::OnPersonalContextRetrieved(
+    base::RepeatingCallback<void(MemorySearchResults)> callback,
     personal_context::FetchContextResult result) {
   if (!result.response.has_value()) {
     personal_context::ContextMemoryError::ExecutionError error =
@@ -596,44 +494,71 @@ void AtMemoryQueryService::OnPersonalContextQueryComplete(
         personal_context::ContextMemoryError::ExecutionError::kCancelled) {
       return;
     }
-    update_callback.Run(MemorySearchResults(MapContextMemoryError(error),
-                                            std::move(fallback_local_entries)));
+    callback.Run(MemorySearchResults(MapContextMemoryError(error)));
     return;
   }
 
   personal_context::proto::AtMemoryQueryResponse response;
   if (!response.ParseFromString(result.response->value())) {
-    update_callback.Run(
-        MemorySearchResults(MemorySearchStatus::kInternalFailure,
-                            std::move(fallback_local_entries)));
+    callback.Run(MemorySearchResults(MemorySearchStatus::kInternalFailure));
     return;
   }
 
   std::vector<MemorySearchResult> remote_results =
       ExtractRemoteResults(response);
 
-  std::vector<MemorySearchResult> filtered_personal_context_entries =
-      FilterResults(remote_results, classified_query.filter_words);
+  std::vector<MemoryDataType> local_data_types;
+  base::flat_set<std::u16string> filter_words;
+  if (response.has_autofill_fetch_plan()) {
+    const personal_context::proto::AutofillFetchPlan& plan =
+        response.autofill_fetch_plan();
+    local_data_types = base::ToVector(plan.data_types(), [](int type) {
+      return ToMemoryDataType(
+          static_cast<personal_context::proto::MemoryDataType>(type));
+    });
+    filter_words = base::MakeFlatSet<std::u16string>(
+        plan.filter_keywords(), {}, [](const std::string& word) {
+          return base::ToLowerASCII(base::UTF8ToUTF16(word));
+        });
+  }
 
-  // If the query completed successfully but returned no additional results
-  // after filtering, return the fallback local entries with the final status.
-  if (filtered_personal_context_entries.empty()) {
-    update_callback.Run(
-        MemorySearchResults(classified_query.intent == MemoryDataType::kUnknown
-                                ? MemorySearchStatus::kUnsupportedQuery
-                                : MemorySearchStatus::kFinalResponseSuccess,
-                            std::move(fallback_local_entries)));
+  if (local_data_types.empty() || !data_provider_) {
+    std::vector<MemorySearchResult> filtered_remote_results =
+        FilterResults(remote_results, filter_words);
+    DeduplicateResults(filtered_remote_results);
+    callback.Run(MemorySearchResults(MemorySearchStatus::kFinalResponseSuccess,
+                                     std::move(filtered_remote_results)));
     return;
   }
 
-  // In order to avoid extra allocations, remote results are merged into the
-  // `filtered_local_entries` vector.
-  base::Extend(filtered_local_entries,
-               std::move(filtered_personal_context_entries));
-  DeduplicateResults(filtered_local_entries);
-  update_callback.Run(
-      MemorySearchResults(MemorySearchStatus::kFinalResponseSuccess,
-                          std::move(filtered_local_entries)));
+  data_provider_->RetrieveAll(
+      local_data_types,
+      base::BindOnce(&AtMemoryQueryService::OnLocalDataRetrieved,
+                     weak_ptr_factory_.GetWeakPtr(), callback,
+                     std::move(remote_results), std::move(filter_words)));
+}
+
+void AtMemoryQueryService::OnLocalDataRetrieved(
+    base::RepeatingCallback<void(MemorySearchResults)> callback,
+    std::vector<MemorySearchResult> remote_results,
+    base::flat_set<std::u16string> filter_words,
+    std::vector<MemorySearchResult> local_results) {
+  base::UmaHistogramCounts1000(
+      "AccessibilityAnnotator.AtMemoryQueryService.ProviderResultCount."
+      "AutofillDataProvider",
+      local_results.size());
+
+  std::vector<MemorySearchResult> filtered_local_results =
+      FilterResults(local_results, filter_words);
+
+  std::vector<MemorySearchResult> merged_results =
+      std::move(filtered_local_results);
+  base::Extend(merged_results, std::move(remote_results));
+  DeduplicateResults(merged_results);
+
+  // TODO(crbug.com/524713777): Implement ranking of the merged suggestions.
+  callback.Run(MemorySearchResults(MemorySearchStatus::kFinalResponseSuccess,
+                                   std::move(merged_results)));
 }
 
 }  // namespace accessibility_annotator
