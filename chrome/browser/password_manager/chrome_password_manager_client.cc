@@ -1937,6 +1937,7 @@ void ChromePasswordManagerClient::WebContentsDestroyed() {
 void ChromePasswordManagerClient::ResourceLoadComplete(
     content::RenderFrameHost* render_frame_host,
     const content::GlobalRequestID& request_id,
+    const GURL& original_url,
     const blink::mojom::ResourceLoadInfo& resource_load_info) {
   if (resource_load_info.method == "POST" &&
       resource_load_info.http_status_code >= 400 &&
@@ -1944,7 +1945,7 @@ void ChromePasswordManagerClient::ResourceLoadComplete(
     password_manager_.OnResourceLoadingFailed(
         password_manager::ContentPasswordManagerDriver::GetForRenderFrameHost(
             render_frame_host),
-        resource_load_info.original_url);
+        original_url);
   }
 }
 

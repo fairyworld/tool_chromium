@@ -533,6 +533,7 @@ void LoadingPredictorTabHelper::DidFinishNavigation(
 void LoadingPredictorTabHelper::ResourceLoadComplete(
     content::RenderFrameHost* render_frame_host,
     const content::GlobalRequestID& request_id,
+    const GURL& original_url,
     const blink::mojom::ResourceLoadInfo& resource_load_info) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   if (!predictor_)
@@ -547,7 +548,7 @@ void LoadingPredictorTabHelper::ResourceLoadComplete(
     return;
 
   predictor_->loading_data_collector()->RecordResourceLoadComplete(
-      page_data->navigation_id_, resource_load_info);
+      page_data->navigation_id_, original_url, resource_load_info);
 }
 
 void LoadingPredictorTabHelper::DidLoadResourceFromMemoryCache(
@@ -574,7 +575,7 @@ void LoadingPredictorTabHelper::DidLoadResourceFromMemoryCache(
   resource_load_info.network_info =
       blink::mojom::CommonNetworkInfo::New(false, false, std::nullopt);
   predictor_->loading_data_collector()->RecordResourceLoadComplete(
-      page_data->navigation_id_, resource_load_info);
+      page_data->navigation_id_, url, resource_load_info);
 }
 
 void LoadingPredictorTabHelper::DocumentOnLoadCompletedInPrimaryMainFrame() {
