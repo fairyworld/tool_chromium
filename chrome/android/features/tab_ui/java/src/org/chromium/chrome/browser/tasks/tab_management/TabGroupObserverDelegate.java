@@ -4,6 +4,8 @@
 
 package org.chromium.chrome.browser.tasks.tab_management;
 
+import static org.chromium.build.NullUtil.assumeNonNull;
+
 import android.util.Pair;
 
 import org.chromium.base.Token;
@@ -31,7 +33,9 @@ abstract class TabGroupObserverDelegate implements TabGroupObserver {
     }
 
     @Override
-    public void didChangeTabGroupTitle(Token tabGroupId, String newTitle) {}
+    public void didChangeTabGroupTitle(Token tabGroupId, String newTitle) {
+        mMediator.updateTabGroupTitle(tabGroupId);
+    }
 
     @Override
     public void didChangeTabGroupColor(Token tabGroupId, @TabGroupColorId int newColor) {
@@ -49,27 +53,41 @@ abstract class TabGroupObserverDelegate implements TabGroupObserver {
     }
 
     @Override
-    public void didChangeTabGroupCollapsed(
-            Token tabGroupId, boolean isCollapsed, boolean animate) {}
+    public void didMoveWithinGroup(Tab movedTab, int tabModelOldIndex, int tabModelNewIndex) {
+        TabModel tabModel = mMediator.getCurrentTabModelChecked();
+
+        // Maintain correct order.
+        int curPosition = mModelList.indexFromTabId(movedTab.getId());
+
+        if (!mModelList.isValidIndex(curPosition)) return;
+
+        Tab destinationTab =
+                tabModel.getTabAt(
+                        tabModelNewIndex > tabModelOldIndex
+                                ? tabModelNewIndex - 1
+                                : tabModelNewIndex + 1);
+        assumeNonNull(destinationTab);
+        int newPosition = mModelList.indexFromTabId(destinationTab.getId());
+
+        if (!mModelList.isValidIndex(newPosition)) return;
+        mModelList.move(curPosition, newPosition);
+    }
 
     @Override
-    public void didMoveWithinGroup(Tab movedTab, int tabModelOldIndex, int tabModelNewIndex) {}
+    public void didMoveTabGroup(Tab movedTab, int tabModelOldIndex, int tabModelNewIndex) {
+        // TODO(crbug.com/509226293): Pending migration.
+    }
 
     @Override
-    public void didMoveTabOutOfGroup(Tab movedTab, int prevFilterIndex) {}
-
-    @Override
-    public void didMergeTabToGroup(Tab movedTab, boolean isDestinationTab) {}
-
-    @Override
-    public void didMoveTabGroup(Tab movedTab, int tabModelOldIndex, int tabModelNewIndex) {}
-
-    @Override
-    public void didCreateNewGroup(Tab destinationTab, TabModel tabModel) {}
+    public void didCreateNewGroup(Tab destinationTab, TabModel tabModel) {
+        // TODO(crbug.com/509226293): Pending migration.
+    }
 
     @Override
     public void didRemoveTabGroup(
             int oldRootId,
             @Nullable Token oldTabGroupId,
-            @DidRemoveTabGroupReason int removalReason) {}
+            @DidRemoveTabGroupReason int removalReason) {
+        // TODO(crbug.com/509226293): Pending migration.
+    }
 }

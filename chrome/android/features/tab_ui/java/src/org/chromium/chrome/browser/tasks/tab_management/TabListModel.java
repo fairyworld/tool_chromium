@@ -81,6 +81,14 @@ public class TabListModel extends ModelList {
                 new PropertyModel.WritableIntPropertyKey();
     }
 
+    /**
+     * @param index The index to check.
+     * @return Whether the given index is a valid position in the model list.
+     */
+    public boolean isValidIndex(int index) {
+        return index >= 0 && index < size();
+    }
+
     /** Returns whether the given model is a TAB or TAB_GROUP card. */
     public static boolean isTabOrTabGroup(PropertyModel model) {
         @CardProperties.ModelType int type = model.get(CARD_TYPE);
