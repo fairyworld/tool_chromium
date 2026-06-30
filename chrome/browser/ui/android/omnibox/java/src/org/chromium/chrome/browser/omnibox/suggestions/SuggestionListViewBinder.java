@@ -42,22 +42,34 @@ class SuggestionListViewBinder {
      */
     public static void bind(
             PropertyModel model, SuggestionListViewHolder view, PropertyKey propertyKey) {
-        if (SuggestionListProperties.ALPHA.equals(propertyKey)) {
+        if (SuggestionListProperties.ACTIVITY_WINDOW_FOCUSED.equals(propertyKey)) {
+            updateContainerVisibility(model, view);
+        } else if (SuggestionListProperties.ALLOW_PARKING_AT_SENTINEL.equals(propertyKey)) {
+            view.dropdown.setAllowParkingAtSentinel(
+                    model.get(SuggestionListProperties.ALLOW_PARKING_AT_SENTINEL));
+        } else if (SuggestionListProperties.ALPHA.equals(propertyKey)) {
             view.dropdown.setChildAlpha(model.get(SuggestionListProperties.ALPHA));
         } else if (SuggestionListProperties.CHILD_TRANSLATION_Y.equals(propertyKey)) {
             view.dropdown.translateChildrenVertical(
                     model.get(SuggestionListProperties.CHILD_TRANSLATION_Y));
-        } else if (SuggestionListProperties.EMBEDDER.equals(propertyKey)) {
-            view.container.setEmbedder(model.get(SuggestionListProperties.EMBEDDER));
-        } else if (SuggestionListProperties.OMNIBOX_SESSION_ACTIVE.equals(propertyKey)) {
+        } else if (SuggestionListProperties.COLOR_SCHEME.equals(propertyKey)) {
+            updateColorScheme(model, view);
+        } else if (SuggestionListProperties.CONTAINER_ALWAYS_VISIBLE.equals(propertyKey)) {
+            if (model.get(SuggestionListProperties.CONTAINER_ALWAYS_VISIBLE)) {
+                updateColorScheme(model, view);
+            }
             updateContainerVisibility(model, view);
-            view.container.onOmniboxSessionStateChange(
-                    model.get(SuggestionListProperties.OMNIBOX_SESSION_ACTIVE));
-        } else if (SuggestionListProperties.GESTURE_OBSERVER.equals(propertyKey)) {
-            view.dropdown.setGestureObserver(model.get(SuggestionListProperties.GESTURE_OBSERVER));
-        } else if (SuggestionListProperties.NAVIGATION_LISTENER.equals(propertyKey)) {
-            view.dropdown.setNavigationListener(
-                    model.get(SuggestionListProperties.NAVIGATION_LISTENER));
+        } else if (SuggestionListProperties.DRAW_OVER_ANCHOR.equals(propertyKey)) {
+            boolean drawOver = model.get(SuggestionListProperties.DRAW_OVER_ANCHOR);
+            // Note: this assumes the anchor view's z hasn't been modified. If this changes, we'll
+            // need to wire that z value so that we choose the correct one here.
+            view.container.setTranslationZ(
+                    drawOver
+                            ? view.container
+                                    .getResources()
+                                    .getDimensionPixelSize(
+                                            R.dimen.omnibox_suggestion_list_elevation)
+                            : 0.0f);
         } else if (SuggestionListProperties.DROPDOWN_HEIGHT_CHANGE_LISTENER.equals(propertyKey)) {
             view.container.setHeightChangeListener(
                     model.get(SuggestionListProperties.DROPDOWN_HEIGHT_CHANGE_LISTENER));
@@ -66,20 +78,35 @@ class SuggestionListViewBinder {
                     .getLayoutScrollListener()
                     .setSuggestionDropdownScrollListener(
                             model.get(SuggestionListProperties.DROPDOWN_SCROLL_LISTENER));
-        } else if (SuggestionListProperties.DROPDOWN_SCROLL_TO_TOP_LISTENER.equals(propertyKey)) {
-            view.dropdown
-                    .getLayoutScrollListener()
-                    .setSuggestionDropdownOverscrolledToTopListener(
-                            model.get(SuggestionListProperties.DROPDOWN_SCROLL_TO_TOP_LISTENER));
         } else if (SuggestionListProperties.DROPDOWN_SCROLL_OFFSET_LISTENER.equals(propertyKey)) {
             view.dropdown
                     .getLayoutScrollListener()
                     .setScrollOffsetListener(
                             model.get(SuggestionListProperties.DROPDOWN_SCROLL_OFFSET_LISTENER));
+        } else if (SuggestionListProperties.DROPDOWN_SCROLL_TO_TOP_LISTENER.equals(propertyKey)) {
+            view.dropdown
+                    .getLayoutScrollListener()
+                    .setSuggestionDropdownOverscrolledToTopListener(
+                            model.get(SuggestionListProperties.DROPDOWN_SCROLL_TO_TOP_LISTENER));
+        } else if (SuggestionListProperties.EMBEDDER.equals(propertyKey)) {
+            view.container.setEmbedder(model.get(SuggestionListProperties.EMBEDDER));
+        } else if (SuggestionListProperties.GESTURE_OBSERVER.equals(propertyKey)) {
+            view.dropdown.setGestureObserver(model.get(SuggestionListProperties.GESTURE_OBSERVER));
+        } else if (SuggestionListProperties.IS_LARGE_SCREEN.equals(propertyKey)) {
+            updateColorScheme(model, view);
+            view.container.setShouldClipToOutline(
+                    model.get(SuggestionListProperties.IS_LARGE_SCREEN));
         } else if (SuggestionListProperties.LIST_IS_FINAL.equals(propertyKey)) {
             if (model.get(SuggestionListProperties.LIST_IS_FINAL)) {
                 view.dropdown.emitWindowContentChangedAnnouncement();
             }
+        } else if (SuggestionListProperties.NAVIGATION_LISTENER.equals(propertyKey)) {
+            view.dropdown.setNavigationListener(
+                    model.get(SuggestionListProperties.NAVIGATION_LISTENER));
+        } else if (SuggestionListProperties.OMNIBOX_SESSION_ACTIVE.equals(propertyKey)) {
+            updateContainerVisibility(model, view);
+            view.container.onOmniboxSessionStateChange(
+                    model.get(SuggestionListProperties.OMNIBOX_SESSION_ACTIVE));
         } else if (SuggestionListProperties.RESET_SELECTION.equals(propertyKey)) {
             view.dropdown.resetSelection();
         } else if (SuggestionListProperties.ROUND_TOP_CORNERS.equals(propertyKey)) {
@@ -105,32 +132,6 @@ class SuggestionListViewBinder {
             // When the suggestions list is installed for the first time, it may already contain
             // elements. Be sure to capture and reflect this fact appropriately.
             updateContainerVisibility(model, view);
-        } else if (SuggestionListProperties.COLOR_SCHEME.equals(propertyKey)) {
-            updateColorScheme(model, view);
-        } else if (SuggestionListProperties.CONTAINER_ALWAYS_VISIBLE.equals(propertyKey)
-                || SuggestionListProperties.ACTIVITY_WINDOW_FOCUSED.equals(propertyKey)) {
-            if (model.get(SuggestionListProperties.CONTAINER_ALWAYS_VISIBLE)) {
-                updateColorScheme(model, view);
-            }
-            updateContainerVisibility(model, view);
-        } else if (SuggestionListProperties.DRAW_OVER_ANCHOR == propertyKey) {
-            boolean drawOver = model.get(SuggestionListProperties.DRAW_OVER_ANCHOR);
-            // Note: this assumes the anchor view's z hasn't been modified. If this changes, we'll
-            // need to wire that z value so that we choose the correct one here.
-            view.container.setTranslationZ(
-                    drawOver
-                            ? view.container
-                                    .getResources()
-                                    .getDimensionPixelSize(
-                                            R.dimen.omnibox_suggestion_list_elevation)
-                            : 0.0f);
-        } else if (SuggestionListProperties.IS_LARGE_SCREEN == propertyKey) {
-            updateColorScheme(model, view);
-            view.container.setShouldClipToOutline(
-                    model.get(SuggestionListProperties.IS_LARGE_SCREEN));
-        } else if (SuggestionListProperties.ALLOW_PARKING_AT_SENTINEL.equals(propertyKey)) {
-            view.dropdown.setAllowParkingAtSentinel(
-                    model.get(SuggestionListProperties.ALLOW_PARKING_AT_SENTINEL));
         }
     }
 
