@@ -174,6 +174,7 @@ COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicExperimentalTriggeringOptInBypass);
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicExperimentalTriggeringOpenWindowIfNone);
+BASE_DECLARE_FEATURE(kGlicBackgroundTriggering);
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<std::string>
     kGlicExperimentalTriggeringOptInURL;
