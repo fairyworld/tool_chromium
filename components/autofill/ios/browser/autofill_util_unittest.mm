@@ -16,6 +16,8 @@
 #import "components/autofill/core/common/form_field_data.h"
 #import "components/autofill/core/common/unique_ids.h"
 #import "components/autofill/ios/common/features.h"
+#import "testing/gmock/include/gmock/gmock.h"
+#import "testing/gtest/include/gtest/gtest.h"
 #import "testing/platform_test.h"
 #import "url/gurl.h"
 #import "url/origin.h"
@@ -30,6 +32,8 @@ using ::autofill::ExtractFillingResults;
 using ::autofill::ExtractIDs;
 using ::autofill::FieldRendererId;
 using ::base::ASCIIToUTF16;
+using ::testing::IsEmpty;
+using ::testing::SizeIs;
 
 TEST_F(AutofillUtilTest, ExtractFormData_FullUrl) {
   base::test::ScopedFeatureList scoped_feature_list;
@@ -179,17 +183,16 @@ TEST_F(AutofillUtilTest, DeserializeTokens) {
   EXPECT_FALSE(token.has_value());
 }
 
-// Test that the properties mask is extracted from the form field data.
+// Test that the child frames is extracted from the form field data.
 TEST_F(AutofillUtilTest, ExtractRemoteFrameToken) {
-  base::DictValue remote_frame_token_dict;
-  remote_frame_token_dict.Set("token",
-                              base::Value("beefbeefbeefbeefcafecafecafecafe"));
-  remote_frame_token_dict.Set("predecessor", base::Value(64));
+  base::DictValue wellformed1;
+  wellformed1.Set("token", base::Value("beefbeefbeefbeefcafecafecafecafe"));
+  wellformed1.Set("predecessor", base::Value(64));
 
   autofill::FrameTokenWithPredecessor token_with_predecessor;
 
-  ASSERT_TRUE(ExtractRemoteFrameToken(remote_frame_token_dict,
-                                      &token_with_predecessor));
+  ASSERT_TRUE(
+      ExtractRemoteFrameTokenForTest(wellformed1, &token_with_predecessor));
   EXPECT_EQ(base::ToLowerASCII(std::get<autofill::RemoteFrameToken>(
                                    token_with_predecessor.token)
                                    .ToString()),
@@ -198,16 +201,78 @@ TEST_F(AutofillUtilTest, ExtractRemoteFrameToken) {
 
   base::DictValue malformed1;
   malformed1.Set("garbage", base::Value("garbage"));
-  EXPECT_FALSE(ExtractRemoteFrameToken(malformed1, &token_with_predecessor));
+  EXPECT_FALSE(
+      ExtractRemoteFrameTokenForTest(malformed1, &token_with_predecessor));
 
   base::DictValue malformed2;
   malformed2.Set("token", base::Value("garbage"));
-  EXPECT_FALSE(ExtractRemoteFrameToken(malformed2, &token_with_predecessor));
+  EXPECT_FALSE(
+      ExtractRemoteFrameTokenForTest(malformed2, &token_with_predecessor));
 
   base::DictValue malformed3;
   malformed3.Set("token", base::Value("beefbeefbeefbeefcafecafecafecafe"));
   malformed3.Set("predecessor", base::Value("garbage"));
-  EXPECT_FALSE(ExtractRemoteFrameToken(malformed3, &token_with_predecessor));
+  EXPECT_FALSE(
+      ExtractRemoteFrameTokenForTest(malformed3, &token_with_predecessor));
+
+  // Test that -1 is the only negative number supported for `predecessor`.
+  base::DictValue wellformed2 = wellformed1.Clone();
+  wellformed2.Set("predecessor", base::Value(-1));
+  EXPECT_TRUE(
+      ExtractRemoteFrameTokenForTest(wellformed2, &token_with_predecessor));
+
+  base::DictValue malformed4 = wellformed1.Clone();
+  malformed4.Set("predecessor", base::Value(-5));
+  EXPECT_FALSE(
+      ExtractRemoteFrameTokenForTest(malformed4, &token_with_predecessor));
+}
+
+// Tests that ExtractChildFrames() only accepts predecessors that in ascending
+// order.
+TEST_F(AutofillUtilTest, ExtractChildFrames_PredecessorsMustBeSorted) {
+  auto create_child = [](std::string token, int predecessor) {
+    base::DictValue child;
+    child.Set("token", base::Value(std::move(token)));
+    child.Set("predecessor", base::Value(predecessor));
+    return child;
+  };
+  auto create_children = [](auto&&... children) {
+    base::ListValue list;
+    (list.Append(std::move(children)), ...);
+    return list;
+  };
+
+  base::DictValue form;
+  EXPECT_THAT(ExtractChildFramesForTest(form), IsEmpty());
+
+  form.Set("child_frames", base::ListValue());
+  EXPECT_THAT(ExtractChildFramesForTest(form), IsEmpty());
+
+  form.Set("child_frames", create_children());
+  EXPECT_THAT(ExtractChildFramesForTest(form), IsEmpty());
+
+  form.Set("child_frames", create_children(create_child(
+                               "aeefbeefbeefbeefcafecafecafecafe", 12)));
+  EXPECT_THAT(ExtractChildFramesForTest(form), SizeIs(1));
+
+  form.Set(
+      "child_frames",
+      create_children(create_child("aeefbeefbeefbeefcafecafecafecafe", 12),
+                      create_child("beefbeefbeefbeefcafecafecafecafe", 23)));
+  EXPECT_THAT(ExtractChildFramesForTest(form), SizeIs(2));
+
+  form.Set(
+      "child_frames",
+      create_children(create_child("aeefbeefbeefbeefcafecafecafecafe", -1),
+                      create_child("beefbeefbeefbeefcafecafecafecafe", 12),
+                      create_child("ceefbeefbeefbeefcafecafecafecafe", 23)));
+  EXPECT_THAT(ExtractChildFramesForTest(form), SizeIs(3));
+
+  form.Set(
+      "child_frames",
+      create_children(create_child("aeefbeefbeefbeefcafecafecafecafe", 99),
+                      create_child("beefbeefbeefbeefcafecafecafecafe", 1)));
+  EXPECT_THAT(ExtractChildFramesForTest(form), IsEmpty());
 }
 
 }  // namespace
