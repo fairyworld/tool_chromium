@@ -98,7 +98,6 @@ PersonalContextAccessManagerImpl::PersonalContextAccessManagerImpl(
                                 OnPersonalContextSettingsToggleChanged,
                             base::Unretained(this)));
   }
-  MaybeImportEntitiesForTesting(weak_factory_.GetWeakPtr());
 }
 
 PersonalContextAccessManagerImpl::~PersonalContextAccessManagerImpl() = default;
@@ -438,21 +437,6 @@ void PersonalContextAccessManagerImpl::
               kPersonalContextInAutofillSettingsToggleStatus)) {
     WipeCache();
   }
-}
-
-void PersonalContextAccessManagerImpl::SetTestingEntities(
-    const std::vector<EntityInstance>& test_entities) {
-  std::vector<ParsedEntity> parsed_entities;
-  std::set<EntityType> types;
-  for (const EntityInstance& entity : test_entities) {
-    types.insert(entity.type());
-    parsed_entities.push_back({
-        .instance = entity,
-        .proto = personal_context::proto::Entity(),
-    });
-  }
-  ProcessPrefetchedEntities(std::vector<EntityType>(types.begin(), types.end()),
-                            std::move(parsed_entities));
 }
 
 bool PersonalContextAccessManagerImpl::ShouldRequestType(
