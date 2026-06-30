@@ -380,6 +380,7 @@ struct Suggestion {
     kIdCardSpark,
     kKey,
     kLocation,
+    kLocationSpark,
     kLoyalty,
     kMagic,
     kOfferTag,
@@ -404,6 +405,7 @@ struct Suggestion {
     kGoogleCalendar,
     // Payment method icons
     kCardGeneric,
+    kCardGenericSpark,
     kCardAmericanExpress,
     kCardDiners,
     kCardDiscover,

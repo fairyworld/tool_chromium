@@ -145,6 +145,7 @@ std::u16string GetIconAccessibleName(Suggestion::Icon icon) {
       return l10n_util::GetStringUTF16(IDS_AUTOFILL_CC_VISA);
     // Other networks.
     case Suggestion::Icon::kCardGeneric:
+    case Suggestion::Icon::kCardGenericSpark:
       return l10n_util::GetStringUTF16(IDS_AUTOFILL_CC_GENERIC);
     case Suggestion::Icon::kIban:
       return l10n_util::GetStringUTF16(IDS_AUTOFILL_IBAN_GENERIC);
@@ -187,6 +188,7 @@ std::u16string GetIconAccessibleName(Suggestion::Icon icon) {
     case Suggestion::Icon::kIdCardSpark:
     case Suggestion::Icon::kKey:
     case Suggestion::Icon::kLocation:
+    case Suggestion::Icon::kLocationSpark:
     case Suggestion::Icon::kLoyalty:
     case Suggestion::Icon::kMagic:
     case Suggestion::Icon::kNoIcon:
@@ -416,6 +418,9 @@ std::optional<ui::ImageModel> GetIconImageModelFromIcon(Suggestion::Icon icon) {
                                           ? vector_icons::kAccountCircleIcon
                                           : kAccountCircleOldIcon,
                                       kIconSize);
+    case Suggestion::Icon::kCardGenericSpark:
+      return ImageModelFromVectorIcon(vector_icons::kCreditCardSparkIcon,
+                                      kChromeRefreshIconSize);
     case Suggestion::Icon::kClear:
       return ImageModelFromVectorIcon(::features::IsRoundedIconsEnabled()
                                           ? kBackspaceFilledIcon
@@ -547,6 +552,9 @@ std::optional<ui::ImageModel> GetIconImageModelFromIcon(Suggestion::Icon icon) {
               ? vector_icons::kLocationOnIcon
               : vector_icons::kLocationOnChromeRefreshOldIcon,
           kChromeRefreshIconSize);
+    case Suggestion::Icon::kLocationSpark:
+      return ImageModelFromVectorIcon(vector_icons::kLocationOnSparkIcon,
+                                      kChromeRefreshIconSize);
     case Suggestion::Icon::kLoyalty:
       return ImageModelFromVectorIcon(::features::IsRoundedIconsEnabled()
                                           ? vector_icons::kLoyaltyIcon
