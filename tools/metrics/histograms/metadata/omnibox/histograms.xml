@@ -5095,6 +5095,21 @@ Keep consistent with active providers. Doesn't need to include every provider in
   </summary>
 </histogram>
 
+<histogram name="Omnibox.TemplateUrl.DBRefresh.RegulatoryDuplicatesSameKeyword"
+    enum="Boolean" expires_after="2026-12-01">
+  <owner>dgn@google.com</owner>
+  <owner>chrome-regionalcapabilities@google.com</owner>
+  <summary>
+    Recorded when multiple TemplateURLs tagged as created by a regulatory
+    program (e.g., Android EEA Choice Screen) are loaded from the Keyword Web
+    Database during startup reconciliation. Records True if all such duplicate
+    regulatory entries share the identical search keyword, and False if at least
+    one entry has a different keyword. This helps identify whether database
+    duplicates are caused by row cloning vs incomplete deletions of prior engine
+    choices.
+  </summary>
+</histogram>
+
 <histogram name="Omnibox.TemplateUrl.DBRefresh.TotalDuplicates" units="units"
     expires_after="2026-12-31">
   <owner>dgn@google.com</owner>

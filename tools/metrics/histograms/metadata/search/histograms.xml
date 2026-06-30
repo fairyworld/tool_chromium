@@ -372,6 +372,20 @@ https://chromium.googlesource.com/chromium/src/tools/+/HEAD/metrics/histograms/R
   <token key="Profile" variants="ProfileIndex"/>
 </histogram>
 
+<histogram name="Search.ChoiceDebug.PreexistingProgramTaggedEntries"
+    units="entries" expires_after="2026-12-01">
+  <owner>dgn@google.com</owner>
+  <owner>chrome-regionalcapabilities@google.com</owner>
+  <summary>
+    Recorded on Android whenever a new Play API search engine is set (e.g., via
+    the EEA Choice Screen). Records the total count of pre-existing regulatory
+    program tagged search engines (Android EEA) found in the
+    TemplateURLService's loaded engines list and removed prior to adding the new
+    engine. Identifies how many stale regulatory entries were accumulated and
+    successfully cleaned up.
+  </summary>
+</histogram>
+
 <histogram name="Search.ChoiceDebug.ScrollStateWithMoreButtonClick"
     enum="SearchEngineChoiceScrollState" expires_after="2026-08-19">
   <owner>dgn@chromium.org</owner>
