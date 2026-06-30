@@ -3373,11 +3373,10 @@ public class TabListMediator implements TabListNotificationHandler {
     }
 
     /**
-     * Inserts a special {@link org.chromium.ui.modelutil.MVCListAdapter.ListItem} at given index of
-     * the current {@link TabListModel}.
+     * Inserts a special {@link ListItem} at given index of the current {@link TabListModel}.
      *
-     * @param index The index of the {@link org.chromium.ui.modelutil.MVCListAdapter.ListItem} to be
-     *     inserted, or TabList.INVALID_TAB_INDEX to ignore.
+     * @param index The index of the {@link ListItem} to be inserted, or TabList.INVALID_TAB_INDEX
+     *     to ignore.
      * @param uiType The view type the model will bind to.
      * @param model The model that will be bound to a view.
      */
@@ -3389,13 +3388,12 @@ public class TabListMediator implements TabListNotificationHandler {
     }
 
     /**
-     * Removes a special {@link org.chromium.ui.modelutil.MVCListAdapter.ListItem} that has the
-     * given {@code uiType} and/or its {@link PropertyModel} has the given {@code itemIdentifier}
-     * from the current {@link TabListModel}.
+     * Removes a special {@link ListItem} that has the given {@code uiType} and/or its {@link
+     * PropertyModel} has the given {@code itemIdentifier} from the current {@link TabListModel}.
      *
      * @param uiType The uiType to match.
      * @param itemIdentifier The itemIdentifier to match. This can be obsoleted if the {@link
-     *     org.chromium.ui.modelutil.MVCListAdapter.ListItem} does not need additional identifier.
+     *     ListItem} does not need additional identifier.
      */
     void removeSpecialItemFromModelList(@UiType int uiType, @MessageType int itemIdentifier) {
         int index = TabModel.INVALID_TAB_INDEX;
@@ -3417,8 +3415,8 @@ public class TabListMediator implements TabListNotificationHandler {
     }
 
     /**
-     * Removes a {@link org.chromium.ui.modelutil.MVCListAdapter.ListItem} that has the given {@code
-     * uiType} and the {@link PropertyModel} has the given {@link TabListEditorItemSelectionId}.
+     * Removes a {@link ListItem} that has the given {@code uiType} and the {@link PropertyModel}
+     * has the given {@link TabListEditorItemSelectionId}.
      *
      * @param uiType The uiType to match.
      * @param itemId The itemId to match.
@@ -3698,9 +3696,8 @@ public class TabListMediator implements TabListNotificationHandler {
 
     /**
      * @param itemIdentifier The itemIdentifier to match.
-     * @return whether a special {@link org.chromium.ui.modelutil.MVCListAdapter.ListItem} with the
-     *     given {@code itemIdentifier} for its {@link PropertyModel} exists in the current {@link
-     *     TabListModel}.
+     * @return whether a special {@link ListItem} with the given {@code itemIdentifier} for its
+     *     {@link PropertyModel} exists in the current {@link TabListModel}.
      */
     boolean specialItemExistsInModel(@MessageType int itemIdentifier) {
         if (itemIdentifier == MessageType.ALL) {

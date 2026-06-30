@@ -181,7 +181,7 @@ public class VerticalTabListCoordinatorUnitTest {
         when(mProfile.getOriginalProfile()).thenReturn(mProfile);
         when(mTabModel.isTabModelRestored()).thenReturn(true);
         when(mTabModel.getTabCreator()).thenReturn(mTabCreator);
-        when(mTabModel.iterator()).thenReturn(java.util.Collections.emptyIterator());
+        when(mTabModel.iterator()).thenReturn(Collections.emptyIterator());
         when(mTabModelSelector.isTabStateInitialized()).thenReturn(true);
         when(mWindowAndroid.getActivity()).thenReturn(new WeakReference<>(mActivity));
         GlicEnabling.setEnabledForTesting(false);

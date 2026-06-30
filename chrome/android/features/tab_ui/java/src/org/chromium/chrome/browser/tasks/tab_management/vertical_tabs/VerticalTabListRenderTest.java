@@ -14,6 +14,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -402,14 +403,8 @@ public class VerticalTabListRenderTest {
 
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {
-                    android.view.MotionEvent event =
-                            android.view.MotionEvent.obtain(
-                                    0,
-                                    0,
-                                    android.view.MotionEvent.ACTION_HOVER_ENTER,
-                                    0.0f,
-                                    0.0f,
-                                    0);
+                    MotionEvent event =
+                            MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_ENTER, 0.0f, 0.0f, 0);
                     view[0].dispatchGenericMotionEvent(event);
                 });
 
@@ -500,14 +495,8 @@ public class VerticalTabListRenderTest {
 
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {
-                    android.view.MotionEvent event =
-                            android.view.MotionEvent.obtain(
-                                    0,
-                                    0,
-                                    android.view.MotionEvent.ACTION_HOVER_ENTER,
-                                    0.0f,
-                                    0.0f,
-                                    0);
+                    MotionEvent event =
+                            MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_ENTER, 0.0f, 0.0f, 0);
                     view[0].dispatchGenericMotionEvent(event);
                 });
 
@@ -576,14 +565,8 @@ public class VerticalTabListRenderTest {
 
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {
-                    android.view.MotionEvent event =
-                            android.view.MotionEvent.obtain(
-                                    0,
-                                    0,
-                                    android.view.MotionEvent.ACTION_HOVER_ENTER,
-                                    0.0f,
-                                    0.0f,
-                                    0);
+                    MotionEvent event =
+                            MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_ENTER, 0.0f, 0.0f, 0);
                     view[0].dispatchGenericMotionEvent(event);
                 });
 
@@ -610,14 +593,8 @@ public class VerticalTabListRenderTest {
 
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {
-                    android.view.MotionEvent event =
-                            android.view.MotionEvent.obtain(
-                                    0,
-                                    0,
-                                    android.view.MotionEvent.ACTION_HOVER_ENTER,
-                                    0.0f,
-                                    0.0f,
-                                    0);
+                    MotionEvent event =
+                            MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_ENTER, 0.0f, 0.0f, 0);
                     view[0].dispatchGenericMotionEvent(event);
                 });
 

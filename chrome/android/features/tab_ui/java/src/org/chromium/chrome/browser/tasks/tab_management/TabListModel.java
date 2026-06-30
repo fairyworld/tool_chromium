@@ -36,10 +36,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
 
-/**
- * A {@link PropertyListModel} implementation to keep information about a list of {@link
- * org.chromium.chrome.browser.tab.Tab}s.
- */
+/** A {@link PropertyListModel} implementation to keep information about a list of {@link Tab}s. */
 @NullMarked
 public class TabListModel extends ModelList {
     @IntDef({

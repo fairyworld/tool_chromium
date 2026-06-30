@@ -42,6 +42,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.shadows.ShadowLooper;
 
 import org.chromium.base.Callback;
+import org.chromium.base.Token;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.chrome.R.string;
@@ -636,7 +637,7 @@ public class TabVerticalViewBinderUnitTest {
                 new ViewGroup.MarginLayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        mModel.set(TabProperties.TAB_GROUP_ID, new org.chromium.base.Token(1L, 2L));
+        mModel.set(TabProperties.TAB_GROUP_ID, new Token(1L, 2L));
         TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.TAB_GROUP_ID);
 
         ViewGroup.MarginLayoutParams lp =
