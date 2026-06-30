@@ -3118,6 +3118,10 @@ source_set("browser_tests") {
       deps += [ "//chrome/browser/ui/aura/accessibility" ]
     }
 
+    if (use_ozone) {
+      deps += [ "//ui/ozone" ]
+    }
+
     # TODO(417228688): Remove when the following tests get modularized:
     # - chrome_serial_browsertest.cc
     # - controlled_frame_disabled_permission_browsertest.cc
@@ -3200,6 +3204,10 @@ source_set("interactive_ui_tests") {
         "//chrome/browser/ui/download",
         "//chrome/browser/ui/download:download_display",
       ]
+    }
+
+    if (use_ozone) {
+      deps += [ "//ui/ozone" ]
     }
   }
 }
