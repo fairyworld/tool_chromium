@@ -386,6 +386,16 @@ bool HasGuid(const Suggestion::Payload& payload) {
         });
   }
 
+  if (suggestion.type == SuggestionType::kAutocompleteAtMemoryButton) {
+    // TODO(crbug.com/527936416) - Clicking this chip should open the
+    // AtMemoryViewController.
+    if (SuggestionHandledCompletion c =
+            std::exchange(_suggestionHandledCompletion, nil)) {
+      c();
+    }
+    return;
+  }
+
   if (suggestion.type == SuggestionType::kAutocompleteEntry ||
       suggestion.type == SuggestionType::kAddressEntry ||
       suggestion.type == SuggestionType::kCreditCardEntry ||
@@ -644,6 +654,7 @@ bool HasGuid(const Suggestion::Payload& payload) {
         }
         break;
 
+      case SuggestionType::kAutocompleteAtMemoryButton:
       case SuggestionType::kFetchingAmbientData:
         value = SysUTF16ToNSString(popup_suggestion.main_text.value);
         break;
@@ -657,7 +668,6 @@ bool HasGuid(const Suggestion::Payload& payload) {
       case SuggestionType::kAtMemoryNoConnection:
       case SuggestionType::kAtMemorySearchAffordance:
       case SuggestionType::kAtMemorySearchResult:
-      case SuggestionType::kAutocompleteAtMemoryButton:
       case SuggestionType::kAutofillAiOtherOrders:
       case SuggestionType::kBackupPasswordEntry:
       case SuggestionType::kBnplEntry:

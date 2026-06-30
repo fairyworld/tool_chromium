@@ -478,9 +478,10 @@ void ConfigureFetchingAmbientDataSuggestion(UIStackView* stackView,
 
     BOOL isTablet = ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET;
 
-    BOOL hasText = suggestionText.length > 0 ||
-                   suggestion.minorValue.length > 0 ||
-                   suggestion.displayDescription.length > 0;
+    BOOL hasText =
+        suggestion.type != SuggestionType::kAutocompleteAtMemoryButton &&
+        (suggestionText.length > 0 || suggestion.minorValue.length > 0 ||
+         suggestion.displayDescription.length > 0);
 
     if (hasText) {
       if (isTablet) {
