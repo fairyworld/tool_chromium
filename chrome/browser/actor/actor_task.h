@@ -153,7 +153,8 @@ class ActorTask : public base::SupportsUserData {
     kUserStartedNewChat = 6,
     kUserLoadedPreviousChat = 7,
     kUserNavigatedAway = 8,
-    kMaxValue = kUserNavigatedAway,
+    kTimeout = 9,
+    kMaxValue = kTimeout,
   };
   // LINT.ThenChange(//tools/metrics/histograms/metadata/actor/histograms.xml:StoppedReason,
   // //tools/metrics/histograms/metadata/actor/enums.xml:StoppedReasonEnum)

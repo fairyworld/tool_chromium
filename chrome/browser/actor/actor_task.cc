@@ -985,6 +985,7 @@ ActorTask::State ActorTask::GetTaskStateFromStoppedReason(
     case StoppedReason::kUserNavigatedAway:
     case StoppedReason::kTabDetached:
     case StoppedReason::kShutdown:
+    case StoppedReason::kTimeout:
       final_state = State::kCancelled;
       break;
     case StoppedReason::kTaskComplete:

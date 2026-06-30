@@ -439,6 +439,7 @@ chromium-metrics-reviews@google.com.
   <int value="6" label="Started new chat"/>
   <int value="7" label="Loaded previous chat"/>
   <int value="8" label="User navigated away"/>
+  <int value="9" label="Timeout"/>
 </enum>
 
 <!-- LINT.ThenChange(//chrome/browser/actor/actor_task.h:StoppedReason) -->
