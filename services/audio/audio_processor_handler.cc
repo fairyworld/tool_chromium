@@ -14,6 +14,7 @@
 #include "media/base/media_switches.h"
 #include "services/audio/ml_model_manager.h"
 #include "services/audio/processing_audio_fifo.h"
+#include "services/audio/voice_isolation_handler.h"
 
 namespace audio {
 
@@ -28,14 +29,24 @@ AudioProcessorHandler::AudioProcessorHandler(
         controls_receiver,
     media::AecdumpRecordingManager* aecdump_recording_manager,
     raw_ptr<MlModelManager> ml_model_manager)
-    : residual_echo_estimation_model_handle_(
+    : voice_isolation_handler_(
+#if BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)
+          settings.voice_isolation
+              ? std::make_unique<VoiceIsolationHandler>(
+                    std::move(deliver_processed_audio_callback))
+              : nullptr
+#else
+          nullptr
+#endif
+          ),
+      residual_echo_estimation_model_handle_(
           ml_model_manager ? ml_model_manager->GetModel(
                                  mojom::MlModelType::kResidualEchoEstimation)
                            : nullptr),
       audio_processor_(media::AudioProcessor::Create(
           // Unretained is safe because this class owns audio_processor_, so it
           // will be destroyed first.
-          base::BindRepeating(&AudioProcessorHandler::DeliverProcessedAudio,
+          base::BindRepeating(&AudioProcessorHandler::OnAudioProcessorOutput,
                               base::Unretained(this)),
           log_callback,
           settings,
@@ -45,7 +56,10 @@ AudioProcessorHandler::AudioProcessorHandler(
               ? residual_echo_estimation_model_handle_->Get()
               : nullptr)),
       deliver_processed_audio_callback_(
-          std::move(deliver_processed_audio_callback)),
+          voice_isolation_handler_
+              ? DeliverProcessedAudioCallback()
+              // NOLINTNEXTLINE(bugprone-use-after-move)
+              : std::move(deliver_processed_audio_callback)),
       reference_stream_error_callback_(
           std::move(reference_stream_error_callback)),
       receiver_(this, std::move(controls_receiver)),
@@ -174,12 +188,24 @@ void AudioProcessorHandler::StopAecdump() {
   audio_processor_->OnStopDump();
 }
 
-void AudioProcessorHandler::DeliverProcessedAudio(
+void AudioProcessorHandler::OnAudioProcessorOutput(
     const media::AudioBus& audio_bus,
     base::TimeTicks audio_capture_time,
     std::optional<double> new_volume) {
-  deliver_processed_audio_callback_.Run(audio_bus, audio_capture_time,
-                                        new_volume,
-                                        glitch_info_accumulator_.GetAndReset());
+  // Retrieve and reset the accumulated glitch info to ensure it is attached
+  // to the processed frame.
+  const media::AudioGlitchInfo glitch_info =
+      glitch_info_accumulator_.GetAndReset();
+
+  if (voice_isolation_handler_) {
+    // Route the processed audio and its metadata through voice isolation.
+    voice_isolation_handler_->ProcessCapturedAudio(
+        audio_bus, audio_capture_time, new_volume, glitch_info);
+  } else {
+    DCHECK(deliver_processed_audio_callback_);
+    // Deliver directly to the final destination callback.
+    deliver_processed_audio_callback_.Run(audio_bus, audio_capture_time,
+                                          new_volume, glitch_info);
+  }
 }
 }  // namespace audio

@@ -449,7 +449,12 @@ class InputControllerTestHelper {
 
   bool IsUsingProcessingThread() {
     return controller_->audio_processor_handler_ &&
-           !!controller_->audio_processor_handler_->processing_fifo_.get();
+           controller_->audio_processor_handler_->processing_fifo_;
+  }
+
+  bool HasVoiceIsolation() {
+    auto* handler = controller_->audio_processor_handler_.get();
+    return handler && handler->voice_isolation_handler_ != nullptr;
   }
 
   // Adds a callback that will be run immediately after processing is done, in
@@ -1016,6 +1021,48 @@ TEST_F(InputControllerTestWithReferenceSignalProvider,
   EXPECT_FALSE(helper_->IsUsingProcessingThread());
 
   // Test cleanup.
+  controller_->Close();
+}
+
+TEST_F(SystemTimeInputControllerTestWithReferenceSignalProvider,
+       VoiceIsolationNotCalledIfNull) {
+  SetupProcessingConfig(AudioProcessingType::kWithPlayoutReference);
+  EXPECT_CALL(event_handler_, OnCreated(_));
+  CreateAudioController();
+  ASSERT_TRUE(controller_.get());
+  EXPECT_FALSE(helper_->HasVoiceIsolation());
+
+  base::RunLoop loop;
+  EXPECT_CALL(sync_writer_, Write(NotNull(), _, _, _))
+      .Times(AtLeast(1))
+      .WillOnce(InvokeWithoutArgs([&]() { loop.Quit(); }));
+
+  controller_->Record();
+  loop.Run();
+
+  EXPECT_CALL(sync_writer_, Close());
+  controller_->Close();
+}
+
+TEST_F(SystemTimeInputControllerTestWithReferenceSignalProvider,
+       VoiceIsolationEnabledInConfig) {
+  SetupProcessingConfig(AudioProcessingType::kWithPlayoutReference);
+  processing_config_->settings.voice_isolation = true;
+  EXPECT_CALL(event_handler_, OnCreated(_));
+
+  CreateAudioController();
+  ASSERT_TRUE(controller_.get());
+  EXPECT_TRUE(helper_->HasVoiceIsolation());
+
+  base::RunLoop loop;
+  EXPECT_CALL(sync_writer_, Write(NotNull(), _, _, _))
+      .Times(AtLeast(1))
+      .WillOnce(InvokeWithoutArgs([&]() { loop.Quit(); }));
+
+  controller_->Record();
+  loop.Run();
+
+  EXPECT_CALL(sync_writer_, Close());
   controller_->Close();
 }
 
