@@ -30,8 +30,7 @@ BASE_FEATURE(kWebXROrientationSensorDevice,
 #if BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
-             // TODO(https://crbug.com/820308, https://crbug.com/773829): Enable
-             // once platform specific bugs have been fixed.
+             // TODO(crbug.com/529477337): Restrict this feature to Android.
              base::FEATURE_DISABLED_BY_DEFAULT
 #endif
 );
