@@ -139,11 +139,7 @@ base::flat_set<AutofillTypeSet> ComputeUniqueTypeSets(
 // control type.
 bool HasSameControlType(const PageContext::FormField& pending_field,
                         const autofill::AutofillField& local_field) {
-  std::optional<autofill::FormControlType> pending_type =
-      autofill::StringToFormControlTypeDiscouraged(
-          pending_field.form_control_type);
-  return pending_type.has_value() &&
-         *pending_type == local_field.form_control_type();
+  return pending_field.form_control_type == local_field.form_control_type();
 }
 
 }  // namespace
@@ -321,8 +317,7 @@ const PageContext::FormField*
 ReceivedTabFormsFiller::FindPendingFieldByIdNameAndType(
     const autofill::AutofillField& field) const {
   auto it = pending_fields_.find(std::make_tuple(
-      field.id_attribute(), field.name_attribute(),
-      autofill::FormControlTypeToString(field.form_control_type())));
+      field.id_attribute(), field.name_attribute(), field.form_control_type()));
   return it != pending_fields_.end() ? &*it : nullptr;
 }
 
