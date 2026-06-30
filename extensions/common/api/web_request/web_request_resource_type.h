@@ -1,9 +1,9 @@
-// Copyright 2017 The Chromium Authors
+// Copyright 2026 The Chromium Authors
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef EXTENSIONS_BROWSER_API_WEB_REQUEST_WEB_REQUEST_RESOURCE_TYPE_H_
-#define EXTENSIONS_BROWSER_API_WEB_REQUEST_WEB_REQUEST_RESOURCE_TYPE_H_
+#ifndef EXTENSIONS_COMMON_API_WEB_REQUEST_WEB_REQUEST_RESOURCE_TYPE_H_
+#define EXTENSIONS_COMMON_API_WEB_REQUEST_WEB_REQUEST_RESOURCE_TYPE_H_
 
 #include <stdint.h>
 
@@ -12,10 +12,6 @@
 #include "extensions/buildflags/buildflags.h"
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
-
-namespace network {
-struct ResourceRequest;
-}
 
 namespace extensions {
 
@@ -39,10 +35,6 @@ enum class WebRequestResourceType : uint8_t {
   OTHER,  // The type is unknown, or differs from all the above.
 };
 
-WebRequestResourceType ToWebRequestResourceType(
-    const network::ResourceRequest& request,
-    bool is_download);
-
 // Returns a string representation of `type`.
 const char* WebRequestResourceTypeToString(WebRequestResourceType type);
 
@@ -53,4 +45,4 @@ bool ParseWebRequestResourceType(std::string_view text,
 
 }  // namespace extensions
 
-#endif  // EXTENSIONS_BROWSER_API_WEB_REQUEST_WEB_REQUEST_RESOURCE_TYPE_H_
+#endif  // EXTENSIONS_COMMON_API_WEB_REQUEST_WEB_REQUEST_RESOURCE_TYPE_H_
