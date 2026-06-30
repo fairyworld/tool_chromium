@@ -2411,6 +2411,16 @@ prefs when the profile is loaded.  -->
   </summary>
 </histogram>
 
+<histogram name="Signin.IOSAccountMenu.Opened" enum="IOSAccountMenuAccessPoint"
+    expires_after="2027-06-19">
+  <owner>jlebel@chromium.org</owner>
+  <owner>chrome-signin-team@google.com</owner>
+  <summary>
+    Records the access point from where the account menu was opened. Recorded
+    every time the account menu is opened. iOS only.
+  </summary>
+</histogram>
+
 <histogram name="Signin.IOSAccountsOnDeviceCount{AccountType}" units="accounts"
     expires_after="2026-12-06">
   <owner>msarda@chromium.org</owner>
