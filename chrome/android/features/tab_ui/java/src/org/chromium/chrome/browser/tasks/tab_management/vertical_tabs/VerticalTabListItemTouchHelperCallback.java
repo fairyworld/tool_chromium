@@ -22,6 +22,7 @@ import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabSelectionType;
+import org.chromium.chrome.browser.tabmodel.TabGroupMergeNotificationType;
 import org.chromium.chrome.browser.tabmodel.TabGroupUtils;
 import org.chromium.chrome.browser.tabmodel.TabModel;
 import org.chromium.chrome.browser.tasks.tab_management.TabGridItemLongPressOrchestrator;
@@ -197,6 +198,11 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
         int top = selectedBounds.top + dy;
         final int targetsSize = dropTargets.size();
         Rect targetBounds = new Rect();
+
+        boolean isSelectedStandalone =
+                selected.getItemViewType() == TabProperties.UiType.TAB
+                        && getTabGroupId(selected) == null;
+
         for (int i = 0; i < targetsSize; i++) {
             final RecyclerView.ViewHolder target = dropTargets.get(i);
             getBoundingBox(target, targetBounds);
@@ -226,6 +232,28 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
             int targetCenterY = targetBounds.top + targetBounds.height() / 2;
 
             if (dy < 0) {
+                // If a standalone tab is dragged upward into the lowest tab of a group,
+                // trigger grouping.
+                if (isSelectedStandalone) {
+                    boolean isTargetChildTab =
+                            target.getItemViewType() == TabProperties.UiType.TAB
+                                    && getTabGroupId(target) != null;
+
+                    if (isTargetChildTab) {
+                        int targetTabId = getTabId(target);
+                        List<Tab> relatedTabs = getRelatedTabsForId(targetTabId);
+                        boolean isTargetLowestTab =
+                                relatedTabs != null
+                                        && !relatedTabs.isEmpty()
+                                        && relatedTabs.get(relatedTabs.size() - 1).getId()
+                                                == targetTabId;
+
+                        if (isTargetLowestTab) {
+                            targetCenterY = targetBounds.bottom - targetBounds.height() / 4;
+                        }
+                    }
+                }
+
                 if (top < targetCenterY && targetBounds.top < selectedBounds.top) {
                     final int score = Math.abs(targetBounds.top - top);
                     if (score > winnerScore) {
@@ -290,6 +318,52 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
                     tabModel.getTabUngrouper().ungroupTabs(List.of(currentTab), trailing, false);
                 }
                 return true;
+            }
+        }
+
+        if (isStandaloneTab) {
+            // Intercept swaps between a standalone tab and a tab group.
+            Token destGroupId = getTabGroupId(toViewHolder);
+            if (destGroupId != null) {
+                boolean isDestGroupHeader =
+                        toViewHolder.getItemViewType() == TabProperties.UiType.TAB_GROUP;
+                boolean isDraggingDown = distance > 0;
+                boolean isDraggingUp = distance < 0;
+
+                Tab currentTab = tabModel.getTabById(currentTabId);
+                Tab destinationTab = tabModel.getTabById(destinationTabId);
+
+                if (currentTab != null && destinationTab != null) {
+                    // When dragging down, grouping occurs when swapping with the group header.
+                    if (isDraggingDown && isDestGroupHeader) {
+                        tabModel.mergeListOfTabsToGroup(
+                                List.of(currentTab),
+                                destinationTab,
+                                /* indexInGroup= */ 0,
+                                TabGroupMergeNotificationType.NOTIFY_ALWAYS);
+                        return true;
+                    }
+
+                    // When dragging up, grouping occurs when swapping with the lowest tab in the
+                    // group.
+                    if (isDraggingUp && !isDestGroupHeader) {
+                        List<Tab> destRelatedTabs = getRelatedTabsForId(destinationTabId);
+                        boolean isTargetLowestTab =
+                                destRelatedTabs != null
+                                        && !destRelatedTabs.isEmpty()
+                                        && destRelatedTabs.get(destRelatedTabs.size() - 1).getId()
+                                                == destinationTabId;
+
+                        if (isTargetLowestTab) {
+                            tabModel.mergeListOfTabsToGroup(
+                                    List.of(currentTab),
+                                    destinationTab,
+                                    /* indexInGroup= */ null,
+                                    TabGroupMergeNotificationType.NOTIFY_ALWAYS);
+                            return true;
+                        }
+                    }
+                }
             }
         }
 

@@ -45,6 +45,7 @@ import org.chromium.base.Token;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabSelectionType;
+import org.chromium.chrome.browser.tabmodel.TabGroupMergeNotificationType;
 import org.chromium.chrome.browser.tabmodel.TabModel;
 import org.chromium.chrome.browser.tabmodel.TabUngrouper;
 import org.chromium.chrome.browser.tasks.tab_management.TabGridItemLongPressOrchestrator;
@@ -247,6 +248,67 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
         assertTrue(mCallback.onMove(mRecyclerView, mViewHolder, mTargetViewHolder));
 
         verify(mTabModel).moveRelatedTabs(1, 5);
+    }
+
+    @Test
+    public void testOnMove_StandaloneTabToGroupHeader_Downward_Groups() {
+        mPropertyModel.set(TabProperties.TAB_ID, 1);
+        mPropertyModel.set(TabProperties.TAB_GROUP_ID, null);
+        when(mViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB);
+
+        mTargetPropertyModel.set(TabProperties.TAB_ID, 2);
+        Token destGroupId = new Token(1L, 2L);
+        mTargetPropertyModel.set(TabProperties.TAB_GROUP_HEADER_ID, destGroupId); // It's a header
+        when(mTargetViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB_GROUP);
+
+        Tab tab1 = mock(Tab.class);
+        Tab tab2 = mock(Tab.class);
+        doReturn(tab1).when(mTabModel).getTabById(1);
+        doReturn(tab2).when(mTabModel).getTabById(2);
+
+        // distance > 0 -> dragging downward
+        when(mViewHolder.getBindingAdapterPosition()).thenReturn(0);
+        when(mTargetViewHolder.getBindingAdapterPosition()).thenReturn(1);
+
+        assertTrue(mCallback.onMove(mRecyclerView, mViewHolder, mTargetViewHolder));
+
+        verify(mTabModel)
+                .mergeListOfTabsToGroup(
+                        Arrays.asList(tab1), tab2, 0, TabGroupMergeNotificationType.NOTIFY_ALWAYS);
+    }
+
+    @Test
+    public void testOnMove_StandaloneTabToLowestGroupTab_Upward_Groups() {
+        mPropertyModel.set(TabProperties.TAB_ID, 1);
+        mPropertyModel.set(TabProperties.TAB_GROUP_ID, null);
+        when(mViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB);
+
+        mTargetPropertyModel.set(TabProperties.TAB_ID, 2);
+        Token destGroupId = new Token(1L, 2L);
+        mTargetPropertyModel.set(TabProperties.TAB_GROUP_ID, destGroupId);
+        when(mTargetViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB);
+
+        Tab tab1 = mock(Tab.class);
+        Tab tab2 = mock(Tab.class);
+        when(tab2.getId()).thenReturn(2);
+        doReturn(tab1).when(mTabModel).getTabById(1);
+        doReturn(tab2).when(mTabModel).getTabById(2);
+
+        // Mock target as lowest tab
+        doReturn(Arrays.asList(mock(Tab.class), tab2)).when(mTabModel).getRelatedTabList(2);
+
+        // distance < 0 -> dragging upward
+        when(mViewHolder.getBindingAdapterPosition()).thenReturn(2);
+        when(mTargetViewHolder.getBindingAdapterPosition()).thenReturn(1);
+
+        assertTrue(mCallback.onMove(mRecyclerView, mViewHolder, mTargetViewHolder));
+
+        verify(mTabModel)
+                .mergeListOfTabsToGroup(
+                        Arrays.asList(tab1),
+                        tab2,
+                        null,
+                        TabGroupMergeNotificationType.NOTIFY_ALWAYS);
     }
 
     @Test
@@ -1016,6 +1078,53 @@ public class VerticalTabListItemTouchHelperCallbackUnitTest {
         // It HAS crossed the center of target (y=-150).
         RecyclerView.ViewHolder winner4 = mCallback.chooseDropTarget(mViewHolder, targets, 0, -160);
         assertEquals(mTargetViewHolder, winner4);
+    }
+
+    @Test
+    public void testChooseDropTarget_VerticalDrag_StandaloneTabToGroupLowestTab_SwapsAt25Percent() {
+        // Setup currently dragged item (mViewHolder) as a normal standalone tab
+        when(mViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB);
+        mPropertyModel.set(TabProperties.TAB_GROUP_ID, null);
+        mCallback.onSelectedChanged(mViewHolder, ItemTouchHelper.ACTION_STATE_DRAG);
+
+        // selected view layout
+        when(mViewHolder.itemView.getLeft()).thenReturn(0);
+        when(mViewHolder.itemView.getTop()).thenReturn(0);
+        when(mViewHolder.itemView.getRight()).thenReturn(100);
+        when(mViewHolder.itemView.getBottom()).thenReturn(100);
+
+        // Setup target item as a child tab of a group
+        when(mTargetViewHolder.getItemViewType()).thenReturn(TabProperties.UiType.TAB);
+        Token groupId = new Token(1L, 2L);
+        mTargetPropertyModel.set(TabProperties.TAB_GROUP_ID, groupId);
+        mTargetPropertyModel.set(TabProperties.TAB_ID, 2);
+        when(mTargetViewHolder.itemView.getLeft()).thenReturn(0);
+        when(mTargetViewHolder.itemView.getTop()).thenReturn(-200);
+        when(mTargetViewHolder.itemView.getRight()).thenReturn(100);
+        when(mTargetViewHolder.itemView.getBottom()).thenReturn(-100); // Center is y=-150
+
+        // Mock TabModel to target the lowest tab
+        Tab targetTab = mock(Tab.class);
+        when(targetTab.getId()).thenReturn(2);
+        when(mTabModel.getRelatedTabList(2))
+                .thenReturn(Arrays.asList(mock(Tab.class), targetTab)); // last item is target
+
+        List<RecyclerView.ViewHolder> targets = Arrays.asList(mTargetViewHolder);
+
+        // Standard 50% overlap is at y=-150.
+        // But for grouping a standalone tab UPWARDS into the lowest tab of a group,
+        // the threshold is 25% overlap (bottom quarter).
+        // 25% overlap with bottom (-100) and height (100) -> threshold is -125.
+
+        // Scenario 1: Drag upward, leading edge (top) is at -115.
+        // Not crossed 25% threshold (-125).
+        RecyclerView.ViewHolder winner1 = mCallback.chooseDropTarget(mViewHolder, targets, 0, -115);
+        assertEquals(null, winner1);
+
+        // Scenario 2: Drag upward, leading edge (top) is at -135.
+        // Crossed 25% threshold (-125).
+        RecyclerView.ViewHolder winner2 = mCallback.chooseDropTarget(mViewHolder, targets, 0, -135);
+        assertEquals(mTargetViewHolder, winner2);
     }
 
     @Test
