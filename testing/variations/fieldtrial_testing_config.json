@@ -23015,7 +23015,7 @@
             ]
         }
     ],
-    "SmartRestartLockScreen": [
+    "SmartRestart": [
         {
             "platforms": [
                 "linux",
