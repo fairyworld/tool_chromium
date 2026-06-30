@@ -48,12 +48,6 @@ using ::testing::AssertionSuccess;
 using ::testing::ElementsAre;
 using ::testing::Property;
 
-constexpr CallTimerState kCallTimerStateDummy = {
-    .call_site = CallTimerState::CallSite::kUpdateFormCache,
-    .last_autofill_agent_reset = {},
-    .last_dom_content_loaded = {},
-};
-
 class FormAutocompleteTest : public test::AutofillRendererTest {
  public:
   FormAutocompleteTest() = default;
@@ -75,14 +69,7 @@ class FormAutocompleteTest : public test::AutofillRendererTest {
   AssertionResult SimulateFillForm(
       std::optional<FormData> form_data = std::nullopt) {
     if (!form_data) {
-      form_data = form_util::ExtractFormData(
-          GetMainFrame()->GetDocument(),
-          GetMainFrame()
-              ->GetDocument()
-              .GetElementById(WebString::FromUtf8("myForm"))
-              .To<blink::WebFormElement>(),
-          *base::MakeRefCounted<FieldDataManager>(), kCallTimerStateDummy,
-          /*button_titles_cache=*/nullptr);
+      form_data = ExtractFormData("myForm");
     }
     if (!form_data) {
       return AssertionFailure();
@@ -190,16 +177,8 @@ TEST_F(FormAutocompleteTest, VerifyFocusAndBlurEventAfterElementAdded) {
   focus_test_utils_->FocusElement("fname");
 
   // Simulate filling the form using Autofill.
-  std::optional<FormData> form = form_util::ExtractFormData(
-      GetMainFrame()->GetDocument(),
-      GetMainFrame()
-          ->GetDocument()
-          .GetElementById("myForm")
-          .To<blink::WebFormElement>(),
-      *base::MakeRefCounted<FieldDataManager>(), kCallTimerStateDummy,
-      /*button_titles_cache=*/nullptr);
+  std::optional<FormData> form = ExtractFormData("myForm");
   ASSERT_TRUE(form);
-  FormData data = *form;
   // Simulate that the form was modified between parsing and executing the fill.
   // The element is inserted at the beginning of the form to verify that
   // everything works correctly even if `renderer_id`s of the `<input>`
@@ -233,16 +212,9 @@ TEST_F(FormAutocompleteTest, VerifyFocusAndBlurEventAfterElementRemoved) {
   focus_test_utils_->FocusElement("fname");
 
   // Simulate filling the form using Autofill.
-  std::optional<FormData> form = form_util::ExtractFormData(
-      GetMainFrame()->GetDocument(),
-      GetMainFrame()
-          ->GetDocument()
-          .GetElementById("myForm")
-          .To<blink::WebFormElement>(),
-      *base::MakeRefCounted<FieldDataManager>(), kCallTimerStateDummy,
-      /*button_titles_cache=*/nullptr);
-
+  std::optional<FormData> form = ExtractFormData("myForm");
   ASSERT_TRUE(form);
+
   ExecuteJavaScriptForTests("document.getElementById('lname').remove()");
   ASSERT_TRUE(SimulateFillForm(form));
 

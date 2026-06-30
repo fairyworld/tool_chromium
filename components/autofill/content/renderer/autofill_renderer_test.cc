@@ -38,12 +38,22 @@
 
 namespace autofill::test {
 
-using base::test::RunClosure;
-using testing::AssertionFailure;
-using testing::AssertionResult;
-using testing::Assign;
-using testing::DoAll;
-using testing::Property;
+using ::base::test::RunClosure;
+using ::testing::AssertionFailure;
+using ::testing::AssertionResult;
+using ::testing::Assign;
+using ::testing::DoAll;
+using ::testing::Property;
+
+namespace {
+
+constexpr CallTimerState kCallTimerStateDummy = {
+    .call_site = CallTimerState::CallSite::kUpdateFormCache,
+    .last_autofill_agent_reset = {},
+    .last_dom_content_loaded = {},
+};
+
+}  // namespace
 
 MockAutofillDriver::MockAutofillDriver() = default;
 
@@ -90,6 +100,20 @@ std::unique_ptr<AutofillAgent> AutofillRendererTest::CreateAutofillAgent(
   return std::make_unique<AutofillAgent>(
       render_frame, std::move(password_autofill_agent),
       std::move(password_generation_agent), associated_interfaces);
+}
+
+std::optional<FormData> AutofillRendererTest::ExtractFormData(
+    blink::WebFormElement form_element) {
+  return form_util::ExtractFormData(GetDocument(), form_element,
+                                    *base::MakeRefCounted<FieldDataManager>(),
+                                    kCallTimerStateDummy,
+                                    /*button_titles_cache=*/nullptr);
+}
+
+std::optional<FormData> AutofillRendererTest::ExtractFormData(
+    std::string_view form_id) {
+  return ExtractFormData(
+      GetWebElementById(form_id).To<blink::WebFormElement>());
 }
 
 AssertionResult AutofillRendererTest::SimulateFillForm(

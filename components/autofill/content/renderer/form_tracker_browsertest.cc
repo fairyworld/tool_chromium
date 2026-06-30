@@ -40,12 +40,6 @@ using ::testing::Eq;
 using ::testing::Ne;
 using ::testing::Property;
 
-constexpr CallTimerState kCallTimerStateDummy = {
-    .call_site = CallTimerState::CallSite::kUpdateFormCache,
-    .last_autofill_agent_reset = {},
-    .last_dom_content_loaded = {},
-};
-
 template <typename... Args>
 auto FieldsAre(Args&&... matchers) {
   return Property("FormData::fields", &FormData::fields,
@@ -135,11 +129,7 @@ class FormTrackerTest : public test::AutofillRendererTest,
   }
 
   bool SimulateFillForm() {
-    if (std::optional<FormData> data = form_util::ExtractFormData(
-            GetDocument(),
-            GetWebElementById("myForm").To<blink::WebFormElement>(),
-            autofill_agent().field_data_manager(), kCallTimerStateDummy,
-            /*button_titles_cache=*/nullptr)) {
+    if (std::optional<FormData> data = ExtractFormData("myForm")) {
       return AutofillRendererTest::SimulateFillForm(
           *data, "fname", {{u"fname", u"John"}, {u"lname", u"Smith"}});
     }
@@ -398,19 +388,17 @@ TEST_P(FormTrackerTest, FormApplyFormActionUpdatesLastInteractedSavedState) {
   ASSERT_TRUE(field);
   ASSERT_EQ("text_id", field.GetIdAttribute().Ascii());
 
-  FormData form = *form_util::ExtractFormData(
-      form_element.GetDocument(), form_element,
-      *base::MakeRefCounted<FieldDataManager>(), kCallTimerStateDummy,
-      /*button_titles_cache=*/nullptr);
+  std::optional<FormData> form = ExtractFormData(form_element);
+  ASSERT_TRUE(form);
 
-  ASSERT_EQ(1u, form.fields().size());
-  test_api(form).field(0).set_value(u"autofilled");
-  test_api(form).field(0).set_is_autofilled_according_to_renderer(true);
+  ASSERT_EQ(1u, form->fields().size());
+  test_api(*form).field(0).set_value(u"autofilled");
+  test_api(*form).field(0).set_is_autofilled_according_to_renderer(true);
 
   ASSERT_EQ(field.GetAutofillState(), blink::WebAutofillState::kNotFilled);
   autofill_agent().ApplyFieldsAction(
       mojom::FormActionType::kFill, mojom::ActionPersistence::kFill,
-      GetFillData(form.fields()), FillId::Create(),
+      GetFillData(form->fields()), FillId::Create(),
       /*supports_refill=*/false);
   ASSERT_EQ(field.GetAutofillState(), blink::WebAutofillState::kAutofilled);
 
@@ -609,10 +597,8 @@ TEST_P(FormTrackerTest,
   blink::WebFormElement form_element =
       GetWebElementById("form").DynamicTo<blink::WebFormElement>();
   ASSERT_TRUE(form_element);
-  std::optional<FormData> form = form_util::ExtractFormData(
-      GetDocument(), form_element, autofill_agent().field_data_manager(),
-      kCallTimerStateDummy, /*button_titles_cache=*/nullptr);
-  ASSERT_TRUE(form.has_value());
+  std::optional<FormData> form = ExtractFormData(form_element);
+  ASSERT_TRUE(form);
 
   std::vector<blink::WebFormControlElement> field_elements =
       form_util::GetOwnedFormControlsForTesting(form_element.GetDocument(),

@@ -54,22 +54,23 @@
 #include "third_party/blink/public/web/win/web_font_rendering.h"
 #endif
 
-using base::ASCIIToUTF16;
-using blink::WebAutofillState;
-using blink::WebDocument;
-using blink::WebElement;
-using blink::WebFormControlElement;
-using blink::WebFormElement;
-using blink::WebInputElement;
-using blink::WebLocalFrame;
-using blink::WebSelectElement;
-using blink::WebString;
-using testing::_;
-using testing::ElementsAre;
-using testing::Field;
-using testing::Optional;
-using testing::Pair;
-using testing::Property;
+using ::base::ASCIIToUTF16;
+using ::blink::WebAutofillState;
+using ::blink::WebDocument;
+using ::blink::WebElement;
+using ::blink::WebFormControlElement;
+using ::blink::WebFormElement;
+using ::blink::WebInputElement;
+using ::blink::WebLocalFrame;
+using ::blink::WebSelectElement;
+using ::blink::WebString;
+using ::testing::_;
+using ::testing::Each;
+using ::testing::ElementsAre;
+using ::testing::Field;
+using ::testing::Optional;
+using ::testing::Pair;
+using ::testing::Property;
 
 namespace autofill::form_util {
 namespace {
@@ -348,12 +349,6 @@ class FormAutofillTest : public test::AutofillRendererTest {
   void TearDown() override {
     form_cache_.reset();
     test::AutofillRendererTest::TearDown();
-  }
-
-  std::optional<FormData> ExtractFormData(WebFormElement form) {
-    return form_util::ExtractFormData(
-        GetDocument(), form, *base::MakeRefCounted<FieldDataManager>(),
-        kExtractFormDataCallTimerStateDummy, /*button_titles_cache=*/nullptr);
   }
 
   std::optional<std::pair<FormData, raw_ref<const FormFieldData>>>
@@ -1888,10 +1883,12 @@ TEST_F(FormAutofillTest, WebFormElementConsiderNonControlLabelableElements) {
       frame->GetDocument().GetElementById("form").To<WebFormElement>();
   ASSERT_TRUE(web_form);
 
-  FormData form = *ExtractFormData(web_form);
+  std::optional<FormData> form = ExtractFormData(web_form);
+  ASSERT_TRUE(form);
 
-  EXPECT_THAT(form.fields(), testing::ElementsAre(test::FormFieldDescriptionEq(
-                                 {.name = u"firstname"})));
+  EXPECT_THAT(
+      form->fields(),
+      ElementsAre(test::FormFieldDescriptionEq({.name = u"firstname"})));
 }
 
 // We should not be able to serialize a form with too many fillable fields.
@@ -1943,10 +1940,11 @@ TEST_F(FormAutofillTest, WebFormElementToFormData_AutocompleteOff_OnForm) {
       frame->GetDocument().GetElementById("form").To<WebFormElement>();
   ASSERT_TRUE(web_form);
 
-  FormData form = *ExtractFormData(web_form);
-  for (const FormFieldData& field : form.fields()) {
-    EXPECT_FALSE(field.should_autocomplete());
-  }
+  std::optional<FormData> form = ExtractFormData(web_form);
+  ASSERT_TRUE(form);
+  EXPECT_THAT(
+      form->fields(),
+      Each(test::FormFieldDescriptionEq({.should_autocomplete = false})));
 }
 
 // Tests that the `should_autocomplete` is set to false only for the field
@@ -1969,10 +1967,11 @@ TEST_F(FormAutofillTest, WebFormElementToFormData_AutocompleteOff_OnField) {
       frame->GetDocument().GetElementById("form").To<WebFormElement>();
   ASSERT_TRUE(web_form);
 
-  FormData form = *ExtractFormData(web_form);
-  EXPECT_THAT(form.fields(),
-              testing::ElementsAre(
-                  test::FormFieldDescriptionEq({.should_autocomplete = false}),
+  std::optional<FormData> form = ExtractFormData(web_form);
+  ASSERT_TRUE(form);
+  EXPECT_THAT(
+      form->fields(),
+      ElementsAre(test::FormFieldDescriptionEq({.should_autocomplete = false}),
                   test::FormFieldDescriptionEq({.should_autocomplete = true}),
                   test::FormFieldDescriptionEq({.should_autocomplete = true})));
 }
@@ -1991,9 +1990,10 @@ TEST_F(FormAutofillTest, WebFormElementToFormData_AutocompleteOff_OneTimeCode) {
       frame->GetDocument().GetElementById("form").To<WebFormElement>();
   ASSERT_TRUE(web_form);
 
-  FormData form = *ExtractFormData(web_form);
-  EXPECT_THAT(form.fields(), testing::ElementsAre(test::FormFieldDescriptionEq(
-                                 {.should_autocomplete = false})));
+  std::optional<FormData> form = ExtractFormData(web_form);
+  ASSERT_TRUE(form);
+  EXPECT_THAT(form->fields(), ElementsAre(test::FormFieldDescriptionEq(
+                                  {.should_autocomplete = false})));
 }
 
 // Tests CSS classes are set.
@@ -2012,10 +2012,11 @@ TEST_F(FormAutofillTest, WebFormElementToFormData_CssClasses) {
       frame->GetDocument().GetElementById("form").To<WebFormElement>();
   ASSERT_TRUE(web_form);
 
-  FormData form = *ExtractFormData(web_form);
+  std::optional<FormData> form = ExtractFormData(web_form);
+  ASSERT_TRUE(form);
   EXPECT_THAT(
-      form.fields(),
-      testing::ElementsAre(
+      form->fields(),
+      ElementsAre(
           test::FormFieldDescriptionEq({.css_classes = u"firstname_field"}),
           test::FormFieldDescriptionEq({.css_classes = u"lastname_field"}),
           test::FormFieldDescriptionEq({.css_classes = u""})));
@@ -2038,10 +2039,11 @@ TEST_F(FormAutofillTest, WebFormElementToFormData_IdAttributes) {
       frame->GetDocument().GetElementById("form").To<WebFormElement>();
   ASSERT_TRUE(web_form);
 
-  FormData form = *ExtractFormData(web_form);
+  std::optional<FormData> form = ExtractFormData(web_form);
+  ASSERT_TRUE(form);
   EXPECT_THAT(
-      form.fields(),
-      testing::ElementsAre(
+      form->fields(),
+      ElementsAre(
           test::FormFieldDescriptionEq({.name = u"name1",
                                         .name_attribute = u"name1",
                                         .id_attribute = u"firstname"}),
@@ -2363,12 +2365,14 @@ TEST_F(FormAutofillTest, LabelForAttribute) {
 
   base::HistogramTester histogram_tester;
   // Simulate seeing an unowned form containing just the input "fieldID".
-  FormData form = *ExtractFormData(WebFormElement());
-  ASSERT_EQ(form.fields().size(), 1u);
-  FormFieldData& form_field_data = test_api(form).field(0);
+  std::optional<FormData> form = ExtractFormData(WebFormElement());
+  ASSERT_TRUE(form);
 
-  EXPECT_EQ(form_field_data.label(), u"foo bar");
-  EXPECT_EQ(form_field_data.label_source(), FormFieldData::LabelSource::kForId);
+  EXPECT_THAT(form->fields(),
+              ElementsAre(test::FormFieldDescriptionEq({
+                  .label = u"foo bar",
+                  .label_source = FormFieldData::LabelSource::kForId,
+              })));
 }
 
 // Tests that when a label is assigned to an input, text behind it is considered
@@ -3530,13 +3534,14 @@ TEST_F(FormAutofillTest, ThreePartPhone) {
   std::vector<WebFormElement> forms = frame->GetDocument().GetTopLevelForms();
   ASSERT_EQ(1U, forms.size());
 
-  FormData form = *ExtractFormData(forms[0]);
-  EXPECT_EQ(u"TestForm", form.name());
-  EXPECT_EQ(GURL("http://cnn.com"), form.action());
+  std::optional<FormData> form = ExtractFormData(forms.front());
+  ASSERT_TRUE(form);
+  EXPECT_EQ(form->name(), u"TestForm");
+  EXPECT_EQ(form->action(), GURL("http://cnn.com"));
 
   EXPECT_THAT(
-      form.fields(),
-      testing::ElementsAre(
+      form->fields(),
+      ElementsAre(
           test::FormFieldDescriptionEq({.label = u"Phone:",
                                         .name = u"dayphone1",
                                         .name_attribute = u"dayphone1"}),
@@ -3572,13 +3577,14 @@ TEST_F(FormAutofillTest, MaxLengthFields) {
   std::vector<WebFormElement> forms = frame->GetDocument().GetTopLevelForms();
   ASSERT_EQ(1U, forms.size());
 
-  FormData form = *ExtractFormData(forms[0]);
-  EXPECT_EQ(u"TestForm", form.name());
-  EXPECT_EQ(GURL("http://cnn.com"), form.action());
+  std::optional<FormData> form = ExtractFormData(forms.front());
+  ASSERT_TRUE(form);
+  EXPECT_EQ(form->name(), u"TestForm");
+  EXPECT_EQ(form->action(), GURL("http://cnn.com"));
 
-  EXPECT_THAT(form.fields(),
-              testing::ElementsAre(
-                  test::FormFieldDescriptionEq({.label = u"Phone:",
+  EXPECT_THAT(
+      form->fields(),
+      ElementsAre(test::FormFieldDescriptionEq({.label = u"Phone:",
                                                 .name = u"dayphone1",
                                                 .name_attribute = u"dayphone1",
                                                 .max_length = 3}),
@@ -4025,20 +4031,21 @@ TEST_F(FormAutofillTest, UndoAutofill) {
       GetMainFrame()->GetDocument().GetTopLevelForms();
   EXPECT_EQ(1U, forms.size());
 
-  FormData form = *ExtractFormData(forms[0]);
+  std::optional<FormData> form = ExtractFormData(forms.front());
+  ASSERT_TRUE(form);
 
-  EXPECT_EQ(form.fields().size(), 4u);
+  ASSERT_EQ(form->fields().size(), 4u);
   std::vector<FormFieldData> undo_fields;
   for (size_t i = 0; i < 4; i += 2) {
     std::u16string type = i == 0 ? u"text" : u"select_option";
-    test_api(form).field(i).set_value(u"undo_" + type + u"_1");
-    test_api(form).field(i).set_is_autofilled_according_to_renderer(false);
-    undo_fields.push_back(form.fields()[i]);
+    test_api(*form).field(i).set_value(u"undo_" + type + u"_1");
+    test_api(*form).field(i).set_is_autofilled_according_to_renderer(false);
+    undo_fields.push_back(form->fields()[i]);
   }
 
-  form.set_fields(undo_fields);
+  form->set_fields(undo_fields);
   ExecuteJavaScriptForTests("document.getElementById('text_id_1').focus();");
-  ApplyFieldsAction(text_element_1.GetDocument(), form.fields(),
+  ApplyFieldsAction(text_element_1.GetDocument(), form->fields(),
                     mojom::ActionPersistence::kFill,
                     mojom::FormActionType::kUndo);
   EXPECT_THAT(text_element_1,
@@ -4211,13 +4218,14 @@ TEST_F(FormAutofillTest, SelectOneAsText) {
   std::vector<WebFormElement> forms = frame->GetDocument().GetTopLevelForms();
   ASSERT_EQ(1U, forms.size());
 
-  FormData form = *ExtractFormData(forms[0]);
-  EXPECT_EQ(u"TestForm", form.name());
-  EXPECT_EQ(GURL("http://cnn.com"), form.action());
+  std::optional<FormData> form = ExtractFormData(forms.front());
+  ASSERT_TRUE(form);
+  EXPECT_EQ(form->name(), u"TestForm");
+  EXPECT_EQ(form->action(), GURL("http://cnn.com"));
 
-  EXPECT_THAT(form.fields(),
-              testing::ElementsAre(
-                  test::FormFieldDescriptionEq({.label = u"John",
+  EXPECT_THAT(
+      form->fields(),
+      ElementsAre(test::FormFieldDescriptionEq({.label = u"John",
                                                 .name = u"firstname",
                                                 .id_attribute = u"firstname",
                                                 .value = u"John"}),
@@ -4241,14 +4249,15 @@ TEST_F(FormAutofillTest, UnownedFormElementsToFormDataWithoutForm) {
                 <label for=email>Email:</label>
                 <input id=email value='john@example.com'>
               </div>)");
-  FormData form = *ExtractFormData(WebFormElement());
+  std::optional<FormData> form = ExtractFormData(WebFormElement());
+  ASSERT_TRUE(form);
 
-  EXPECT_TRUE(form.name().empty());
-  EXPECT_FALSE(form.action().is_valid());
+  EXPECT_TRUE(form->name().empty());
+  EXPECT_FALSE(form->action().is_valid());
 
   EXPECT_THAT(
-      form.fields(),
-      testing::ElementsAre(
+      form->fields(),
+      ElementsAre(
           test::FormFieldDescriptionEq({.label = u"First name:",
                                         .name = u"firstname",
                                         .id_attribute = u"firstname",

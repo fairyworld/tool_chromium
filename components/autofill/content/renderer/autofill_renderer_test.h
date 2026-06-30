@@ -151,6 +151,10 @@ class AutofillRendererTest : public content::RenderViewTest {
     return GetWebElementById(id).DynamicTo<blink::WebInputElement>();
   }
 
+  // Wraps `form_util::ExtractFormData`.
+  std::optional<FormData> ExtractFormData(std::string_view form_id);
+  std::optional<FormData> ExtractFormData(blink::WebFormElement form_element);
+
   // Simulates autofill of a form specified by provided `FormData`. The filling
   // is initiated by clicking on the HTML element identified using
   // `initiate_click_element_id`. The filled values are specified by the
