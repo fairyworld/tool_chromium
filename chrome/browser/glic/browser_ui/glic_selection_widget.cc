@@ -7,6 +7,7 @@
 #include "base/strings/strcat.h"
 #include "base/task/single_thread_task_runner.h"
 #include "chrome/app/vector_icons/vector_icons.h"
+#include "chrome/browser/glic/browser_ui/glic_vector_icon_manager.h"
 #include "chrome/browser/glic/public/features.h"
 #include "chrome/browser/glic/resources/grit/glic_browser_resources.h"
 #include "chrome/browser/platform_util.h"
@@ -32,6 +33,7 @@
 #include "ui/compositor/scoped_layer_animation_settings.h"
 #include "ui/display/screen.h"
 #include "ui/gfx/image/image_skia_operations.h"
+#include "ui/gfx/paint_vector_icon.h"
 #include "ui/gfx/text_elider.h"
 #include "ui/gfx/text_utils.h"
 #include "ui/menus/simple_menu_model.h"
@@ -267,6 +269,8 @@ class GlicSelectionContentsView : public views::View,
     ask_gemini_btn->SetLabelStyle(views::style::STYLE_BODY_5_MEDIUM);
     ask_gemini_btn->SetCustomPadding(gfx::Insets::TLBR(0, 2, 0, 6));
 
+    ask_gemini_btn_ = ask_gemini_btn;
+
     gfx::ImageSkia* icon_skia =
         ui::ResourceBundle::GetSharedInstance().GetImageSkiaNamed(
             IDR_GLIC_BUTTON_ALT_ICON);
@@ -274,7 +278,7 @@ class GlicSelectionContentsView : public views::View,
         *icon_skia, skia::ImageOperations::RESIZE_BEST,
         gfx::Size(kIconSize, kIconSize));
 
-    auto generator = base::BindRepeating(
+    auto active_generator = base::BindRepeating(
         [](gfx::ImageSkia icon, const ui::ColorProvider* color_provider) {
           if (!color_provider) {
             return icon;
@@ -286,13 +290,37 @@ class GlicSelectionContentsView : public views::View,
         },
         resized_icon);
 
-    auto icon_model = ui::ImageModel::FromImageGenerator(std::move(generator),
-                                                         gfx::Size(20, 20));
+    active_icon_model_ = ui::ImageModel::FromImageGenerator(
+        std::move(active_generator), gfx::Size(20, 20));
 
-    ask_gemini_btn->SetImageModel(views::Button::STATE_NORMAL, icon_model);
-    ask_gemini_btn->SetImageModel(views::Button::STATE_HOVERED, icon_model);
-    ask_gemini_btn->SetImageModel(views::Button::STATE_PRESSED, icon_model);
-    ask_gemini_btn->SetImageModel(views::Button::STATE_DISABLED, icon_model);
+    auto inactive_generator = base::BindRepeating(
+        [](const ui::ColorProvider* color_provider) -> gfx::ImageSkia {
+          if (!color_provider) {
+            return gfx::ImageSkia();
+          }
+          const gfx::VectorIcon& vector_icon =
+              glic::GlicVectorIconManager::GetVectorIcon(
+                  IDR_GLIC_BUTTON_VECTOR_ICON);
+          gfx::ImageSkia icon = gfx::CreateVectorIcon(
+              vector_icon, kIconSize,
+              color_provider->GetColor(ui::kColorSysOnSurfaceVariant));
+          SkColor circle_bg_color =
+              color_provider->GetColor(ui::kColorSysBaseContainer);
+          return gfx::ImageSkiaOperations::CreateImageWithCircleBackground(
+              10, circle_bg_color, icon);
+        });
+
+    inactive_icon_model_ = ui::ImageModel::FromImageGenerator(
+        std::move(inactive_generator), gfx::Size(20, 20));
+
+    ask_gemini_btn_->SetImageModel(views::Button::STATE_NORMAL,
+                                   inactive_icon_model_);
+    ask_gemini_btn_->SetImageModel(views::Button::STATE_HOVERED,
+                                   active_icon_model_);
+    ask_gemini_btn_->SetImageModel(views::Button::STATE_PRESSED,
+                                   active_icon_model_);
+    ask_gemini_btn_->SetImageModel(views::Button::STATE_DISABLED,
+                                   inactive_icon_model_);
 
     views::InkDrop::Get(ask_gemini_btn)
         ->SetMode(views::InkDropHost::InkDropMode::ON);
@@ -433,6 +461,7 @@ class GlicSelectionContentsView : public views::View,
   }
 
   void OnMouseEntered(const ui::MouseEvent& event) override {
+    UpdateAskGeminiIcon(true);
     if (control_pill_) {
       control_pill_->layer()->SetOpacity(1.0f);
     }
@@ -449,6 +478,7 @@ class GlicSelectionContentsView : public views::View,
   }
 
   void OnMouseExited(const ui::MouseEvent& event) override {
+    UpdateAskGeminiIcon(false);
     if (control_pill_) {
       control_pill_->layer()->SetOpacity(0.0f);
     }
@@ -521,6 +551,15 @@ class GlicSelectionContentsView : public views::View,
     }
   }
 
+  void UpdateAskGeminiIcon(bool is_hovered) {
+    if (!ask_gemini_btn_) {
+      return;
+    }
+    const ui::ImageModel& normal_model =
+        is_hovered ? active_icon_model_ : inactive_icon_model_;
+    ask_gemini_btn_->SetImageModel(views::Button::STATE_NORMAL, normal_model);
+  }
+
   void OnMenuButtonClicked() {
     if (menu_runner_ && menu_runner_->IsRunning()) {
       return;
@@ -564,6 +603,9 @@ class GlicSelectionContentsView : public views::View,
 
  private:
   const raw_ptr<GlicSelectionWidgetDelegate> widget_delegate_;
+  raw_ptr<views::MdTextButton> ask_gemini_btn_ = nullptr;
+  ui::ImageModel inactive_icon_model_;
+  ui::ImageModel active_icon_model_;
   raw_ptr<views::ImageButton> copy_link_btn_ = nullptr;
   raw_ptr<views::ImageButton> pin_btn_ = nullptr;
   raw_ptr<views::ImageButton> menu_btn_ = nullptr;
