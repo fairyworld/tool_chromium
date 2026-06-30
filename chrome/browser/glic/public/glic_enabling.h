@@ -311,6 +311,23 @@ class GlicEnabling final : public signin::IdentityManager::Observer,
     };
     // LINT.ThenChange(//tools/metrics/histograms/metadata/glic/enums.xml:GlicFeatureDisabledReason)
 
+    // LINT.IfChange(GlicAnchoredDespiteEligibilityReason)
+    enum class AnchoredDespiteEligibilityReason {
+      kFeatureFlagDisabled = 0,
+      kCountryDisabled = 1,
+      kLocaleDisabled = 2,
+      kSystemRequirementNotMet = 3,
+      kOsVersionNotSupported = 4,
+      kPrimaryAccountNotCapable = 5,
+      kDisallowedByChromePolicy = 6,
+      kDisallowedByRemoteAdmin = 7,
+      kDisallowedByRemoteOther = 8,
+      kNotRegularProfile = 9,
+      kNotRolledOut = 10,
+      kMaxValue = kNotRolledOut,
+    };
+    // LINT.ThenChange(//tools/metrics/histograms/metadata/glic/enums.xml:GlicAnchoredDespiteEligibilityReason)
+
     enum class DisabledReason {
       kFeatureDisabled = 0,
       kNotRegularProfile = 1,

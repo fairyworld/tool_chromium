@@ -259,6 +259,8 @@ bool g_bypass_enablement_checks_for_testing = false;
 using DisabledReason = GlicEnabling::ProfileEnablement::DisabledReason;
 using FeatureDisabledReason =
     GlicEnabling::ProfileEnablement::FeatureDisabledReason;
+using AnchoredDespiteEligibilityReason =
+    GlicEnabling::ProfileEnablement::AnchoredDespiteEligibilityReason;
 
 void RecordDisabledReasonsWith(
     const GlicEnabling::ProfileEnablement& enablement,
@@ -303,6 +305,55 @@ void RecordFeatureDisabledReasonsWith(
   }
   if (!enablement.os_version_supported) {
     record_reason(FeatureDisabledReason::kOsVersionNotSupported);
+  }
+}
+
+void RecordAnchoredDespiteEligibilityReasonsWith(
+    const GlicEnabling::ProfileEnablement& enablement,
+    std::string_view name) {
+  if (!enablement.feature_flag_enabled) {
+    base::UmaHistogramEnumeration(
+        name, AnchoredDespiteEligibilityReason::kFeatureFlagDisabled);
+  }
+  if (!enablement.allowed_by_country_filter) {
+    base::UmaHistogramEnumeration(
+        name, AnchoredDespiteEligibilityReason::kCountryDisabled);
+  }
+  if (!enablement.allowed_by_locale_filter) {
+    base::UmaHistogramEnumeration(
+        name, AnchoredDespiteEligibilityReason::kLocaleDisabled);
+  }
+  if (!enablement.system_requirement_met) {
+    base::UmaHistogramEnumeration(
+        name, AnchoredDespiteEligibilityReason::kSystemRequirementNotMet);
+  }
+  if (!enablement.os_version_supported) {
+    base::UmaHistogramEnumeration(
+        name, AnchoredDespiteEligibilityReason::kOsVersionNotSupported);
+  }
+  if (!enablement.primary_account_is_capable) {
+    base::UmaHistogramEnumeration(
+        name, AnchoredDespiteEligibilityReason::kPrimaryAccountNotCapable);
+  }
+  if (!enablement.allowed_by_chrome_policy) {
+    base::UmaHistogramEnumeration(
+        name, AnchoredDespiteEligibilityReason::kDisallowedByChromePolicy);
+  }
+  if (!enablement.allowed_by_remote_admin) {
+    base::UmaHistogramEnumeration(
+        name, AnchoredDespiteEligibilityReason::kDisallowedByRemoteAdmin);
+  }
+  if (!enablement.allowed_by_remote_other) {
+    base::UmaHistogramEnumeration(
+        name, AnchoredDespiteEligibilityReason::kDisallowedByRemoteOther);
+  }
+  if (!enablement.is_regular_profile) {
+    base::UmaHistogramEnumeration(
+        name, AnchoredDespiteEligibilityReason::kNotRegularProfile);
+  }
+  if (!enablement.is_rolled_out) {
+    base::UmaHistogramEnumeration(
+        name, AnchoredDespiteEligibilityReason::kNotRolledOut);
   }
 }
 
@@ -373,16 +424,11 @@ void GlicEnabling::ProfileEnablement::RecordMetrics(
       base::StrCat(
           {"Glic.ProfileEnablement.IsPrimaryAccountFullySignedIn.", suffix}),
       primary_account_is_fully_signed_in);
-  if (suffix == "Startup" && anchor_entrypoint_override_active) {
-    auto record_disabled_reason = [&](FeatureDisabledReason reason) {
-      base::UmaHistogramEnumeration(
-          base::StrCat({"Glic.ProfileEnablement."
-                        "AnchoredDespiteEligibilityFailureReason.",
-                        suffix}),
-          reason);
-    };
-
-    RecordFeatureDisabledReasonsWith(*this, record_disabled_reason);
+  if (anchor_entrypoint_override_active && ShouldShowGlicButton()) {
+    RecordAnchoredDespiteEligibilityReasonsWith(
+        *this, base::StrCat({"Glic.ProfileEnablement."
+                             "AnchoredDespiteEligibilityReason.",
+                             suffix}));
   }
 
   base::UmaHistogramBoolean(
