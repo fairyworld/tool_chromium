@@ -18811,6 +18811,7 @@ from previous Chrome versions.
   <int value="1382727025" label="SeparateLocalAndAccountThemes:disabled"/>
   <int value="1382972493" label="AndroidSurfaceColorUpdate:enabled"/>
   <int value="1383197819" label="IncognitoScreenshot:enabled"/>
+  <int value="1383232548" label="InAppWindowManagerDeprecation:disabled"/>
   <int value="1383319785" label="EnableFullscreenToScreen:enabled"/>
   <int value="1383526461" label="QuickAnswersRichUi:enabled"/>
   <int value="1383591631" label="enable-gesture-typing"/>
@@ -21055,6 +21056,7 @@ from previous Chrome versions.
   <int value="2097465503" label="RequestDesktopSiteZoom:disabled"/>
   <int value="2098059607" label="WifiSyncAllowDeletes:disabled"/>
   <int value="2098114768" label="DocumentPictureInPictureAPI:disabled"/>
+  <int value="2098167718" label="InAppWindowManagerDeprecation:enabled"/>
   <int value="2098274741" label="NtpRealboxCr23ExpandedStateLayout:disabled"/>
   <int value="2098597721"
       label="WebAuthenticationPasskeysUIExperiment:disabled"/>

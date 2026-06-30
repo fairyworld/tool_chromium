@@ -7468,6 +7468,11 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(segmentation_platform::features::
                             kSegmentationPlatformAndroidHomeModuleRankerV2)},
 
+    {"in-app-window-manager-deprecation",
+     flag_descriptions::kInAppWindowManagerDeprecationName,
+     flag_descriptions::kInAppWindowManagerDeprecationDescription, kOsAndroid,
+     FEATURE_VALUE_TYPE(chrome::android::kInAppWindowManagerDeprecation)},
+
     {"search-in-cct", flag_descriptions::kSearchInCCTName,
      flag_descriptions::kSearchInCCTDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(chrome::android::kSearchInCCT)},
