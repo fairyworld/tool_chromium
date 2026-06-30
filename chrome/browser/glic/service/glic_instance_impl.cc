@@ -19,6 +19,10 @@
 #include "chrome/browser/actor/actor_keyed_service_factory.h"
 #include "chrome/browser/background/glic/glic_launcher_configuration.h"
 #include "chrome/browser/browser_process.h"
+#if !BUILDFLAG(IS_ANDROID)
+#include "chrome/browser/glic/browser_ui/glic_actor_task_icon_manager.h"
+#include "chrome/browser/glic/browser_ui/glic_actor_task_icon_manager_factory.h"
+#endif
 #include "chrome/browser/glic/common/future_browser_features.h"
 #include "chrome/browser/glic/glic_metrics.h"
 #include "chrome/browser/glic/glic_pref_names.h"
@@ -1618,6 +1622,13 @@ void GlicInstanceImpl::OnTabAddedToTask(
                                    /*success=*/false);
     return;
   }
+
+#if !BUILDFLAG(IS_ANDROID)
+  if (auto* icon_manager =
+          glic::GlicActorTaskIconManagerFactory::GetForProfile(profile_)) {
+    icon_manager->OnTabAddedToTask(task_id);
+  }
+#endif
 
   if (IsActiveEmbedder(CreateSidePanelEmbedderKey(tab))) {
     return;

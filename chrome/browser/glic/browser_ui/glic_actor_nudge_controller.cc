@@ -85,9 +85,10 @@ void GlicActorNudgeController::OnStateUpdate(
       if (show_bubble) {
         ShowBubble();
       } else {
-        // In either case, close the bubble as the nudge has been either hidden
-        // or reset.
-        CloseBubble();
+        // Do not close the bubble if there are still active tasks in progress.
+        if (num_tasks_need_processing == 0) {
+          CloseBubble();
+        }
       }
       break;
     case ActorTaskNudgeState::Text::kNeedsAttention:
