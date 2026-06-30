@@ -48,6 +48,9 @@ DeviceCommandsFactoryAsh::~DeviceCommandsFactoryAsh() = default;
 std::unique_ptr<RemoteCommandJob> DeviceCommandsFactoryAsh::BuildJobForType(
     RemoteCommand::Type type,
     RemoteCommandsService* service) {
+  // TODO(crbug.com/404133022): Inject local state PrefService.
+  PrefService* local_state = g_browser_process->local_state();
+
   switch (type) {
     case RemoteCommand::DEVICE_REBOOT:
       return std::make_unique<DeviceCommandRebootJob>();
@@ -81,9 +84,9 @@ std::unique_ptr<RemoteCommandJob> DeviceCommandsFactoryAsh::BuildJobForType(
       return std::make_unique<DeviceCommandFetchSupportPacketJob>();
     case RemoteCommand::QUERY_GEOLOCATION:
       return std::make_unique<DeviceCommandQueryGeolocationJob>(
-          g_browser_process->platform_part()
-              ->browser_policy_connector_ash()
-              ->GetDeviceCloudPolicyManager());
+          local_state, g_browser_process->platform_part()
+                           ->browser_policy_connector_ash()
+                           ->GetDeviceCloudPolicyManager());
 
     case RemoteCommand::COMMAND_ECHO_TEST:
     case RemoteCommand::USER_ARC_COMMAND:
