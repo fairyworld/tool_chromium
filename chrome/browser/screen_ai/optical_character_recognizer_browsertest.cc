@@ -314,6 +314,7 @@ class OpticalCharacterRecognizerTest
     }
 
     ocr()->PerformOCR(*bitmap, perform_future_.GetCallback());
+    ASSERT_TRUE(perform_future_.Wait());
     disconnect_timer_.Stop();
   }
 
