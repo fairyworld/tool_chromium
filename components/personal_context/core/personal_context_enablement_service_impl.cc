@@ -130,8 +130,10 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     return kDisabledNotEligible;
   }
 
-  const bool notice_should_be_shown = pref_service->GetBoolean(
-      prefs::kPersonalContextInAutofillNoticeShouldBeShown);
+  // TODO(b:494149753): This pref is autofill specific, find a way to move it to
+  // components/autofill.
+  const bool ambient_autofill_notice_should_be_shown = pref_service->GetBoolean(
+      prefs::kPersonalContextAmbientAutofillNoticeShouldBeShown);
   const bool toggle_is_on = pref_service->GetBoolean(
       prefs::kPersonalContextInAutofillSettingsToggleStatus);
 
@@ -142,7 +144,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     return kDisabledViaPersonalIntelligenceInAutofillToggle;
   }
 
-  if (notice_should_be_shown) {
+  if (ambient_autofill_notice_should_be_shown) {
     MaybeOutputReason(debug_message, "Notice not yet shown.");
     return kEnabledShouldShowNotice;
   }
@@ -171,7 +173,7 @@ PersonalContextEnablementServiceImpl::PersonalContextEnablementServiceImpl(
   if (pref_service_) {
     pref_registrar_.Init(pref_service_);
     pref_registrar_.Add(
-        prefs::kPersonalContextInAutofillNoticeShouldBeShown,
+        prefs::kPersonalContextAmbientAutofillNoticeShouldBeShown,
         base::BindRepeating(
             &PersonalContextEnablementServiceImpl::UpdateEnablementState,
             base::Unretained(this)));
@@ -251,7 +253,7 @@ void PersonalContextEnablementServiceImpl::OnPrimaryAccountChanged(
       signin::PrimaryAccountChangeEvent::Type::kCleared) {
     if (pref_service_) {
       pref_service_->ClearPref(
-          prefs::kPersonalContextInAutofillNoticeShouldBeShown);
+          prefs::kPersonalContextAmbientAutofillNoticeShouldBeShown);
       pref_service_->ClearPref(
           prefs::kPersonalContextInAutofillSettingsToggleStatus);
     }

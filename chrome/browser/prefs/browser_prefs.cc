@@ -1000,6 +1000,10 @@ inline constexpr char kTabSearchPinnedToTabstripMigrationComplete2[] =
     "tab_search.pinned_to_tabstrip_migration_complete_2";
 
 // Deprecated 06/2026.
+constexpr char kPersonalContextInAutofillNoticeShouldBeShown[] =
+    "autofill.personal_context.notice_should_be_shown";
+
+// Deprecated 06/2026.
 inline constexpr char kDefaultBrowserInfobarLastDeclined[] =
     "browser.default_browser_infobar_last_declined";
 
@@ -1363,6 +1367,10 @@ void RegisterProfilePrefsForMigration(
   registry->RegisterBooleanPref(kTabSearchPinnedToTabstripMigrationComplete,
                                 true);
   registry->RegisterBooleanPref(kTabSearchPinnedToTabstripMigrationComplete2,
+                                true);
+
+  // Deprecated 06/2026.
+  registry->RegisterBooleanPref(kPersonalContextInAutofillNoticeShouldBeShown,
                                 true);
 
   // Deprecated 06/2026.
@@ -2658,6 +2666,9 @@ void MigrateObsoleteProfilePrefs(PrefService* profile_prefs,
   profile_prefs->ClearPref(kTabSearchMigrationComplete);
   profile_prefs->ClearPref(kTabSearchPinnedToTabstripMigrationComplete);
   profile_prefs->ClearPref(kTabSearchPinnedToTabstripMigrationComplete2);
+
+  // Added 06/2026.
+  profile_prefs->ClearPref(kPersonalContextInAutofillNoticeShouldBeShown);
 
   // Added 06/2026
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)

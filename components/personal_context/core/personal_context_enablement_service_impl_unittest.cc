@@ -78,7 +78,8 @@ class PersonalContextEnablementServiceImplTest : public testing::Test {
   void SetPrefs() {
     personal_context::prefs::RegisterProfilePrefs(pref_service_.registry());
     pref_service_.SetBoolean(
-        personal_context::prefs::kPersonalContextInAutofillNoticeShouldBeShown,
+        personal_context::prefs::
+            kPersonalContextAmbientAutofillNoticeShouldBeShown,
         false);
     pref_service_.SetBoolean(
         personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
@@ -161,7 +162,8 @@ TEST_F(PersonalContextEnablementServiceImplTest, EnabledWhenAllFeaturesAreOn) {
 TEST_F(PersonalContextEnablementServiceImplTest,
        EnabledShouldNotShowNoticeAndToggleIsOn) {
   pref_service_.SetBoolean(
-      personal_context::prefs::kPersonalContextInAutofillNoticeShouldBeShown,
+      personal_context::prefs::
+          kPersonalContextAmbientAutofillNoticeShouldBeShown,
       false);
   pref_service_.SetBoolean(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
@@ -175,7 +177,8 @@ TEST_F(PersonalContextEnablementServiceImplTest,
 TEST_F(PersonalContextEnablementServiceImplTest,
        EnabledShouldShowNoticeAndToggleIsOn) {
   pref_service_.SetBoolean(
-      personal_context::prefs::kPersonalContextInAutofillNoticeShouldBeShown,
+      personal_context::prefs::
+          kPersonalContextAmbientAutofillNoticeShouldBeShown,
       true);
   pref_service_.SetBoolean(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
@@ -193,14 +196,16 @@ TEST_F(PersonalContextEnablementServiceImplTest, DisabledViaToggle) {
 
   // The toggle takes precedence no matter if the notice should still be shown.
   pref_service_.SetBoolean(
-      personal_context::prefs::kPersonalContextInAutofillNoticeShouldBeShown,
+      personal_context::prefs::
+          kPersonalContextAmbientAutofillNoticeShouldBeShown,
       false);
   EXPECT_EQ(service().GetEnablementState(),
             PersonalContextEnablementState::
                 kDisabledViaPersonalIntelligenceInAutofillToggle);
 
   pref_service_.SetBoolean(
-      personal_context::prefs::kPersonalContextInAutofillNoticeShouldBeShown,
+      personal_context::prefs::
+          kPersonalContextAmbientAutofillNoticeShouldBeShown,
       true);
   EXPECT_EQ(service().GetEnablementState(),
             PersonalContextEnablementState::
@@ -219,14 +224,16 @@ TEST_F(PersonalContextEnablementServiceImplTest, DisabledWhenSignedOut) {
 // ensuring they see the notice again if they sign back in.
 TEST_F(PersonalContextEnablementServiceImplTest, ClearsPrefOnSignout) {
   pref_service_.SetBoolean(
-      personal_context::prefs::kPersonalContextInAutofillNoticeShouldBeShown,
+      personal_context::prefs::
+          kPersonalContextAmbientAutofillNoticeShouldBeShown,
       false);
   pref_service_.SetBoolean(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       false);
   identity_test_env_.ClearPrimaryAccount();
   EXPECT_TRUE(pref_service_.GetBoolean(
-      personal_context::prefs::kPersonalContextInAutofillNoticeShouldBeShown));
+      personal_context::prefs::
+          kPersonalContextAmbientAutofillNoticeShouldBeShown));
   EXPECT_TRUE(pref_service_.GetBoolean(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus));
 }
@@ -358,14 +365,16 @@ TEST_F(PersonalContextEnablementServiceImplTest,
               OnEnablementStateChanged(
                   PersonalContextEnablementState::kEnabledShouldShowNotice));
   pref_service_.SetBoolean(
-      personal_context::prefs::kPersonalContextInAutofillNoticeShouldBeShown,
+      personal_context::prefs::
+          kPersonalContextAmbientAutofillNoticeShouldBeShown,
       true);
 
   // Trigger a change back to kEnabled.
   EXPECT_CALL(observer, OnEnablementStateChanged(
                             PersonalContextEnablementState::kEnabled));
   pref_service_.SetBoolean(
-      personal_context::prefs::kPersonalContextInAutofillNoticeShouldBeShown,
+      personal_context::prefs::
+          kPersonalContextAmbientAutofillNoticeShouldBeShown,
       false);
 
   service().RemoveObserver(&observer);

@@ -95,7 +95,7 @@ TEST_F(PersonalContextFirstRunServiceImplTest, SetsPrefOnAcknowledge) {
 
   EXPECT_EQ(future.Get(), FirstRunTriggerResult::kSuccess);
   EXPECT_FALSE(pref_service()->GetBoolean(
-      prefs::kPersonalContextInAutofillNoticeShouldBeShown));
+      prefs::kPersonalContextAmbientAutofillNoticeShouldBeShown));
 }
 
 TEST_F(PersonalContextFirstRunServiceImplTest, DoesNotSetPrefOnDismiss) {
@@ -116,7 +116,7 @@ TEST_F(PersonalContextFirstRunServiceImplTest, DoesNotSetPrefOnDismiss) {
 
   EXPECT_EQ(future.Get(), FirstRunTriggerResult::kSuccess);
   EXPECT_TRUE(pref_service()->GetBoolean(
-      prefs::kPersonalContextInAutofillNoticeShouldBeShown));
+      prefs::kPersonalContextAmbientAutofillNoticeShouldBeShown));
 }
 
 TEST_F(PersonalContextFirstRunServiceImplTest, DoesNotTriggerWhenNotEligible) {
@@ -172,12 +172,12 @@ TEST_F(PersonalContextFirstRunServiceImplTest, TriggersWhenShouldShowNotice) {
 TEST_F(PersonalContextFirstRunServiceImplTest,
        MarkPersonalContextInAutofillNoticeAsAcknowledgedSetsPrefs) {
   pref_service()->SetBoolean(
-      prefs::kPersonalContextInAutofillNoticeShouldBeShown, true);
+      prefs::kPersonalContextAmbientAutofillNoticeShouldBeShown, true);
 
   service()->MarkPersonalContextInAutofillNoticeAsAcknowledged();
 
   EXPECT_FALSE(pref_service()->GetBoolean(
-      prefs::kPersonalContextInAutofillNoticeShouldBeShown));
+      prefs::kPersonalContextAmbientAutofillNoticeShouldBeShown));
 }
 
 TEST_F(PersonalContextFirstRunServiceImplTest,

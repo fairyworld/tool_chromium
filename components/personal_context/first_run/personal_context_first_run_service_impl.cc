@@ -62,7 +62,7 @@ void PersonalContextFirstRunServiceImpl::
     MarkPersonalContextInAutofillNoticeAsAcknowledged() {
   if (pref_service_) {
     pref_service_->SetBoolean(
-        prefs::kPersonalContextInAutofillNoticeShouldBeShown, false);
+        prefs::kPersonalContextAmbientAutofillNoticeShouldBeShown, false);
   }
 }
 
@@ -85,7 +85,7 @@ void PersonalContextFirstRunServiceImpl::OnNoticeDialogCompleted(
   if (result == NoticeResult::kAcknowledged) {
     if (pref_service_) {
       pref_service_->SetBoolean(
-          prefs::kPersonalContextInAutofillNoticeShouldBeShown, false);
+          prefs::kPersonalContextAmbientAutofillNoticeShouldBeShown, false);
     }
   }
   std::move(callback).Run(FirstRunTriggerResult::kSuccess);
