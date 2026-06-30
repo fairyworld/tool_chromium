@@ -594,7 +594,7 @@ try_.builder(
     name = "mac_chromium_dbg_ng",
     mirrors = [
         "ci/mac-arm64-dbg",
-        "ci/mac15-tests-dbg",
+        "ci/mac26-tests-dbg",
     ],
     gn_args = "ci/mac-arm64-dbg",
     cpu = cpu.ARM64,

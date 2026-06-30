@@ -774,9 +774,9 @@ ci.thin_tester(
 )
 
 ci.thin_tester(
-    name = "mac15-tests-dbg",
+    name = "mac26-tests-dbg",
     branch_selector = branches.selector.MAC_BRANCHES,
-    description_html = "Runs Mac 15 tests with debug config.",
+    description_html = "Runs Mac 26 tests with debug config.",
     parent = "ci/mac-arm64-dbg",
     builder_spec = builder_config.builder_spec(
         execution_mode = builder_config.execution_mode.TEST,
@@ -800,7 +800,7 @@ ci.thin_tester(
             "chromium_dbg_isolated_scripts",
         ],
         mixins = [
-            "mac_15_arm64",
+            "mac_26_arm64",
         ],
         per_test_modifications = {
             "blink_web_tests": targets.mixin(
@@ -856,7 +856,7 @@ ci.thin_tester(
     gardener_rotations = args.ignore_default(None),
     console_view_entry = consoles.console_view_entry(
         category = "debug",
-        short_name = "15",
+        short_name = "26",
     ),
     cq_mirrors_console_view = "mirrors",
     contact_team_email = "bling-engprod@google.com",
