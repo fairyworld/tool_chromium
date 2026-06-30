@@ -1052,10 +1052,7 @@ DeveloperPrivateInstallDroppedFileFunction::Run() {
         CrxInstaller::OffStoreInstallAllowedFromSettingsPage);
     crx_installer->set_install_immediately(true);
 
-    if (MatchesExtension(file, FILE_PATH_LITERAL(".user.js"))) {
-      crx_installer->InstallUserScript(file.path,
-                                       net::FilePathToFileURL(file.path));
-    } else if (MatchesExtension(file, FILE_PATH_LITERAL(".crx"))) {
+    if (MatchesExtension(file, FILE_PATH_LITERAL(".crx"))) {
       crx_installer->InstallCrx(file.path);
     } else {
       EXTENSION_FUNCTION_VALIDATE(false);

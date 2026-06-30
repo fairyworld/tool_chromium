@@ -2455,7 +2455,6 @@ source_set("browser_tests") {
     "updater/update_service_browsertest.cc",
     "user_host_restrictions_browsertest.cc",
     "user_script_csp_browsertest.cc",
-    "user_script_extension_browsertest.cc",
     "view_extension_source_browsertest.cc",
     "wasm_mv3_browsertest.cc",
     "web_accessible_resources_browsertest.cc",
