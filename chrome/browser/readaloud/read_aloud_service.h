@@ -186,6 +186,8 @@ class ReadAloudService : public KeyedService,
       const dom_distiller::DistilledArticleProto* article_proto) override;
   void OnArticleUpdated(
       dom_distiller::ArticleDistillationUpdate article_update) override;
+  void OnDistillationFailed(
+      dom_distiller::DistillationParseResult reason) override;
 
   dom_distiller::ViewerHandle* GetViewerHandleForTesting() const {
     return viewer_handle_.get();

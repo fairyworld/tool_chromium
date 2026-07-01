@@ -124,4 +124,9 @@ void ReadAloudService::OnUtilityDisconnect() {
   player_factory_.reset();
 }
 
+void ReadAloudService::OnDistillationFailed(
+    dom_distiller::DistillationParseResult reason) {
+  base::UmaHistogramEnumeration("ReadAloud.Distillation.FailureReason", reason);
+}
+
 }  // namespace readaloud
