@@ -4990,6 +4990,8 @@ if (is_android) {
     deps = [
       ":file_provider_utils_java",
       ":log_java",
+      ":tasks_java",
+      ":time_utils_java",
       "//third_party/androidx:androidx_annotation_annotation_java",
       "//third_party/jni_zero:jni_zero_java",
     ]
