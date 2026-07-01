@@ -1315,7 +1315,6 @@ inline constexpr char kManagedSerialAllowAllPortsForUrls[] =
 inline constexpr char kManagedSerialAllowUsbDevicesForUrls[] =
     "managed.serial_allow_usb_devices_for_urls";
 
-#if !BUILDFLAG(IS_ANDROID)
 // Used to store the value of the WebHidAllowAllDevicesForUrls policy.
 inline constexpr char kManagedWebHidAllowAllDevicesForUrls[] =
     "managed.web_hid_allow_all_devices_for_urls";
@@ -1333,7 +1332,6 @@ inline constexpr char kManagedWebHidAllowDevicesForUrlsOnLoginScreen[] =
 // policy.
 inline constexpr char kManagedWebHidAllowDevicesWithHidUsagesForUrls[] =
     "managed.web_hid_allow_devices_with_hid_usages_for_urls";
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Directory of the last profile used.
 inline constexpr char kProfileLastUsed[] = "profile.last_used";
