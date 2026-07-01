@@ -16348,20 +16348,8 @@
             ],
             "experiments": [
                 {
-                    "name": "Treatment",
+                    "name": "Enabled",
                     "enable_features": [
-                        "IOSMiniMapUniversalLink"
-                    ],
-                    "disable_features": [
-                        "IOSMiniMapUniversalLinkCounterfactual"
-                    ]
-                },
-                {
-                    "name": "Counterfactual",
-                    "enable_features": [
-                        "IOSMiniMapUniversalLinkCounterfactual"
-                    ],
-                    "disable_features": [
                         "IOSMiniMapUniversalLink"
                     ]
                 }
