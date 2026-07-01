@@ -691,7 +691,6 @@ public class OmniboxSuggestionsDropdown extends RecyclerView {
         return mAdapter;
     }
 
-    @VisibleForTesting
     SelectionController getSelectionControllerForTesting() {
         return mSelectionController;
     }

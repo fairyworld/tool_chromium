@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.FrameLayout.LayoutParams;
 
 import androidx.annotation.ColorInt;
-import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.ValueChangedCallback;
 import org.chromium.base.supplier.MonotonicObservableSupplier;
@@ -309,11 +308,6 @@ public class HubManagerImpl implements HubManager, HubController {
         }
     }
 
-    @VisibleForTesting
-    public @Nullable HubCoordinator getHubCoordinatorForTesting() {
-        return mHubCoordinator;
-    }
-
     private void onFocusedPaneChanged(Pane newPane, @Nullable Pane oldPane) {
         detachPaneDependencies(oldPane);
         if (mHubCoordinator != null) {
@@ -355,5 +349,9 @@ public class HubManagerImpl implements HubManager, HubController {
                 ParentOverrideSlot.HUB,
                 mHubCoordinator.getSnackbarContainer(),
                 hasBottomToolbar ? mSnackbarMarginSupplier : null);
+    }
+
+    public @Nullable HubCoordinator getHubCoordinatorForTesting() {
+        return mHubCoordinator;
     }
 }

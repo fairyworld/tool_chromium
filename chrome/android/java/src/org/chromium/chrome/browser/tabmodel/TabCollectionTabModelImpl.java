@@ -972,13 +972,6 @@ public class TabCollectionTabModelImpl extends TabModelJniBridge {
         mTabsList = null;
     }
 
-    @VisibleForTesting
-    List<Tab> getAllTabsFromNativeForTesting() {
-        assertOnUiThread();
-        if (mNativeTabCollectionTabModelImplPtr == 0) return Collections.emptyList();
-        return TabCollectionTabModelImplJni.get().getAllTabs(mNativeTabCollectionTabModelImplPtr);
-    }
-
     @Override
     protected boolean containsTabGroup(Token tabGroupId) {
         assertOnUiThread();
@@ -2774,12 +2767,6 @@ public class TabCollectionTabModelImpl extends TabModelJniBridge {
         mClosingTabsCount--;
     }
 
-    void setPendingTabClosureManagerForTesting(
-            @Nullable PendingTabClosureManager pendingTabClosureManager) {
-        mPendingTabClosureManager = pendingTabClosureManager;
-        ResettersForTesting.register(() -> mPendingTabClosureManager = null);
-    }
-
     @NativeMethods
     interface Natives {
         long init(TabCollectionTabModelImpl javaObject, @JniType("Profile*") Profile profile);
@@ -2880,5 +2867,17 @@ public class TabCollectionTabModelImpl extends TabModelJniBridge {
 
         @JniType("tabs::TabStripCollection*")
         TabStripCollection getTabStripCollection(long nativeTabCollectionTabModelImpl);
+    }
+
+    List<Tab> getAllTabsFromNativeForTesting() {
+        assertOnUiThread();
+        if (mNativeTabCollectionTabModelImplPtr == 0) return Collections.emptyList();
+        return TabCollectionTabModelImplJni.get().getAllTabs(mNativeTabCollectionTabModelImplPtr);
+    }
+
+    void setPendingTabClosureManagerForTesting(
+            @Nullable PendingTabClosureManager pendingTabClosureManager) {
+        mPendingTabClosureManager = pendingTabClosureManager;
+        ResettersForTesting.register(() -> mPendingTabClosureManager = null);
     }
 }
