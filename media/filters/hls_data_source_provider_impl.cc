@@ -198,8 +198,16 @@ void HlsDataSourceProviderImpl::DataSourceInitialized(
       stream->set_did_redirect();
     }
     const auto& response_uri = it->second->GetUrlAfterRedirects();
-    if (!response_uri.is_empty() && !response_uri.SchemeIs("data")) {
-      stream->TrackOrigin(url::Origin::Create(response_uri));
+    if (!response_uri.is_empty()) {
+      if (!response_uri.SchemeIs("data")) {
+        stream->TrackOrigin(url::Origin::Create(response_uri));
+      }
+      stream->SetPostRedirectUri(response_uri);
+    } else {
+      std::move(callback).Run({ReadStatus::Codes::kError,
+                               "Invalid security origin for non-existent URL"});
+      TRACE_EVENT_END("media", GetTracingTrack(this));
+      return;
     }
   }
 
