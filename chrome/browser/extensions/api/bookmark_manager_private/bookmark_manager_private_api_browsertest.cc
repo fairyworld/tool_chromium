@@ -226,6 +226,36 @@ IN_PROC_BROWSER_TEST_F(BookmarkManagerPrivateApiBrowsertest,
 }
 
 IN_PROC_BROWSER_TEST_F(BookmarkManagerPrivateApiBrowsertest,
+                       StartDragWithoutSenderWebContentsFails) {
+  const BookmarkNode* node = model()->AddURL(
+      model()->bookmark_bar_node(), 0, u"Goog", GURL("https://www.google.com"));
+  std::string node_id = base::NumberToString(node->id());
+
+  auto start_drag_function =
+      base::MakeRefCounted<BookmarkManagerPrivateStartDragFunction>();
+  EXPECT_EQ(
+      "Drag failed: sender WebContents is gone.",
+      api_test_utils::RunFunctionAndReturnError(
+          start_drag_function.get(),
+          base::StringPrintf(R"([["%s"], 0, false, 0, 0])", node_id.c_str()),
+          GetProfile()));
+}
+
+IN_PROC_BROWSER_TEST_F(BookmarkManagerPrivateApiBrowsertest,
+                       DropWithoutSenderWebContentsFails) {
+  std::string parent_id =
+      base::NumberToString(model()->bookmark_bar_node()->id());
+
+  auto drop_function =
+      base::MakeRefCounted<BookmarkManagerPrivateDropFunction>();
+  EXPECT_EQ(
+      "Drop failed: sender WebContents is gone.",
+      api_test_utils::RunFunctionAndReturnError(
+          drop_function.get(),
+          base::StringPrintf(R"(["%s", 0])", parent_id.c_str()), GetProfile()));
+}
+
+IN_PROC_BROWSER_TEST_F(BookmarkManagerPrivateApiBrowsertest,
                        RunOpenInNewTabFunction) {
   // Browser starts with one tab.
   ASSERT_EQ(1, browser()->tab_strip_model()->count());

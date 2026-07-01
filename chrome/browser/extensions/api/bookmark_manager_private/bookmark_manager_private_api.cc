@@ -111,6 +111,8 @@ constexpr char kBookmarkNodesNotFoundFromIdListError[] =
 
 constexpr char kInvalidBrowserError[] = "Can't find a valid browser";
 
+constexpr char kDragFailedNoWebContentsError[] =
+    "Drag failed: sender WebContents is gone.";
 constexpr char kDropFailedNoWebContentsError[] =
     "Drop failed: sender WebContents is gone.";
 constexpr char kDropFailedNoDragRouterError[] =
@@ -612,10 +614,15 @@ BookmarkManagerPrivateStartDragFunction::RunOnReady() {
     return RespondNow(Error(bookmarks_errors::kEditBookmarksDisabled));
   }
 
-  content::WebContents* web_contents = GetSenderWebContents();
   std::optional<StartDrag::Params> params = StartDrag::Params::Create(args());
   if (!params) {
     return RespondNow(BadMessage());
+  }
+
+  content::WebContents* web_contents = GetSenderWebContents();
+  // May be null after async BookmarkModelLoaded if the RFH is gone.
+  if (!web_contents) {
+    return RespondNow(Error(kDragFailedNoWebContentsError));
   }
 
   BookmarkModel* model =
