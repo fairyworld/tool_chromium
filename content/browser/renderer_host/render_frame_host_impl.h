@@ -2113,7 +2113,9 @@ class CONTENT_EXPORT RenderFrameHostImpl
   void GetFileSystemAccessManager(
       mojo::PendingReceiver<blink::mojom::FileSystemAccessManager> receiver);
 
+#if !BUILDFLAG(IS_ANDROID)
   void GetHidService(mojo::PendingReceiver<blink::mojom::HidService> receiver);
+#endif
 
   void BindSerialService(
       mojo::PendingReceiver<blink::mojom::SerialService> receiver);

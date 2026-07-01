@@ -68,7 +68,6 @@ class HidTest : public ContentBrowserTest {
   void SetUpCommandLine(base::CommandLine* command_line) override {
     command_line->AppendSwitch(
         switches::kEnableExperimentalWebPlatformFeatures);
-    command_line->AppendSwitchASCII(switches::kEnableBlinkFeatures, "WebHID");
   }
 
   void SetUpOnMainThread() override {
