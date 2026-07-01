@@ -9,9 +9,7 @@
 #include <vector>
 
 #include "base/metrics/field_trial.h"
-#include "base/metrics/runtime_field_trial_overrides.h"
 #include "components/variations/variations_ids_provider.h"
-#include "content/common/content_export.h"
 
 namespace content {
 class RenderProcessHost;
@@ -31,10 +29,9 @@ class RenderProcessHost;
 //
 // This class also registers itself as a VariationsIdsProvider Observer and
 // updates the renderers if the variations header changes.
-class CONTENT_EXPORT FieldTrialSynchronizer
+class FieldTrialSynchronizer
     : public base::FieldTrialList::Observer,
-      public variations::VariationsIdsProvider::Observer,
-      public base::RuntimeFieldTrialOverrides::Observer {
+      public variations::VariationsIdsProvider::Observer {
  public:
   // Creates the global FieldTrialSynchronizer instance for this process. After
   // this is invoked, renderers are notified whenever a field trial group is
@@ -55,12 +52,6 @@ class CONTENT_EXPORT FieldTrialSynchronizer
 
   // VariationsIdsProvider::Observer methods:
   void VariationIdsHeaderUpdated() override;
-
-  // RuntimeFieldTrialOverrides::Observer methods:
-  void OnRuntimeFieldTrialOverride(
-      const base::RuntimeFieldTrialOverrides::RuntimeOverrideInfo&
-          override_info,
-      std::string_view previous_override_trial_name) override;
 
   // Sends the current variations header to |host|'s renderer.
   static void UpdateRendererVariationsHeader(RenderProcessHost* host);
