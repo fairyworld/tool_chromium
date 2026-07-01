@@ -24,14 +24,12 @@ export class SkillsWebClientMessageHandler implements
     MessageHandlerInterface<SkillsClient> {
   private cachedSkillPreviews: SkillPreview[] = [];
   private cachedContextualSkillPreviews: SkillPreview[] = [];
-  private cachedSkillPrompts = new Map<string, string>();
 
   constructor(private host: SkillsHostInterface) {}
 
   notifySkillPreviewsChanged(payload: {
     skillPreviews: SkillPreview[],
   }): void {
-    this.cachedSkillPrompts.clear();
     this.cachedSkillPreviews = payload.skillPreviews;
     this.host.skillPreviews.assignAndSignal(this.combineSkillPreviews());
   }
@@ -47,7 +45,6 @@ export class SkillsWebClientMessageHandler implements
     skillPreview: SkillPreview,
   }): void {
     const skillPreview = payload.skillPreview;
-    this.cachedSkillPrompts.delete(skillPreview.id);
 
     const index = this.cachedSkillPreviews.findIndex(
         (cachedSkillPreview) => cachedSkillPreview.id === skillPreview.id);
@@ -72,7 +69,6 @@ export class SkillsWebClientMessageHandler implements
     skillId: string,
   }): void {
     const skillId = payload.skillId;
-    this.cachedSkillPrompts.delete(skillId);
     const index = this.cachedSkillPreviews.findIndex(
         (cachedSkillPreview) => cachedSkillPreview.id === skillId);
     if (index !== -1) {
@@ -89,13 +85,6 @@ export class SkillsWebClientMessageHandler implements
     skill: Skill,
   }): void {
     this.host.skillToInvoke.assignAndSignal(payload.skill);
-  }
-
-  cacheSkillPrompt(skill: Skill) {
-    const preview = skill.preview;
-    if (preview.id && skill.prompt) {
-      this.cachedSkillPrompts.set(preview.id, skill.prompt);
-    }
   }
 
   private combineSkillPreviews() {
@@ -167,7 +156,6 @@ export function glicBrowserHostSkillsMixin<T extends Constructor>(base: T) {
       if (!result.skill) {
         throw new Error('getSkill: failed');
       }
-      this.skillsWebClientMessageHandler.cacheSkillPrompt(result.skill);
       return result.skill;
     }
 
