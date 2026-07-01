@@ -86,7 +86,8 @@ std::unique_ptr<RemoteCommandJob> DeviceCommandsFactoryAsh::BuildJobForType(
     case RemoteCommand::DEVICE_RESET_EUICC:
       return std::make_unique<DeviceCommandResetEuiccJob>();
     case RemoteCommand::FETCH_CRD_AVAILABILITY_INFO:
-      return std::make_unique<DeviceCommandFetchCrdAvailabilityInfoJob>();
+      return std::make_unique<DeviceCommandFetchCrdAvailabilityInfoJob>(
+          local_state);
     case RemoteCommand::FETCH_SUPPORT_PACKET:
       return std::make_unique<DeviceCommandFetchSupportPacketJob>();
     case RemoteCommand::QUERY_GEOLOCATION:
