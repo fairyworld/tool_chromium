@@ -13,6 +13,7 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
+#include "chrome/browser/glic/host/context/glic_sharing_utils.h"
 #include "chrome/browser/glic/host/glic.mojom.h"
 #include "chrome/browser/glic/host/glic_skills_manager.h"
 #include "chrome/browser/glic/host/host.h"
@@ -70,6 +71,9 @@ class GlicSkillsManagerImpl : public GlicSkillsManager, public Host::Observer {
 
   Profile* profile() const { return &*profile_; }
   GlicInstance& instance() { return *instance_; }
+  GlicActiveTabForProfileTracker& active_tab_tracker() {
+    return active_tab_tracker_;
+  }
 
  private:
   tabs::TabInterface* EnsureTabForSkills();
@@ -86,7 +90,7 @@ class GlicSkillsManagerImpl : public GlicSkillsManager, public Host::Observer {
                                  base::OnceCallback<void(bool)> callback);
 
   // The function corresponding to our subscription.
-  void OnFocusedTabChanged(const FocusedTabData& focused_tab_data);
+  void OnActiveTabChanged(tabs::TabInterface* tab);
 
   // Host::Observer
   void WebUiStateChanged(mojom::WebUiState state) override;
@@ -95,8 +99,10 @@ class GlicSkillsManagerImpl : public GlicSkillsManager, public Host::Observer {
   const raw_ref<GlicInstance> instance_;
   const raw_ref<Profile> profile_;
 
-  // We update the set of skills on focused tab changes.
-  base::CallbackListSubscription focused_tab_changed_subscription_;
+  GlicActiveTabForProfileTracker active_tab_tracker_;
+
+  // We update the set of skills on active tab changes.
+  base::CallbackListSubscription active_tab_changed_subscription_;
 
   // Used for observer WebUI state changes; this can also trigger updates.
   base::ScopedObservation<Host, Host::Observer> host_observation_{this};

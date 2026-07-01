@@ -131,6 +131,10 @@ class GlicInstance {
   // Exposes basic pinning controls to external Chrome consumers.
   virtual GlicSharingManager* GetSharingManager() = 0;
 
+  // Returns true if the instance is currently hibernated (its WebUI is not
+  // loaded).
+  virtual bool IsHibernated() const = 0;
+
   // Triggers sending skill previews to the web client.
   virtual void UpdateSkillPreviews(
       std::optional<tabs::TabInterface*> updated_tab) = 0;

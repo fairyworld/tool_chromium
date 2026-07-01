@@ -51,10 +51,10 @@ mojom::SkillPreviewPtr ToMojomSkillPreview(const skills::proto::Skill& skill) {
 
 GlicSkillsManagerImpl::GlicSkillsManagerImpl(GlicInstance* instance,
                                              Profile* profile)
-    : instance_(*instance), profile_(*profile) {
-  focused_tab_changed_subscription_ =
-      instance->host().GetSharingManagerInternal().AddFocusedTabChangedCallback(
-          base::BindRepeating(&GlicSkillsManagerImpl::OnFocusedTabChanged,
+    : instance_(*instance), profile_(*profile), active_tab_tracker_(profile) {
+  active_tab_changed_subscription_ =
+      active_tab_tracker_.AddActiveTabChangedCallback(
+          base::BindRepeating(&GlicSkillsManagerImpl::OnActiveTabChanged,
                               weak_ptr_factory_.GetWeakPtr()));
   host_observation_.Observe(&instance->host());
 }
@@ -77,17 +77,13 @@ void GlicSkillsManagerImpl::UpdateSkillPreviews(
 }
 
 tabs::TabInterface* GlicSkillsManagerImpl::EnsureTabForSkills() {
-  const FocusedTabData& ftd =
-      instance_->host().GetSharingManagerInternal().GetFocusedTabData();
-  tabs::TabInterface* tab = ftd.focus() ? ftd.focus() : ftd.unfocused_tab();
+  tabs::TabInterface* tab = active_tab_tracker_.GetActiveTab();
 
   if (tab) {
     return tab;
   }
 
-  content::WebContents* guest_contents =
-      instance_->host().web_client_contents();
-  if (!guest_contents) {
+  if (instance_->IsHibernated()) {
     return nullptr;
   }
 
@@ -245,8 +241,7 @@ void GlicSkillsManagerImpl::ShowSkillsUiAtRelativePath(
   }
 }
 
-void GlicSkillsManagerImpl::OnFocusedTabChanged(
-    const FocusedTabData& focused_tab_data) {
+void GlicSkillsManagerImpl::OnActiveTabChanged(tabs::TabInterface* tab) {
   UpdateSkillPreviews(std::nullopt);
 }
 
@@ -457,20 +452,17 @@ void GlicSkillsClientSession::UpdateSkillPreviews(
   if (!client_) {
     return;
   }
-  auto* focused_tab = manager_->instance()
-                          .host()
-                          .GetSharingManagerInternal()
-                          .GetFocusedTabData()
-                          .focus();
-  if (!focused_tab) {
+  auto* active_tab = manager_->active_tab_tracker().GetActiveTab();
+  if (!active_tab ||
+      !manager_->instance().GetSharingManager()->IsTabShared(active_tab)) {
     client_->NotifyContextualSkillPreviewsChanged({});
     contextual_skill_previews_.clear();
     return;
   }
-  if (updated_tab && focused_tab != *updated_tab) {
+  if (updated_tab && active_tab != *updated_tab) {
     return;
   }
-  auto* observer = skills::SkillsUpdateObserver::From(focused_tab);
+  auto* observer = skills::SkillsUpdateObserver::From(active_tab);
   if (!observer) {
     return;
   }
