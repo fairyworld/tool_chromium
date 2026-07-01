@@ -22,9 +22,9 @@
 #include "chrome/browser/chromeos/extensions/telemetry/api/common/util.h"
 #include "chrome/browser/chromeos/extensions/telemetry/api/routines/diagnostic_routine.h"
 #include "chrome/browser/chromeos/extensions/telemetry/api/routines/diagnostic_routine_info.h"
-#include "chrome/browser/chromeos/extensions/telemetry/api/routines/remote_diagnostic_routines_service_strategy.h"
 #include "chrome/common/chromeos/extensions/api/diagnostics.h"
-#include "chromeos/ash/components/telemetry_extension/routines/telemetry_diagnostic_routine_service_ash.h"
+#include "chromeos/ash/components/telemetry_extension/routines/routine_converters.h"
+#include "chromeos/ash/services/cros_healthd/public/cpp/service_connection.h"
 #include "chromeos/crosapi/mojom/telemetry_diagnostic_routine_service.mojom.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/web_contents.h"
@@ -108,14 +108,17 @@ DiagnosticRoutineManager::CreateRoutine(
   crosapi::TelemetryDiagnosticRoutineArgument::Tag routine_argument_tag =
       routine_argument->which();
 
-  mojo::PendingRemote<crosapi::TelemetryDiagnosticRoutineControl>
-      control_remote;
+  mojo::PendingRemote<ash::cros_healthd::mojom::RoutineControl> control_remote;
   mojo::PendingReceiver<ash::cros_healthd::mojom::RoutineObserver>
       observer_receiver;
 
-  GetService().CreateRoutine(std::move(routine_argument),
-                             control_remote.InitWithNewPipeAndPassReceiver(),
-                             observer_receiver.InitWithNewPipeAndPassRemote());
+  // Register the two objects with cros_healthd.
+  ash::cros_healthd::ServiceConnection::GetInstance()
+      ->GetRoutinesService()
+      ->CreateRoutine(
+          ash::converters::ConvertRoutinePtr(std::move(routine_argument)),
+          control_remote.InitWithNewPipeAndPassReceiver(),
+          observer_receiver.InitWithNewPipeAndPassRemote());
 
   auto uuid = base::Uuid::GenerateRandomV4();
   DiagnosticRoutineInfo routine_info(extension_id, uuid, browser_context_,
@@ -155,7 +158,7 @@ bool DiagnosticRoutineManager::StartRoutineForExtension(
     return false;
   }
 
-  routine->get()->GetRemote()->Start();
+  routine->get()->GetControl().Start();
   return true;
 }
 
@@ -195,7 +198,8 @@ bool DiagnosticRoutineManager::ReplyToRoutineInquiryForExtension(
     return false;
   }
 
-  routine->get()->GetRemote()->ReplyToInquiry(std::move(reply));
+  routine->get()->GetControl().ReplyInquiry(
+      ash::converters::ConvertRoutinePtr(std::move(reply)));
   return true;
 }
 
@@ -205,14 +209,6 @@ void DiagnosticRoutineManager::OnExtensionUnloaded(
     extensions::UnloadedExtensionReason reason) {
   routines_per_extension_.erase(extension->id());
   app_ui_observers_.erase(extension->id());
-}
-
-ash::TelemetryDiagnosticsRoutineServiceAsh&
-DiagnosticRoutineManager::GetService() {
-  if (!remote_strategy_) {
-    remote_strategy_ = RemoteDiagnosticRoutineServiceStrategy::Create();
-  }
-  return remote_strategy_->GetService();
 }
 
 void DiagnosticRoutineManager::OnAppUiClosed(
