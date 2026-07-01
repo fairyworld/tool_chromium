@@ -89,7 +89,9 @@ source_set("test_support") {
       "test/scoped_nfc_overrider.cc",
       "test/scoped_nfc_overrider.h",
     ]
-  } else {
+  }
+
+  if (!is_ios) {
     sources += [
       "test/fake_hid_manager.cc",
       "test/fake_hid_manager.h",

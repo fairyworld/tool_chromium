@@ -178,6 +178,7 @@ source_set("impl") {
     "//media",
     "//media:media_buildflags",
     "//sandbox/policy",
+    "//services/device/public/cpp/hid",
     "//services/network/public/cpp:flags_and_switches",
     "//services/webnn:webnn_switches",
     "//services/webnn/public/mojom:features",
@@ -264,7 +265,6 @@ source_set("impl") {
       "//extensions/browser",
       "//net",
       "//printing/buildflags",
-      "//services/device/public/cpp/hid",
     ]
     if (is_chromeos) {
       deps += [
