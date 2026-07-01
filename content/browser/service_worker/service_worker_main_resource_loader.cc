@@ -1062,9 +1062,16 @@ void ServiceWorkerMainResourceLoader::Fallback(
       receiver_.Unbind();
 
   if (fallback_callback_) {
-    if (network::mojom::URLLoaderFactory* factory =
-            std::move(fallback_callback_)
-                .Run(std::move(response_header_params))) {
+    // Running the fallback callback may synchronously destroy the owner of
+    // `this`, which in turn calls `DetachedFromRequest()`. Since `receiver_`
+    // is no longer bound at this point, that triggers `delete this`.
+    base::WeakPtr<ServiceWorkerMainResourceLoader> weak_this = AsWeakPtr();
+    network::mojom::URLLoaderFactory* factory =
+        std::move(fallback_callback_).Run(std::move(response_header_params));
+    if (!weak_this) {
+      return;
+    }
+    if (factory) {
       // Fallback to the default factory, and pass the original parameters/mojo
       // pipes of the initial request received in `StartRequest()`.
       factory->CreateLoaderAndStart(std::move(receiver), request_id_, options_,
