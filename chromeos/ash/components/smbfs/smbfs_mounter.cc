@@ -101,6 +101,10 @@ void SmbFsMounter::Mount(SmbFsMounter::DoneCallback callback) {
   if (options_.enable_verbose_logging) {
     mount_options.emplace_back("log-level=-2");
   }
+  if (!options_.account_hash.empty()) {
+    mount_options.emplace_back(
+        base::StrCat({"account_hash=", options_.account_hash}));
+  }
 
   ash::disks::MountPoint::Mount(
       disk_mount_manager_, mount_url_, "" /* source_format */, mount_dir_name_,
