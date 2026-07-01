@@ -24,6 +24,7 @@
 #include "chrome/browser/glic/host/context/glic_tab_favicon_observer.h"
 #include "chrome/browser/glic/host/glic.mojom.h"
 #include "chrome/browser/glic/host/glic_features.mojom-features.h"
+#include "chrome/browser/glic/host/glic_skills_manager.h"
 #include "chrome/browser/glic/host/glic_web_contents_warming_pool.h"
 #include "chrome/browser/glic/host/host.h"
 #include "chrome/browser/glic/host/webui_contents_container.h"
@@ -2294,14 +2295,10 @@ class NewGlicApiTestWithSkills : public NewGlicApiTest {
 
   void SetUpOnMainThread() override {
     NewGlicApiTest::SetUpOnMainThread();
-#if !BUILDFLAG(IS_ANDROID)
     service_ = skills::SkillsServiceFactory::GetForProfile(GetProfile());
     ASSERT_TRUE(service_);
     service_->SetServiceStatusForTesting(
         skills::SkillsService::ServiceStatus::kReady);
-#else
-    NOTREACHED();
-#endif
     ASSERT_OK(OpenGlicForActiveTab());
   }
 
@@ -2314,8 +2311,7 @@ class NewGlicApiTestWithSkills : public NewGlicApiTest {
 
   void WaitForSkillsTab(const std::string& path) {
     ASSERT_TRUE(base::test::RunUntil([&]() {
-      tabs::TabInterface* tab =
-          InProcessBrowserTest::browser()->tab_strip_model()->GetActiveTab();
+      tabs::TabInterface* tab = GetTabListInterface()->GetActiveTab();
       return tab && base::StartsWith(
                         tab->GetContents()->GetLastCommittedURL().spec(),
                         GURL(chrome::kChromeUISkillsURL).Resolve(path).spec());
@@ -2353,7 +2349,6 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills, testGetSkillPreviewsSuccess) {
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills,
                        testDisplaySkillInDialogSuccess) {
-#if !BUILDFLAG(IS_ANDROID)  // TODO(b/520114620): Enable skills on Android.
   ExecuteJsTest();
   ASSERT_TRUE(base::test::RunUntil([&]() {
     tabs::TabInterface* tab = GetTabListInterface()->GetActiveTab();
@@ -2367,7 +2362,6 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills,
     }
     return false;
   }));
-#endif
 }
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills, testShowManageSkillsUi) {
@@ -2382,7 +2376,6 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills, testShowBrowseSkillsUi) {
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills,
                        testSendingContextualSkillsToGlic) {
-#if !BUILDFLAG(IS_ANDROID)  // TODO(b/520114620): Enable skills on Android.
   SkillsService()->AddSkill(/*source_skill_id=*/"", /*name=*/"user_skill_1",
                             /*icon=*/"user_icon_1",
                             /*prompt=*/"test_prompt_1");
@@ -2404,7 +2397,8 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills,
 
   GlicInstanceImpl* instance = GetOnlyGlicInstance();
   ASSERT_TRUE(instance);
-  instance->host().NotifyContextualSkillsChanged(std::move(skills_batch_1));
+  instance->host().skills_manager().NotifyContextualSkillsChanged(
+      std::move(skills_batch_1));
 
   ContinueJsTest();
 
@@ -2413,15 +2407,34 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills,
       "contextual_skill_id_3", "contextual_skill_3", "contextual_skill_icon_3",
       mojom::SkillSource::kFirstParty, "contextual_skill_description_3",
       /*curated_by=*/std::nullopt, /*image_url=*/GURL("https://example.com")));
-  instance->host().NotifyContextualSkillsChanged(std::move(skills_batch_2));
+  instance->host().skills_manager().NotifyContextualSkillsChanged(
+      std::move(skills_batch_2));
 
   ContinueJsTest();
-#endif
+}
+
+IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills,
+                       testSendingPendingContextualSkillsToGlic) {
+  ToggleGlicForActiveTab(/*prevent_close=*/true);
+  GlicInstanceImpl* instance = GetOnlyGlicInstance();
+  ASSERT_TRUE(instance);
+
+  std::vector<mojom::SkillPreviewPtr> skills_batch;
+  skills_batch.push_back(mojom::SkillPreview::New(
+      "contextual_skill_id_1", "contextual_skill_1", "contextual_skill_icon_1",
+      mojom::SkillSource::kFirstParty, "contextual_skill_description_1",
+      /*curated_by=*/std::nullopt, /*image_url=*/GURL("https://example.com")));
+
+  instance->host().skills_manager().NotifyContextualSkillsChanged(
+      std::move(skills_batch));
+
+  ASSERT_OK(WaitForGlicOpen());
+
+  ExecuteJsTest();
 }
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills,
                        testShowManageSkillsUiNoWindow) {
-#if !BUILDFLAG(IS_ANDROID)  // TODO(b/520114620): Enable skills on Android.
   ASSERT_OK_AND_ASSIGN(auto* instance, OpenGlicForActiveTabAndDetach());
   BrowserWindowInterface* browser_to_close = GetBrowserWindowInterface();
   PlatformBrowserTest::CreateIncognitoBrowser();
@@ -2443,11 +2456,9 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills,
     }
     return false;
   }));
-#endif
 }
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills, testCreateSkillNoWindow) {
-#if !BUILDFLAG(IS_ANDROID)  // TODO(b/520114620): Enable skills on Android.
   ASSERT_OK_AND_ASSIGN(auto* instance, OpenGlicForActiveTabAndDetach());
   BrowserWindowInterface* browser_to_close = GetBrowserWindowInterface();
   PlatformBrowserTest::CreateIncognitoBrowser();
@@ -2469,7 +2480,6 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithSkills, testCreateSkillNoWindow) {
     }
     return false;
   }));
-#endif
 }
 #endif
 

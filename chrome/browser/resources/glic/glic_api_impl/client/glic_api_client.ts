@@ -3,10 +3,11 @@
 // found in the LICENSE file.
 
 import {CaptureRegionErrorReason, HostCapability} from '../../glic_api/glic_api.js';
-import type {ActivateTabOptions, AdditionalContext, AnnotatedPageData, CaptureRegionParams, CaptureRegionResult, ChromeVersion, ClientCapabilities, ClientErrorDialogType, ConversationInfo, CounterAbuseVerdict, CreateSkillRequest, CreateTabOptions, ExperimentalTriggeringUpdate, FocusedTabData, FormFactor, GeminiEnterpriseSettings, GetPinCandidatesOptions, GlicBrowserHost, GlicBrowserHostMetrics, GlicHostRegistry, GlicWebClient, ImageBytesResult, ImageInfo, InvokeOptions, MicrophoneStatus, Observable, ObservableValue, OnResponseStoppedDetails, OpenPanelInfo, OpenSettingsOptions, PageMetadata, PanelOpeningData, PanelState, PdfDocumentData, PinCandidate, PinTabsOptions, Platform, ResizeWindowOptions, ResumeActorTaskResult, Screenshot, SelectAutofillSuggestionsDialogRequest, Skill, SkillPreview, SkillsWebClientEvent, TabContextOptions, TabContextResult, TabData, UnpinTabsOptions, UpdateSkillRequest, UserProfileInfo, WebClientMode, ZeroStateSuggestions, ZeroStateSuggestionsOptions, ZeroStateSuggestionsV2} from '../../glic_api/glic_api.js';
+import type {ActivateTabOptions, AdditionalContext, AnnotatedPageData, CaptureRegionParams, CaptureRegionResult, ChromeVersion, ClientCapabilities, ClientErrorDialogType, ConversationInfo, CounterAbuseVerdict, CreateTabOptions, ExperimentalTriggeringUpdate, FocusedTabData, FormFactor, GeminiEnterpriseSettings, GetPinCandidatesOptions, GlicBrowserHost, GlicBrowserHostMetrics, GlicHostRegistry, GlicWebClient, ImageBytesResult, ImageInfo, InvokeOptions, MicrophoneStatus, Observable, ObservableValue, OnResponseStoppedDetails, OpenPanelInfo, OpenSettingsOptions, PageMetadata, PanelOpeningData, PanelState, PdfDocumentData, PinCandidate, PinTabsOptions, Platform, ResizeWindowOptions, ResumeActorTaskResult, Screenshot, SelectAutofillSuggestionsDialogRequest, TabContextOptions, TabContextResult, TabData, UnpinTabsOptions, UserProfileInfo, WebClientMode, ZeroStateSuggestions, ZeroStateSuggestionsOptions, ZeroStateSuggestionsV2} from '../../glic_api/glic_api.js';
 import {ObservableValue as ObservableValueImpl, Subject} from '../../observable.js';
 import {GlicBrowserHostActor} from '../actor/actor_client.js';
 import {glicBrowserHostAnnotationMixin} from '../annotation/annotation_client.js';
+import {glicBrowserHostSkillsMixin} from '../skills/skills_client.js';
 import type {ResponseExtras} from '../transport/messaging.js';
 import {createBidirectionalPostMessageTransport} from '../transport/post_message_transport.js';
 import type {PendingRemote, PostMessageHandler, PostMessageReceiver, PostMessageRemote, PostMessageRouter} from '../transport/post_message_transport.js';
@@ -51,9 +52,6 @@ export class GlicHostRegistryImpl implements GlicHostRegistry {
 // correct parameter and return types.
 class WebClientMessageHandler implements PostMessageHandler<WebClient> {
   private cachedPinnedTabs: TabData[]|undefined = undefined;
-  private cachedSkillPreviews: SkillPreview[] = [];
-  private cachedContextualSkillPreviews: SkillPreview[] = [];
-  private cachedSkillPrompts = new Map<string, string>();
 
   constructor(
       private webClient: GlicWebClient, private host: GlicBrowserHostImpl) {}
@@ -266,60 +264,6 @@ class WebClientMessageHandler implements PostMessageHandler<WebClient> {
     this.host.pinnedTabs.assignAndSignal(this.cachedPinnedTabs);
   }
 
-  notifySkillPreviewsChanged(payload: {
-    skillPreviews: SkillPreview[],
-  }): void {
-    this.cachedSkillPrompts.clear();
-    this.cachedSkillPreviews = payload.skillPreviews;
-    this.host.skillPreviews.assignAndSignal(this.combineSkillPreviews());
-  }
-
-  notifyContextualSkillPreviewsChanged(payload: {
-    contextualSkillPreviews: SkillPreview[],
-  }): void {
-    this.cachedContextualSkillPreviews = payload.contextualSkillPreviews;
-    this.host.skillPreviews.assignAndSignal(this.combineSkillPreviews());
-  }
-
-  notifySkillPreviewChanged(payload: {skillPreview: SkillPreview}): void {
-    const skillPreview = payload.skillPreview;
-    this.cachedSkillPrompts.delete(skillPreview.id);
-
-    const index = this.cachedSkillPreviews.findIndex(
-        (cachedSkillPreview) => cachedSkillPreview.id === skillPreview.id);
-
-    if (index !== -1) {
-      // SkillPreview with the same ID exists, replace it.
-      this.cachedSkillPreviews = [
-        ...this.cachedSkillPreviews.slice(0, index),
-        skillPreview,
-        ...this.cachedSkillPreviews.slice(index + 1),
-      ];
-    } else {
-      // SkillPreview with this ID not found, add it to the cache.
-      this.cachedSkillPreviews = [...this.cachedSkillPreviews, skillPreview];
-    }
-
-    // Signal the change to the host.
-    this.host.skillPreviews.assignAndSignal(this.combineSkillPreviews());
-  }
-
-  notifySkillDeleted(payload: {
-    skillId: string,
-  }): void {
-    const skillId = payload.skillId;
-    this.cachedSkillPrompts.delete(skillId);
-    const index = this.cachedSkillPreviews.findIndex(
-        (cachedSkillPreview) => cachedSkillPreview.id === skillId);
-    if (index !== -1) {
-      // SkillPreview with the same ID exists, remove it.
-      this.cachedSkillPreviews = [
-        ...this.cachedSkillPreviews.slice(0, index),
-        ...this.cachedSkillPreviews.slice(index + 1),
-      ];
-    }
-    this.host.skillPreviews.assignAndSignal(this.combineSkillPreviews());
-  }
 
   pageMetadataChanged(
       payload: {tabId: string, pageMetadata: PageMetadata|null}): void {
@@ -359,16 +303,6 @@ class WebClientMessageHandler implements PostMessageHandler<WebClient> {
     this.host.actorTaskListRowClickedSubject.next(payload.taskId);
   }
 
-  cacheSkillPrompt(skill: Skill) {
-    const preview = skill.preview;
-    if (preview.id && skill.prompt) {
-      this.cachedSkillPrompts.set(preview.id, skill.prompt);
-    }
-  }
-
-  combineSkillPreviews() {
-    return [...this.cachedContextualSkillPreviews, ...this.cachedSkillPreviews];
-  }
 }
 
 class WebClientRegionCaptureHandler implements
@@ -387,8 +321,9 @@ class WebClientRegionCaptureHandler implements
   }
 }
 
-export class GlicBrowserHostImpl extends glicBrowserHostAnnotationMixin
-(GlicBrowserHostActor) implements GlicBrowserHost {
+export class GlicBrowserHostImpl extends glicBrowserHostSkillsMixin
+(glicBrowserHostAnnotationMixin(GlicBrowserHostActor))
+    implements GlicBrowserHost {
   readonly router: PostMessageRouter;
   readonly clientRemote: PostMessageRemote<WebClientHost>;
   private webClientMessageHandler: WebClientMessageHandler;
@@ -430,8 +365,6 @@ export class GlicBrowserHostImpl extends glicBrowserHostAnnotationMixin
   private cachedUserProfile?: Promise<UserProfileInfo>;
   private enableCachedGetUserProfileInfo?: boolean;
   pinnedTabs = ObservableValueImpl.withNoValue<TabData[]>();
-  skillPreviews = ObservableValueImpl.withNoValue<SkillPreview[]>();
-  skillToInvoke = ObservableValueImpl.withNoValue<Skill>();
   pinCandidates: PinCandidatesObservable|undefined;
   captureRegionObservable?: CaptureRegionObservable;
 
@@ -499,6 +432,9 @@ export class GlicBrowserHostImpl extends glicBrowserHostAnnotationMixin
           response.initialState, this.router, response.actorRemote,
           response.actorReceiver);
     }
+    this.initializeSkills(
+        response.initialState, this.router, response.skillsRemote,
+        response.skillsReceiver);
     this.initializeAnnotation(
         response.initialState, this.router, this.clientRemote);
     const state = response.initialState;
@@ -1022,51 +958,6 @@ export class GlicBrowserHostImpl extends glicBrowserHostAnnotationMixin
         .unpinnedAll;
   }
 
-  async createSkill?(request: CreateSkillRequest): Promise<void> {
-    const result =
-        await this.clientRemote.requestWithResponse('createSkill', {request});
-    if (!result.modalOpened) {
-      throw new Error('createSkill: failed to open dialog');
-    }
-  }
-
-  async updateSkill?(request: UpdateSkillRequest): Promise<void> {
-    const result =
-        await this.clientRemote.requestWithResponse('updateSkill', {request});
-    if (!result.modalOpened) {
-      throw new Error('updateSkill: failed to open dialog');
-    }
-  }
-
-  showManageSkillsUi?(): void {
-    this.clientRemote.requestNoResponse('showManageSkillsUi', undefined);
-  }
-
-  showBrowseSkillsUi?(): void {
-    this.clientRemote.requestNoResponse('showBrowseSkillsUi', undefined);
-  }
-
-  async getSkill?(id: string): Promise<Skill> {
-    const result =
-        await this.clientRemote.requestWithResponse('getSkill', {id});
-    if (!result.skill) {
-      throw new Error('getSkill: failed');
-    }
-    this.webClientMessageHandler.cacheSkillPrompt(result.skill);
-    return result.skill;
-  }
-
-  recordSkillsWebClientEvent?(event: SkillsWebClientEvent): void {
-    this.clientRemote.requestNoResponse('recordSkillsWebClientEvent', {event});
-  }
-
-  getSkillPreviews?(): ObservableValue<SkillPreview[]> {
-    return this.skillPreviews;
-  }
-
-  getSkillToInvoke?(): ObservableValue<Skill> {
-    return this.skillToInvoke;
-  }
 
   unpinAllTabs?(options?: UnpinTabsOptions): void {
     this.clientRemote.requestNoResponse('unpinAllTabs', {options});

@@ -136,16 +136,6 @@ void Host::NotifyActorTaskListRowClicked(int32_t task_id) {
   }
 }
 
-void Host::NotifyContextualSkillsChanged(
-    std::vector<mojom::SkillPreviewPtr> contextual_skill_previews) {
-  if (auto* client = GetPrimaryWebClient()) {
-    client->NotifyContextualSkillPreviewsChanged(
-        std::move(contextual_skill_previews));
-  } else {
-    pending_contextual_skills_ = std::move(contextual_skill_previews);
-  }
-}
-
 void Host::GetExperimentalTriggeringUpdates(
     mojo::PendingRemote<mojom::ExperimentalTriggeringUpdatesHandler> handler,
     base::OnceCallback<void(bool)> success_status_callback) {
@@ -422,12 +412,6 @@ void Host::SetWebClient(GlicWebClientAccess* web_client) {
   CHECK(web_client);
   handler_info_->web_client = web_client;
 
-  // TODO(b/507074189): Refactor Skills to use the invoke API.
-  if (!pending_contextual_skills_.empty()) {
-    web_client->NotifyContextualSkillPreviewsChanged(
-        std::move(pending_contextual_skills_));
-    pending_contextual_skills_.clear();
-  }
 
   for (auto& [source, context] : pending_additional_contexts_) {
     web_client->NotifyAdditionalContext(std::move(context));
