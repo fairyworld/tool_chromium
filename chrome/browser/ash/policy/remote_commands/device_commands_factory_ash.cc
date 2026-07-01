@@ -30,6 +30,7 @@
 #include "chrome/browser/browser_process_platform_part.h"
 #include "components/policy/core/common/remote_commands/remote_command_job.h"
 #include "components/policy/proto/device_management_backend.pb.h"
+#include "services/network/public/cpp/shared_url_loader_factory.h"
 
 namespace policy {
 
@@ -50,6 +51,8 @@ std::unique_ptr<RemoteCommandJob> DeviceCommandsFactoryAsh::BuildJobForType(
     RemoteCommandsService* service) {
   // TODO(crbug.com/404133022): Inject global objects into this class.
   PrefService* local_state = g_browser_process->local_state();
+  auto shared_url_loader_factory =
+      g_browser_process->shared_url_loader_factory();
   BrowserPolicyConnectorAsh* browser_policy_connector_ash =
       g_browser_process->platform_part()->browser_policy_connector_ash();
 
@@ -58,7 +61,8 @@ std::unique_ptr<RemoteCommandJob> DeviceCommandsFactoryAsh::BuildJobForType(
       return std::make_unique<DeviceCommandRebootJob>();
     case RemoteCommand::DEVICE_SCREENSHOT:
       return std::make_unique<DeviceCommandScreenshotJob>(
-          CreateScreenshotDelegate());
+          CreateScreenshotDelegate(shared_url_loader_factory,
+                                   browser_policy_connector_ash));
     case RemoteCommand::DEVICE_SET_VOLUME:
       return std::make_unique<DeviceCommandSetVolumeJob>();
     case RemoteCommand::DEVICE_START_CRD_SESSION:
@@ -107,11 +111,14 @@ void DeviceCommandsFactoryAsh::set_commands_for_testing(
 }
 
 std::unique_ptr<DeviceCommandScreenshotJob::Delegate>
-DeviceCommandsFactoryAsh::CreateScreenshotDelegate() {
+DeviceCommandsFactoryAsh::CreateScreenshotDelegate(
+    scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory,
+    BrowserPolicyConnectorAsh* browser_policy_connector_ash) {
   if (device_commands_test_) {
     return std::make_unique<FakeScreenshotDelegate>();
   }
-  return std::make_unique<ScreenshotDelegate>();
+  return std::make_unique<ScreenshotDelegate>(
+      std::move(shared_url_loader_factory), browser_policy_connector_ash);
 }
 
 }  // namespace policy
