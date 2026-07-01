@@ -39,6 +39,7 @@ import org.chromium.base.test.BaseJUnit4ClassRunner;
 import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.base.test.util.MinAndroidSdkLevel;
+import org.chromium.base.test.util.Restriction;
 import org.chromium.base.test.util.UrlUtils;
 import org.chromium.content.common.ContentInternalFeatures;
 import org.chromium.content_public.browser.ContentFeatureList;
@@ -46,6 +47,7 @@ import org.chromium.ui.accessibility.testservice.EventMatcher;
 import org.chromium.ui.accessibility.testservice.IAccessibilityTestHelperService;
 import org.chromium.ui.accessibility.testservice.NodeMatcher;
 import org.chromium.ui.accessibility.testservice.WaitForParams;
+import org.chromium.ui.test.util.DeviceRestriction;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -266,6 +268,7 @@ public class WebContentsAccessibilityE2ETest {
 
     @Test
     @SmallTest
+    @Restriction(DeviceRestriction.RESTRICTION_TYPE_NON_AUTO) // crbug.com/529881530
     public void testAccessibilityServiceReceivesInitialEvent() throws Throwable {
         // Load a page.
         setupTest("<p>hello</p>", new NodeMatcherBuilder().setText("hello").build());
